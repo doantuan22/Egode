@@ -1,6 +1,7 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { RoomTypeWithAvailability } from '../../../features/hotels/types';
 import { formatDateRangeVi } from '../../../lib/utils';
+import { ApiError } from '../../../services/apiClient';
 import { EmptyState } from '../../common/EmptyState';
 import { Icon } from '../../common/Icon';
 import { PageSpinner } from '../../common/PageSpinner';
@@ -33,7 +34,7 @@ export function RoomList({ search, onSearch, roomsQuery, selectedRooms, onQuanti
       {roomsQuery.isLoading ? (
         <PageSpinner className="py-10" />
       ) : roomsQuery.isError ? (
-        <div className="rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink">Không thể tải danh sách phòng</div>
+        <div role="alert" className="rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink">{roomsQuery.error instanceof ApiError && roomsQuery.error.statusCode === 400 ? roomsQuery.error.message : 'Không thể tải danh sách phòng'}</div>
       ) : roomsQuery.data && roomsQuery.data.length === 0 ? (
         <EmptyState icon="bed" title="Không có loại phòng phù hợp." />
       ) : (

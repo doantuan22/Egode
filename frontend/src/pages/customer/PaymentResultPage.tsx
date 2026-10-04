@@ -37,6 +37,8 @@ export default function PaymentResultPage() {
   const latestPayment = booking?.ThanhToan[0];
   const result = booking ? resolvePaymentResult(booking) : null;
   const isConfirmed = result?.kind === 'confirmed';
+  // Confirmed without a single payment row: the booking had nothing to pay (total 0).
+  const isFreeBooking = isConfirmed && booking?.ThanhToan.length === 0;
   const isFailed = result?.kind === 'failed';
   // A failed attempt can be retried only while the booking still holds the rooms.
   const canRetryPayment = isFailed && booking?.TrangThaiDatPhong === BOOKING_STATUS.PENDING_PAYMENT;
@@ -93,8 +95,10 @@ export default function PaymentResultPage() {
     outcome = (
       <ResultBanner
         tone="success"
-        title="Thanh toán thành công!"
-        description="Cảm ơn bạn đã lựa chọn Egode. Đặt phòng của bạn đã được xác nhận."
+        title={isFreeBooking ? 'Đặt phòng thành công!' : 'Thanh toán thành công!'}
+        description={isFreeBooking
+          ? 'Cảm ơn bạn đã lựa chọn Egode. Đơn có tổng thanh toán 0 đ nên được xác nhận ngay, không cần thanh toán.'
+          : 'Cảm ơn bạn đã lựa chọn Egode. Đặt phòng của bạn đã được xác nhận.'}
         actions={<>{bookingLink && linkButton(bookingLink, 'Xem đơn đặt phòng')}{linkButton('/', 'Về trang chủ', 'secondary')}</>}
       >
         {booking && (
@@ -104,13 +108,14 @@ export default function PaymentResultPage() {
             </div>
             <div className="mb-8 rounded-xl border border-border bg-surface-secondary p-5 text-left">
               <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
-                <h2 className="text-base font-semibold text-heading">Tổng quan giao dịch</h2>
-                <StatusBadge domain="payment" status="Thành công" />
+                <h2 className="text-base font-semibold text-heading">{isFreeBooking ? 'Tổng quan đơn' : 'Tổng quan giao dịch'}</h2>
+                {isFreeBooking ? <StatusBadge domain="booking" status={booking.TrangThaiDatPhong} /> : <StatusBadge domain="payment" status="Thành công" />}
               </div>
               <div className="flex items-center justify-between pt-2">
                 <span className="text-sm text-muted">Số tiền thanh toán</span>
-                <span className="text-xl font-bold text-primary">{formatCurrencyVND(latestPayment?.SoTien || 0)}</span>
+                <span className="text-xl font-bold text-primary">{formatCurrencyVND(latestPayment?.SoTien ?? 0)}</span>
               </div>
+              {isFreeBooking && <p className="mt-3 text-xs text-muted">Không phát sinh giao dịch thanh toán cho đơn này.</p>}
             </div>
           </>
         )}

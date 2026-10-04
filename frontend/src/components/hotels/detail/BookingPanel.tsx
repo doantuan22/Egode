@@ -168,8 +168,11 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoCode, onPromo
             loading={isBooking}
             disabled={!quoteMatchesPromo || !quote.KhaDung || quoteQuery.isFetching}
           >
-            {isBooking ? 'Đang xử lý...' : <><span>Tạo đặt phòng</span><Icon name="arrow-right" weight="bold" /></>}
+            {isBooking ? 'Đang xử lý...' : <><span>{quote.TongTienThanhToan === 0 ? 'Xác nhận đặt phòng' : 'Tạo đặt phòng'}</span><Icon name="arrow-right" weight="bold" /></>}
           </Button>
+        )}
+        {isSignedIn && isCustomer && quote.TongTienThanhToan === 0 && (
+          <p className="mt-2 text-center text-[11px] text-ink-muted">Tổng thanh toán 0 đ — đặt phòng được xác nhận ngay, không cần thanh toán.</p>
         )}
       </div>
 

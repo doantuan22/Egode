@@ -2,7 +2,8 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Icon } from '../common/Icon';
 import { searchFormSchema, type SearchFormValues } from '../../features/hotels/schemas';
 import { useLocations } from '../../features/locations/hooks';
-import { toDateInputValue, formatDateRangeVi, formatDateVi } from '../../lib/utils';
+import { formatDateRangeVi, formatDateVi } from '../../lib/utils';
+import { businessToday, latestCheckIn, MAX_NIGHTS } from '../../lib/stayDates';
 import { DateRangePicker } from '../common/DateRangePicker';
 import { Combobox } from '../common/Combobox';
 import { GuestPicker } from '../common/GuestPicker';
@@ -32,8 +33,7 @@ export function TravelSearchBar({ currentSearch, onSearch, variant = 'compact', 
   const id = useId();
   const isStay = variant === 'stay';
   const locations = useLocations(!isStay);
-  const enforceFutureDates = variant !== 'stay';
-  const today = toDateInputValue(new Date());
+  const today = businessToday();
   const destinationOptions = (locations.data ?? []).map((item) => ({ value: item.TenThanhPho, label: item.TenThanhPho }));
   if (draftSearch.location && !destinationOptions.some((item) => item.value === draftSearch.location)) {
     destinationOptions.unshift({ value: draftSearch.location, label: draftSearch.location });
@@ -85,11 +85,8 @@ export function TravelSearchBar({ currentSearch, onSearch, variant = 'compact', 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parsed = searchFormSchema.safeParse(draftSearch);
-    const futureDateInvalid = enforceFutureDates && draftSearch.checkIn < today;
-    if (!parsed.success || futureDateInvalid) {
-      const dateIssue = futureDateInvalid
-        ? { path: ['checkIn'], message: 'Ngày nhận phòng không được trước hôm nay.' }
-        : parsed.success ? undefined : parsed.error.issues.find((issue) => issue.path.includes('checkIn') || issue.path.includes('checkOut'));
+    if (!parsed.success) {
+      const dateIssue = parsed.error.issues.find((issue) => issue.path.includes('checkIn') || issue.path.includes('checkOut'));
       setDateError(dateIssue?.message ?? 'Vui lòng kiểm tra ngày lưu trú.');
       setActiveEditor(dateIssue ? 'dates' : 'guests');
       return;
@@ -124,12 +121,15 @@ export function TravelSearchBar({ currentSearch, onSearch, variant = 'compact', 
     {activeEditor === 'dates' && <div className="travel-search__date-fields">
       <DateRangePicker
         value={{ from: draftSearch.checkIn, to: draftSearch.checkOut }}
-        min={enforceFutureDates ? today : undefined}
+        min={today}
+        maxCheckIn={latestCheckIn()}
+        maxNights={MAX_NIGHTS}
         onChange={({ from, to }) => { updateDraft({ checkIn: from, checkOut: to }); setDateError(''); }}
       />
       <p className="travel-search__hint" aria-live="polite">
         Nhận phòng: <strong>{draftSearch.checkIn ? formatDateVi(draftSearch.checkIn) : 'chưa chọn'}</strong>
         {' · '}Trả phòng: <strong>{draftSearch.checkOut ? formatDateVi(draftSearch.checkOut) : 'chưa chọn'}</strong>
+        {' · '}Tối đa {MAX_NIGHTS} đêm
       </p>
       {dateError && <p className="travel-search__error" role="alert">{dateError}</p>}
     </div>}

@@ -224,6 +224,12 @@ export class BookingsService {
 
       const tongTienThanhToan = tongTienPhong - soTienGiam;
 
+      // Nothing to pay (a promotion — or a free rate — brought the total to 0): the booking is confirmed
+      // right away. It never enters "Chờ thanh toán", so it holds no payment timeout, and no THANH_TOAN
+      // row (SoTien > 0) or gateway call is made for it. A promotion on it counts as used, like any other
+      // non-cancelled booking, from this moment on.
+      const trangThai = tongTienThanhToan === 0 ? BOOKING_STATUS.CONFIRMED : BOOKING_STATUS.PENDING_PAYMENT;
+
       const policy = await this.repository.findActiveCancellationPolicy(tx);
       if (!policy) {
         throw AppError.internal('Chưa có chính sách hủy nào đang hoạt động trong hệ thống');
@@ -242,6 +248,7 @@ export class BookingsService {
         soTienGiam,
         tongTienThanhToan,
         ghiChu: input.ghiChu ?? null,
+        trangThai,
       });
 
       await this.repository.insertBookingLines(
@@ -268,7 +275,7 @@ export class BookingsService {
         KhuyenMai: khuyenMai,
         SoTienGiam: soTienGiam,
         TongTienThanhToan: tongTienThanhToan,
-        TrangThai: BOOKING_STATUS.PENDING_PAYMENT,
+        TrangThai: booking.TrangThai,
         GhiChu: booking.GhiChu,
         ChinhSachHuy: {
           MaChinhSachHuy: policy.MaChinhSachHuy,

@@ -4,6 +4,7 @@ import app from '../../app';
 import { createTestAccount, createTestDiaPhuong, createTestHotel, deleteTestAccount, deleteTestDiaPhuong, deleteTestHotel } from '../../test/factories';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
+import { getPrismaClient } from '../../config/prisma';
 
 const accountIds: number[] = []; const hotelIds: number[] = []; const locationIds: number[] = [];
 let adminToken = ''; let customerToken = ''; let ownerToken = ''; let hotelId = 0;
@@ -38,5 +39,173 @@ describe('admin hotel management (UC33/UC34)', () => {
     const reactivated = await request(app).post(`/api/admin/hotels/${hotelId}/reactivate`).set('Authorization', `Bearer ${adminToken}`);
     expect(reactivated.status).toBe(200); expect(reactivated.body.data.TrangThai).toBe(HOTEL_STATUS.ACTIVE);
     expect((await request(app).get(`/api/hotels/${hotelId}`)).status).toBe(200);
+  });
+});
+
+describe('hotel approval workflow (Bug #1)', () => {
+  const asAdmin = (req: request.Test) => req.set('Authorization', `Bearer ${adminToken}`);
+  const asOwner = (req: request.Test) => req.set('Authorization', `Bearer ${ownerToken}`);
+  const createdHotelIds: number[] = [];
+  let adminAccountId = 0;
+  let locationId = 0;
+
+  const newHotelPayload = () => ({
+    TenKhachSan: `Approval Flow Hotel ${Date.now()}${Math.floor(Math.random() * 1000)}`,
+    DiaChiChiTiet: '99 Approval Street',
+    HangSao: 3,
+    GioNhanPhong: '14:00',
+    GioTraPhong: '12:00',
+    MaDiaPhuong: locationId,
+  });
+  const ownerCreatesHotel = async () => {
+    const res = await asOwner(request(app).post('/api/owner/hotels')).send(newHotelPayload());
+    expect(res.status).toBe(201);
+    createdHotelIds.push(res.body.data.MaKhachSan);
+    return res.body.data as { MaKhachSan: number; TrangThai: string };
+  };
+  const publicStatus = async (id: number) => (await request(app).get(`/api/hotels/${id}`)).status;
+  const dbHotel = (id: number) => getPrismaClient().kHACH_SAN.findUniqueOrThrow({ where: { MaKhachSan: id } });
+
+  beforeAll(async () => {
+    const location = await createTestDiaPhuong();
+    locationId = location.MaDiaPhuong;
+    locationIds.push(locationId);
+    const admin = await createTestAccount({ role: ROLE_NAMES.ADMIN });
+    accountIds.push(admin.account.MaTaiKhoan);
+    adminAccountId = admin.account.MaTaiKhoan;
+    adminToken = await tokenFor(admin.account.Email, admin.plainPassword);
+  });
+  afterAll(async () => {
+    await Promise.all(createdHotelIds.map(deleteTestHotel));
+  });
+
+  it('owner creates a hotel as "Chờ duyệt" and it is not public', async () => {
+    const hotel = await ownerCreatesHotel();
+    expect(hotel.TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(404);
+    const row = await dbHotel(hotel.MaKhachSan);
+    expect(row.MaTaiKhoanDuyet).toBeNull();
+    expect(row.NgayDuyet).toBeNull();
+  });
+
+  it('admin approve → "Hoạt động", records MaTaiKhoanDuyet + NgayDuyet, and the hotel becomes public', async () => {
+    const hotel = await ownerCreatesHotel();
+    const res = await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`));
+    expect(res.status).toBe(200);
+    expect(res.body.data.TrangThai).toBe(HOTEL_STATUS.ACTIVE);
+
+    const row = await dbHotel(hotel.MaKhachSan);
+    expect(row.TrangThai).toBe(HOTEL_STATUS.ACTIVE);
+    expect(row.MaTaiKhoanDuyet).toBe(adminAccountId);
+    expect(row.NgayDuyet).toBeInstanceOf(Date);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(200);
+  });
+
+  it('approving twice, or approving a hotel that does not exist, is rejected', async () => {
+    const hotel = await ownerCreatesHotel();
+    expect((await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`))).status).toBe(200);
+    expect((await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`))).status).toBe(400);
+    expect((await asAdmin(request(app).post('/api/admin/hotels/999999999/approve'))).status).toBe(404);
+  });
+
+  it('admin reject → "Từ chối", never public, and no admin action can move it on afterwards', async () => {
+    const hotel = await ownerCreatesHotel();
+    const res = await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/reject`));
+    expect(res.status).toBe(200);
+    expect(res.body.data.TrangThai).toBe(HOTEL_STATUS.REJECTED);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(404);
+    for (const action of ['approve', 'reactivate', 'suspend', 'reject']) {
+      expect((await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/${action}`))).status).toBe(400);
+    }
+    expect((await dbHotel(hotel.MaKhachSan)).TrangThai).toBe(HOTEL_STATUS.REJECTED);
+  });
+
+  it('reactivate is not a shortcut to approval: a pending hotel can be neither reactivated nor suspended', async () => {
+    const hotel = await ownerCreatesHotel();
+    expect((await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/reactivate`))).status).toBe(400);
+    expect((await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/suspend`))).status).toBe(400);
+    expect((await dbHotel(hotel.MaKhachSan)).TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(404);
+  });
+
+  it('two approvals at once: exactly one succeeds', async () => {
+    const hotel = await ownerCreatesHotel();
+    const results = await Promise.all([
+      asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`)),
+      asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`)),
+    ]);
+    expect(results.map((r) => r.status).sort()).toEqual([200, 400]);
+  });
+
+  it('admin suspend → not public; admin reactivate → public again', async () => {
+    const hotel = await ownerCreatesHotel();
+    await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`));
+    const suspended = await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/suspend`));
+    expect(suspended.body.data.TrangThai).toBe(HOTEL_STATUS.SUSPENDED);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(404);
+    const reactivated = await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/reactivate`));
+    expect(reactivated.body.data.TrangThai).toBe(HOTEL_STATUS.ACTIVE);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(200);
+  });
+
+  it('owner deactivate → not public; owner reactivate of an approved hotel → public again', async () => {
+    const hotel = await ownerCreatesHotel();
+    await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`));
+
+    const off = await asOwner(request(app).post(`/api/owner/hotels/${hotel.MaKhachSan}/deactivate`));
+    expect(off.status).toBe(200);
+    expect(off.body.data.TrangThai).toBe(HOTEL_STATUS.INACTIVE);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(404);
+
+    const on = await asOwner(request(app).post(`/api/owner/hotels/${hotel.MaKhachSan}/reactivate`));
+    expect(on.status).toBe(200);
+    expect(on.body.data.TrangThai).toBe(HOTEL_STATUS.ACTIVE);
+    expect(await publicStatus(hotel.MaKhachSan)).toBe(200);
+  });
+
+  it('owner cannot activate a hotel an admin never approved (pending / rejected / inactive without approval)', async () => {
+    const pending = await ownerCreatesHotel();
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${pending.MaKhachSan}/reactivate`))).status).toBe(400);
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${pending.MaKhachSan}/deactivate`))).status).toBe(400);
+
+    await asAdmin(request(app).post(`/api/admin/hotels/${pending.MaKhachSan}/reject`));
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${pending.MaKhachSan}/reactivate`))).status).toBe(400);
+
+    // Forged state: INACTIVE but with no approval trail must still be refused.
+    const never = await ownerCreatesHotel();
+    await getPrismaClient().kHACH_SAN.update({ where: { MaKhachSan: never.MaKhachSan }, data: { TrangThai: HOTEL_STATUS.INACTIVE } });
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${never.MaKhachSan}/reactivate`))).status).toBe(400);
+
+    for (const h of [pending, never]) expect(await publicStatus(h.MaKhachSan)).toBe(404);
+  });
+
+  it('owner cannot reactivate or deactivate a hotel suspended by an admin', async () => {
+    const hotel = await ownerCreatesHotel();
+    await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/approve`));
+    await asAdmin(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/suspend`));
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${hotel.MaKhachSan}/reactivate`))).status).toBe(400);
+    expect((await asOwner(request(app).post(`/api/owner/hotels/${hotel.MaKhachSan}/deactivate`))).status).toBe(400);
+    expect((await dbHotel(hotel.MaKhachSan)).TrangThai).toBe(HOTEL_STATUS.SUSPENDED);
+  });
+
+  it('a customer or an owner cannot drive the admin workflow', async () => {
+    const hotel = await ownerCreatesHotel();
+    for (const action of ['approve', 'reject']) {
+      expect((await request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/${action}`).set('Authorization', `Bearer ${customerToken}`)).status).toBe(403);
+      expect((await asOwner(request(app).post(`/api/admin/hotels/${hotel.MaKhachSan}/${action}`))).status).toBe(403);
+    }
+    expect((await request(app).post(`/api/owner/hotels/${hotel.MaKhachSan}/reactivate`).set('Authorization', `Bearer ${customerToken}`)).status).toBe(403);
+    expect((await dbHotel(hotel.MaKhachSan)).TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL);
+  });
+
+  it('the admin list can be filtered to the approval queue ("Chờ duyệt")', async () => {
+    const hotel = await ownerCreatesHotel();
+    const res = await asAdmin(request(app).get(`/api/admin/hotels?TrangThai=${encodeURIComponent(HOTEL_STATUS.PENDING_APPROVAL)}&limit=100`));
+    expect(res.status).toBe(200);
+    const ids = res.body.data.map((h: { MaKhachSan: number; TrangThai: string }) => {
+      expect(h.TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL);
+      return h.MaKhachSan;
+    });
+    expect(ids).toContain(hotel.MaKhachSan);
   });
 });

@@ -16,13 +16,10 @@ import { getPrismaClient } from '../../config/prisma';
 import { env } from '../../config/env';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-status';
+import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-const addDays = (days: number): Date => {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d;
-};
+// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 const loginAndGetToken = async (email: string, password: string) => {

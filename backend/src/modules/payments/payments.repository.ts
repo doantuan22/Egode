@@ -32,6 +32,45 @@ export class PaymentsRepository {
     });
   }
 
+  /**
+   * Takes an exclusive row lock on the booking (held until the surrounding transaction ends) and re-reads it.
+   * Concurrent "create payment" requests for the same booking queue here, so each one sees the payments
+   * written by the previous one and at most one "Chờ xử lý" payment can exist per booking.
+   */
+  async lockBookingById(tx: Prisma.TransactionClient, maDatPhong: number) {
+    await tx.$queryRaw<Array<{ MaDatPhong: number }>>(Prisma.sql`
+      SELECT MaDatPhong
+      FROM DAT_PHONG WITH (UPDLOCK, HOLDLOCK, ROWLOCK)
+      WHERE MaDatPhong = ${maDatPhong}
+    `);
+    return tx.dAT_PHONG.findUnique({ where: { MaDatPhong: maDatPhong } });
+  }
+
+  async findSuccessfulPaymentTx(tx: Prisma.TransactionClient, maDatPhong: number) {
+    return tx.tHANH_TOAN.findFirst({ where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.SUCCESS } });
+  }
+
+  /** The booking's still-open attempt, if any (oldest first, so a legacy duplicate resolves deterministically). */
+  async findPendingPaymentTx(tx: Prisma.TransactionClient, maDatPhong: number) {
+    return tx.tHANH_TOAN.findFirst({
+      where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.PENDING },
+      orderBy: { MaThanhToan: 'asc' },
+    });
+  }
+
+  async insertPaymentTx(tx: Prisma.TransactionClient, data: InsertPaymentData) {
+    return tx.tHANH_TOAN.create({
+      data: {
+        MaDatPhong: data.maDatPhong,
+        SoTien: data.soTien,
+        PhuongThucThanhToan: data.phuongThucThanhToan,
+        MaGiaoDichDoiTac: data.maGiaoDichDoiTac,
+        TrangThai: data.trangThai,
+        ThoiGianGiaoDich: data.thoiGianGiaoDich,
+      },
+    });
+  }
+
   async findExistingSuccessfulPayment(maDatPhong: number) {
     const prisma = getPrismaClient();
     return prisma.tHANH_TOAN.findFirst({ where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.SUCCESS } });

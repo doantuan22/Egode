@@ -33,6 +33,8 @@ export const updateHotel = async (id: number, payload: Partial<HotelFormValues>)
 };
 export const deactivateHotel = async (id: number): Promise<OwnerHotel> => { const res = await apiClient<OwnerHotel>(`/owner/hotels/${id}/deactivate`, { method: 'POST' }); return res.data as OwnerHotel; };
 
+export const reactivateHotel = async (id: number): Promise<OwnerHotel> => { const res = await apiClient<OwnerHotel>(`/owner/hotels/${id}/reactivate`, { method: 'POST' }); return res.data as OwnerHotel; };
+
 export const replaceHotelAmenities = async (id: number, amenityIds: number[]): Promise<OwnerHotel> => {
   const res = await apiClient<OwnerHotel>(`/owner/hotels/${id}/amenities`, {
     method: 'PUT',

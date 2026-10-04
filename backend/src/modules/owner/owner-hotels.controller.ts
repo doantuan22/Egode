@@ -49,6 +49,16 @@ export class OwnerHotelsController {
     }
   };
 
+  reactivate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params as unknown as { id: number };
+      const hotel = await this.service.reactivate(this.ownerId(req), id);
+      sendSuccess(res, hotel, 'Khách sạn đã hoạt động trở lại');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   deactivate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };

@@ -47,6 +47,28 @@ describe('PaymentResultPage without a booking id', () => {
   });
 });
 
+describe('PaymentResultPage for a booking with nothing to pay (total 0, confirmed on the spot)', () => {
+  it('reports a successful booking — not a payment — with 0 đ and no transaction', () => {
+    mockStatus({ data: data('Đã xác nhận', []) });
+    renderPage('?bookingId=42&status=success');
+
+    expect(screen.getByRole('heading', { name: 'Đặt phòng thành công!' })).toBeInTheDocument();
+    expect(screen.getByText(/không cần thanh toán/)).toBeInTheDocument();
+    expect(screen.getByText(formatCurrencyVND(0))).toBeInTheDocument();
+    expect(screen.getByText('Không phát sinh giao dịch thanh toán cho đơn này.')).toBeInTheDocument();
+    expect(screen.queryByText('Thanh toán thành công!')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Thử thanh toán lại/ })).not.toBeInTheDocument();
+  });
+
+  it('a paid booking still reads "Thanh toán thành công!"', () => {
+    mockStatus({ data: data('Đã xác nhận', [payment('Thành công')]) });
+    renderPage('?bookingId=42&status=success');
+
+    expect(screen.getByRole('heading', { name: 'Thanh toán thành công!' })).toBeInTheDocument();
+    expect(screen.queryByText('Không phát sinh giao dịch thanh toán cho đơn này.')).not.toBeInTheDocument();
+  });
+});
+
 describe('PaymentResultPage when the booking expired but the payment went through', () => {
   const render = (refunds: RefundView[]) => {
     mockStatus({ data: data('Đã hủy', [payment('Thành công', refunds)]) });

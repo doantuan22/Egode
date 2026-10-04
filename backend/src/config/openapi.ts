@@ -104,7 +104,7 @@ export const openApiSpec = {
         tags: ['Booking'],
         security: [{ BearerAuth: [] }],
         description:
-          'Everything (availability, per-night price, promotion, cancellation policy) is recomputed server-side inside a locked SQL Server transaction — a prior Quote is never trusted. Rows in QUY_PHONG_GIA for the requested room types/date range are locked WITH (UPDLOCK, ROWLOCK, HOLDLOCK) so two concurrent requests contending for the last room can never both commit. Booking always starts at TrangThai="Chờ thanh toán"; no payment is processed in M5.',
+          'Everything (availability, per-night price, promotion, cancellation policy) is recomputed server-side inside a locked SQL Server transaction — a prior Quote is never trusted. Rows in QUY_PHONG_GIA for the requested room types/date range are locked WITH (UPDLOCK, ROWLOCK, HOLDLOCK) so two concurrent requests contending for the last room can never both commit. A booking starts at TrangThai="Chờ thanh toán" (payment is a separate step) — except when the payable total is 0 (a promotion or a free rate), which is confirmed immediately (TrangThai="Đã xác nhận") with no THANH_TOAN row. Stay dates are validated for every stay endpoint (search, rooms, quote, booking): checkIn >= today in Asia/Ho_Chi_Minh, checkOut > checkIn, 1..30 nights, checkIn at most 365 days ahead.',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         requestBody: {
           required: true,
@@ -538,6 +538,16 @@ export const openApiSpec = {
         responses: { '200': { description: 'Deactivated (idempotent)' }, '403': { description: "Not this owner's hotel" }, '404': { description: 'Not found' } },
       },
     },
+    '/owner/hotels/{id}/reactivate': {
+      post: {
+        summary: 'Reactivate an owned hotel that the owner switched off ("Ngừng hoạt động" → "Hoạt động")',
+        description: 'Only for a hotel an admin has already approved. A hotel that is pending, rejected or suspended cannot be activated by its owner.',
+        tags: ['Owner'],
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Reactivated (idempotent when already active)' }, '400': { description: 'Hotel was never approved or is not inactive' }, '403': { description: "Not this owner's hotel" }, '404': { description: 'Not found' }, '409': { description: 'Status changed concurrently' } },
+      },
+    },
     '/owner/hotels/{hotelId}/bookings': {
       get: {
         summary: 'List bookings for an owned hotel (UC24), paginated/filterable',
@@ -899,10 +909,26 @@ export const openApiSpec = {
         responses: { '200': { description: 'Hotel updated' }, '400': { description: 'Invalid editable data' }, '403': { description: 'Admin role required' }, '404': { description: 'Hotel not found' } },
       },
     },
+    '/admin/hotels/{id}/approve': {
+      post: {
+        summary: 'Approve a pending hotel ("Chờ duyệt" → "Hoạt động", admin only)',
+        description: 'Atomically sets TrangThai, MaTaiKhoanDuyet (the calling admin) and NgayDuyet. Only valid from "Chờ duyệt".', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
+        responses: { '200': { description: 'Hotel approved' }, '400': { description: 'Hotel is not pending approval' }, '403': { description: 'Admin role required' }, '404': { description: 'Hotel not found' } },
+      },
+    },
+    '/admin/hotels/{id}/reject': {
+      post: {
+        summary: 'Reject a pending hotel ("Chờ duyệt" → "Từ chối", admin only)',
+        description: 'Only valid from "Chờ duyệt". A rejected hotel never appears publicly.', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
+        responses: { '200': { description: 'Hotel rejected' }, '400': { description: 'Hotel is not pending approval' }, '403': { description: 'Admin role required' }, '404': { description: 'Hotel not found' } },
+      },
+    },
     '/admin/hotels/{id}/suspend': {
       post: {
         summary: 'Suspend a hotel from public sellable inventory (UC34, admin only)',
-        description: 'Idempotent. A suspended hotel no longer appears in public discovery or booking flows.', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        description: 'Idempotent. Only an active hotel can be suspended. A suspended hotel no longer appears in public discovery or booking flows.', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
         responses: { '200': { description: 'Hotel state changed to Đình chỉ' }, '403': { description: 'Admin role required' }, '404': { description: 'Hotel not found' } },
       },

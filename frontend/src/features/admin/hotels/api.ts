@@ -20,5 +20,7 @@ export const listAdminHotels = async (query: AdminHotelQuery): Promise<AdminHote
 export const getAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}`)).data as AdminHotel;
 export type UpdateAdminHotelPayload = Pick<AdminHotel, 'TenKhachSan' | 'DiaChiChiTiet' | 'HangSao' | 'MoTa'>;
 export const updateAdminHotel = async (id: number, payload: Partial<UpdateAdminHotelPayload>): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })).data as AdminHotel;
+export const approveAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/approve`, { method: 'POST' })).data as AdminHotel;
+export const rejectAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reject`, { method: 'POST' })).data as AdminHotel;
 export const suspendAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/suspend`, { method: 'POST' })).data as AdminHotel;
 export const reactivateAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reactivate`, { method: 'POST' })).data as AdminHotel;

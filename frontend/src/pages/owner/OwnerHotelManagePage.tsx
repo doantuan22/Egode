@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams, Link } from 'react-router-dom';
-import { useMyHotel, useUpdateHotel, useReplaceHotelAmenities, useUploadHotelImage, useDeleteHotelImage, useSetPrimaryHotelImage, useDeactivateHotel } from '../../features/owner/hooks';
+import { useMyHotel, useUpdateHotel, useReplaceHotelAmenities, useUploadHotelImage, useDeleteHotelImage, useSetPrimaryHotelImage, useDeactivateHotel, useReactivateHotel } from '../../features/owner/hooks';
 import { useLocations } from '../../features/locations/hooks';
 import { useAmenities } from '../../features/amenities/hooks';
 import { hotelFormSchema, HotelFormSchemaValues } from '../../features/owner/schemas';
@@ -26,6 +26,7 @@ export default function OwnerHotelManagePage() {
   const deleteImageMutation = useDeleteHotelImage(hotelId);
   const setPrimaryMutation = useSetPrimaryHotelImage(hotelId);
   const deactivateMutation = useDeactivateHotel(hotelId);
+  const reactivateMutation = useReactivateHotel(hotelId);
   const confirm = useConfirm();
 
   const [imageError, setImageError] = useState<string | null>(null);
@@ -117,13 +118,16 @@ export default function OwnerHotelManagePage() {
             <nav aria-label="Thao tác khách sạn">
               <Link to={`/owner/revenue?hotelId=${hotelId}`}>Doanh thu</Link>
               <Link to={`/owner/bookings?hotelId=${hotelId}`}>Quản lý đặt phòng</Link>
-              {hotel.TrangThai !== 'Ngừng hoạt động' && <button type="button" className="is-danger" disabled={deactivateMutation.isPending} onClick={async () => { if (await confirm({ title: 'Ngừng kinh doanh khách sạn?', description: 'Các đặt phòng lịch sử sẽ được giữ lại.', confirmLabel: 'Ngừng kinh doanh', variant: 'danger' })) deactivateMutation.mutate(); }}>{deactivateMutation.isPending ? 'Đang xử lý...' : 'Ngừng kinh doanh'}</button>}
+              {hotel.TrangThai === 'Hoạt động' && <button type="button" className="is-danger" disabled={deactivateMutation.isPending} onClick={async () => { if (await confirm({ title: 'Ngừng kinh doanh khách sạn?', description: 'Các đặt phòng lịch sử sẽ được giữ lại.', confirmLabel: 'Ngừng kinh doanh', variant: 'danger' })) deactivateMutation.mutate(); }}>{deactivateMutation.isPending ? 'Đang xử lý...' : 'Ngừng kinh doanh'}</button>}
+              {hotel.TrangThai === 'Ngừng hoạt động' && hotel.NgayDuyet && <button type="button" disabled={reactivateMutation.isPending} onClick={async () => { if (await confirm({ title: 'Bật lại hoạt động khách sạn?', description: 'Khách sạn sẽ hiển thị công khai và nhận đặt phòng trở lại.', confirmLabel: 'Bật lại' })) reactivateMutation.mutate(); }}>{reactivateMutation.isPending ? 'Đang xử lý...' : 'Bật lại hoạt động'}</button>}
             </nav>
           </details>
         </div>
       </header>
 
       {deactivateMutation.isSuccess && <div role="status" className="rounded-lg bg-success-light border border-success/30 px-4 py-3 text-sm text-success-ink">Khách sạn đã ngừng kinh doanh; lịch sử booking được giữ lại.</div>}
+      {reactivateMutation.isSuccess && <div role="status" className="rounded-lg bg-success-light border border-success/30 px-4 py-3 text-sm text-success-ink">Khách sạn đã hoạt động trở lại.</div>}
+      {reactivateMutation.isError && <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">{reactivateMutation.error instanceof ApiError ? reactivateMutation.error.message : 'Không thể bật lại khách sạn'}</div>}
       {deactivateMutation.isError && <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">{deactivateMutation.error instanceof ApiError ? deactivateMutation.error.message : 'Không thể ngừng kinh doanh khách sạn'}</div>}
 
       <form id="owner-hotel-editor" onSubmit={handleSubmit((v) => updateMutation.mutate(v))} noValidate className="flex flex-col gap-5">

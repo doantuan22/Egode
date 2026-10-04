@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { toDateInputValue } from '../../lib/utils';
+import { addDaysToDateKey, businessToday, findStayDateIssue } from '../../lib/stayDates';
 
 export const searchFormSchema = z
   .object({
@@ -8,9 +8,9 @@ export const searchFormSchema = z
     checkOut: z.string().min(1, 'Vui lòng chọn ngày trả phòng'),
     guests: z.coerce.number().int().min(1, 'Ít nhất 1 khách').max(50, 'Tối đa 50 khách'),
   })
-  .refine((data) => data.checkOut > data.checkIn, {
-    message: 'Ngày trả phòng phải sau ngày nhận phòng',
-    path: ['checkOut'],
+  .superRefine((data, ctx) => {
+    const issue = findStayDateIssue(data.checkIn, data.checkOut);
+    if (issue) ctx.addIssue({ code: 'custom', path: [issue.field], message: issue.message });
   });
 export type SearchFormValues = z.infer<typeof searchFormSchema>;
 
@@ -25,9 +25,6 @@ export const parseGuests = (raw: string | null): number => {
 
 /** Defaults a fresh search form to tomorrow → the day after (a valid 1-night stay). */
 export const defaultSearchDates = (): { checkIn: string; checkOut: string } => {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const dayAfter = new Date();
-  dayAfter.setDate(dayAfter.getDate() + 2);
-  return { checkIn: toDateInputValue(tomorrow), checkOut: toDateInputValue(dayAfter) };
+  const today = businessToday();
+  return { checkIn: addDaysToDateKey(today, 1), checkOut: addDaysToDateKey(today, 2) };
 };

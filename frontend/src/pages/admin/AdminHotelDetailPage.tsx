@@ -3,9 +3,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useEffect, useState } from 'react';
 import { ApiError } from '../../services/apiClient';
 import { useConfirm } from '../../components/common/FeedbackProvider';
-import { getAdminHotel, reactivateAdminHotel, suspendAdminHotel, updateAdminHotel, type UpdateAdminHotelPayload } from '../../features/admin/hotels/api';
+import { approveAdminHotel, getAdminHotel, reactivateAdminHotel, rejectAdminHotel, suspendAdminHotel, updateAdminHotel, type UpdateAdminHotelPayload } from '../../features/admin/hotels/api';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+
+type HotelAction = 'update' | 'approve' | 'reject' | 'suspend' | 'reactivate';
 
 export default function AdminHotelDetailPage() {
   const id = Number(useParams().id); 
@@ -15,8 +17,15 @@ export default function AdminHotelDetailPage() {
   
   const [saved, setSaved] = useState(false);
   const mutation = useMutation({ 
-    mutationFn: ({ action, payload }: { action: 'update' | 'suspend' | 'reactivate'; payload?: Partial<UpdateAdminHotelPayload> }) => 
-      action === 'update' ? updateAdminHotel(id, payload ?? {}) : action === 'suspend' ? suspendAdminHotel(id) : reactivateAdminHotel(id), 
+    mutationFn: ({ action, payload }: { action: HotelAction; payload?: Partial<UpdateAdminHotelPayload> }) => {
+      switch (action) {
+        case 'update': return updateAdminHotel(id, payload ?? {});
+        case 'approve': return approveAdminHotel(id);
+        case 'reject': return rejectAdminHotel(id);
+        case 'suspend': return suspendAdminHotel(id);
+        case 'reactivate': return reactivateAdminHotel(id);
+      }
+    },
     onSuccess: () => { setSaved(true); queryClient.invalidateQueries({ queryKey: ['admin', 'hotels'] }); } 
   });
   const confirm = useConfirm();
@@ -46,11 +55,19 @@ export default function AdminHotelDetailPage() {
   const suspend = async () => {
     if (await confirm({ title: 'Đình chỉ khách sạn?', description: 'Cơ sở sẽ không thể tiếp nhận đặt phòng mới.', confirmLabel: 'Đình chỉ', variant: 'danger' })) mutation.mutate({ action: 'suspend' });
   };
+  const approve = async () => {
+    if (await confirm({ title: 'Duyệt khách sạn?', description: `Khách sạn ${query.data?.TenKhachSan ?? ''} sẽ được hiển thị công khai và nhận đặt phòng.`, confirmLabel: 'Duyệt' })) mutation.mutate({ action: 'approve' });
+  };
+  const reject = async () => {
+    if (await confirm({ title: 'Từ chối khách sạn?', description: 'Khách sạn sẽ không được hiển thị công khai.', confirmLabel: 'Từ chối', variant: 'danger' })) mutation.mutate({ action: 'reject' });
+  };
   const reactivate = async () => {
     if (await confirm({ title: 'Kích hoạt lại khách sạn?', description: `Khách sạn ${query.data?.TenKhachSan ?? ''} sẽ được chuyển về trạng thái hoạt động.`, confirmLabel: 'Kích hoạt lại' })) mutation.mutate({ action: 'reactivate' });
   };
   
   const isActive = hotel.TrangThai === 'Hoạt động';
+  const isPending = hotel.TrangThai === 'Chờ duyệt';
+  const isSuspended = hotel.TrangThai === 'Đình chỉ';
 
   return (
     <div className="flex flex-col gap-6 max-w-[800px] mx-auto w-full">
@@ -87,7 +104,7 @@ export default function AdminHotelDetailPage() {
           )}
           {mutation.isError && (
             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-              Thao tác thất bại, vui lòng thử lại
+              {mutation.error instanceof ApiError ? mutation.error.message : 'Thao tác thất bại, vui lòng thử lại'}
             </div>
           )}
 
@@ -144,11 +161,23 @@ export default function AdminHotelDetailPage() {
               <i className="ph-fill ph-shield-warning text-warning"></i> Quản lý vận hành & Trạng thái
             </h4>
             <div className="text-xs text-ink-muted leading-relaxed mb-3">
-              Đình chỉ khách sạn sẽ ẩn cơ sở khỏi kết quả tìm kiếm và ngăn chặn các đặt phòng mới. Tuy nhiên, các đặt phòng hiện tại vẫn phải được khách sạn xử lý.
+              {isPending
+                ? 'Khách sạn đang chờ duyệt và chưa hiển thị công khai. Duyệt để cho phép nhận đặt phòng, hoặc từ chối hồ sơ.'
+                : 'Đình chỉ khách sạn sẽ ẩn cơ sở khỏi kết quả tìm kiếm và ngăn chặn các đặt phòng mới. Tuy nhiên, các đặt phòng hiện tại vẫn phải được khách sạn xử lý.'}
             </div>
             
             <div className="flex items-center gap-3 pt-1">
-              {isActive ? (
+              {isPending && (
+                <>
+                  <Button type="button" onClick={approve} disabled={mutation.isPending} variant="success-outline">
+                    <i className="ph ph-check-circle"></i> {mutation.isPending ? 'Đang xử lý...' : 'Duyệt khách sạn'}
+                  </Button>
+                  <Button type="button" onClick={reject} disabled={mutation.isPending} variant="danger-outline">
+                    <i className="ph ph-x-circle"></i> {mutation.isPending ? 'Đang xử lý...' : 'Từ chối'}
+                  </Button>
+                </>
+              )}
+              {isActive && (
                 <Button
                   type="button"
                   onClick={suspend}
@@ -156,7 +185,8 @@ export default function AdminHotelDetailPage() {
                 >
                   <i className="ph ph-prohibit"></i> {mutation.isPending ? 'Đang xử lý...' : 'Tạm đình chỉ hoạt động'}
                 </Button>
-              ) : (
+              )}
+              {isSuspended && (
                 <Button
                   type="button"
                   onClick={reactivate}
@@ -164,6 +194,9 @@ export default function AdminHotelDetailPage() {
                 >
                   <i className="ph ph-check-circle"></i> {mutation.isPending ? 'Đang xử lý...' : 'Kích hoạt lại cơ sở'}
                 </Button>
+              )}
+              {!isPending && !isActive && !isSuspended && (
+                <p className="text-xs text-ink-muted">Không có thao tác nào khả dụng ở trạng thái "{hotel.TrangThai}".</p>
               )}
             </div>
           </div>

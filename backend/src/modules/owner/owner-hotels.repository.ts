@@ -47,6 +47,16 @@ export class OwnerHotelsRepository {
     return prisma.kHACH_SAN.update({ where: { MaKhachSan: maKhachSan }, data });
   }
 
+  /** Atomic compare-and-set on TrangThai; false when the hotel is no longer in the expected state. */
+  async changeStatus(maKhachSan: number, from: string, to: string, now: Date): Promise<boolean> {
+    const prisma = getPrismaClient();
+    const result = await prisma.kHACH_SAN.updateMany({
+      where: { MaKhachSan: maKhachSan, TrangThai: from },
+      data: { TrangThai: to, NgayCapNhat: now },
+    });
+    return result.count === 1;
+  }
+
   async replaceAmenities(maKhachSan: number, amenityIds: number[]) {
     const prisma = getPrismaClient();
     await prisma.$transaction([

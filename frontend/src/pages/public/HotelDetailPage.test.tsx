@@ -295,6 +295,48 @@ describe('HotelDetailPage price quote', () => {
 
     expect(bookingMutate.mock.calls[0][0]).toEqual({ ...request(), promoCode: undefined, ghiChu: undefined });
   });
+
+  describe('where the visitor lands once the booking is created', () => {
+    const openWithDestinations = () =>
+      renderWithProviders(
+        <Routes>
+          <Route path="/hotels/:id" element={<FeedbackProvider><HotelDetailPage /></FeedbackProvider>} />
+          <Route path="/bookings/:id" element={<h1>Chi tiết đơn đặt phòng</h1>} />
+          <Route path="/payment/result" element={<h1>Kết quả đặt phòng</h1>} />
+        </Routes>,
+        { route: '/hotels/1?checkIn=2030-01-01&checkOut=2030-01-02&guests=2' }
+      );
+
+    const bookAndReturn = async (booking: { MaDatPhong: number; TrangThai: string }) => {
+      const bookingMutate = vi.fn((_payload: unknown, options?: { onSuccess?: (b: unknown) => void }) => options?.onSuccess?.(booking));
+      vi.mocked(useCreateBooking).mockReturnValue({ ...idle, mutate: bookingMutate } as unknown as ReturnType<typeof useCreateBooking>);
+      openWithDestinations();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.click(screen.getByRole('button', { name: /(Tạo|Xác nhận) đặt phòng/ }));
+    };
+
+    it('an unpaid booking opens its detail page, where the payment is made', async () => {
+      await bookAndReturn({ MaDatPhong: 7, TrangThai: 'Chờ thanh toán' });
+      expect(await screen.findByRole('heading', { name: 'Chi tiết đơn đặt phòng' })).toBeInTheDocument();
+    });
+
+    it('a booking confirmed on the spot (total 0) skips payment and goes straight to the result page', async () => {
+      mockQuote({ data: { ...quote, PromoHopLe: true, SoTienGiam: 700000, TongTienThanhToan: 0, PromoThongBao: 'Áp dụng thành công' } });
+      await bookAndReturn({ MaDatPhong: 8, TrangThai: 'Đã xác nhận' });
+      expect(await screen.findByRole('heading', { name: 'Kết quả đặt phòng' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Chi tiết đơn đặt phòng' })).not.toBeInTheDocument();
+    });
+
+    it('with a total of 0 the button and the note say nothing has to be paid', async () => {
+      mockQuote({ data: { ...quote, PromoHopLe: true, SoTienGiam: 700000, TongTienThanhToan: 0, PromoThongBao: 'Áp dụng thành công' } });
+      openWithDestinations();
+      await addRoom(userEvent.setup());
+
+      expect(screen.getByRole('button', { name: /Xác nhận đặt phòng/ })).toBeInTheDocument();
+      expect(screen.getByText(/không cần thanh toán/)).toBeInTheDocument();
+    });
+  });
 });
 
 describe('HotelDetailPage page sections', () => {

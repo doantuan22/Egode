@@ -37,6 +37,8 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
   const activeCount = hotels.filter(h => h.TrangThai === 'Hoạt động').length;
   const pendingCount = hotels.filter(h => h.TrangThai === 'Chờ duyệt').length;
   const suspendedCount = hotels.filter(h => h.TrangThai === 'Đình chỉ').length;
+  const rejectedCount = hotels.filter(h => h.TrangThai === 'Từ chối').length;
+  const inactiveCount = hotels.filter(h => h.TrangThai === 'Ngừng hoạt động').length;
   const visibleHotels = useMemo(() => (hotelsQuery.data ?? []).filter((hotel) => {
     const search = searchTerm.trim().toLocaleLowerCase('vi');
     const matchesSearch = !search || `${hotel.TenKhachSan} ${hotel.DiaChiChiTiet} ${hotel.DIA_PHUONG.TenThanhPho}`.toLocaleLowerCase('vi').includes(search);
@@ -141,6 +143,8 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
               <FilterChip pressed={statusFilter === 'Hoạt động'} onClick={() => setStatusFilter('Hoạt động')}>Hoạt động ({activeCount})</FilterChip>
               <FilterChip pressed={statusFilter === 'Chờ duyệt'} onClick={() => setStatusFilter('Chờ duyệt')}>Chờ duyệt ({pendingCount})</FilterChip>
               {suspendedCount > 0 && <FilterChip pressed={statusFilter === 'Đình chỉ'} onClick={() => setStatusFilter('Đình chỉ')}>Đình chỉ ({suspendedCount})</FilterChip>}
+              {rejectedCount > 0 && <FilterChip pressed={statusFilter === 'Từ chối'} onClick={() => setStatusFilter('Từ chối')}>Từ chối ({rejectedCount})</FilterChip>}
+              {inactiveCount > 0 && <FilterChip pressed={statusFilter === 'Ngừng hoạt động'} onClick={() => setStatusFilter('Ngừng hoạt động')}>Ngừng hoạt động ({inactiveCount})</FilterChip>}
             </div>
           </div>}
 
@@ -199,7 +203,11 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
                       Xem chi tiết hồ sơ
                     </Link>
                   )}
-                  {/* Additional actions can be placed here if needed */}
+                  {hotel.TrangThai !== 'Hoạt động' && hotel.TrangThai !== 'Chờ duyệt' && (
+                    <Link to={`/owner/hotels/${hotel.MaKhachSan}`} className="btn btn-secondary btn-sm flex justify-center py-2">
+                      Xem chi tiết
+                    </Link>
+                  )}
                 </div>
               </article>
             ))}

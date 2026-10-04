@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { refineStayDates } from '../../common/utils/stay-dates';
 
 const dateOnly = z.coerce.date();
 
@@ -28,10 +29,7 @@ export const searchHotelsQuerySchema = z
     limit: z.coerce.number().int().min(1).max(50).default(12),
     sort: z.enum(['price_asc', 'price_desc', 'star_desc', 'newest']).default('price_asc'),
   })
-  .refine((data) => data.checkOut.getTime() > data.checkIn.getTime(), {
-    message: 'checkOut phải sau checkIn',
-    path: ['checkOut'],
-  })
+  .superRefine(refineStayDates)
   .refine((data) => data.minPrice === undefined || data.maxPrice === undefined || data.minPrice <= data.maxPrice, {
     message: 'minPrice phải nhỏ hơn hoặc bằng maxPrice',
     path: ['minPrice'],
@@ -48,8 +46,5 @@ export const hotelRoomsQuerySchema = z
     checkOut: dateOnly,
     guests: z.coerce.number().int().min(1).max(50).optional(),
   })
-  .refine((data) => data.checkOut.getTime() > data.checkIn.getTime(), {
-    message: 'checkOut phải sau checkIn',
-    path: ['checkOut'],
-  });
+  .superRefine(refineStayDates);
 export type HotelRoomsQuery = z.infer<typeof hotelRoomsQuerySchema>;

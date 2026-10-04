@@ -56,6 +56,8 @@ export interface InsertBookingData {
   soTienGiam: number;
   tongTienThanhToan: number;
   ghiChu: string | null;
+  /** Initial DAT_PHONG.TrangThai: "Chờ thanh toán" unless nothing is payable (see BookingsService.createBooking). */
+  trangThai: string;
 }
 
 export class BookingsRepository {
@@ -182,7 +184,7 @@ export class BookingsRepository {
         SoTienGiam: data.soTienGiam,
         TongTienThanhToan: data.tongTienThanhToan,
         GhiChu: data.ghiChu,
-        TrangThai: BOOKING_STATUS.PENDING_PAYMENT,
+        TrangThai: data.trangThai,
         NgayTao: now,
         NgayCapNhat: now,
       },

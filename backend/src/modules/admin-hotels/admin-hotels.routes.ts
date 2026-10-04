@@ -8,6 +8,8 @@ router.use(authenticate, requireAdmin);
 router.get('/', validateRequest({ query: listHotelsSchema }), controller.list);
 router.get('/:id', validateRequest({ params: hotelIdSchema }), controller.getOne);
 router.patch('/:id', validateRequest({ params: hotelIdSchema, body: updateHotelSchema }), controller.update);
+router.post('/:id/approve', validateRequest({ params: hotelIdSchema }), controller.approve);
+router.post('/:id/reject', validateRequest({ params: hotelIdSchema }), controller.reject);
 router.post('/:id/suspend', validateRequest({ params: hotelIdSchema }), controller.suspend);
 router.post('/:id/reactivate', validateRequest({ params: hotelIdSchema }), controller.reactivate);
 export default router;

@@ -8,7 +8,7 @@ export type StatusDomain = 'hotel' | 'roomType' | 'roomRate' | 'booking' | 'paym
 export type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
 const statusTones: Record<StatusDomain, Record<string, StatusTone>> = {
-  hotel: { 'Hoạt động': 'success', 'Chờ duyệt': 'warning', 'Đình chỉ': 'danger', 'Ngừng hoạt động': 'neutral' },
+  hotel: { 'Hoạt động': 'success', 'Chờ duyệt': 'warning', 'Đình chỉ': 'danger', 'Từ chối': 'danger', 'Ngừng hoạt động': 'neutral' },
   roomType: { 'Hoạt động': 'success', 'Ngừng bán': 'neutral' },
   roomRate: { 'Mở bán': 'success', 'Đóng bán': 'neutral' },
   booking: { [BOOKING_STATUS.PENDING_PAYMENT]: 'warning', [BOOKING_STATUS.CONFIRMED]: 'success', [BOOKING_STATUS.CANCELLED]: 'neutral', [BOOKING_STATUS.COMPLETED]: 'success' },

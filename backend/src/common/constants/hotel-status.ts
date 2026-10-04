@@ -6,6 +6,7 @@ export const HOTEL_STATUS = {
   PENDING_APPROVAL: 'Chờ duyệt',
   ACTIVE: 'Hoạt động',
   INACTIVE: 'Ngừng hoạt động',
+  REJECTED: 'Từ chối',
   SUSPENDED: 'Đình chỉ',
 } as const;
 

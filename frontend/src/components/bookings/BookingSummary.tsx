@@ -33,7 +33,7 @@ export function BookingSummary({ booking, onRetryRefund }: BookingSummaryProps) 
 
       <div className="mt-4 pt-3.5 border-t border-dashed border-border text-[13px] text-muted flex flex-col gap-1.5">
         {booking.ThanhToan.length === 0 ? (
-          <div>Chưa có giao dịch thanh toán.</div>
+          <div>{booking.TongTienThanhToan === 0 ? 'Đơn 0 đ — không phát sinh giao dịch thanh toán.' : 'Chưa có giao dịch thanh toán.'}</div>
         ) : (
           booking.ThanhToan.map((payment) => (
             <div key={payment.MaThanhToan} className="bg-surface-secondary p-2 rounded border border-surface-tertiary mt-2">

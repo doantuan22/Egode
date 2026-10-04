@@ -50,3 +50,29 @@ describe('apiClient session expiry', () => {
     expect(useAuthStore.getState().sessionExpired).toBe(false);
   });
 });
+
+describe('apiClient validation errors', () => {
+  it("shows the server's own validation messages instead of a generic \"Validation failed\"", async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({
+      success: false,
+      message: 'Validation failed',
+      errors: [
+        { field: 'checkIn', message: 'Ngày nhận phòng không được trước hôm nay' },
+        { field: 'checkOut', message: 'Mỗi lần đặt tối đa 30 đêm' },
+        { field: 'checkOut', message: 'Mỗi lần đặt tối đa 30 đêm' },
+      ],
+    }, 400)));
+
+    const error = await apiClient('/hotels').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).message).toBe('Ngày nhận phòng không được trước hôm nay. Mỗi lần đặt tối đa 30 đêm');
+    expect((error as ApiError).statusCode).toBe(400);
+    expect((error as ApiError).details).toHaveLength(3);
+  });
+
+  it('keeps the plain message for errors that carry no validation list', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ success: false, message: 'Không tìm thấy khách sạn' }, 404)));
+    await expect(apiClient('/hotels/9')).rejects.toMatchObject({ message: 'Không tìm thấy khách sạn', statusCode: 404 });
+  });
+});

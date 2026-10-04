@@ -15,6 +15,7 @@ import {
 import { getPrismaClient } from '../../config/prisma';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-status';
+import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
 /**
  * BUG-001 — a promo's SoLuongGioiHan must hold under concurrent bookings.
@@ -31,12 +32,8 @@ const ROUNDS = 8;
 const MAX_BURST = 20;
 const STOCK_PER_ROOM = 200; // never the limiting factor — only the promo limit may reject
 
-const addDays = (days: number): Date => {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d;
-};
+// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 const accountIds: number[] = [];

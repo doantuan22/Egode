@@ -3,13 +3,10 @@ import request from 'supertest';
 import app from '../../app';
 import { getPrismaClient } from '../../config/prisma';
 import { seedDiscovery } from '../../../prisma/seed-discovery';
+import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-const addDays = (days: number): string => {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-};
+// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+const addDays = (days: number): string => addDaysToDateKey(businessToday(), days);
 
 let grandSaigonId: number;
 let danangResortId: number;

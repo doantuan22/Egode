@@ -18,6 +18,15 @@ export class ApiError extends Error {
   }
 }
 
+/** The distinct messages of a server validation error list ([{ field, message }]), or null when there is none. */
+const validationMessage = (errors: unknown): string | null => {
+  if (!Array.isArray(errors)) return null;
+  const messages = errors
+    .map((item) => (item && typeof (item as { message?: unknown }).message === 'string' ? (item as { message: string }).message : ''))
+    .filter(Boolean);
+  return messages.length > 0 ? [...new Set(messages)].join('. ') : null;
+};
+
 const buildUrl = (endpoint: string) =>
   `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
@@ -93,7 +102,9 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
   }
 
   if (!response.ok || !data.success) {
-    throw new ApiError(data.message || 'Request failed', response.status, data.error);
+    // A 400 from request validation lists what is wrong in `errors`; show that instead of a generic "Validation failed".
+    const fieldErrors = (data as { errors?: unknown }).errors;
+    throw new ApiError(validationMessage(fieldErrors) ?? (data.message || 'Request failed'), response.status, fieldErrors ?? data.error);
   }
 
   return data;

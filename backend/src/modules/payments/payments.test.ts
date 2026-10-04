@@ -158,6 +158,94 @@ describe('POST /bookings/:id/payments/vnpay', () => {
   });
 });
 
+describe('POST /bookings/:id/payments/vnpay — at most one pending attempt per booking (Bug #4)', () => {
+  const createPayment = (bookingId: number) =>
+    request(app).post(`/api/bookings/${bookingId}/payments/vnpay`).set('Authorization', `Bearer ${customerToken}`);
+
+  const countByStatus = async (bookingId: number, trangThai: string) =>
+    getPrismaClient().tHANH_TOAN.count({ where: { MaDatPhong: bookingId, TrangThai: trangThai } });
+
+  it('two near-simultaneous requests share one pending payment', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { tongTienPhong: 500_000 });
+    const [a, b] = await Promise.all([createPayment(booking.MaDatPhong), createPayment(booking.MaDatPhong)]);
+
+    expect([a.status, b.status]).toEqual([201, 201]);
+    expect(a.body.data.maThanhToan).toBe(b.body.data.maThanhToan);
+    expect(a.body.data.maGiaoDichDoiTac).toBe(b.body.data.maGiaoDichDoiTac);
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.PENDING)).toBe(1);
+    expect(await getPrismaClient().tHANH_TOAN.count({ where: { MaDatPhong: booking.MaDatPhong } })).toBe(1);
+  });
+
+  it('a double-click burst (5 parallel requests) still leaves exactly one pending payment', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { tongTienPhong: 520_000 });
+    const results = await Promise.all(Array.from({ length: 5 }, () => createPayment(booking.MaDatPhong)));
+
+    expect(results.every((r) => r.status === 201)).toBe(true);
+    expect(new Set(results.map((r) => r.body.data.maThanhToan)).size).toBe(1);
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.PENDING)).toBe(1);
+  });
+
+  it('reuses the existing pending payment instead of inserting another (same txnRef and amount in the URL)', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { tongTienPhong: 530_000 });
+    const first = await createPayment(booking.MaDatPhong);
+    const second = await createPayment(booking.MaDatPhong);
+
+    expect(second.status).toBe(201);
+    expect(second.body.data.maThanhToan).toBe(first.body.data.maThanhToan);
+    const url = new URL(second.body.data.paymentUrl);
+    expect(url.searchParams.get('vnp_TxnRef')).toBe(first.body.data.maGiaoDichDoiTac);
+    expect(url.searchParams.get('vnp_Amount')).toBe(String(530_000 * 100));
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.PENDING)).toBe(1);
+  });
+
+  it('allows a fresh attempt after the previous payment failed', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { tongTienPhong: 540_000 });
+    const failed = await createTestPayment(booking.MaDatPhong, 540_000, PAYMENT_STATUS.FAILED);
+
+    const res = await createPayment(booking.MaDatPhong);
+    expect(res.status).toBe(201);
+    expect(res.body.data.maThanhToan).not.toBe(failed.MaThanhToan);
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.PENDING)).toBe(1);
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.FAILED)).toBe(1);
+  });
+
+  it('creates no payment at all for a booking that is already confirmed', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.CONFIRMED);
+    const res = await createPayment(booking.MaDatPhong);
+
+    expect(res.status).toBe(400);
+    expect(await getPrismaClient().tHANH_TOAN.count({ where: { MaDatPhong: booking.MaDatPhong } })).toBe(0);
+  });
+
+  it('the same pending payment confirmed twice via IPN stays a single successful payment with no pending left', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { tongTienPhong: 550_000 });
+    const [a, b] = await Promise.all([createPayment(booking.MaDatPhong), createPayment(booking.MaDatPhong)]);
+    const txnRef = a.body.data.maGiaoDichDoiTac as string;
+    expect(b.body.data.maGiaoDichDoiTac).toBe(txnRef);
+
+    const base = {
+      vnp_TmnCode: env.VNPAY_TMN_CODE,
+      vnp_TransactionNo: '14000099',
+      vnp_PayDate: toVnpayDate(new Date()),
+      vnp_BankCode: 'NCB',
+      vnp_TxnRef: txnRef,
+      vnp_Amount: String(550_000 * 100),
+      vnp_ResponseCode: '00',
+      vnp_TransactionStatus: '00',
+    };
+    const query = { ...base, vnp_SecureHash: signVnpayParams(base, env.VNPAY_HASH_SECRET) };
+
+    const first = await request(app).get('/api/payments/vnpay-ipn').query(query);
+    const second = await request(app).get('/api/payments/vnpay-ipn').query(query);
+    expect(first.body.RspCode).toBe('00');
+    expect(second.body.RspCode).toBe('02');
+
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.PENDING)).toBe(0);
+    expect(await countByStatus(booking.MaDatPhong, PAYMENT_STATUS.SUCCESS)).toBe(1);
+    expect(await getPrismaClient().hOAN_TIEN.count({ where: { THANH_TOAN: { MaDatPhong: booking.MaDatPhong } } })).toBe(0);
+  });
+});
+
 describe('GET /bookings/:id/payments/status', () => {
   it('403 for a non-owning customer', async () => {
     const booking = await makeBooking(BOOKING_STATUS.PENDING_PAYMENT, { ownerId: otherCustomerId });

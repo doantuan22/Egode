@@ -76,6 +76,8 @@ export const createTestDiaPhuong = async () => {
 
 export interface TestHotelOptions {
   status?: string;
+  /** Marks a non-active hotel as one an admin approved before (sets NgayDuyet). */
+  approved?: boolean;
 }
 
 export const createTestHotel = async (
@@ -96,6 +98,8 @@ export const createTestHotel = async (
       GioTraPhong: new Date('1970-01-01T12:00:00Z'),
       TrangThai: options.status ?? HOTEL_STATUS.ACTIVE,
       NgayDangKy: now,
+      // A hotel that is live was approved at some point (real data always carries NgayDuyet).
+      ...((options.status ?? HOTEL_STATUS.ACTIVE) === HOTEL_STATUS.ACTIVE || options.approved ? { NgayDuyet: now } : {}),
       NgayCapNhat: now,
       TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { connect: { MaTaiKhoan: ownerId } },
       DIA_PHUONG: { connect: { MaDiaPhuong: maDiaPhuong } },

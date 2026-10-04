@@ -36,6 +36,8 @@ export function useUpdateHotel(id: number) {
 }
 export function useDeactivateHotel(id: number) { const queryClient = useQueryClient(); return useMutation({ mutationFn: () => ownerApi.deactivateHotel(id), onSuccess: (hotel) => { queryClient.setQueryData(hotelKey(id), hotel); queryClient.invalidateQueries({ queryKey: hotelsKey }); } }); }
 
+export function useReactivateHotel(id: number) { const queryClient = useQueryClient(); return useMutation({ mutationFn: () => ownerApi.reactivateHotel(id), onSuccess: (hotel) => { queryClient.setQueryData(hotelKey(id), hotel); queryClient.invalidateQueries({ queryKey: hotelsKey }); } }); }
+
 export function useReplaceHotelAmenities(id: number) {
   const queryClient = useQueryClient();
   return useMutation({

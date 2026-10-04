@@ -65,8 +65,11 @@ export default function AdminHotelsPage() {
         <div className="min-w-[200px] flex-1">
           <Select label="Trạng thái hoạt động" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
             <option value="">Tất cả trạng thái</option>
+            <option value="Chờ duyệt">Chờ duyệt</option>
             <option value="Hoạt động">Đang hoạt động</option>
+            <option value="Từ chối">Từ chối</option>
             <option value="Đình chỉ">Đình chỉ</option>
+            <option value="Ngừng hoạt động">Ngừng hoạt động</option>
           </Select>
         </div>
       </FilterBar>

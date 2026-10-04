@@ -23,6 +23,7 @@ import { useQuote } from '../../features/quotes/hooks';
 import { quoteMatchesRequest } from '../../features/quotes/match';
 
 import { useCreateBooking } from '../../features/bookings/hooks';
+import { BOOKING_STATUS } from '../../features/bookings/status';
 
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
@@ -486,6 +487,11 @@ export default function HotelDetailPage() {
         onSuccess: (
           booking
         ) => {
+          // Nothing to pay (total 0): the server confirmed it on the spot, so there is no payment step.
+          if (booking.TrangThai === BOOKING_STATUS.CONFIRMED) {
+            navigate(`/payment/result?bookingId=${booking.MaDatPhong}&status=success`);
+            return;
+          }
           navigate(
             `/bookings/${booking.MaDatPhong}`,
             {

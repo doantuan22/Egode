@@ -57,45 +57,62 @@ export class PaymentsService {
   async createVnpayPayment(maDatPhong: number, requesterId: number, ipAddr: string): Promise<CreatePaymentResult> {
     await expireStalePendingBookings(getPrismaClient());
 
-    const booking = await this.repository.findBookingById(maDatPhong);
-    if (!booking) throw AppError.notFound('Không tìm thấy đặt phòng');
-    if (booking.MaTaiKhoanKhachHang !== requesterId) {
-      throw AppError.forbidden('Bạn không có quyền thanh toán đặt phòng này');
-    }
-    if (booking.TrangThai !== BOOKING_STATUS.PENDING_PAYMENT) {
-      throw AppError.badRequest(`Không thể tạo yêu cầu thanh toán — đặt phòng đang ở trạng thái "${booking.TrangThai}"`);
-    }
-    // Defensive — TrangThai should already be CONFIRMED once a payment succeeds, so this only guards a race.
-    const existingSuccess = await this.repository.findExistingSuccessfulPayment(maDatPhong);
-    if (existingSuccess) throw AppError.badRequest('Đặt phòng đã được thanh toán thành công');
+    // The booking row stays locked for the whole check-then-insert, so double clicks, retries and parallel
+    // tabs are serialized: at most one "Chờ xử lý" payment exists per booking at any time.
+    return this.repository.runInTransaction(async (tx) => {
+      const booking = await this.repository.lockBookingById(tx, maDatPhong);
+      if (!booking) throw AppError.notFound('Không tìm thấy đặt phòng');
+      if (booking.MaTaiKhoanKhachHang !== requesterId) {
+        throw AppError.forbidden('Bạn không có quyền thanh toán đặt phòng này');
+      }
+      if (booking.TrangThai !== BOOKING_STATUS.PENDING_PAYMENT) {
+        throw AppError.badRequest(`Không thể tạo yêu cầu thanh toán — đặt phòng đang ở trạng thái "${booking.TrangThai}"`);
+      }
+      // Defensive — TrangThai should already be CONFIRMED once a payment succeeds, so this only guards a race.
+      const existingSuccess = await this.repository.findSuccessfulPaymentTx(tx, maDatPhong);
+      if (existingSuccess) throw AppError.badRequest('Đặt phòng đã được thanh toán thành công');
 
-    // The charge is ALWAYS re-read from DAT_PHONG here — nothing from the
-    // request body feeds into `amount` (M6 §1: "Backend phải tự lấy số
-    // tiền từ DAT_PHONG. Không tin amount từ frontend" — there is in fact
-    // no amount field anywhere in this endpoint's request schema at all).
-    const amount = toNumber(booking.TongTienThanhToan);
-    if (amount <= 0) throw AppError.badRequest('Đặt phòng có tổng thanh toán bằng 0, không cần thanh toán qua cổng');
+      // The charge is ALWAYS re-read from DAT_PHONG here — nothing from the
+      // request body feeds into `amount` (M6 §1: "Backend phải tự lấy số
+      // tiền từ DAT_PHONG. Không tin amount từ frontend").
+      const amount = toNumber(booking.TongTienThanhToan);
+      if (amount <= 0) throw AppError.badRequest('Đặt phòng có tổng thanh toán bằng 0, không cần thanh toán qua cổng');
 
-    const txnRef = generateTxnRef();
-    const now = new Date();
-    const payment = await this.repository.insertPayment({
-      maDatPhong,
-      soTien: amount,
-      phuongThucThanhToan: PAYMENT_METHOD.VNPAY,
-      maGiaoDichDoiTac: txnRef,
-      trangThai: PAYMENT_STATUS.PENDING,
-      thoiGianGiaoDich: now,
+      // An attempt is already open: hand it back instead of opening a second one. The URL is rebuilt from
+      // the stored attempt (same txnRef, amount and creation time), so it is the same payment.
+      const pending = await this.repository.findPendingPaymentTx(tx, maDatPhong);
+      if (pending) {
+        const paymentUrl = buildPaymentUrl({
+          txnRef: pending.MaGiaoDichDoiTac,
+          amount: toNumber(pending.SoTien),
+          orderInfo: `Thanh toan dat phong ${booking.MaXacNhanDatPhong}`,
+          ipAddr,
+          createDate: pending.ThoiGianGiaoDich,
+        });
+        return { maThanhToan: pending.MaThanhToan, maGiaoDichDoiTac: pending.MaGiaoDichDoiTac, paymentUrl };
+      }
+
+      const txnRef = generateTxnRef();
+      const now = new Date();
+      const payment = await this.repository.insertPaymentTx(tx, {
+        maDatPhong,
+        soTien: amount,
+        phuongThucThanhToan: PAYMENT_METHOD.VNPAY,
+        maGiaoDichDoiTac: txnRef,
+        trangThai: PAYMENT_STATUS.PENDING,
+        thoiGianGiaoDich: now,
+      });
+
+      const paymentUrl = buildPaymentUrl({
+        txnRef,
+        amount,
+        orderInfo: `Thanh toan dat phong ${booking.MaXacNhanDatPhong}`,
+        ipAddr,
+        createDate: now,
+      });
+
+      return { maThanhToan: payment.MaThanhToan, maGiaoDichDoiTac: txnRef, paymentUrl };
     });
-
-    const paymentUrl = buildPaymentUrl({
-      txnRef,
-      amount,
-      orderInfo: `Thanh toan dat phong ${booking.MaXacNhanDatPhong}`,
-      ipAddr,
-      createDate: now,
-    });
-
-    return { maThanhToan: payment.MaThanhToan, maGiaoDichDoiTac: txnRef, paymentUrl };
   }
 
   /**

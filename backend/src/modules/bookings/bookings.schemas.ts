@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { refineStayDates } from '../../common/utils/stay-dates';
 
 const bookingRoomLineSchema = z.object({
   maLoaiPhong: z.coerce.number().int().positive(),
@@ -13,10 +14,7 @@ export const createBookingSchema = z
     promoCode: z.string().trim().min(1).optional(),
     ghiChu: z.string().trim().max(1000).optional(),
   })
-  .refine((d) => d.checkOut.getTime() > d.checkIn.getTime(), {
-    message: 'checkOut phải sau checkIn',
-    path: ['checkOut'],
-  })
+  .superRefine(refineStayDates)
   .refine(
     (d) => {
       const ids = d.rooms.map((r) => r.maLoaiPhong);
