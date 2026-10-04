@@ -1,10 +1,12 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import BookingDetailPage from './BookingDetailPage';
 import { useBookingDetail, useCancelBooking } from '../../features/bookings/hooks';
 import { useCreateVnpayPayment, useRetryRefund } from '../../features/payments/hooks';
 import { useCreateReview, useMyReview } from '../../features/reviews/hooks';
 import { renderWithProviders } from '../../test/testUtils';
+import { ApiError } from '../../services/apiClient';
 import type { BookingDetail } from '../../features/bookings/types';
 
 vi.mock('../../features/bookings/hooks');
@@ -119,5 +121,41 @@ describe('BookingDetailPage payment hold', () => {
   it.each(['Đã xác nhận', 'Đã hủy', 'Hoàn tất'])('shows no hold for a %s booking', (status) => {
     open(status);
     expect(screen.queryByRole('timer')).not.toBeInTheDocument();
+  });
+});
+
+describe('BookingDetailPage refund retry', () => {
+  const withRefund = (refundStatus: string) => {
+    const base = booking('Đã hủy');
+    return {
+      ...base,
+      ThanhToan: [{
+        MaThanhToan: 3, SoTien: 1000000, PhuongThucThanhToan: 'VNPAY', TrangThai: 'Thành công', ThoiGianGiaoDich: '2030-01-01T00:00:00.000Z',
+        HoanTien: [{ MaHoanTien: 11, SoTienHoan: 1000000, LyDoHoanTien: 'Hủy', TrangThai: refundStatus, NgayYeuCau: '2030-01-01T00:00:00.000Z', NgayHoanTien: null }],
+      }],
+    } as unknown as BookingDetail;
+  };
+  const openWithRefund = (refundStatus: string, retry: object = {}) => {
+    vi.mocked(useRetryRefund).mockReturnValue({ ...idle, ...retry } as unknown as ReturnType<typeof useRetryRefund>);
+    vi.mocked(useBookingDetail).mockReturnValue({ isLoading: false, isError: false, data: withRefund(refundStatus), dataUpdatedAt: Date.now(), refetch: vi.fn() } as unknown as ReturnType<typeof useBookingDetail>);
+    renderWithProviders(<BookingDetailPage />, { route: '/bookings/5' });
+  };
+
+  it('retries the SAME refund (by its id) from the failed refund row', async () => {
+    const mutate = vi.fn();
+    openWithRefund('Thất bại', { mutate });
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Thử lại' }));
+    expect(mutate).toHaveBeenCalledWith(11);
+  });
+
+  it('no retry button once the refund succeeded', () => {
+    openWithRefund('Thành công');
+    expect(screen.queryByRole('button', { name: 'Thử lại' })).not.toBeInTheDocument();
+  });
+
+  it('waits while a retry is being sent, and says why the server refused one', () => {
+    openWithRefund('Chờ xử lý', { isPending: true, isError: true, error: new ApiError('Yêu cầu hoàn tiền đang được xử lý. Vui lòng kiểm tra lại sau ít phút', 409) });
+    expect(screen.getByRole('button', { name: /Thử lại/ })).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Yêu cầu hoàn tiền đang được xử lý');
   });
 });

@@ -3,7 +3,6 @@ import { AppError } from '../../common/errors/app-error';
 import { Prisma } from '../../generated/prisma/client';
 import { HOTEL_STATUS, ROOM_TYPE_STATUS, ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { CANCELLATION_POLICY_STATUS } from '../../common/constants/commercial';
-import { PAYMENT_STATUS } from '../../common/constants/payment';
 
 export interface LockedRateRow {
   MaLoaiPhong: number;
@@ -262,32 +261,5 @@ export class BookingsRepository {
         AND TrangThai IN (${BOOKING_STATUS.PENDING_PAYMENT}, ${BOOKING_STATUS.CONFIRMED})
     `);
     return Number(result);
-  }
-
-  /** The single successful payment for a booking (by design there is at most one — see payments.service.ts). */
-  async findSuccessfulPayment(tx: Prisma.TransactionClient, maDatPhong: number) {
-    return tx.tHANH_TOAN.findFirst({
-      where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.SUCCESS },
-    });
-  }
-
-  async insertRefund(
-    tx: Prisma.TransactionClient,
-    data: { maThanhToan: number; soTienHoan: number; lyDoHoanTien: string; maGiaoDichDoiTac: string; trangThai: string; ngayYeuCau: Date }
-  ) {
-    return tx.hOAN_TIEN.create({
-      data: {
-        MaThanhToan: data.maThanhToan,
-        SoTienHoan: data.soTienHoan,
-        LyDoHoanTien: data.lyDoHoanTien,
-        MaGiaoDichDoiTac: data.maGiaoDichDoiTac,
-        TrangThai: data.trangThai,
-        NgayYeuCau: data.ngayYeuCau,
-      },
-    });
-  }
-
-  async markRefundOutcome(tx: Prisma.TransactionClient, maHoanTien: number, trangThai: string, ngayHoanTien: Date | null) {
-    return tx.hOAN_TIEN.update({ where: { MaHoanTien: maHoanTien }, data: { TrangThai: trangThai, NgayHoanTien: ngayHoanTien } });
   }
 }

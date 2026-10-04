@@ -118,57 +118,6 @@ export class PaymentsRepository {
       include: { HOAN_TIEN: { orderBy: { NgayYeuCau: 'desc' } } },
     });
   }
-
-  async insertRefund(
-    tx: Prisma.TransactionClient,
-    data: { maThanhToan: number; soTienHoan: number; lyDoHoanTien: string; maGiaoDichDoiTac: string; trangThai: string; ngayYeuCau: Date }
-  ) {
-    return tx.hOAN_TIEN.create({
-      data: {
-        MaThanhToan: data.maThanhToan,
-        SoTienHoan: data.soTienHoan,
-        LyDoHoanTien: data.lyDoHoanTien,
-        MaGiaoDichDoiTac: data.maGiaoDichDoiTac,
-        TrangThai: data.trangThai,
-        NgayYeuCau: data.ngayYeuCau,
-      },
-    });
-  }
-
-  async sumSuccessfulRefunds(tx: Prisma.TransactionClient, maThanhToan: number): Promise<number> {
-    const rows = await tx.hOAN_TIEN.findMany({
-      where: { MaThanhToan: maThanhToan, TrangThai: PAYMENT_STATUS.SUCCESS },
-      select: { SoTienHoan: true },
-    });
-    return rows.reduce((sum, r) => sum + Number(r.SoTienHoan), 0);
-  }
-
-  /** Includes the ownership chain (HOAN_TIEN → THANH_TOAN → DAT_PHONG) so the service can check MaTaiKhoanKhachHang without a second round trip. */
-  async findRefundWithOwnership(maHoanTien: number) {
-    const prisma = getPrismaClient();
-    return prisma.hOAN_TIEN.findUnique({
-      where: { MaHoanTien: maHoanTien },
-      include: { THANH_TOAN: { include: { DAT_PHONG: true } } },
-    });
-  }
-
-  /** Serializes concurrent retries for one refund until the surrounding transaction commits. */
-  async lockRefundWithOwnership(tx: Prisma.TransactionClient, maHoanTien: number) {
-    await tx.$queryRaw<Array<{ MaHoanTien: number }>>(Prisma.sql`
-      SELECT MaHoanTien
-      FROM HOAN_TIEN WITH (UPDLOCK, ROWLOCK, HOLDLOCK)
-      WHERE MaHoanTien = ${maHoanTien}
-    `);
-    return tx.hOAN_TIEN.findUnique({
-      where: { MaHoanTien: maHoanTien },
-      include: { THANH_TOAN: { include: { DAT_PHONG: true } } },
-    });
-  }
-
-  async markRefundOutcome(tx: Prisma.TransactionClient, maHoanTien: number, trangThai: string, ngayHoanTien: Date | null) {
-    return tx.hOAN_TIEN.update({ where: { MaHoanTien: maHoanTien }, data: { TrangThai: trangThai, NgayHoanTien: ngayHoanTien } });
-  }
-
   async runInTransaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
     const prisma = getPrismaClient();
     return prisma.$transaction(fn);

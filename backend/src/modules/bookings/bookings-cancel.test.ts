@@ -398,13 +398,17 @@ describe('PaymentsService.retryRefund — idempotent (M6 §4/§6)', () => {
 
     const succeedingGateway = new FakeRefundGateway({ success: true, message: 'ok' });
     const paymentsService = new PaymentsService(new PaymentsRepository(), succeedingGateway);
-    const [first, second] = await Promise.all([
+    const results = await Promise.allSettled([
       paymentsService.retryRefund(refundId, customerId, '127.0.0.1'),
       paymentsService.retryRefund(refundId, customerId, '127.0.0.1'),
     ]);
 
-    expect(first.TrangThai).toBe(REFUND_STATUS.SUCCESS);
-    expect(second.TrangThai).toBe(REFUND_STATUS.SUCCESS);
+    // One retry does the work; the other either arrives after it (already "Thành công", a no-op) or meets the
+    // attempt in flight and is told so (409) — it never reaches the gateway itself.
+    const fulfilled = results.filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof paymentsService.retryRefund>>> => r.status === 'fulfilled');
+    expect(fulfilled.length).toBeGreaterThanOrEqual(1);
+    expect(fulfilled.some((r) => r.value.TrangThai === REFUND_STATUS.SUCCESS)).toBe(true);
+    for (const r of results) if (r.status === 'rejected') expect(r.reason).toMatchObject({ statusCode: 409 });
     expect(succeedingGateway.calls).toHaveLength(1);
   });
 

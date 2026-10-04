@@ -108,7 +108,11 @@ export class VnpayRefundGateway implements RefundGateway {
       if (json?.vnp_ResponseCode === '00') {
         return { success: true, message: json.vnp_Message ?? 'Refund confirmed by VNPAY' };
       }
-      return { success: false, message: json?.vnp_Message ?? `VNPAY refund rejected (HTTP ${res.status})` };
+      // VNPAY answered with a response code other than 00: a definitive rejection.
+      if (json?.vnp_ResponseCode) {
+        return { success: false, message: json.vnp_Message ?? `VNPAY refund rejected (code ${json.vnp_ResponseCode})` };
+      }
+      return { success: false, message: `VNPAY refund gave no readable answer (HTTP ${res.status})` };
     } catch (err) {
       return { success: false, message: err instanceof Error ? err.message : 'VNPAY refund request failed' };
     }

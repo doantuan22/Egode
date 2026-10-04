@@ -7,12 +7,11 @@ import { completeFinishedBookings } from './booking-completion';
 import { selectRefundPercent, computeRefundAmount } from './refund-policy';
 import { AppError } from '../../common/errors/app-error';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
-import { REFUND_STATUS } from '../../common/constants/payment';
 import { getPrismaClient } from '../../config/prisma';
 import type { RefundGateway } from '../payments/refund-gateway';
 import { VnpayRefundGateway } from '../payments/refund-gateway';
-import { generateRefundRef } from '../payments/vnpay';
-import { attemptGatewayRefund } from '../payments/refund-helper';
+import { RefundsRepository } from '../payments/refunds.repository';
+import { RefundProcessor } from '../payments/refund-processor';
 import type { CreateBookingInput, CancelBookingInput } from './bookings.schemas';
 
 const toNumber = (value: unknown): number => Number(value);
@@ -99,7 +98,9 @@ export interface BookingDetail extends Omit<BookingResponse, 'ChiTietPhong'> {
 export class BookingsService {
   constructor(
     private readonly repository: BookingsRepository = new BookingsRepository(),
-    private readonly refundGateway: RefundGateway = new VnpayRefundGateway()
+    refundGateway: RefundGateway = new VnpayRefundGateway(),
+    private readonly refunds: RefundsRepository = new RefundsRepository(),
+    private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds)
   ) {}
 
   async createBooking(
@@ -350,38 +351,36 @@ export class BookingsService {
     const refundPercent = selectRefundPercent(tiers, hoursBeforeCheckIn);
     const note = input.ghiChu ? `Khách hủy đặt phòng: ${input.ghiChu}` : 'Khách hủy đặt phòng';
 
-    const maDatPhongAfterCancel = await this.repository.runInTransaction(async (tx) => {
+    // Phase 1 — one short transaction that decides everything and writes it: the booking becomes "Đã hủy" and,
+    // when money is owed back, the single HOAN_TIEN "Chờ xử lý" for the paid amount. No gateway call in here.
+    const pendingRefund = await this.repository.runInTransaction(async (tx) => {
       const affected = await this.repository.cancelBooking(tx, maDatPhong, note, now);
       if (affected === 0) {
         throw AppError.conflict('Đặt phòng đã đổi trạng thái trước đó (có thể đã bị hủy hoặc hết hạn) — vui lòng tải lại');
       }
 
-      // No successful payment (still PENDING_PAYMENT, never paid) → nothing
-      // to refund. Never fabricate a HOAN_TIEN for money that was never
-      // actually captured (M6 §4).
-      const successPayment = await this.repository.findSuccessfulPayment(tx, maDatPhong);
-      if (!successPayment) return maDatPhong;
+      // No successful payment (never paid, or a 0đ booking) → nothing to refund. Never fabricate a HOAN_TIEN
+      // for money that was never actually captured (M6 §4).
+      const successPayment = await this.refunds.lockSuccessfulPayment(tx, maDatPhong);
+      if (!successPayment) return null;
 
       const refundAmount = computeRefundAmount(toNumber(successPayment.SoTien), refundPercent);
-      if (refundAmount <= 0) return maDatPhong; // eligible for cancellation, not for any refund (0% tier)
+      if (refundAmount <= 0) return null; // eligible for cancellation, not for any refund (0% tier)
 
-      const refundRef = generateRefundRef();
-      const refund = await this.repository.insertRefund(tx, {
-        maThanhToan: successPayment.MaThanhToan,
-        soTienHoan: refundAmount,
-        lyDoHoanTien: `Hủy đặt phòng — hoàn ${refundPercent}% theo chính sách hủy (${hoursBeforeCheckIn.toFixed(1)}h trước nhận phòng)`,
-        maGiaoDichDoiTac: refundRef,
-        trangThai: REFUND_STATUS.PENDING,
-        ngayYeuCau: now,
-      });
-
-      const outcome = await attemptGatewayRefund(this.refundGateway, successPayment.MaGiaoDichDoiTac, refundRef, refundAmount, ipAddr);
-      await this.repository.markRefundOutcome(tx, refund.MaHoanTien, outcome.success ? REFUND_STATUS.SUCCESS : REFUND_STATUS.FAILED, outcome.success ? new Date() : null);
-
-      return maDatPhong;
+      return this.refunds.openPendingRefund(
+        tx,
+        successPayment,
+        refundAmount,
+        `Hủy đặt phòng — hoàn ${refundPercent}% theo chính sách hủy (${hoursBeforeCheckIn.toFixed(1)}h trước nhận phòng)`,
+        now
+      );
     });
 
-    return this.getBookingDetail(maDatPhongAfterCancel, requesterId);
+    // Phase 2 — the transaction has committed and holds no lock; only now is the gateway asked. The refund is
+    // then settled on its own, and a refund that fails never undoes the cancellation.
+    if (pendingRefund) await this.refundProcessor.process(pendingRefund, ipAddr);
+
+    return this.getBookingDetail(maDatPhong, requesterId);
   }
 
   private toBookingDetail(

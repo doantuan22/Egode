@@ -7,10 +7,14 @@ interface BookingSummaryProps {
   booking: BookingDetail;
   /** Retries a refund that did not succeed; gets the refund id. */
   onRetryRefund: (refundId: number) => void;
+  /** A retry is being sent: the retry buttons wait instead of firing a second request. */
+  isRetryingRefund?: boolean;
+  /** Why the last retry was refused (for example "an attempt is already in progress"). */
+  retryRefundError?: string | null;
 }
 
 /** The money side of a booking: room total, promotion, the amount to pay, and every payment with its refunds. */
-export function BookingSummary({ booking, onRetryRefund }: BookingSummaryProps) {
+export function BookingSummary({ booking, onRetryRefund, isRetryingRefund = false, retryRefundError = null }: BookingSummaryProps) {
   return (
     <Card padded={false} className="card-body">
       <h2 className="text-base font-bold text-heading mb-5 pb-3 border-b border-border">Chi tiết thanh toán</h2>
@@ -48,7 +52,7 @@ export function BookingSummary({ booking, onRetryRefund }: BookingSummaryProps) 
                     <div key={refund.MaHoanTien} className="flex flex-wrap items-center gap-2 text-warning-ink">
                       <span><strong>Hoàn tiền:</strong> {formatCurrencyVND(refund.SoTienHoan)} ({refund.TrangThai})</span>
                       {refund.TrangThai !== 'Thành công' && (
-                        <Button type="button" variant="outline" size="sm" onClick={() => onRetryRefund(refund.MaHoanTien)}>Thử lại</Button>
+                        <Button type="button" variant="outline" size="sm" loading={isRetryingRefund} disabled={isRetryingRefund} onClick={() => onRetryRefund(refund.MaHoanTien)}>Thử lại</Button>
                       )}
                     </div>
                   ))}
@@ -58,6 +62,7 @@ export function BookingSummary({ booking, onRetryRefund }: BookingSummaryProps) 
           ))
         )}
       </div>
+      {retryRefundError && <div role="alert" className="mt-3 rounded-lg bg-danger-light px-3 py-2 text-xs text-danger-ink">{retryRefundError}</div>}
     </Card>
   );
 }

@@ -179,7 +179,12 @@ export default function BookingDetailPage() {
 
         {/* Right Column */}
         <aside className="flex flex-col gap-5">
-          <BookingSummary booking={booking} onRetryRefund={(refundId) => retryRefundMutation.mutate(refundId)} />
+          <BookingSummary
+            booking={booking}
+            onRetryRefund={(refundId) => retryRefundMutation.mutate(refundId)}
+            isRetryingRefund={retryRefundMutation.isPending}
+            retryRefundError={retryRefundMutation.isError ? (retryRefundMutation.error instanceof ApiError ? retryRefundMutation.error.message : 'Không thể thử lại hoàn tiền') : null}
+          />
           <BookingActions
             canPay={booking.TrangThai === BOOKING_STATUS.PENDING_PAYMENT}
             canCancel={canCancel}
