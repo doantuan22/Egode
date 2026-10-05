@@ -3,7 +3,6 @@
  * resolve exactly as they do for the Vitest suite) against the SQL Server test database, and gives the Playwright specs:
  *   - controlled test data (accounts, hotels, room types + stock, promotions, a completed stay) and read-back of the rows
  *     a spec wants to verify ("SQL verification"),
- *   - a local stand-in for VNPAY's refund API (the one third party the backend calls over the network),
  *   - a cleanup that removes everything this run created, including rows made through the UI by `e2e_` accounts.
  * It is NOT part of the application: the application under test is the real built frontend + the real backend process.
  */
@@ -51,9 +50,6 @@ async function restoreAdmins(): Promise<void> {
 }
 void restoreAdmins(); // start-up repair of a previous crashed run
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGBREAK'] as const) process.on(signal, () => void restoreAdmins().finally(() => process.exit(0)));
-
-let refundMode: 'ok' | 'reject' = 'ok';
-const refundCalls: Array<Record<string, unknown>> = [];
 
 const dateAt = (key: string) => new Date(`${key}T00:00:00Z`);
 
@@ -245,13 +241,6 @@ const routes: Record<string, Handler> = {
 
   '/db/active-admins': async () => ({ count: await prisma().tAI_KHOAN.count({ where: { TrangThai: 'Hoạt động', VAI_TRO: { TenVaiTro: ROLE_NAMES.ADMIN } } }) }),
 
-  /** What the refund gateway stand-in answers next: 'ok' or 'reject'. */
-  '/gateway/mode': async (b) => {
-    refundMode = b.mode === 'reject' ? 'reject' : 'ok';
-    return { mode: refundMode };
-  },
-  '/gateway/calls': async () => ({ calls: refundCalls }),
-
   '/cleanup': async () => {
     await cleanup();
     return { ok: true };
@@ -312,12 +301,6 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
     if (url.pathname === '/health') return send(200, { ok: true });
 
-    // VNPAY refund API stand-in (the backend posts here instead of sandbox.vnpayment.vn).
-    if (url.pathname === '/vnpay/refund' && req.method === 'POST') {
-      const body = await readBody(req);
-      refundCalls.push(body);
-      return send(200, refundMode === 'ok' ? { vnp_ResponseCode: '00', vnp_Message: 'Refund success' } : { vnp_ResponseCode: '94', vnp_Message: 'Refund rejected (e2e stub)' });
-    }
 
     const handler = routes[url.pathname];
     if (!handler) return send(404, { error: `no fixture route ${url.pathname}` });

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createVnpayPayment, getPaymentStatus, retryRefund } from './api';
+import { createVnpayPayment, getPaymentStatus, paySimulated, retryRefund } from './api';
 
 export function useCreateVnpayPayment(bookingId: number) {
   return useMutation({
@@ -23,6 +23,17 @@ export function useRetryRefund(bookingId: number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payment-status', bookingId] });
       queryClient.invalidateQueries({ queryKey: ['bookings', bookingId] });
+    },
+  });
+}
+
+export function useSimulatedPayment(bookingId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => paySimulated(bookingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payment-status', bookingId] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
   });
 }

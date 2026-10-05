@@ -18,6 +18,22 @@ export class PaymentsController {
     }
   };
 
+  /** Simulated payment (PAYMENT_PROVIDER=simulated): pays and confirms in one call, no redirect. */
+  paySimulated = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params as unknown as { id: number };
+      const result = await this.service.paySimulated(id, req.user!.maTaiKhoan);
+      sendSuccess(res, result, 'Thanh toán thành công', 201);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /** Which payment mode is active, so the client knows whether to redirect to a gateway or run the simulated flow. */
+  getConfig = (_req: Request, res: Response): void => {
+    sendSuccess(res, this.service.getConfig());
+  };
+
   getStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };

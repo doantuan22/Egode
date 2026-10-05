@@ -101,6 +101,7 @@ describe('SameSite=None end to end: login, refresh and logout all use the cross-
 describe('production environment validation (env.ts)', () => {
   const productionEnv: Record<string, string> = {
     NODE_ENV: 'production',
+    PAYMENT_PROVIDER: 'vnpay',
     DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true',
     JWT_ACCESS_SECRET: 'a'.repeat(40),
     JWT_REFRESH_SECRET: 'b'.repeat(40),

@@ -8,7 +8,8 @@ import { buildPaymentUrl, verifyVnpaySignature, generateTxnRef, encodeGatewayRef
 import { RefundsRepository, type PendingRefund } from './refunds.repository';
 import { RefundProcessor } from './refund-processor';
 import type { RefundGateway } from './refund-gateway';
-import { VnpayRefundGateway } from './refund-gateway';
+import { ConfiguredRefundGateway } from './simulated-refund-gateway';
+import { getPaymentProvider, type PaymentProvider } from './payment-provider';
 
 const toNumber = (value: unknown): number => Number(value);
 
@@ -24,6 +25,18 @@ export interface CallbackOutcome {
   /** Only meaningful for the return-URL redirect — irrelevant to the IPN JSON response. */
   redirectStatus: 'success' | 'failed' | 'unknown';
   maDatPhong: number | null;
+}
+
+/** Result of a simulated payment: the money was "taken", the payment row is written and the booking is confirmed. */
+export interface SimulatedPaymentResult {
+  maThanhToan: number;
+  maGiaoDichDoiTac: string;
+  maDatPhong: number;
+  maXacNhanDatPhong: string;
+  soTien: number;
+  trangThaiThanhToan: string;
+  trangThaiDatPhong: string;
+  thoiGianThanhToan: string;
 }
 
 export interface RefundView {
@@ -52,7 +65,7 @@ export interface PaymentStatusResponse {
 export class PaymentsService {
   constructor(
     private readonly repository: PaymentsRepository = new PaymentsRepository(),
-    refundGateway: RefundGateway = new VnpayRefundGateway(),
+    refundGateway: RefundGateway = new ConfiguredRefundGateway(),
     private readonly refunds: RefundsRepository = new RefundsRepository(),
     private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds)
   ) {}
@@ -63,23 +76,7 @@ export class PaymentsService {
     // The booking row stays locked for the whole check-then-insert, so double clicks, retries and parallel
     // tabs are serialized: at most one "Chờ xử lý" payment exists per booking at any time.
     return this.repository.runInTransaction(async (tx) => {
-      const booking = await this.repository.lockBookingById(tx, maDatPhong);
-      if (!booking) throw AppError.notFound('Không tìm thấy đặt phòng');
-      if (booking.MaTaiKhoanKhachHang !== requesterId) {
-        throw AppError.forbidden('Bạn không có quyền thanh toán đặt phòng này');
-      }
-      if (booking.TrangThai !== BOOKING_STATUS.PENDING_PAYMENT) {
-        throw AppError.badRequest(`Không thể tạo yêu cầu thanh toán — đặt phòng đang ở trạng thái "${booking.TrangThai}"`);
-      }
-      // Defensive — TrangThai should already be CONFIRMED once a payment succeeds, so this only guards a race.
-      const existingSuccess = await this.repository.findSuccessfulPaymentTx(tx, maDatPhong);
-      if (existingSuccess) throw AppError.badRequest('Đặt phòng đã được thanh toán thành công');
-
-      // The charge is ALWAYS re-read from DAT_PHONG here — nothing from the
-      // request body feeds into `amount` (M6 §1: "Backend phải tự lấy số
-      // tiền từ DAT_PHONG. Không tin amount từ frontend").
-      const amount = toNumber(booking.TongTienThanhToan);
-      if (amount <= 0) throw AppError.badRequest('Đặt phòng có tổng thanh toán bằng 0, không cần thanh toán qua cổng');
+      const { booking, amount } = await this.lockPayableBooking(tx, maDatPhong, requesterId);
 
       // An attempt is already open: hand it back instead of opening a second one. The URL is rebuilt from
       // the stored attempt (same txnRef, amount and creation time), so it is the same payment.
@@ -115,6 +112,78 @@ export class PaymentsService {
       });
 
       return { maThanhToan: payment.MaThanhToan, maGiaoDichDoiTac: txnRef, paymentUrl };
+    });
+  }
+
+  /** Locks the booking and checks it can be paid by this customer; the amount is ALWAYS re-read from DAT_PHONG. */
+  private async lockPayableBooking(tx: Parameters<Parameters<PaymentsRepository['runInTransaction']>[0]>[0], maDatPhong: number, requesterId: number) {
+    const booking = await this.repository.lockBookingById(tx, maDatPhong);
+    if (!booking) throw AppError.notFound('Không tìm thấy đặt phòng');
+    if (booking.MaTaiKhoanKhachHang !== requesterId) {
+      throw AppError.forbidden('Bạn không có quyền thanh toán đặt phòng này');
+    }
+    if (booking.TrangThai !== BOOKING_STATUS.PENDING_PAYMENT) {
+      throw AppError.badRequest(`Không thể tạo yêu cầu thanh toán — đặt phòng đang ở trạng thái "${booking.TrangThai}"`);
+    }
+    // Defensive — TrangThai should already be CONFIRMED once a payment succeeds, so this only guards a race.
+    const existingSuccess = await this.repository.findSuccessfulPaymentTx(tx, maDatPhong);
+    if (existingSuccess) throw AppError.badRequest('Đặt phòng đã được thanh toán thành công');
+
+    // Nothing from the request body feeds into `amount` (M6 §1: "Backend phải tự lấy số tiền từ DAT_PHONG").
+    const amount = toNumber(booking.TongTienThanhToan);
+    if (amount <= 0) throw AppError.badRequest('Đặt phòng có tổng thanh toán bằng 0, không cần thanh toán qua cổng');
+    return { booking, amount };
+  }
+
+  getConfig(): { provider: PaymentProvider } {
+    return { provider: getPaymentProvider() };
+  }
+
+  /**
+   * Simulated payment: no gateway, no redirect. Inside ONE transaction (the booking row stays locked) it writes the
+   * THANH_TOAN row as "Thành công" — with a transaction number and pay date packed into MaGiaoDichDoiTac exactly like a
+   * real VNPAY confirmation, so a later refund finds everything it needs — and confirms the booking. Double clicks and
+   * parallel tabs serialise on the lock: the first pays, the others find the booking already confirmed.
+   */
+  async paySimulated(maDatPhong: number, requesterId: number): Promise<SimulatedPaymentResult> {
+    if (getPaymentProvider() !== 'simulated') {
+      throw AppError.badRequest('Thanh toán mô phỏng đang tắt (PAYMENT_PROVIDER không phải "simulated")');
+    }
+    await expireStalePendingBookings(getPrismaClient());
+
+    return this.repository.runInTransaction(async (tx) => {
+      const { booking, amount } = await this.lockPayableBooking(tx, maDatPhong, requesterId);
+      const now = new Date();
+      const txnRef = generateTxnRef();
+      const transactionNo = String(10_000_000 + Math.floor(Math.random() * 89_999_999));
+      const packedRef = encodeGatewayRef(txnRef, transactionNo, toVnpayDate(now));
+
+      // A pending attempt left by the real-gateway mode is closed by this payment rather than duplicated.
+      const pending = await this.repository.findPendingPaymentTx(tx, maDatPhong);
+      const payment = pending
+        ? await this.repository.markPaymentOutcome(tx, pending.MaThanhToan, PAYMENT_STATUS.SUCCESS, packedRef)
+        : await this.repository.insertPaymentTx(tx, {
+            maDatPhong,
+            soTien: amount,
+            phuongThucThanhToan: PAYMENT_METHOD.VNPAY_SIMULATED,
+            maGiaoDichDoiTac: packedRef,
+            trangThai: PAYMENT_STATUS.SUCCESS,
+            thoiGianGiaoDich: now,
+          });
+
+      const confirmed = await this.repository.confirmBookingIfPending(tx, maDatPhong, now);
+      if (confirmed === 0) throw AppError.conflict('Đặt phòng đã đổi trạng thái trước khi thanh toán — vui lòng tải lại');
+
+      return {
+        maThanhToan: payment.MaThanhToan,
+        maGiaoDichDoiTac: txnRef,
+        maDatPhong,
+        maXacNhanDatPhong: booking.MaXacNhanDatPhong,
+        soTien: toNumber(payment.SoTien),
+        trangThaiThanhToan: PAYMENT_STATUS.SUCCESS,
+        trangThaiDatPhong: BOOKING_STATUS.CONFIRMED,
+        thoiGianThanhToan: now.toISOString(),
+      };
     });
   }
 

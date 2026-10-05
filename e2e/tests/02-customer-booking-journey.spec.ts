@@ -1,5 +1,4 @@
 import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, money, type Account } from '../support/fixtures';
-import { simulateGateway } from '../support/payment';
 
 /**
  * The main customer journey, end to end through the real UI:
@@ -43,7 +42,6 @@ const pickDay = async (page: import('@playwright/test').Page, key: string) => {
 
 test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> payment -> result -> history -> cancel and refund', async ({ page }) => {
   await login(page, customer);
-  const gateway = await simulateGateway(page, 'success');
 
   // ---- search from the home page (destination, dates, guests) through the real search box
   await page.goto('/');
@@ -104,7 +102,7 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
   await expect(panel).toContainText('Khuyến mãi giảm');
   await expect(panel).toContainText(money(total - discount));
 
-  // ---- create the booking, then pay at the (simulated) gateway
+  // ---- create the booking, then pay (simulated: processing animation, then confirmation)
   await panel.getByRole('button', { name: /Tạo đặt phòng/ }).click();
   await expect(page).toHaveURL(/\/bookings\/\d+/);
   const bookingId = Number(new URL(page.url()).pathname.split('/').pop());
@@ -117,28 +115,38 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
   expect(row.THANH_TOAN).toHaveLength(0);
 
   await page.getByRole('button', { name: 'Thanh toán ngay' }).click();
+  const payDialog = page.getByRole('dialog');
+  await expect(payDialog).toContainText('Đang xử lý thanh toán'); // the loading effect
+  await expect(payDialog.getByRole('button', { name: 'Xem kết quả' })).toHaveCount(0); // cannot be skipped while running
+  await expect(payDialog).toContainText('Thanh toán thành công!');
+  await expect(payDialog).toContainText(money(total - discount));
   await expect(page).toHaveURL(/\/payment\/result\?.*status=success/);
   await expect(page.getByText(/thành công/i).first()).toBeVisible();
-  expect(gateway).toHaveLength(1);
-  expect(gateway[0].amountVnd).toBe(total - discount);
 
   row = await fx('/db/booking', { id: bookingId });
   expect(row.TrangThai).toBe('Đã xác nhận');
   expect(row.THANH_TOAN).toHaveLength(1);
   expect(row.THANH_TOAN[0]).toMatchObject({ TrangThai: 'Thành công' });
   expect(Number(row.THANH_TOAN[0].SoTien)).toBe(total - discount);
+  expect(row.THANH_TOAN[0].PhuongThucThanhToan).toBe('VNPAY (mô phỏng)');
+  expect(row.THANH_TOAN[0].MaGiaoDichDoiTac).toMatch(/^[^:]+:\d+:\d{14}$/); // txnRef:transactionNo:payDate, like a real confirmation
 
   // ---- booking history lists it with the right state and total
   await page.goto('/bookings');
   await expect(page.getByText(star4.name).first()).toBeVisible();
   await expect(page.getByText('Đã xác nhận').first()).toBeVisible();
 
-  // ---- cancel: refund per the booking's cancellation policy, through the (stand-in) gateway
+  // ---- cancel: loading effect, then "the amount has been refunded to ..."; refund per the booking's cancellation policy
   await page.goto(`/bookings/${bookingId}`);
   await page.getByRole('button', { name: 'Hủy đặt phòng này' }).click();
   await expect(page.getByText('Xác nhận hủy đặt phòng?')).toBeVisible();
   const previewText = (await page.getByText(/Dự kiến hoàn/).first().locator('xpath=..').innerText()).replace(/\s+/g, ' ');
   await page.getByRole('button', { name: 'Xác nhận hủy' }).click();
+  const refundDialog = page.getByRole('dialog');
+  await expect(refundDialog).toContainText('Đang xử lý hủy đặt phòng và hoàn tiền'); // the loading effect
+  await expect(refundDialog).toContainText(/Hủy đặt phòng thành công|Đã hủy, hoàn tiền chưa hoàn tất/);
+  const resultText = (await refundDialog.innerText()).replace(/\s+/g, ' ');
+  await refundDialog.getByRole('button', { name: 'Đóng' }).click();
   await expect(page.getByText('Đã hủy').first()).toBeVisible();
 
   row = await fx('/db/booking', { id: bookingId });
@@ -146,8 +154,8 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
   const paid = Number(row.THANH_TOAN[0].SoTien);
   const refunds = row.THANH_TOAN[0].HOAN_TIEN as Array<{ SoTienHoan: string; TrangThai: string; NgayHoanTien: string | null; NgayYeuCau: string }>;
   if (refunds.length === 0) {
-    // a 0 % tier: nothing is refunded and no gateway call is made
-    expect(await fx('/gateway/calls')).toMatchObject({ calls: [] });
+    // a 0 % tier: nothing is refunded, and the dialog says so
+    expect(resultText).toContain('không được hoàn tiền');
   } else {
     expect(refunds).toHaveLength(1);
     expect(refunds[0].TrangThai).toBe('Thành công');
@@ -155,6 +163,9 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
     expect(Number(refunds[0].SoTienHoan)).toBeLessThanOrEqual(paid);
     // what the customer was told before confirming is what the server refunded
     expect(previewText).toContain(money(Number(refunds[0].SoTienHoan)));
+    // ... and the message at the end names the refunded amount and the original payment method
+    expect(resultText).toContain(money(Number(refunds[0].SoTienHoan)));
+    expect(resultText).toContain('đã được hoàn về phương thức thanh toán ban đầu (VNPAY (mô phỏng))');
     expect(new Date(refunds[0].NgayHoanTien!).getTime()).toBeGreaterThanOrEqual(new Date(refunds[0].NgayYeuCau).getTime());
   }
 });

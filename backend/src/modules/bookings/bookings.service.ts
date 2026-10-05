@@ -11,7 +11,7 @@ import { checkInInstant, checkOutInstant, hoursUntil, timeOfDayOf } from '../../
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { getPrismaClient } from '../../config/prisma';
 import type { RefundGateway } from '../payments/refund-gateway';
-import { VnpayRefundGateway } from '../payments/refund-gateway';
+import { ConfiguredRefundGateway } from '../payments/simulated-refund-gateway';
 import { RefundsRepository } from '../payments/refunds.repository';
 import { RefundProcessor } from '../payments/refund-processor';
 import type { CreateBookingInput, CancelBookingInput } from './bookings.schemas';
@@ -106,7 +106,7 @@ export interface BookingDetail extends Omit<BookingResponse, 'ChiTietPhong'> {
 export class BookingsService {
   constructor(
     private readonly repository: BookingsRepository = new BookingsRepository(),
-    refundGateway: RefundGateway = new VnpayRefundGateway(),
+    refundGateway: RefundGateway = new ConfiguredRefundGateway(),
     private readonly refunds: RefundsRepository = new RefundsRepository(),
     private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds),
     /** The moment the cancellation cut-off is measured from (hours until check-in); only tests replace it. */

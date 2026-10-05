@@ -5,8 +5,8 @@ import { defineConfig } from '@playwright/test';
  * Server test database (backend/.env -> HotelBooking_DB0_Test). Nothing about the application is mocked.
  *   - NODE_ENV=test for the backend turns off ONLY the per-IP rate limiters (a suite that signs in dozens of times from
  *     one IP would otherwise hit the 10-logins-per-15-minutes limit), the request log and real SMTP.
- *   - The fixture server (backend package, tsx) seeds data, reads rows back, and stands in for VNPAY's refund API.
- *   - The hosted VNPAY payment page is the one external page we replace, inside the browser (see support/payment.ts).
+ *   - The fixture server (backend package, tsx) seeds data, reads rows back, and cleans up.
+ *   - Payments and refunds run in the app's own simulated mode (PAYMENT_PROVIDER=simulated): no external gateway at all.
  */
 const API_PORT = 5100;
 const WEB_PORT = 5174; // already in backend/.env CORS_ORIGIN
@@ -46,9 +46,7 @@ export default defineConfig({
         PORT: String(API_PORT),
         FRONTEND_URL: `http://localhost:${WEB_PORT}`,
         CORS_ORIGIN: `http://localhost:${WEB_PORT}`,
-        VNPAY_RETURN_URL: `http://localhost:${API_PORT}/api/payments/vnpay-return`,
-        VNPAY_IPN_URL: `http://localhost:${API_PORT}/api/payments/vnpay-ipn`,
-        VNPAY_REFUND_URL: `http://localhost:${FIXTURE_PORT}/vnpay/refund`,
+        PAYMENT_PROVIDER: 'simulated',
       },
       url: `http://localhost:${API_PORT}/api/health`,
       reuseExistingServer: false,

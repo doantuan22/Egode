@@ -1,4 +1,4 @@
-import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, type Account } from '../support/fixtures';
+import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, money, type Account } from '../support/fixtures';
 
 const API = 'http://localhost:5100/api';
 let owner: Account;
@@ -10,57 +10,60 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  await fx('/gateway/mode', { mode: 'ok' });
   await fx('/cleanup');
 });
 
-test.describe('Refund lifecycle', () => {
-  test('the gateway refuses the refund: the booking is still cancelled, the refund is "Thất bại", and the retry succeeds on the SAME refund row', async ({ page }) => {
+test.describe('Refund (simulated)', () => {
+  test('cancelling a paid booking: a processing dialog, then "the amount was refunded to ..."; HOAN_TIEN is written once and finished', async ({ page }) => {
     const h = await fx('/hotel', { ownerId: owner.id, name: 'E2E Hotel Hoàn Tiền' });
     const rt = await fx('/room-type', { hotelId: h.id, name: 'Phòng Hoàn Tiền', rooms: 2, price: 300_000, fromOffset: 20, days: 5 });
     const customer = await newAccount(ROLES.customer);
     const paid = await fx('/paid-booking-for', { customerId: customer.id, hotelId: h.id, roomTypeId: rt.id, checkIn: addDays(today, 22) });
-    await fx('/gateway/mode', { mode: 'reject' });
-    const callsBefore = (await fx('/gateway/calls')).calls.length; // the stand-in's log is shared by the whole run
     await login(page, customer);
     await page.goto(`/bookings/${paid.id}`);
 
     await page.getByRole('button', { name: 'Hủy đặt phòng này' }).click();
     await page.getByRole('button', { name: 'Xác nhận hủy' }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText('Đang xử lý hủy đặt phòng và hoàn tiền'); // loading effect
+    await expect(dialog).toContainText('Hủy đặt phòng thành công');
+    await expect(dialog).toContainText(money(300_000)); // 100 % tier, a month ahead
+    await expect(dialog).toContainText('đã được hoàn về phương thức thanh toán ban đầu');
+    await dialog.getByRole('button', { name: 'Đóng' }).click();
     await expect(page.getByText('Đã hủy').first()).toBeVisible();
 
-    let row = await fx('/db/booking', { id: paid.id });
-    expect((await fx('/gateway/calls')).calls).toHaveLength(callsBefore + 1); // the refusal really came from the gateway
-    expect(row.TrangThai).toBe('Đã hủy'); // the cancellation is not undone by a gateway problem
+    const row = await fx('/db/booking', { id: paid.id });
+    expect(row.TrangThai).toBe('Đã hủy');
     const refund = row.THANH_TOAN[0].HOAN_TIEN;
     expect(refund).toHaveLength(1);
-    expect(refund[0]).toMatchObject({ TrangThai: 'Thất bại', NgayHoanTien: null });
-    expect(Number(refund[0].SoTienHoan)).toBe(300_000); // 100 % tier, a month ahead
-    const refundId = refund[0].MaHoanTien;
-    const requestedAt = refund[0].NgayYeuCau;
-
-    // the customer sees a retry; the gateway is back; one click finishes the SAME refund
-    await fx('/gateway/mode', { mode: 'ok' });
-    await page.reload();
-    await page.getByRole('button', { name: /Thử lại/ }).click();
-    await expect.poll(async () => (await fx('/db/booking', { id: paid.id })).THANH_TOAN[0].HOAN_TIEN[0].TrangThai).toBe('Thành công');
-
-    row = await fx('/db/booking', { id: paid.id });
-    const after = row.THANH_TOAN[0].HOAN_TIEN;
-    expect(after).toHaveLength(1);
-    expect(after[0].MaHoanTien).toBe(refundId);
-    expect(after[0].NgayYeuCau).toBe(requestedAt); // the request date never moves
-    expect(after[0].NgayHoanTien).not.toBeNull();
-    expect(new Date(after[0].NgayHoanTien).getTime()).toBeGreaterThanOrEqual(new Date(requestedAt).getTime());
+    expect(refund[0]).toMatchObject({ TrangThai: 'Thành công' });
+    expect(Number(refund[0].SoTienHoan)).toBe(300_000);
+    expect(refund[0].NgayHoanTien).not.toBeNull();
+    expect(new Date(refund[0].NgayHoanTien).getTime()).toBeGreaterThanOrEqual(new Date(refund[0].NgayYeuCau).getTime());
+    // nothing left to retry, and the booking page shows the refund as done
     await expect(page.getByRole('button', { name: /Thử lại/ })).toHaveCount(0);
+  });
 
-    // retrying a finished refund moves no more money
-    const calls = (await fx('/gateway/calls')).calls.length;
-    const again = await page.request.post(`${API}/auth/refresh`, { headers: { Origin: 'http://localhost:5174' } });
-    const token = (await again.json()).data.accessToken;
-    const retry = await page.request.post(`${API}/payments/refunds/${refundId}/retry`, { headers: { Authorization: `Bearer ${token}` } });
-    expect(retry.status()).toBe(200);
-    expect((await fx('/gateway/calls')).calls.length).toBe(calls);
+  test('cancelling too close to check-in (0 % tier) still shows the loading effect, then says no refund is due and writes no refund row', async ({ page }) => {
+    const h = await fx('/hotel', { ownerId: owner.id, name: 'E2E Hotel Không Hoàn' });
+    const rt = await fx('/room-type', { hotelId: h.id, name: 'Phòng Sát Ngày', rooms: 2, price: 300_000, fromOffset: 0, days: 4 });
+    const customer = await newAccount(ROLES.customer);
+    // check-in today (Vietnam): inside the shortest refund window of the default policy
+    const paid = await fx('/paid-booking-for', { customerId: customer.id, hotelId: h.id, roomTypeId: rt.id, checkIn: today });
+    await login(page, customer);
+    await page.goto(`/bookings/${paid.id}`);
+
+    await page.getByRole('button', { name: 'Hủy đặt phòng này' }).click();
+    await page.getByRole('button', { name: 'Xác nhận hủy' }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText('Đang xử lý hủy đặt phòng và hoàn tiền');
+    await expect(dialog).toContainText('Theo chính sách hủy, đơn này không được hoàn tiền.');
+    await expect(dialog).not.toContainText('đã được hoàn về');
+    const row = await fx('/db/booking', { id: paid.id });
+    expect(row.TrangThai).toBe('Đã hủy');
+    expect(row.THANH_TOAN[0].HOAN_TIEN).toHaveLength(0); // the fixture policy refunds 100 % only 24 h or more ahead; check-in is today
   });
 });
 

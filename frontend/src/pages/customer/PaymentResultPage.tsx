@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useCreateVnpayPayment, usePaymentStatus } from '../../features/payments/hooks';
+import { usePaymentStatus } from '../../features/payments/hooks';
+import { usePaymentFlow } from '../../features/payments/usePaymentFlow';
 import { formatCurrencyVND } from '../../lib/utils';
 import { CustomerCenterNavigation } from '../../components/layouts/CustomerCenterNavigation';
 import { resolvePaymentResult, type PaymentResult } from '../../features/payments/result';
@@ -42,8 +43,8 @@ export default function PaymentResultPage() {
   const isFailed = result?.kind === 'failed';
   // A failed attempt can be retried only while the booking still holds the rooms.
   const canRetryPayment = isFailed && booking?.TrangThaiDatPhong === BOOKING_STATUS.PENDING_PAYMENT;
-  const payMutation = useCreateVnpayPayment(hasBookingId ? bookingId : 0);
-  const retryPayment = () => payMutation.mutate(undefined, { onSuccess: (payment) => { window.location.href = payment.paymentUrl; } });
+  const paymentFlow = usePaymentFlow(hasBookingId ? bookingId : 0);
+  const retryPayment = paymentFlow.start;
 
   const bookingLink = hasBookingId ? `/bookings/${bookingId}` : null;
   const linkButton = (to: string, label: string, variant: 'primary' | 'secondary' | 'danger' = 'primary') => (
@@ -130,17 +131,17 @@ export default function PaymentResultPage() {
         actions={
           <>
             {canRetryPayment && (
-              <Button type="button" size="lg" className="sm:flex-1" onClick={retryPayment} loading={payMutation.isPending}>
-                {payMutation.isPending ? 'Đang chuyển đến cổng thanh toán...' : 'Thử thanh toán lại'}
+              <Button type="button" size="lg" className="sm:flex-1" onClick={retryPayment} loading={paymentFlow.isBusy}>
+                {paymentFlow.isBusy ? 'Đang xử lý thanh toán...' : 'Thử thanh toán lại'}
               </Button>
             )}
             {bookingLink && linkButton(bookingLink, 'Về chi tiết đơn', canRetryPayment ? 'secondary' : 'danger')}
           </>
         }
       >
-        {payMutation.isError && (
+        {Boolean(paymentFlow.redirectError) && (
           <p role="alert" className="mb-4 rounded-lg bg-danger-light p-3 text-sm text-danger-ink">
-            {payMutation.error instanceof ApiError ? payMutation.error.message : 'Không thể khởi tạo thanh toán'}
+            {paymentFlow.redirectError instanceof ApiError ? paymentFlow.redirectError.message : 'Không thể khởi tạo thanh toán'}
           </p>
         )}
       </ResultBanner>
@@ -164,6 +165,7 @@ export default function PaymentResultPage() {
       <div className="page-container max-w-[800px] py-12 md:py-16 flex-grow flex flex-col items-center justify-center">
         {outcome}
       </div>
+      {paymentFlow.dialog}
     </div>
   );
 }

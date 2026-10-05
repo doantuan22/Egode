@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PaymentResultPage from './PaymentResultPage';
 import { useCreateVnpayPayment, usePaymentStatus } from '../../features/payments/hooks';
+import { getPaymentConfig } from '../../features/payments/api';
 import { formatCurrencyVND } from '../../lib/utils';
 import { ApiError } from '../../services/apiClient';
 import { renderWithProviders } from '../../test/testUtils';
@@ -10,6 +11,7 @@ import type { PaymentStatusResponse } from '../../features/payments/types';
 import type { PaymentView, RefundView } from '../../features/bookings/types';
 
 vi.mock('../../features/payments/hooks');
+vi.mock('../../features/payments/api');
 
 const refund = (TrangThai: string, SoTienHoan = 100000) => ({ MaHoanTien: 1, SoTienHoan, LyDoHoanTien: '', TrangThai, NgayYeuCau: '', NgayHoanTien: null }) as RefundView;
 const payment = (TrangThai: string, HoanTien: RefundView[] = []) => ({ MaThanhToan: 1, SoTien: 100000, PhuongThucThanhToan: 'VNPAY', TrangThai, ThoiGianGiaoDich: '', HoanTien }) as PaymentView;
@@ -26,6 +28,7 @@ beforeEach(() => {
   vi.mocked(usePaymentStatus).mockReset();
   mockStatus({});
   payMutate.mockReset();
+  vi.mocked(getPaymentConfig).mockResolvedValue({ provider: 'vnpay' }); // the real-gateway mode: paying again redirects to the gateway
   vi.mocked(useCreateVnpayPayment).mockReturnValue({ mutate: payMutate, isPending: false, isError: false, error: null } as unknown as ReturnType<typeof useCreateVnpayPayment>);
 });
 
@@ -161,7 +164,7 @@ describe('PaymentResultPage retry after a failed payment', () => {
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Thử thanh toán lại' }));
 
-    expect(payMutate).toHaveBeenCalledOnce();
+    await waitFor(() => expect(payMutate).toHaveBeenCalledOnce());
     // The mutation's onSuccess sends the browser to the VNPAY payment URL.
     const [, options] = payMutate.mock.calls[0] as [undefined, { onSuccess: (result: { paymentUrl: string }) => void }];
     const original = window.location;

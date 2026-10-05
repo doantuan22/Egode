@@ -2,7 +2,7 @@ import { test as base, expect, type Page } from '@playwright/test';
 
 const FIXTURE = 'http://localhost:5191';
 
-/** Calls the fixture server (seed data / read rows back / switch the refund gateway stand-in). */
+/** Calls the fixture server (seed data / read rows back / clean up). */
 export const fx = async <T = any>(path: string, body: Record<string, unknown> = {}): Promise<T> => {
   const res = await fetch(`${FIXTURE}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const json = (await res.json()) as { data?: T; error?: string };

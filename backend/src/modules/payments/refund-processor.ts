@@ -1,6 +1,6 @@
 import { REFUND_STATUS } from '../../common/constants/payment';
 import type { RefundGateway } from './refund-gateway';
-import { VnpayRefundGateway } from './refund-gateway';
+import { ConfiguredRefundGateway } from './simulated-refund-gateway';
 import { attemptGatewayRefund } from './refund-helper';
 import { RefundsRepository, type PendingRefund } from './refunds.repository';
 
@@ -20,7 +20,7 @@ import { RefundsRepository, type PendingRefund } from './refunds.repository';
  */
 export class RefundProcessor {
   constructor(
-    private readonly gateway: RefundGateway = new VnpayRefundGateway(),
+    private readonly gateway: RefundGateway = new ConfiguredRefundGateway(),
     private readonly repository: RefundsRepository = new RefundsRepository()
   ) {}
 

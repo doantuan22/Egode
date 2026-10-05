@@ -52,6 +52,14 @@ cp frontend/.env.example frontend/.env
 
 > Dev: nếu thiếu `VITE_API_BASE_URL`, `apiClient` gọi `/api` tương đối và Vite proxy (`vite.config.ts`) chuyển tiếp sang `http://localhost:5000` (đổi bằng `VITE_DEV_API_TARGET`). Khi API trả về không phải JSON, thông báo lỗi chỉ rõ cần kiểm tra `VITE_API_BASE_URL`/proxy.
 
+### Thanh toán và hoàn tiền (mô phỏng)
+
+Mặc định (`PAYMENT_PROVIDER` không đặt hoặc `simulated`) thanh toán và hoàn tiền được **mô phỏng hoàn toàn, không cần tài khoản VNPAY**, nhưng vẫn ghi đủ dữ liệu như thật:
+- **Thanh toán:** bấm "Thanh toán ngay" → hộp thoại loading ("Đang kết nối cổng thanh toán… / xác thực giao dịch… / xác nhận…") → "Thanh toán thành công!" → trang kết quả. Backend (`POST /api/bookings/:id/payments/simulate`) trong một transaction ghi `THANH_TOAN` "Thành công" (phương thức "VNPAY (mô phỏng)", mã giao dịch dạng `txnRef:số-giao-dịch:ngày-thanh-toán`) và chuyển đơn sang "Đã xác nhận". Số tiền luôn lấy từ đơn, bấm đúp/nhiều tab chỉ tạo một thanh toán.
+- **Hoàn tiền:** hủy đơn đã thanh toán → hộp thoại loading ("Đang hoàn tiền về phương thức thanh toán ban đầu…") → thông báo "Số tiền … đã được hoàn về phương thức thanh toán ban đầu". Số tiền theo chính sách hủy của đơn; `HOAN_TIEN` đi đúng quy trình 3 bước (ghi "Chờ xử lý" → cổng mô phỏng luôn thành công → "Thành công" + `NgayHoanTien`). Ngoài khung giờ được hoàn (0%) thì đơn vẫn hủy, không có dòng hoàn tiền và thông báo nói rõ.
+- Hiệu ứng loading kéo dài tối thiểu ~2,6 giây (`VITE_SIMULATION_DELAY_MS`); dữ liệu do server ghi, không phụ thuộc hiệu ứng.
+- Muốn dùng cổng VNPAY thật: `PAYMENT_PROVIDER=vnpay` kèm `VNPAY_*`. **Production phải đặt `PAYMENT_PROVIDER` tường minh** — backend không khởi động nếu thiếu.
+
 ### Triển khai: cookie refresh và CORS
 
 Refresh token nằm trong cookie `HttpOnly` (`Path=/api/auth`). Trình duyệt chỉ gửi nó theo cách phụ thuộc vào việc SPA và API **cùng site** hay **khác site**. Repo không quy định domain production (tài liệu chỉ nêu frontend dự kiến chạy trên Cloudflare Pages), nên chính sách là cấu hình bắt buộc khi `NODE_ENV=production`:

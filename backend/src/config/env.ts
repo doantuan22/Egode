@@ -42,7 +42,12 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
 
-  // VNPAY Sandbox (M6)
+  // How payments and refunds are completed: `simulated` (default outside production — no external gateway, the whole
+  // flow is recorded in our own database) or `vnpay` (real VNPAY redirect/IPN/refund; needs the VNPAY_* values below).
+  // Production must choose explicitly: simulating payments there would confirm bookings without any money moving.
+  PAYMENT_PROVIDER: z.preprocess((value) => (value === '' ? undefined : value), z.enum(['simulated', 'vnpay']).optional()),
+
+  // VNPAY Sandbox (M6) — only used when PAYMENT_PROVIDER=vnpay
   VNPAY_TMN_CODE: z.string().optional().default(''),
   VNPAY_HASH_SECRET: z.string().optional().default(''),
   VNPAY_PAYMENT_URL: z.string().optional().default('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
@@ -95,6 +100,11 @@ const envSchema = z.object({
     });
   }
 
+  if (!value.PAYMENT_PROVIDER) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['PAYMENT_PROVIDER'], message: 'PAYMENT_PROVIDER must be set explicitly in production: vnpay (real gateway) or simulated (no money moves)' });
+  }
+  const usesVnpay = value.PAYMENT_PROVIDER === 'vnpay';
+
   const requiredProductionSecrets: Array<[keyof typeof value, string]> = [
     ['DATABASE_URL', 'DATABASE_URL'],
     ['JWT_ACCESS_SECRET', 'JWT_ACCESS_SECRET'],
@@ -102,13 +112,12 @@ const envSchema = z.object({
     ['CLOUDINARY_API_SECRET', 'CLOUDINARY_API_SECRET'],
     ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_CLOUD_NAME'],
     ['CLOUDINARY_API_KEY', 'CLOUDINARY_API_KEY'],
-    ['VNPAY_TMN_CODE', 'VNPAY_TMN_CODE'],
-    ['VNPAY_HASH_SECRET', 'VNPAY_HASH_SECRET'],
     ['SMTP_HOST', 'SMTP_HOST'],
     ['SMTP_USER', 'SMTP_USER'],
     ['SMTP_PASSWORD', 'SMTP_PASSWORD'],
     ['SMTP_FROM', 'SMTP_FROM'],
   ];
+  if (usesVnpay) requiredProductionSecrets.push(['VNPAY_TMN_CODE', 'VNPAY_TMN_CODE'], ['VNPAY_HASH_SECRET', 'VNPAY_HASH_SECRET']);
   for (const [key, label] of requiredProductionSecrets) {
     const raw = String(value[key] ?? '');
     if (!raw || /change_me|your_|dev_jwt|yourpassword/i.test(raw)) {
@@ -120,15 +129,14 @@ const envSchema = z.object({
   }
   const publicUrls = [
     ['CORS_ORIGIN', value.CORS_ORIGIN],
-    ['VNPAY_RETURN_URL', value.VNPAY_RETURN_URL],
-    ['VNPAY_IPN_URL', value.VNPAY_IPN_URL],
+    ...(usesVnpay ? ([['VNPAY_RETURN_URL', value.VNPAY_RETURN_URL], ['VNPAY_IPN_URL', value.VNPAY_IPN_URL]] as const) : []),
   ] as const;
   for (const [key, raw] of publicUrls) {
     if (raw.split(',').some((url) => !url.trim().startsWith('https://'))) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must use HTTPS in production` });
     }
   }
-  if (value.VNPAY_PAYMENT_URL.includes('sandbox') || value.VNPAY_REFUND_URL.includes('sandbox')) {
+  if (usesVnpay && (value.VNPAY_PAYMENT_URL.includes('sandbox') || value.VNPAY_REFUND_URL.includes('sandbox'))) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['VNPAY_PAYMENT_URL'], message: 'Production must not use VNPAY sandbox endpoints' });
   }
   if (!/(^|;)\s*encrypt\s*=\s*true\s*(;|$)/i.test(value.DATABASE_URL)) {

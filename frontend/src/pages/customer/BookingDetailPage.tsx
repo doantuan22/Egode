@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useBookingDetail, useCancelBooking } from '../../features/bookings/hooks';
 import { hoursBeforeCheckIn, selectRefundPercentPreview, computeRefundAmountPreview } from '../../features/bookings/refund-preview';
-import { useCreateVnpayPayment, useRetryRefund } from '../../features/payments/hooks';
+import { useRetryRefund } from '../../features/payments/hooks';
+import { usePaymentFlow } from '../../features/payments/usePaymentFlow';
+import { CancelRefundDialog, type CancelFlowState } from '../../components/bookings/CancelRefundDialog';
+import { withMinimumDelay } from '../../lib/simulation';
 import { ReviewSection } from '../../components/reviews/ReviewSection';
 import { PaymentHoldNotice } from '../../components/bookings/PaymentHoldNotice';
 import { BookingSummary } from '../../components/bookings/BookingSummary';
@@ -22,8 +25,9 @@ export default function BookingDetailPage() {
   const justBooked = Boolean((location.state as { justBooked?: boolean } | null)?.justBooked);
 
   const bookingQuery = useBookingDetail(bookingId);
-  const payMutation = useCreateVnpayPayment(bookingId);
+  const paymentFlow = usePaymentFlow(bookingId);
   const cancelMutation = useCancelBooking(bookingId);
+  const [cancelFlow, setCancelFlow] = useState<CancelFlowState>({ phase: 'idle' });
   const retryRefundMutation = useRetryRefund(bookingId);
 
   // Linked from the booking list ("Đánh giá"): the review section only exists after the booking has loaded.
@@ -51,16 +55,23 @@ export default function BookingDetailPage() {
   const previewPercent = selectRefundPercentPreview(booking.ChinhSachHuy.ChiTiet, previewHours);
   const previewAmount = computeRefundAmountPreview(successfulPaid, previewPercent);
 
-  const startPayment = () => {
-    payMutation.mutate(undefined, {
-      onSuccess: (result) => {
-        window.location.href = result.paymentUrl;
-      },
-    });
-  };
-
   const confirmCancel = (note: string | undefined, onDone: () => void) => {
-    cancelMutation.mutate({ ghiChu: note }, { onSuccess: onDone });
+    // Nothing was paid: a plain cancellation, no refund to wait for.
+    if (successfulPaid <= 0) {
+      cancelMutation.mutate({ ghiChu: note }, { onSuccess: onDone });
+      return;
+    }
+    // Paid: show the processing animation, then what happens to the money.
+    setCancelFlow({ phase: 'processing' });
+    void (async () => {
+      try {
+        const updated = await withMinimumDelay(cancelMutation.mutateAsync({ ghiChu: note }));
+        onDone();
+        setCancelFlow({ phase: 'success', booking: updated });
+      } catch (error) {
+        setCancelFlow({ phase: 'error', message: error instanceof ApiError ? error.message : 'Không thể hủy đặt phòng. Vui lòng thử lại.' });
+      }
+    })();
   };
 
   return (
@@ -190,9 +201,9 @@ export default function BookingDetailPage() {
           <BookingActions
             canPay={booking.TrangThai === BOOKING_STATUS.PENDING_PAYMENT}
             canCancel={canCancel}
-            onPay={startPayment}
-            isPaying={payMutation.isPending}
-            payError={payMutation.isError ? payMutation.error : null}
+            onPay={paymentFlow.start}
+            isPaying={paymentFlow.isBusy}
+            payError={paymentFlow.redirectError}
             onCancel={confirmCancel}
             isCancelling={cancelMutation.isPending}
             cancelError={cancelMutation.isError ? cancelMutation.error : null}
@@ -203,6 +214,9 @@ export default function BookingDetailPage() {
       </div>
 
       <ReviewSection bookingId={booking.MaDatPhong} bookingStatus={booking.TrangThai} />
+
+      {paymentFlow.dialog}
+      <CancelRefundDialog flow={cancelFlow} onClose={() => setCancelFlow({ phase: 'idle' })} />
 
     </div>
   );

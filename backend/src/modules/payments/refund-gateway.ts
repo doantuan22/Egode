@@ -32,6 +32,8 @@ export interface RefundResult {
 
 export interface RefundGateway {
   requestRefund(input: RefundRequestInput): Promise<RefundResult>;
+  /** false for a gateway that does not need the original VNPAY transaction number (the simulated one). Default: true. */
+  requiresOriginalTransaction?(): boolean;
 }
 
 /**

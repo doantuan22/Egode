@@ -1,5 +1,4 @@
-import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, type Account } from '../support/fixtures';
-import { simulateGateway } from '../support/payment';
+import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, money, type Account } from '../support/fixtures';
 
 let owner: Account;
 let admin: Account;
@@ -20,7 +19,7 @@ test.beforeAll(async () => {
   city = { id: h.cityId, name: h.cityName };
   hotel = { id: h.id, name: h.name };
   roomTypeName = 'Phòng Tiêu Chuẩn E2E';
-  await fx('/room-type', { hotelId: hotel.id, name: roomTypeName, capacity: 2, price: PRICE, rooms: 2, fromOffset: 10, days: 15 });
+  await fx('/room-type', { hotelId: hotel.id, name: roomTypeName, capacity: 2, price: PRICE, rooms: 6, fromOffset: 10, days: 15 });
 });
 
 test.afterAll(async () => {
@@ -30,11 +29,10 @@ test.afterAll(async () => {
 const stayUrl = () => `/hotels/${hotel.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=2`;
 
 test.describe('Zero-price booking', () => {
-  test('a 100% promotion makes the total 0: confirmed on the spot, no payment row, the gateway is never visited', async ({ page }) => {
+  test('a 100% promotion makes the total 0: confirmed on the spot, no payment row, no payment dialog', async ({ page }) => {
     const customer = await newAccount(ROLES.customer);
     const free = await fx('/promotion', { type: 'Phần trăm', value: 100, startKey: addDays(await todayVN(), -1), endKey: addDays(await todayVN(), 60) });
     await login(page, customer);
-    const gateway = await simulateGateway(page, 'success');
 
     await page.goto(stayUrl());
     await page.getByRole('button', { name: `Tăng phòng ${roomTypeName}` }).click();
@@ -46,7 +44,7 @@ test.describe('Zero-price booking', () => {
 
     await expect(page).toHaveURL(/\/payment\/result\?.*status=success/);
     await expect(page.getByText(/Đặt phòng thành công/).first()).toBeVisible();
-    expect(gateway).toHaveLength(0);
+    await expect(page.getByRole('dialog')).toHaveCount(0); // nothing to pay, so no payment animation either
 
     const row = await fx('/db/latest-booking', { customerId: customer.id });
     expect(row.TrangThai).toBe('Đã xác nhận');
@@ -56,8 +54,8 @@ test.describe('Zero-price booking', () => {
   });
 });
 
-test.describe('Payment outcomes', () => {
-  test('a declined card leaves the booking unpaid; paying again with a good card confirms it', async ({ page }) => {
+test.describe('Payment (simulated)', () => {
+  test('"Thanh toán ngay": a processing dialog, then success; the payment and the confirmed booking are written; paying again is impossible', async ({ page }) => {
     const customer = await newAccount(ROLES.customer);
     await login(page, customer);
     await page.goto(stayUrl());
@@ -65,26 +63,41 @@ test.describe('Payment outcomes', () => {
     await page.locator('#dat-phong').getByRole('button', { name: /Tạo đặt phòng/ }).click();
     await expect(page).toHaveURL(/\/bookings\/\d+/);
     const bookingId = Number(new URL(page.url()).pathname.split('/').pop());
+    expect((await fx('/db/booking', { id: bookingId })).TrangThai).toBe('Chờ thanh toán');
 
-    // first attempt: the bank declines
-    await page.unrouteAll();
-    await simulateGateway(page, 'failed');
     await page.getByRole('button', { name: 'Thanh toán ngay' }).click();
-    await expect(page).toHaveURL(/\/payment\/result\?.*status=(failed|failure|error)/);
-    let row = await fx('/db/booking', { id: bookingId });
-    expect(row.TrangThai).toBe('Chờ thanh toán');
-    expect(row.THANH_TOAN.map((p: { TrangThai: string }) => p.TrangThai)).toEqual(['Thất bại']);
 
-    // second attempt: succeeds
-    await page.unrouteAll();
-    await simulateGateway(page, 'success');
-    await page.goto(`/bookings/${bookingId}`);
-    await page.getByRole('button', { name: 'Thanh toán ngay' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toContainText('Đang xử lý thanh toán');
+    await expect(page.getByRole('status').first()).toContainText('Đang kết nối cổng thanh toán'); // status lines change while it runs
+    await expect(dialog).toContainText('Thanh toán thành công!');
+    await expect(dialog).toContainText(money(PRICE));
+    await dialog.getByRole('button', { name: 'Xem kết quả' }).click();
     await expect(page).toHaveURL(/\/payment\/result\?.*status=success/);
-    row = await fx('/db/booking', { id: bookingId });
+    await expect(page.getByText('Thanh toán thành công!').first()).toBeVisible();
+
+    const row = await fx('/db/booking', { id: bookingId });
     expect(row.TrangThai).toBe('Đã xác nhận');
-    expect(row.THANH_TOAN.filter((p: { TrangThai: string }) => p.TrangThai === 'Thành công')).toHaveLength(1);
-    expect(row.THANH_TOAN.filter((p: { TrangThai: string }) => p.TrangThai === 'Chờ xử lý')).toHaveLength(0);
+    expect(row.THANH_TOAN).toHaveLength(1);
+    expect(row.THANH_TOAN[0]).toMatchObject({ TrangThai: 'Thành công', PhuongThucThanhToan: 'VNPAY (mô phỏng)' });
+    expect(Number(row.THANH_TOAN[0].SoTien)).toBe(Number(row.TongTienThanhToan));
+
+    // the booking page no longer offers payment
+    await page.goto(`/bookings/${bookingId}`);
+    await expect(page.getByRole('button', { name: 'Thanh toán ngay' })).toHaveCount(0);
+  });
+
+  test('without pressing anything the dialog continues to the result page by itself', async ({ page }) => {
+    const customer = await newAccount(ROLES.customer);
+    await login(page, customer);
+    await page.goto(stayUrl());
+    await page.getByRole('button', { name: `Tăng phòng ${roomTypeName}` }).click();
+    await page.locator('#dat-phong').getByRole('button', { name: /Tạo đặt phòng/ }).click();
+    await expect(page).toHaveURL(/\/bookings\/\d+/);
+
+    await page.getByRole('button', { name: 'Thanh toán ngay' }).click();
+
+    await expect(page).toHaveURL(/\/payment\/result\?.*status=success/, { timeout: 15_000 });
   });
 });
 

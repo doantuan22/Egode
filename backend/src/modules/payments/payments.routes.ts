@@ -24,6 +24,15 @@ paymentsBookingRoutes.post(
   controller.createVnpayPayment
 );
 
+paymentsBookingRoutes.post(
+  '/:id/payments/simulate',
+  applyOutsideTests(paymentActionLimiter),
+  authenticate,
+  requireRole(ROLE_NAMES.CUSTOMER),
+  validateRequest({ params: bookingIdParamSchema }),
+  controller.paySimulated
+);
+
 paymentsBookingRoutes.get(
   '/:id/payments/status',
   authenticate,
@@ -35,6 +44,7 @@ paymentsBookingRoutes.get(
 /** Mounted at `/payments` — VNPAY-facing gateway endpoints. No auth: the caller is VNPAY's browser redirect / server, authenticated instead by vnp_SecureHash (verified inside the service). */
 export const paymentsGatewayRoutes = Router();
 
+paymentsGatewayRoutes.get('/config', controller.getConfig);
 paymentsGatewayRoutes.get('/vnpay-return', applyOutsideTests(callbackLimiter), controller.vnpayReturn);
 paymentsGatewayRoutes.get('/vnpay-ipn', applyOutsideTests(callbackLimiter), controller.vnpayIpn);
 

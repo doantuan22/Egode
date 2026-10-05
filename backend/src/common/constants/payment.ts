@@ -10,9 +10,11 @@ export const PAYMENT_STATUS = {
 
 export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
 
-/** THANH_TOAN.PhuongThucThanhToan — open domain. M6 only ever uses VNPAY. */
+/** THANH_TOAN.PhuongThucThanhToan — open domain. VNPAY, or its simulated twin. */
 export const PAYMENT_METHOD = {
   VNPAY: 'VNPAY',
+  /** Simulated payment (PAYMENT_PROVIDER=simulated): recorded like a VNPAY payment, but no gateway was involved. */
+  VNPAY_SIMULATED: 'VNPAY (mô phỏng)',
 } as const;
 
 /** HOAN_TIEN.TrangThai — open domain (no CK constraint). */

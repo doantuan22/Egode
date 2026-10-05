@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import BookingDetailPage from './BookingDetailPage';
@@ -12,6 +12,8 @@ import type { BookingDetail } from '../../features/bookings/types';
 vi.mock('../../features/bookings/hooks');
 vi.mock('../../features/payments/hooks');
 vi.mock('../../features/reviews/hooks');
+// The server answers at once; the screen keeps the animation for a moment. Tests do not wait for that moment.
+vi.mock('../../lib/simulation', () => ({ SIMULATION_DELAY_MS: 0, withMinimumDelay: <T,>(work: Promise<T>) => work }));
 
 const booking = (TrangThai: string) =>
   ({
@@ -161,5 +163,85 @@ describe('BookingDetailPage refund retry', () => {
     openWithRefund('Chờ xử lý', { isPending: true, isError: true, error: new ApiError('Yêu cầu hoàn tiền đang được xử lý. Vui lòng kiểm tra lại sau ít phút', 409) });
     expect(screen.getByRole('button', { name: /Thử lại/ })).toBeDisabled();
     expect(screen.getByRole('alert')).toHaveTextContent('Yêu cầu hoàn tiền đang được xử lý');
+  });
+});
+
+describe('BookingDetailPage cancelling with a refund (simulated)', () => {
+  const paid = (extra: object = {}) =>
+    ({
+      ...booking('Đã xác nhận'),
+      ThanhToan: [{ MaThanhToan: 3, SoTien: 1000000, PhuongThucThanhToan: 'VNPAY (mô phỏng)', TrangThai: 'Thành công', ThoiGianGiaoDich: '2030-01-01T00:00:00.000Z', HoanTien: [] }],
+      ...extra,
+    }) as unknown as BookingDetail;
+  const cancelledWithRefund = (refunds: object[]) => ({ ...paid({ TrangThai: 'Đã hủy' }), ThanhToan: [{ ...paid().ThanhToan[0], HoanTien: refunds }] }) as unknown as BookingDetail;
+  const refundRow = (TrangThai: string, SoTienHoan: number) => ({ MaHoanTien: 1, SoTienHoan, LyDoHoanTien: 'Hủy', TrangThai, NgayYeuCau: '2030-01-01T00:00:00.000Z', NgayHoanTien: null });
+  const mutateAsync = vi.fn();
+  const mutate = vi.fn();
+
+  const openBooking = (data: BookingDetail) => {
+    vi.mocked(useCancelBooking).mockReturnValue({ ...idle, mutate, mutateAsync } as unknown as ReturnType<typeof useCancelBooking>);
+    vi.mocked(useBookingDetail).mockReturnValue({ isLoading: false, isError: false, data, dataUpdatedAt: Date.now(), refetch: vi.fn() } as unknown as ReturnType<typeof useBookingDetail>);
+    renderWithProviders(<BookingDetailPage />, { route: '/bookings/5' });
+  };
+  const confirmCancel = async () => {
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Hủy đặt phòng này' }));
+    await user.click(screen.getByRole('button', { name: 'Xác nhận hủy' }));
+  };
+
+  beforeEach(() => {
+    mutate.mockReset();
+    mutateAsync.mockReset();
+  });
+
+  it('a paid booking: a processing dialog while the cancellation runs, then the amount that was refunded', async () => {
+    let finish: (value: BookingDetail) => void = () => undefined;
+    mutateAsync.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+    openBooking(paid());
+
+    await confirmCancel();
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('Đang xử lý hủy đặt phòng và hoàn tiền');
+    expect(mutateAsync).toHaveBeenCalledWith({ ghiChu: undefined });
+
+    finish(cancelledWithRefund([refundRow('Thành công', 1000000)]));
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveTextContent('Hủy đặt phòng thành công'));
+    expect(screen.getByRole('dialog')).toHaveTextContent('1.000.000');
+    expect(screen.getByRole('dialog')).toHaveTextContent('đã được hoàn về phương thức thanh toán ban đầu');
+  });
+
+  it('sends the reason the customer typed', async () => {
+    mutateAsync.mockResolvedValue(cancelledWithRefund([refundRow('Thành công', 1000000)]));
+    openBooking(paid());
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Hủy đặt phòng này' }));
+    await user.type(screen.getByLabelText('Lý do hủy (không bắt buộc)'), 'Đổi lịch');
+
+    await user.click(screen.getByRole('button', { name: 'Xác nhận hủy' }));
+
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledWith({ ghiChu: 'Đổi lịch' }));
+  });
+
+  it('a refused cancellation is explained in the dialog, which can be closed', async () => {
+    mutateAsync.mockRejectedValue(new ApiError('Đặt phòng đã đổi trạng thái trước đó (có thể đã bị hủy hoặc hết hạn) — vui lòng tải lại', 409));
+    openBooking(paid());
+
+    await confirmCancel();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Đặt phòng đã đổi trạng thái trước đó');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Đóng' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('an unpaid booking is cancelled plainly: no processing dialog, no refund talk', async () => {
+    openBooking(booking('Chờ thanh toán'));
+
+    await confirmCancel();
+
+    expect(mutate).toHaveBeenCalledOnce();
+    expect(mutateAsync).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

@@ -15,15 +15,16 @@ export const attemptGatewayRefund = async (
   ipAddr: string
 ): Promise<RefundResult> => {
   const { txnRef, transactionNo, payDate } = decodeGatewayRef(packedOriginalRef);
-  if (!transactionNo || !payDate) {
+  const needsTransaction = gateway.requiresOriginalTransaction?.() ?? true;
+  if (needsTransaction && (!transactionNo || !payDate)) {
     return { success: false, message: 'Thiếu thông tin giao dịch gốc từ VNPAY (chưa có vnp_TransactionNo)' };
   }
   try {
     return await gateway.requestRefund({
       refundRef,
       originalTxnRef: txnRef,
-      originalTransactionNo: transactionNo,
-      originalPayDate: payDate,
+      originalTransactionNo: transactionNo ?? '',
+      originalPayDate: payDate ?? '',
       amount,
       reason: 'Hoan tien huy dat phong',
       ipAddr,
