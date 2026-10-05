@@ -145,7 +145,7 @@ React Router (src/routes/AppRoutes.tsx)
 ### 3.3. Các cơ chế tích hợp trọng yếu
 1. **Xác thực JWT kép (Dual-Token Mechanism):**
    - Access Token: Ngắn hạn (15 phút), ký HMAC-SHA256 với `JWT_ACCESS_SECRET`, lưu trong bộ nhớ client (Zustand state), gửi qua header `Authorization: Bearer <token>`.
-   - Refresh Token: Dài hạn (7 ngày), ký với `JWT_REFRESH_SECRET`, lưu trong cookie `httpOnly: true`, `secure` tự động bật khi `NODE_ENV==='production'`, `sameSite: 'lax'` (không phải `'strict'` — `'lax'` là lựa chọn có chủ đích để cookie không bị rớt trên một số luồng redirect top-level hợp lệ; xem `auth.controller.ts`).
+   - Refresh Token: Dài hạn (7 ngày), ký với `JWT_REFRESH_SECRET`, lưu trong cookie `httpOnly: true`, `secure` tự động bật khi `NODE_ENV==='production'`, `Path=/api/auth`. `SameSite` do `REFRESH_COOKIE_SAMESITE` quyết định: `lax` khi SPA và API cùng site (mặc định ngoài production; không dùng `strict` để cookie không rớt trên các luồng redirect top-level hợp lệ), `none` (tự bật `Secure`) khi khác site; production bắt buộc đặt tường minh. `POST /auth/refresh` và `/auth/logout` từ chối `Origin` không thuộc `CORS_ORIGIN`. Xem README, mục "Triển khai: cookie refresh và CORS" và `common/utils/auth-cookie.ts`.
    - Auto-refresh: `apiClient.ts` tự động phát hiện mã `401`, gọi `POST /api/auth/refresh` và có cờ `refreshPromise` deduplication chống race condition khi nhiều request đồng thời nhận 401. Nếu refresh cũng thất bại, phiên được đánh dấu hết hạn (`expireSession`) và người dùng thấy thông báo rõ ràng ở trang đăng nhập thay vì bị chuyển hướng âm thầm (M9).
 2. **Cổng thanh toán VNPAY Sandbox:**
    - Tạo URL thanh toán an toàn: Tính checksum `vnp_SecureHash` bằng HMAC-SHA512 với `VNPAY_HASH_SECRET`.

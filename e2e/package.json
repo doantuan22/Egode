@@ -1,0 +1,13 @@
+{
+  "name": "hotel-booking-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Browser E2E: real frontend build + real backend + SQL Server test database",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.0.0"
+  }
+}

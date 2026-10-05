@@ -1,10 +1,8 @@
 import { z } from 'zod';
 import { validateImageDataUri } from '../../common/utils/image-upload';
+import { timeOfDaySchema } from '../../common/utils/time-of-day';
 
-const timeOfDay = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Giờ phải theo định dạng HH:MM')
-  .transform((val) => new Date(`1970-01-01T${val}:00Z`));
+const timeOfDay = timeOfDaySchema; // the same "HH:mm" contract as the admin API
 
 // TrangThai/MaTaiKhoanDuyet/NgayDuyet/MaTaiKhoanSoHuu are intentionally
 // excluded — owners cannot self-approve or reassign ownership (M3 §5).

@@ -6,18 +6,18 @@ export class AppError extends Error {
   public readonly isOperational: boolean;
   public readonly details?: unknown;
 
-  constructor(message: string, statusCode = 500, details?: unknown, isOperational = true) {
+  constructor(message: string, statusCode = 500, details?: unknown, isOperational = true, code?: ErrorCode) {
     super(message);
     this.statusCode = statusCode;
-    this.code = codeForStatus(statusCode);
+    this.code = code ?? codeForStatus(statusCode);
     this.details = details;
     this.isOperational = isOperational;
     Object.setPrototypeOf(this, new.target.prototype);
     Error.captureStackTrace(this, this.constructor);
   }
 
-  static badRequest(message = 'Bad Request', details?: unknown): AppError {
-    return new AppError(message, 400, details);
+  static badRequest(message = 'Bad Request', details?: unknown, code?: ErrorCode): AppError {
+    return new AppError(message, 400, details, true, code);
   }
 
   static unauthorized(message = 'Unauthorized'): AppError {

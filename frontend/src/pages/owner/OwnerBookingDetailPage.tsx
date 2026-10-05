@@ -113,12 +113,12 @@ export default function OwnerBookingDetailPage() {
               <div className="p-3 border border-border rounded-xl bg-surface-secondary/50">
                 <div className="text-[11px] uppercase font-bold text-ink-muted">Nhận phòng (Check-in)</div>
                 <div className="font-bold text-ink text-sm mt-0.5">{formatDateVi(b.NgayNhanPhong)}</div>
-                <div className="text-[11px] text-ink-muted">Từ {b.GioNhanPhong.slice(11, 16)}</div>
+                <div className="text-[11px] text-ink-muted">Từ {b.GioNhanPhong}</div>
               </div>
               <div className="p-3 border border-border rounded-xl bg-surface-secondary/50">
                 <div className="text-[11px] uppercase font-bold text-ink-muted">Trả phòng (Check-out)</div>
                 <div className="font-bold text-ink text-sm mt-0.5">{formatDateVi(b.NgayTraPhong)}</div>
-                <div className="text-[11px] text-ink-muted">Trước {b.GioTraPhong.slice(11, 16)}</div>
+                <div className="text-[11px] text-ink-muted">Trước {b.GioTraPhong}</div>
               </div>
             </div>
           </div>

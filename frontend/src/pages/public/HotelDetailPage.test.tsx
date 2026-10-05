@@ -196,7 +196,7 @@ describe('HotelDetailPage price quote', () => {
     MaKhachSan: 1, NgayNhanPhong: '2030-01-01', NgayTraPhong: '2030-01-02', SoDem: 1, KhaDung: true, ChiTietPhong: [line],
     TongTienPhong: 700000, KhuyenMai: null, SoTienGiam: 0, TongTienThanhToan: 700000, PromoHopLe: false, PromoThongBao: null, ChinhSachHuy: null,
   };
-  const request = (extra: object = {}) => ({ checkIn: '2030-01-01', checkOut: '2030-01-02', rooms: [{ maLoaiPhong: 11, soLuong: 1 }], ...extra });
+  const request = (extra: object = {}) => ({ checkIn: '2030-01-01', checkOut: '2030-01-02', guests: 2, rooms: [{ maLoaiPhong: 11, soLuong: 1 }], ...extra });
   const lastRequest = () => vi.mocked(useQuote).mock.calls.at(-1)?.[1];
   const addRoom = (user: ReturnType<typeof userEvent.setup>) => user.click(screen.getByRole('button', { name: 'Tăng phòng Phòng Superior' }));
   const promoInput = () => screen.getByPlaceholderText('Nhập mã (nếu có)');
@@ -220,6 +220,7 @@ describe('HotelDetailPage price quote', () => {
   });
 
   it('does not send a promo code that is only typed; "Áp dụng" sends it', async () => {
+    mockQuote({ data: { ...quote, PromoHopLe: true, SoTienGiam: 70000, TongTienThanhToan: 630000, PromoThongBao: 'Áp dụng thành công' } });
     open();
     const user = userEvent.setup();
     await addRoom(user);
@@ -245,15 +246,125 @@ describe('HotelDetailPage price quote', () => {
     expect(lastRequest()).toEqual(request());
   });
 
-  it('re-quotes with the promo code that is typed when the room count changes', async () => {
-    open();
-    const user = userEvent.setup();
-    await addRoom(user);
-    await user.type(promoInput(), 'SALE10');
+  describe('promo code: typed (promoInput) is not applied (appliedPromo) until "Áp dụng"; the backend revalidates it', () => {
+    /** Plays the backend: SALE10 gives 10% off but only up to 2 rooms; anything else is not valid. */
+    const backendQuote = (req: { rooms: Array<{ soLuong: number }>; promoCode?: string }) => {
+      const rooms = req.rooms[0].soLuong;
+      const total = 700000 * rooms;
+      const code = req.promoCode;
+      const valid = code === 'SALE10' && rooms <= 2;
+      const discount = valid ? total / 10 : 0;
+      return {
+        ...quote,
+        ChiTietPhong: [{ ...line, SoLuongYeuCau: rooms, ThanhTien: total }],
+        TongTienPhong: total,
+        SoTienGiam: discount,
+        TongTienThanhToan: total - discount,
+        PromoHopLe: valid,
+        PromoThongBao: !code ? null : valid ? 'Áp dụng thành công' : code === 'SALE10' ? 'Mã chỉ áp dụng cho tối đa 2 phòng' : 'Mã không hợp lệ',
+      };
+    };
+    const requests = () => vi.mocked(useQuote).mock.calls.map((c) => c[1]).filter(Boolean) as Array<{ rooms: Array<{ soLuong: number }>; promoCode?: string }>;
+    const apply = (user: ReturnType<typeof userEvent.setup>) => user.click(screen.getByRole('button', { name: 'Áp dụng' }));
 
-    await addRoom(user);
+    beforeEach(() => {
+      vi.mocked(useQuote).mockReset();
+      vi.mocked(useQuote).mockImplementation(((_id: number, req: Parameters<typeof backendQuote>[0] | null) => ({ ...quoteIdle, data: req ? backendQuote(req) : undefined })) as unknown as typeof useQuote);
+    });
 
-    expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }], promoCode: 'SALE10' }));
+    it('a code that is only typed is NOT applied when the room count changes', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'SALE10');
+
+      await addRoom(user);
+
+      expect(requests().every((r) => r.promoCode === undefined)).toBe(true);
+      expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }] }));
+      expect(promoInput()).toHaveValue('SALE10'); // still waiting to be applied
+      expect(screen.getByText('Áp dụng mã để cập nhật báo giá trước khi tiếp tục.')).toBeInTheDocument();
+      expect(screen.queryByText('Áp dụng thành công')).not.toBeInTheDocument();
+    });
+
+    it('apply succeeds → changing the room count re-quotes the APPLIED code and the new total is right', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'SALE10');
+      await apply(user);
+      expect(lastRequest()).toEqual(request({ promoCode: 'SALE10' }));
+      expect(screen.getByText('Áp dụng thành công')).toBeInTheDocument();
+      expect(screen.getAllByText(formatCurrencyVND(630000)).length).toBeGreaterThan(0);
+
+      await addRoom(user); // 2 rooms: still valid
+
+      expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }], promoCode: 'SALE10' }));
+      expect(screen.getByText('Áp dụng thành công')).toBeInTheDocument();
+      expect(screen.getAllByText(formatCurrencyVND(1260000)).length).toBeGreaterThan(0); // 1.400.000 − 10%
+      expect(screen.queryByRole('alert', { name: '' })?.textContent ?? '').not.toContain('Mã khuyến mãi');
+    });
+
+    it('apply succeeds → the new selection makes the code invalid → it is removed, the reason is shown, the total has no discount', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'SALE10');
+      await apply(user);
+      await addRoom(user); // 2
+      await addRoom(user); // 3 rooms → the backend says the code no longer applies
+
+      await waitFor(() => expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 3 }] })));
+      expect(screen.getByText('Mã khuyến mãi SALE10: Mã chỉ áp dụng cho tối đa 2 phòng')).toBeInTheDocument();
+      expect(promoInput()).toHaveValue('');
+      expect(screen.queryByText(/Khuyến mãi giảm/)).not.toBeInTheDocument();
+      expect(screen.getAllByText(formatCurrencyVND(2100000)).length).toBeGreaterThan(0);
+      // it stays removed: going back to 2 rooms does not silently bring it back
+      await user.click(screen.getByRole('button', { name: 'Giảm phòng Phòng Superior' }));
+      expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }] }));
+    });
+
+    it('a code that was typed AFTER another one was applied is ignored by quantity changes (the applied one keeps being used)', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'SALE10');
+      await apply(user);
+      await user.clear(promoInput());
+      await user.type(promoInput(), 'OTHER');
+
+      await addRoom(user);
+
+      expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }] }));
+    });
+
+    it('a wrong code is answered by the backend: clear message, nothing applied, and the new typing clears the message', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'WRONG');
+
+      await apply(user);
+
+      expect(screen.getByText('Mã khuyến mãi WRONG: Mã không hợp lệ')).toBeInTheDocument();
+      expect(lastRequest()).toEqual(request());
+      await user.type(promoInput(), 'S');
+      expect(screen.queryByText('Mã khuyến mãi WRONG: Mã không hợp lệ')).not.toBeInTheDocument();
+    });
+
+    it('applying the same valid code again asks the backend again', async () => {
+      const refetch = vi.fn();
+      vi.mocked(useQuote).mockImplementation(((_id: number, req: Parameters<typeof backendQuote>[0] | null) => ({ ...quoteIdle, data: req ? backendQuote(req) : undefined, refetch })) as unknown as typeof useQuote);
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.type(promoInput(), 'SALE10');
+      await apply(user);
+
+      await apply(user);
+
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('shows a spinner while the quote loads and the error when it fails', async () => {
@@ -339,6 +450,80 @@ describe('HotelDetailPage price quote', () => {
       expect(screen.getByRole('button', { name: /Xác nhận đặt phòng/ })).toBeInTheDocument();
       expect(screen.getByText(/không cần thanh toán/)).toBeInTheDocument();
     });
+  });
+});
+
+describe('HotelDetailPage guests (party size) flow', () => {
+  const room = {
+    MaLoaiPhong: 11, TenLoaiPhong: 'Phòng Superior', SoGiuong: 1, SucChua: 2, DienTich: 24, LoaiGiuong: 'Giường đôi', MoTa: null,
+    HinhAnh: [], TienNghi: [], GiaTheoDem: 700000, TongTien: 700000, SoDem: 1, SoPhongConLai: 5, ConHang: true,
+  };
+  const line = { MaLoaiPhong: 11, TenLoaiPhong: 'Phòng Superior', SoLuongYeuCau: 1, SoPhongConLai: 5, DuPhong: true, CoGiaDayDu: true, GiaTheoDem: 700000, ThanhTien: 700000 };
+  const quote = {
+    MaKhachSan: 1, NgayNhanPhong: '2030-01-01', NgayTraPhong: '2030-01-02', SoDem: 1, KhaDung: true, ChiTietPhong: [line],
+    TongTienPhong: 700000, KhuyenMai: null, SoTienGiam: 0, TongTienThanhToan: 700000, PromoHopLe: false, PromoThongBao: null, ChinhSachHuy: null,
+  };
+  const openFor = (guests: number | null) =>
+    renderWithProviders(
+      <Routes><Route path="/hotels/:id" element={<FeedbackProvider><HotelDetailPage /></FeedbackProvider>} /></Routes>,
+      { route: `/hotels/1?checkIn=2030-01-01&checkOut=2030-01-02${guests === null ? '' : `&guests=${guests}`}` }
+    );
+  const addRoom = (user: ReturnType<typeof userEvent.setup>) => user.click(screen.getByRole('button', { name: 'Tăng phòng Phòng Superior' }));
+  const bookButton = () => screen.getByRole('button', { name: /Tạo đặt phòng/ });
+
+  beforeEach(() => {
+    vi.mocked(useHotelRooms).mockReturnValue({ isLoading: false, isError: false, isFetching: false, data: [room] } as unknown as ReturnType<typeof useHotelRooms>);
+    mockQuote({ data: quote });
+    useAuthStore.setState({ accessToken: 'token', role: 'Khách hàng' });
+  });
+
+  it('the guests from the link go to the rooms, the quote and the booking request', async () => {
+    const bookingMutate = vi.fn();
+    vi.mocked(useCreateBooking).mockReturnValue({ ...idle, mutate: bookingMutate } as unknown as ReturnType<typeof useCreateBooking>);
+    openFor(2);
+    const user = userEvent.setup();
+    await addRoom(user);
+
+    expect(vi.mocked(useHotelRooms).mock.calls.at(-1)?.[1]).toMatchObject({ guests: 2 });
+    expect(vi.mocked(useQuote).mock.calls.at(-1)?.[1]).toMatchObject({ guests: 2 });
+    await user.click(bookButton());
+    expect(bookingMutate.mock.calls[0][0]).toMatchObject({ guests: 2 });
+  });
+
+  it('a different party size in the link is what is sent (it survives a refresh because it lives in the URL)', async () => {
+    openFor(4);
+    await addRoom(userEvent.setup());
+    expect(vi.mocked(useQuote).mock.calls.at(-1)?.[1]).toMatchObject({ guests: 4 });
+  });
+
+  it('rooms that cannot hold everyone: a warning with the real numbers, and booking is not offered', async () => {
+    openFor(5);
+    const user = userEvent.setup();
+    await addRoom(user); // 1 × 2 guests
+
+    expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 2 khách, chưa đủ cho 5 khách');
+    expect(bookButton()).toBeDisabled();
+  });
+
+  it('choosing more rooms until the capacity is enough turns the warning into a plain note and enables booking', async () => {
+    openFor(5);
+    const user = userEvent.setup();
+    await addRoom(user);
+    await addRoom(user);
+    expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 4 khách'); // 4 < 5
+    mockQuote({ data: { ...quote, ChiTietPhong: [{ ...line, SoLuongYeuCau: 3 }] } }); // the quote for 3 rooms arrives
+    await addRoom(user); // 6 >= 5
+
+    expect(screen.queryByText(/chưa đủ cho 5 khách/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Sức chứa các phòng đã chọn: 6 khách/)).toBeInTheDocument();
+    expect(bookButton()).toBeEnabled();
+  });
+
+  it("shows the server's own capacity message when the quote is refused", async () => {
+    mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 2 khách, không đủ cho 3 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
+    openFor(3);
+    await addRoom(userEvent.setup());
+    expect(screen.getAllByText(/không đủ cho 3 khách/).length).toBeGreaterThan(0);
   });
 });
 

@@ -45,6 +45,8 @@ export interface Booking {
 export interface CreateBookingRequest {
   checkIn: string;
   checkOut: string;
+  /** Party size (not stored): the server re-checks it against the capacity of the chosen rooms. */
+  guests: number;
   rooms: Array<{ maLoaiPhong: number; soLuong: number }>;
   promoCode?: string;
   ghiChu?: string;

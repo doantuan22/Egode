@@ -10,6 +10,9 @@ import { PageSpinner } from '../../common/PageSpinner';
 import { Textarea } from '../../common/Textarea';
 
 export interface BookingPanelProps {
+  /** The party size from the search, and what the rooms selected so far can hold (from their SucChua). */
+  guests: number;
+  selectedCapacity: number;
   roomTypeCount: number;
   roomCount: number;
   quoteQuery: UseQueryResult<Quote>;
@@ -17,8 +20,11 @@ export interface BookingPanelProps {
   quoteMatchesSelection: boolean;
   /** The promo code typed is the one the quote was made with. */
   quoteMatchesPromo: boolean;
-  promoCode: string;
-  onPromoCodeChange: (value: string) => void;
+  /** What is typed in the box — not applied until "Áp dụng". */
+  promoInput: string;
+  /** Why a previously applied code was removed (the backend said it is not valid). */
+  promoNotice: string | null;
+  onPromoInputChange: (value: string) => void;
   onApplyPromo: () => void;
   note: string;
   onNoteChange: (value: string) => void;
@@ -55,6 +61,15 @@ export function BookingPanel(props: BookingPanelProps) {
               <span className="text-ink-muted">{roomCount} phòng</span>
             </div>
 
+            <p
+              role={props.selectedCapacity < props.guests ? 'alert' : 'status'}
+              className={cn('rounded-lg px-3 py-2 text-xs', props.selectedCapacity < props.guests ? 'bg-warning-light text-warning-ink' : 'bg-surface-secondary text-ink-muted')}
+            >
+              {props.selectedCapacity < props.guests
+                ? `Các phòng đã chọn chỉ chứa tối đa ${props.selectedCapacity} khách, chưa đủ cho ${props.guests} khách. Hãy chọn thêm phòng.`
+                : `Sức chứa các phòng đã chọn: ${props.selectedCapacity} khách (cho ${props.guests} khách).`}
+            </p>
+
             {quoteQuery.isLoading ? (
               <PageSpinner className="py-6" />
             ) : quoteQuery.isError ? (
@@ -73,7 +88,7 @@ export function BookingPanel(props: BookingPanelProps) {
   );
 }
 
-function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoCode, onPromoCodeChange, onApplyPromo, note, onNoteChange, bookingError, isBooking, isSignedIn, isCustomer, onSignIn, onBook }: BookingPanelProps & { quote: Quote }) {
+function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoNotice, onPromoInputChange, onApplyPromo, note, onNoteChange, bookingError, isBooking, isSignedIn, isCustomer, onSignIn, onBook, guests, selectedCapacity }: BookingPanelProps & { quote: Quote }) {
   return (
     <>
       {!quote.KhaDung && (
@@ -112,15 +127,18 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoCode, onPromo
               id="hotel-detail-ml-1"
               label="Mã khuyến mãi"
               type="text"
-              value={promoCode}
-              onChange={(e) => onPromoCodeChange(e.target.value)}
+              value={promoInput}
+              onChange={(e) => onPromoInputChange(e.target.value)}
               placeholder="Nhập mã (nếu có)"
               className="uppercase"
             />
           </div>
-          <Button type="button" variant="secondary" onClick={onApplyPromo} disabled={!promoCode.trim() || quoteQuery.isFetching}>Áp dụng</Button>
+          <Button type="button" variant="secondary" onClick={onApplyPromo} disabled={!promoInput.trim() || quoteQuery.isFetching}>Áp dụng</Button>
         </div>
         {!quoteMatchesPromo && <p className="text-xs text-warning-ink">Áp dụng mã để cập nhật báo giá trước khi tiếp tục.</p>}
+        {promoNotice && (
+          <p role="alert" className="text-xs font-medium text-danger-ink">{promoNotice}</p>
+        )}
         {quote.PromoThongBao && quoteMatchesPromo && (
           <p className={cn('text-xs font-medium', quote.PromoHopLe ? 'text-success-ink' : 'text-danger-ink')}>{quote.PromoThongBao}</p>
         )}
@@ -166,7 +184,7 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoCode, onPromo
             className="w-full"
             onClick={onBook}
             loading={isBooking}
-            disabled={!quoteMatchesPromo || !quote.KhaDung || quoteQuery.isFetching}
+            disabled={!quoteMatchesPromo || !quote.KhaDung || quoteQuery.isFetching || selectedCapacity < guests}
           >
             {isBooking ? 'Đang xử lý...' : <><span>{quote.TongTienThanhToan === 0 ? 'Xác nhận đặt phòng' : 'Tạo đặt phòng'}</span><Icon name="arrow-right" weight="bold" /></>}
           </Button>

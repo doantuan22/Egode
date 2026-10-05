@@ -6,6 +6,7 @@ import { expireStalePendingBookings, paymentHold } from './booking-expiry';
 import { completeFinishedBookings } from './booking-completion';
 import { selectRefundPercent, computeRefundAmount } from './refund-policy';
 import { AppError } from '../../common/errors/app-error';
+import { assertCapacity } from '../hotels/capacity';
 import { checkInInstant, checkOutInstant, hoursUntil, timeOfDayOf } from '../../common/utils/business-time';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { getPrismaClient } from '../../config/prisma';
@@ -132,6 +133,12 @@ export class BookingsService {
       );
     }
 
+    // Fail fast, before any lock is taken: the rooms must be able to hold the party.
+    assertCapacity(
+      input.guests,
+      input.rooms.map((line) => ({ sucChua: roomTypes.find((rt) => rt.MaLoaiPhong === line.maLoaiPhong)!.SucChua, soLuong: line.soLuong }))
+    );
+
     return this.repository.runInTransaction(async (tx) => {
       // Free up anything abandoned in "Chờ thanh toán" past the timeout
       // BEFORE reading booked quantities below, so an expired hold never
@@ -146,6 +153,10 @@ export class BookingsService {
 
       // Everything below is computed fresh from the DB, inside the locked
       // transaction — the client's prior quote (if any) is never trusted.
+      // The last word on capacity, read again under the same transaction (an owner may have changed SucChua since).
+      const capacities = new Map((await this.repository.findCapacities(tx, maKhachSan, requestedIds)).map((r) => [r.MaLoaiPhong, r.SucChua]));
+      assertCapacity(input.guests, input.rooms.map((line) => ({ sucChua: capacities.get(line.maLoaiPhong) ?? 0, soLuong: line.soLuong })));
+
       const rateRows = await this.repository.lockRatesForUpdate(tx, requestedIds, input.checkIn, input.checkOut);
       const bookedRows = await this.repository.findBookedQuantities(tx, requestedIds, input.checkIn, input.checkOut);
 

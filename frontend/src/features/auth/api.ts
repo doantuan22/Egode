@@ -7,6 +7,7 @@ import type {
   UpdateProfilePayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '../../types/auth';
 
 export const register = async (payload: RegisterPayload): Promise<AuthResult> => {
@@ -35,6 +36,15 @@ export const forgotPassword = async (payload: ForgotPasswordPayload): Promise<vo
 
 export const resetPassword = async (payload: ResetPasswordPayload): Promise<void> => {
   await apiClient('/auth/reset-password', { method: 'POST', body: JSON.stringify(payload) });
+};
+
+/** Protected: needs the access token. The server answers with a fresh access token (and sets a new refresh cookie) because every older session is invalidated. */
+export const changePassword = async (payload: ChangePasswordPayload): Promise<{ accessToken: string }> => {
+  const res = await apiClient<{ accessToken: string }>('/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return res.data as { accessToken: string };
 };
 
 export const getMe = async (): Promise<Account> => {

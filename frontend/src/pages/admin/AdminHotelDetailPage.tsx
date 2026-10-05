@@ -47,8 +47,10 @@ export default function AdminHotelDetailPage() {
         TenKhachSan: String(form.get('TenKhachSan')), 
         DiaChiChiTiet: String(form.get('DiaChiChiTiet')), 
         HangSao: Number(form.get('HangSao')), 
-        MoTa: String(form.get('MoTa')) || null 
-      } 
+        MoTa: String(form.get('MoTa')) || null,
+        GioNhanPhong: String(form.get('GioNhanPhong')),
+        GioTraPhong: String(form.get('GioTraPhong'))
+      }
     }); 
   };
   
@@ -140,6 +142,17 @@ export default function AdminHotelDetailPage() {
               <div className="space-y-1.5">
                 <label htmlFor="admin-hotel-detail-DiaChiChiTiet" className="text-xs font-semibold text-ink-sub block">Địa chỉ chi tiết <span className="text-danger">*</span></label>
                 <input id="admin-hotel-detail-DiaChiChiTiet" type="text" name="DiaChiChiTiet" defaultValue={hotel.DiaChiChiTiet} required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="admin-hotel-detail-GioNhanPhong" className="text-xs font-semibold text-ink-sub block">Giờ nhận phòng <span className="text-danger">*</span></label>
+                  <input id="admin-hotel-detail-GioNhanPhong" type="time" name="GioNhanPhong" defaultValue={hotel.GioNhanPhong ?? '14:00'} required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" />
+                </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="admin-hotel-detail-GioTraPhong" className="text-xs font-semibold text-ink-sub block">Giờ trả phòng <span className="text-danger">*</span></label>
+                  <input id="admin-hotel-detail-GioTraPhong" type="time" name="GioTraPhong" defaultValue={hotel.GioTraPhong ?? '12:00'} required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" />
+                </div>
               </div>
 
               <div className="space-y-1.5">

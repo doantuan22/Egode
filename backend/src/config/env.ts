@@ -20,6 +20,9 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().default('http://localhost:5173'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   TRUST_PROXY: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
+  // Refresh-cookie SameSite policy. `lax` when the SPA and the API are the same site; `none` (forces Secure) when they
+  // are different sites. Optional outside production (defaults to lax); production must choose explicitly — see below.
+  REFRESH_COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).optional(),
 
   // SMTP is optional outside production so contributors can run the API
   // without an email server. Production must configure the complete set.
@@ -75,7 +78,22 @@ const envSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SMTP_FROM'], message: 'SMTP_FROM must be a valid email address' });
   }
 
+  // Credentialed CORS needs exact origins; a wildcard can never be combined with cookies.
+  for (const [key, raw] of [['CORS_ORIGIN', value.CORS_ORIGIN], ['FRONTEND_URL', value.FRONTEND_URL]] as const) {
+    if (raw.split(',').some((origin) => origin.includes('*'))) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must list exact origins; wildcards cannot be used with credentials` });
+    }
+  }
+
   if (value.NODE_ENV !== 'production') return;
+
+  if (!value.REFRESH_COOKIE_SAMESITE) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['REFRESH_COOKIE_SAMESITE'],
+      message: 'REFRESH_COOKIE_SAMESITE must be set explicitly in production: lax (SPA and API on the same site) or none (different sites)',
+    });
+  }
 
   const requiredProductionSecrets: Array<[keyof typeof value, string]> = [
     ['DATABASE_URL', 'DATABASE_URL'],

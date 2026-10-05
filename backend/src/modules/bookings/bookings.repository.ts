@@ -69,7 +69,15 @@ export class BookingsRepository {
     const prisma = getPrismaClient();
     return prisma.lOAI_PHONG.findMany({
       where: { MaKhachSan: maKhachSan, MaLoaiPhong: { in: ids }, TrangThai: ROOM_TYPE_STATUS.ACTIVE },
-      select: { MaLoaiPhong: true, TenLoaiPhong: true },
+      select: { MaLoaiPhong: true, TenLoaiPhong: true, SucChua: true },
+    });
+  }
+
+  /** Capacities read inside the booking transaction, so the final check sees what is committed now. */
+  async findCapacities(tx: Prisma.TransactionClient, maKhachSan: number, ids: number[]) {
+    return tx.lOAI_PHONG.findMany({
+      where: { MaKhachSan: maKhachSan, MaLoaiPhong: { in: ids } },
+      select: { MaLoaiPhong: true, SucChua: true },
     });
   }
 

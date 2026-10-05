@@ -1,6 +1,6 @@
 # FIX VERIFICATION REPORT
 
-Ngày: 2026-10-04 · Nhánh: `tuntun` · Phạm vi: bug #4 → #1 → #3 → #2 → #8, rồi #6 → #7 → #5 → #9 → #10 → #11 → #13 trong `docs/LOGIC_AUDIT.md`.
+Ngày: 2026-10-04 → 2026-10-05 · Nhánh: `tuntun` · Phạm vi: bug #4 → #1 → #3 → #2 → #8, rồi #6 → #7 → #5 → #9 → #10 → #11 → #13, rồi #14 → #18 → #12 → #19 → #15 → #16 → #20, rồi vòng hardening cuối (2 test guest-count → 3 lỗi lint → rà soát báo cáo → #17 → E2E trình duyệt → kiểm toán phát hành) trong `docs/LOGIC_AUDIT.md`. Kết luận phát hành nằm ở `docs/FINAL_RELEASE_AUDIT.md`.
 Mọi kết quả PASS bên dưới có bằng chứng từ lần chạy thật (SQL Server `HotelBooking_DB0_Test`), không chỉ đọc code.
 
 ## Bug #4 — Nhiều payment "Chờ xử lý" cho một booking
@@ -104,7 +104,7 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 - 7915 hoàn 1.000.000 "Thành công" có `NgayHoanTien` · 7916 "Thất bại" `NgayHoanTien` NULL, booking vẫn "Đã hủy" · 7917 (0đ) không có THANH_TOAN/HOAN_TIEN · 7918 lỗi rồi retry ⇒ cùng 1 dòng (615) "Thành công" · 7919 tier 0% không có HOAN_TIEN.
 - Toàn DB, mọi truy vấn đều 0: payment có nhiều hơn 1 dòng refund · refund cộng dồn vượt `SoTien` · payment có nhiều hơn 1 refund thành công · refund "Thành công" thiếu `NgayHoanTien` · refund "Thất bại"/"Chờ xử lý" có `NgayHoanTien` · `NgayHoanTien < NgayYeuCau` · refund trên booking chưa hủy · booking 0đ có payment/refund · refund "Chờ xử lý" kẹt hơn 5 phút.
 
-**Regression result:** backend `eslint` sạch, `tsc --noEmit` sạch, `npm run build` thành công, **43 file / 522 test PASS** (trước bug #8: 42 / 502); `refund-lifecycle.test.ts` 20/20. Nhóm refund/cancel/payment đã chạy lặp 3 lần liên tiếp trước đó, 65/65 mỗi lần, không flaky. Frontend `tsc -b --noEmit` sạch, build thành công, 384 test: 382 PASS, 2 FAIL vốn có từ trước (`HomePage`/`HotelListPage` guest count); `eslint` vẫn 3 lỗi `<main>` có sẵn, không lỗi mới.
+**Regression result:** backend `eslint` sạch, `tsc --noEmit` sạch, `npm run build` thành công, **43 file / 522 test PASS** (trước bug #8: 42 / 502); `refund-lifecycle.test.ts` 20/20. Nhóm refund/cancel/payment đã chạy lặp 3 lần liên tiếp trước đó, 65/65 mỗi lần, không flaky. Frontend (số liệu tại thời điểm đó) `tsc -b --noEmit` sạch, build thành công, 384 test: 382 PASS, 2 FAIL lúc đó chưa xử lý (`HomePage`/`HotelListPage` guest count); `eslint` 3 lỗi `<main>`. Hai test và ba lỗi lint này **đã được xử lý ở vòng hardening** (xem "Hardening 1"); số liệu hiện hành nằm ở mục Regression cuối báo cáo.
 
 **Schema changes:** NONE (không bảng/cột/FK/trạng thái mới; chỉ dùng "Chờ xử lý", "Thành công", "Thất bại" sẵn có).
 
@@ -170,18 +170,18 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 
 **Tests added:** Backend 16: viết tắt tên (6 ca); review chờ duyệt vô hình/không tính tới khi admin duyệt; hiển thị 3 review + ẩn/vi phạm/chờ không lọt vào danh sách hoặc điểm (trung bình 4, đếm 3); kiểm duyệt đổi danh sách và tổng ở cả hai chiều (kể cả xóa an toàn UC37); review khách sạn này không tính cho khách sạn khác; khách vãng lai = khách đăng nhập; không lộ email/tên đầy đủ/id/trạng thái; phân trang 5 review limit 2 (3 trang, thứ tự, tổng); limit/page sai → 400, khách sạn không tồn tại hoặc bị đình chỉ → 404; search có điểm/đếm chỉ của review Hiển thị và đi theo kiểm duyệt. Frontend 6: điểm + đếm + tên viết tắt; không có review; chuyển trang; lỗi server; thẻ khách sạn có/không có điểm.
 **SQL verification:** A6 = 0 (mọi review có trạng thái hợp lệ). A5 = 3: 3 review "Hiển thị" thuộc khách sạn không công khai (dữ liệu demo có sẵn) — endpoint công khai trả 404 cho các khách sạn đó nên không lộ.
-**Regression:** reviews, hotels, quotes (cùng nhóm) và frontend `pages/public`, `components/hotels`, `features` PASS (trừ 2 test có sẵn). **Schema changes:** NONE · **Result: PASS**
+**Regression:** reviews, hotels, quotes (cùng nhóm) và frontend `pages/public`, `components/hotels`, `features` PASS (lúc đó trừ 2 test guest-count, nay đã sửa — "Hardening 1"). **Schema changes:** NONE · **Result: PASS**
 
 ## Bug #11 — Hợp đồng lỗi FE ↔ BE
 **Root cause:** backend trả lỗi validate ở khóa `errors` và lỗi nghiệp vụ ở `details`, không có `code`; frontend đọc `data.error` (không tồn tại) nên field error mất và hiện chuỗi chung "Validation failed".
 
 **Files changed:** Backend: `common/errors/error-codes.ts` (mới), `common/errors/app-error.ts`, `middleware/error.middleware.ts` (viết lại), `notFound.middleware.ts`, `security.middleware.ts`, `common/types/api-response.ts`, `common/utils/response.ts`, `auth.service.ts` & `accounts.service.ts` (trùng email/tên đăng nhập mang `details`), các test cũ đọc `errors`, test mới `middleware/error-contract.test.ts`. Frontend: `services/apiClient.ts`, `types/api.ts`, `lib/apiErrors.ts` (mới), `features/auth/schemas.ts`, các form `RegisterPage`, `OwnerHotelFormPage`, `OwnerHotelManagePage`, `OwnerRoomTypeManagePage`, `PartnerApplyPage`, `ProfilePage`; test mới `apiErrors.test.ts`, `RegisterPage.test.tsx`, `schemas.test.ts`, cập nhật `apiClient.test.ts`.
 
-**Solution:** mọi lỗi trả cùng một dạng `{ success:false, message, code, details? }`. `code` ổn định: `VALIDATION_ERROR`, `INVALID_JSON`, `PAYLOAD_TOO_LARGE`, `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`. Validate: `message` "Dữ liệu không hợp lệ", `details: [{ field, message }]` (đường dẫn lồng nhau nối bằng dấu chấm). Lỗi 5xx và lỗi không xác định chỉ trả "Internal server error" + `INTERNAL_ERROR` — không stack, SQL hay thông điệp nội bộ (ghi log phía server). Khóa `errors` cũ bị bỏ. Frontend: `ApiError` có `message`, `statusCode`, `code`, `details`, `fieldErrors`; với `VALIDATION_ERROR` nội dung banner là các thông điệp field đã loại trùng; `applyServerFieldErrors` đặt lỗi lên đúng input (chỉ các trường form có, input đầu tiên được focus), phần còn lại vẫn nằm ở banner; lỗi không phải ApiError chỉ hiện câu dự phòng, không bao giờ hiện đối tượng thô. Luồng refresh/hết phiên không đổi. Tìm ra và sửa kèm một lỗi có sẵn: bỏ trống giới tính ở form đăng ký làm RHF trả `null`, schema từ chối ngầm nên form không gửi đi và không báo gì — nay `GioiTinh` chấp nhận `null`.
+**Solution:** mọi lỗi trả cùng một dạng `{ success:false, message, code, details? }`. `code` ổn định: `VALIDATION_ERROR`, `INVALID_JSON`, `PAYLOAD_TOO_LARGE`, `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`, và (thêm ở #18) `CAPACITY_EXCEEDED`. Validate: `message` "Dữ liệu không hợp lệ", `details: [{ field, message }]` (đường dẫn lồng nhau nối bằng dấu chấm). Lỗi 5xx và lỗi không xác định chỉ trả "Internal server error" + `INTERNAL_ERROR` — không stack, SQL hay thông điệp nội bộ (ghi log phía server). Khóa `errors` cũ bị bỏ. Frontend: `ApiError` có `message`, `statusCode`, `code`, `details`, `fieldErrors`; với `VALIDATION_ERROR` nội dung banner là các thông điệp field đã loại trùng; `applyServerFieldErrors` đặt lỗi lên đúng input (chỉ các trường form có, input đầu tiên được focus), phần còn lại vẫn nằm ở banner; lỗi không phải ApiError chỉ hiện câu dự phòng, không bao giờ hiện đối tượng thô. Luồng refresh/hết phiên không đổi ở bug này (sau đó #12 sửa việc `/auth/change-password` không được refresh token, và #17 thêm kiểm tra `Origin` cho refresh/logout). Tìm ra và sửa kèm một lỗi có sẵn: bỏ trống giới tính ở form đăng ký làm RHF trả `null`, schema từ chối ngầm nên form không gửi đi và không báo gì — nay `GioiTinh` chấp nhận `null`.
 
 **Tests added:** Backend 17: validate (body, query/param) đúng dạng và không còn `errors`; 401 / 403 / 404 (route và tài nguyên) / 400 JSON hỏng / 413 / 429 đều theo hợp đồng; unit của error handler (AppError giữ message/details/status, mã theo status, ZodError lồng nhau, lỗi lạ không rò rỉ thông điệp/stack, AppError 5xx ẩn chi tiết, `codeForStatus`). Frontend 17: `ApiError` (validate, nghiệp vụ, không có details, thân phản hồi không đọc được), `apiErrors` helpers (6), form đăng ký (lỗi trùng email gắn vào ô Email, nhiều ô cùng lúc, lỗi không có field vẫn qua banner), schema giới tính (7).
 **SQL verification:** không áp dụng (không đụng dữ liệu).
-**Regression:** auth, accounts, middleware, analytics, owner-analytics, stay-dates API (157 test) + frontend lib/services/pages/components PASS (trừ 2 test có sẵn). **Schema changes:** NONE · **Result: PASS**
+**Regression:** auth, accounts, middleware, analytics, owner-analytics, stay-dates API (157 test) + frontend lib/services/pages/components PASS (lúc đó trừ 2 test guest-count, nay đã sửa — "Hardening 1"). **Schema changes:** NONE · **Result: PASS**
 
 ## Bug #13 — Múi giờ nghiệp vụ Asia/Ho_Chi_Minh
 **Root cause:** hạn hủy tính từ 00:00 UTC của ngày nhận phòng (= 07:00 giờ VN, bỏ qua `GioNhanPhong` của khách sạn); `Hoàn tất` chuyển ở 00:00 UTC của ngày trả phòng (5 giờ trước giờ trả phòng thực); khuyến mãi xét theo ngày UTC; báo cáo/bộ lọc ngày so sánh mốc 00:00 UTC với timestamp UTC; frontend tính "hôm nay" theo múi giờ trình duyệt.
@@ -194,12 +194,134 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 **SQL verification:** A4 = 0 (không có đơn "Hoàn tất" mà thời điểm trả phòng còn ở tương lai).
 **Regression:** bookings, payments, reviews, owner, analytics, quotes, promotions, admin-payments (316 test) và frontend features/customer/owner (131) PASS. **Schema changes:** NONE · **Result: PASS**
 
+## Bug #14 — Tỷ lệ lấp đầy tính sai
+**Root cause:** mẫu số chỉ cộng các dòng `QUY_PHONG_GIA` đang `Mở bán` (đêm đã đóng bán biến mất khỏi mẫu số) trong khi tử số cộng mọi đơn không bị hủy — kể cả `Chờ thanh toán` (chưa trả tiền, có thể hết hạn), đêm không có dòng tồn kho và đêm bị đặt vượt — nên tỷ lệ có thể vượt 100% và sai mẫu số.
+
+**Files changed:** `backend/src/modules/analytics/analytics.repository.ts` (`occupancy()` viết lại), test mới `analytics/occupancy.test.ts`.
+
+**Solution:** mẫu số = tổng `SoLuongPhong` của mọi dòng `QUY_PHONG_GIA` (mọi trạng thái) thuộc phạm vi loại phòng trong [from, to); tử số = với mỗi (loại phòng, đêm) có tồn kho, `min(đã đặt, tồn kho)` của các đơn `Đã xác nhận`/`Hoàn tất` giao với khoảng; đêm không có dòng tồn kho không được tính vào tử số. `TyLeLapDay = round(bán / có thể bán × 10000) / 100`, `null` khi không có tồn kho. Không đổi schema, không đổi hình dạng response.
+
+**Tests added:** Backend 12 (`analytics/occupancy.test.ts`): 0% khi có tồn kho mà chưa bán; 100% khi bán hết mọi đêm mọi phòng; tồn kho khác nhau theo đêm và loại phòng → đúng bán/tổng; `Đã xác nhận`/`Hoàn tất` được tính, `Chờ thanh toán`/`Đã hủy` không; đêm đã đóng bán vẫn nằm trong mẫu số; phòng đã bán trên đêm sau đó bị đóng bán vẫn tính là đã bán; đêm bị đặt vượt chỉ tính đầy (không hơn); đêm không có dòng tồn kho không vào tử số; đơn nhô ra ngoài khoảng bị cắt hai đầu; thuộc tính ngẫu nhiên (luôn 0..100, tử ≤ mẫu); `null` (không phải 0%) khi không có tồn kho; endpoint owner trả cùng số liệu.
+**SQL verification:** đêm bán vượt quỹ phòng = 0.
+**Ghi chú liên quan #5:** tỷ lệ lấp đầy chỉ tính `Đã xác nhận`/`Hoàn tất`; các bộ đếm đơn theo trạng thái trong analytics (kiểm ở #5) vẫn đếm `Chờ thanh toán` trong thời hạn giữ chỗ — hai việc khác nhau, test của cả hai cùng PASS.
+**Regression:** analytics, owner-analytics, admin-analytics PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #18 — Số khách (`guests`) không được kiểm tra với sức chứa
+**Root cause:** `guests` chỉ là bộ lọc từng phòng ở tìm kiếm; báo giá và đặt phòng không nhận số khách nên có thể đặt 1 phòng 2 người cho 6 khách. `DAT_PHONG` không có cột số khách.
+
+**Files changed:** Backend: `hotels/capacity.ts` (mới: `guestsInputSchema` 1..50, `totalCapacity`, `assertCapacity`), `common/errors/error-codes.ts` (+`CAPACITY_EXCEEDED`), `common/errors/app-error.ts` (mã tường minh), `quotes/quotes.schemas.ts` & `quotes.service.ts`, `bookings/bookings.schemas.ts`, `bookings.repository.ts`, `bookings.service.ts`, `hotels/hotels.repository.ts`, `hotels.service.ts`, `availability.ts` (`stockForStay`), `config/openapi.ts`; test mới `hotels/guests-capacity.test.ts`, cập nhật `hotels.test.ts`, `reviews/public-reviews.test.ts`. Frontend: `features/quotes/types.ts`, `features/bookings/types.ts`, `pages/public/HotelDetailPage.tsx`, `components/hotels/detail/BookingPanel.tsx`, `HotelDetailPage.test.tsx`.
+
+**Solution:** sức chứa tổng = Σ (`SucChua` × số phòng chọn). Báo giá và đặt phòng nhận `guests` (mặc định 1, 1..50) và trả `400 CAPACITY_EXCEEDED` (`details: [{ field:'guests', ... }]`) khi vượt; đặt phòng kiểm tra hai lần (trước và trong transaction) nên đổi `SucChua` giữa chừng cũng được chặn. Số khách **không** lưu vào DB. Tìm kiếm không còn loại từng phòng theo `SucChua` mà theo khả năng đáp ứng tổng của khách sạn; trang chi tiết liệt kê mọi loại phòng. FE gửi `guests` trong quote/booking, hiện sức chứa đã chọn và khóa nút đặt khi chưa đủ.
+
+**Tests added:** Backend 15 (`hotels/guests-capacity.test.ts`). Frontend: describe "guests (party size) flow" trong `HotelDetailPage.test.tsx` (gửi `guests` trong quote/booking, cảnh báo và khóa nút khi thiếu sức chứa, nhiều phòng cộng dồn sức chứa). Hai test frontend guest-count (`HomePage`, `HotelListPage`) từng được ghi là baseline đã được audit lại và sửa ở vòng hardening ("Hardening 1": kỳ vọng test sai, UI đúng). Hai test cũ backend (`hotels.test.ts`, `public-reviews.test.ts`) được sửa theo ngữ nghĩa mới (tìm kiếm theo tồn kho tổng, khách sạn trong test cần có dòng `QUY_PHONG_GIA`).
+**Regression:** #3/#5/#9 (quote, booking, hold, tồn kho) PASS trong lần chạy toàn bộ. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #12 — Đổi mật khẩu bằng email thay vì endpoint có sẵn
+**Root cause:** `ProfilePage` chỉ có luồng "gửi link qua email"; endpoint `POST /auth/change-password` (cần đăng nhập) chưa có giao diện, và `apiClient` coi mọi URL bắt đầu bằng `/auth/` là endpoint đăng nhập nên không bao giờ refresh token khi access token hết hạn → người dùng bị đăng xuất khi đổi mật khẩu.
+
+**Files changed:** Frontend: `services/apiClient.ts` (`NO_REFRESH_ENDPOINTS` chỉ gồm login/register/forgot/reset), `types/auth.ts`, `features/auth/api.ts`, `hooks.ts` (`useChangePassword` nhận access token mới), `schemas.ts` (`changePasswordSchema`), `pages/customer/ProfilePage.tsx`, `ProfilePage.test.tsx`, `apiClient.test.ts`. Backend: `auth/auth.service.ts` (`details` gắn đúng trường), test mới `auth/change-password-session.test.ts`.
+
+**Solution:** form 3 ô (mật khẩu hiện tại, mới, xác nhận) gọi endpoint có sẵn; lỗi theo trường (`MatKhauCu`/`MatKhauMoi`) hiện dưới đúng ô; thành công hiện thông báo và xóa form. Access token hết hạn → 401 → refresh → **gửi lại cùng request**; refresh thất bại thì kết thúc phiên (không lặp). Chỉ các endpoint thông tin đăng nhập mới không refresh.
+
+**Tests added:** Backend 6 (`change-password-session.test.ts`): hết hạn → 401 → refresh → đổi thành công, chỉ mật khẩu mới đăng nhập được; token mới dùng được ngay và thiết bị khác phải đăng nhập lại; mật khẩu hiện tại sai → `details` `MatKhauCu`; trùng mật khẩu cũ; mật khẩu quá ngắn; tài khoản bị khóa không đổi được. Frontend: ProfilePage 8 (3 ô và không dùng luồng email; payload chỉ gồm mật khẩu cũ và mới; xác nhận không khớp; ô trống/quá ngắn; lỗi từ server dưới đúng ô; banner khi không có field; thành công; chặn bấm đúp) + apiClient 6 (change-password refresh và retry, refresh hỏng thì kết thúc phiên, 4 endpoint thông tin đăng nhập không refresh).
+**Regression:** auth, profile, apiClient PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #19 — Giờ nhận/trả phòng: admin và owner khác định dạng
+**Root cause:** admin PATCH dùng `z.coerce.date()` (chấp nhận mọi chuỗi ngày/giờ lạ), owner dùng "HH:mm"; phản hồi trả `1970-01-01THH:mm:00.000Z` nên FE phải `slice(11, 16)` ở chỗ này mà không ở chỗ kia.
+
+**Files changed:** Backend: `common/utils/time-of-day.ts` (mới: `HHMM_PATTERN`, `timeOfDaySchema`, `timeOfDayJsonReplacer`), `app.ts` (`json replacer`), `admin-hotels/admin-hotels.schemas.ts`, `owner/owner-hotels.schemas.ts`, `owner/owner-bookings.test.ts`; test mới `admin-hotels/hotel-times.contract.test.ts`. Frontend: `features/admin/hotels/api.ts`, `pages/admin/AdminHotelDetailPage.tsx` (hai ô `type="time"`, payload "HH:mm"), `OwnerBookingDetailPage.tsx`, `OwnerHotelManagePage.tsx` (bỏ `slice`), `AdminHotelDetailPage.test.tsx`.
+
+**Solution:** một hợp đồng duy nhất cho `GioNhanPhong`/`GioTraPhong`: **"HH:mm"** cho cả admin và owner, cả request lẫn response. Request: `^([01]\d|2[0-3]):[0-5]\d$` (không còn `z.coerce.date()`); response: `json replacer` của Express viết các cột TIME thành "HH:mm" ở mọi API (admin, owner, công khai, KHACH_SAN lồng). Lưu DB vẫn là TIME.
+
+**Tests added:** Backend 50 (`hotel-times.contract.test.ts`): admin và owner cùng chạy — `14:00`, `02:30`, `00:00`, `23:59`, `09:05` hợp lệ và DB lưu đúng giờ; 15 giá trị bị từ chối (`25:00`, `24:00`, `14:70`, `14:60`, `7:00`, `07:0`, `14`, `14:00:00`, `1400`, `14.00`, khoảng trắng đầu, chữ, rỗng, ISO, ngày) với cùng 400/`VALIDATION_ERROR`/thông điệp và DB không đổi; kiểu số/null/object bị từ chối; hai trường kiểm riêng; admin và owner nhận–trả cùng "HH:mm"; admin/owner/công khai đọc cùng giá trị; owner tạo mới theo cùng quy tắc; replacer chỉ đổi cột TIME. Mutation: đưa `z.coerce.date()` về admin → 22 test FAIL. Frontend 2: ô giờ hiển thị đúng; lưu gửi chuỗi "HH:mm".
+**SQL verification:** `GioNhanPhong`/`GioTraPhong` vẫn kiểu `time` (2/2), không khách sạn nào thiếu giờ.
+**Regression:** admin-hotels, owner, hotels, bookings (309 test) PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #15 — Mã khuyến mãi mới gõ bị áp dụng khi đổi số phòng
+**Root cause:** `setRoomQuantity` gọi `setAppliedPromo(promoCode.trim())` nên mã mới gõ (chưa bấm "Áp dụng") bị áp dụng ngầm khi đổi số phòng; không có chỗ nào gỡ mã khi backend báo không còn hợp lệ.
+
+**Files changed:** Frontend: `pages/public/HotelDetailPage.tsx`, `components/hotels/detail/BookingPanel.tsx`, `HotelDetailPage.test.tsx` (viết lại test cũ mã hóa lỗi này).
+
+**Solution:** tách `promoInput` (đang gõ, chưa có hiệu lực) khỏi `appliedPromo` (duy nhất giá trị này được gửi lên backend). Chỉ nút "Áp dụng" đặt `appliedPromo`; đổi phòng/ngày/số khách làm báo giá chạy lại với `appliedPromo` và backend quyết định. Khi báo giá của mã đang áp dụng trả `PromoHopLe = false` thì gỡ mã, xóa ô nhập và hiện lý do ("Mã khuyến mãi X: …"), tổng quay về không giảm giá; gõ lại sẽ xóa thông báo. Bấm "Áp dụng" lại cùng mã thì hỏi backend lại. Backend không đổi.
+
+**Tests added:** Frontend 5 mới + 2 sửa: gõ mã rồi đổi số phòng → không áp dụng; áp dụng thành công → đổi số phòng → báo giá lại với mã đã áp dụng và tổng đúng (1.260.000); áp dụng → đổi tới mức backend từ chối → gỡ mã, hiện lý do, tổng không giảm, giảm phòng lại không tự áp dụng lại; gõ mã khác sau khi áp dụng thì đổi phòng vẫn dùng mã đã áp dụng; mã sai → thông báo rõ và xóa khi gõ lại; áp dụng lại cùng mã → refetch. Mutation: đưa dòng `setAppliedPromo(promoInput.trim())` về `setRoomQuantity` → test FAIL.
+**Regression:** `HotelDetailPage.test.tsx` 36/36 PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #16 — Ô xác nhận khi đăng ký đối tác không bắt buộc thật
+**Root cause:** checkbox dùng `required` của HTML nhưng form có `noValidate` và checkbox không nối với react-hook-form, nên bỏ trống vẫn gửi được.
+
+**Files changed:** Frontend: `features/partners/schemas.ts` (`XacNhanThongTin`), `pages/customer/PartnerApplyPage.tsx`, test mới `PartnerApplyPage.test.tsx`.
+
+**Solution:** checkbox nối `register('XacNhanThongTin')`, schema `z.boolean().refine(v => v)` với thông điệp "Vui lòng xác nhận thông tin cung cấp là chính xác" hiện ngay dưới ô (`aria-invalid`); chưa tick thì không gửi. Trường này chỉ có ở form, payload gửi lên chỉ có bốn trường nghiệp vụ. Không đổi DB.
+
+**Tests added:** Frontend 7: mặc định không tick và không dùng `required` HTML; điền đủ nhưng chưa tick → không gửi, thông điệp đúng; tick → gửi đúng bốn trường (không lộ `XacNhanThongTin`); bỏ tick lại bị chặn; các ô khác vẫn giữ lỗi riêng; chưa tick và ô khác sai → hiện cả hai; schema từ chối false/thiếu và nhận true.
+**Regression:** pages/customer, features/partners PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #20 — Bộ lọc hạng sao hiển thị như "đúng N sao"
+**Root cause:** backend lọc `HangSao >= N` (đúng quy tắc) nhưng UI hiển thị các nút "1 sao…5 sao" như thể lọc đúng hạng.
+
+**Files changed:** Frontend: `components/hotels/HotelFilterBar.tsx`, `HotelFilterBar.test.tsx`. Backend: chỉ thêm test `hotels/star-rating-filter.test.ts` (API không đổi).
+
+**Solution:** nhãn nhóm "Hạng sao tối thiểu", các nút "Từ 3 sao trở lên", "Từ 4 sao trở lên", "Từ 5 sao trở lên". Quy tắc `starRating = N ⇒ HangSao >= N` giữ nguyên.
+
+**Tests added:** Backend 10: `starRating=3` → 3,4,5 sao; `=4` → 4,5; `=5` → chỉ 5; không lọc và `=1` → đủ 1..5; kết hợp với lọc giá; 5 giá trị sai (`0`, `6`, `-1`, `abc`, `3.5`) → 400 `VALIDATION_ERROR`. Mutation: đổi `gte` thành bằng → 3 test FAIL. Frontend: nhãn và ba nút "Từ N sao trở lên", không còn nút "N sao"; 3 test cũ cập nhật theo nhãn mới.
+**Regression:** `components/hotels` (32 test) PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Hardening 1 — Baseline frontend: 2 test guest-count và 3 lỗi lint `<main>`
+Hai mục này từng được ghi là "baseline cũ". Sau #18 (luồng số khách đổi) chúng được audit lại từ đầu thay vì giữ nhãn baseline.
+
+**2 test guest-count — kết luận: kỳ vọng của test sai, UI đúng.** Business rule #18 được đối chiếu: `guests >= 1`, mặc định 2, số khách đi theo URL của tìm kiếm/chi tiết, backend mới là nơi ép sức chứa.
+- `HomePage › guest count`: thẻ khách sạn có **hai** liên kết tới cùng một khách sạn (ảnh và mũi tên, cùng `aria-label`), test dùng `getByRole('link')` (một phần tử) nên lỗi "multiple elements". Test mới lấy **mọi** liên kết (`getAllByRole`) và khẳng định **từng** `href` đều kết thúc bằng `guests=2` — chặt hơn bản cũ (chỉ kiểm một liên kết). Ô tìm kiếm được kiểm theo nút "Số khách … 2 khách".
+- `HotelListPage › guest count`: "2 khách" xuất hiện đúng ở **hai** chỗ (nút "Số khách" của ô tìm kiếm và chip tóm tắt kết quả), test dùng `getByText` (một phần tử). Test mới kiểm nút "Số khách 2 khách" **và** đúng 2 lần xuất hiện của chip.
+- Không xóa test, không nới assertion, không đổi UI; truyền `guests` vào truy vấn (`lastParams`) vẫn được kiểm ở cả hai.
+
+**3 lỗi lint `<main>` — kết luận: lỗi thật (landmark `<main>` lồng nhau), đã sửa bằng semantic HTML.** Quy tắc `no-restricted-syntax` trong `eslint.config.js` cấm `<main>` trong `src/pages/**` vì `MainLayout` đã render `<main id="main-content">` duy nhất và mọi route trang là con của `<Outlet />` trong layout đó (đã kiểm `AppRoutes.tsx`, `publicRoutes.tsx`). Ba trang tạo thêm `<main>` thứ hai → trang có 2 landmark chính, trình đọc màn hình không biết đâu là nội dung chính.
+- `LoginPage.tsx`, `HotelDetailPage.tsx`, `HotelListPage.tsx`: `<main …>` → `<div …>` (giữ nguyên class, nên bố cục không đổi; không có CSS nào nhắm vào phần tử `main`). Không dùng `eslint-disable`, không đổi luật.
+- Kết quả: `eslint .` sạch (exit 0), `tsc -b --noEmit` sạch, `npm run build` thành công, `vitest` 67 file / 446 test PASS (lúc đó; hiện 460 sau NEW-1).
+**Result: PASS**
+
+## Deployment Configuration — Cookie / CORS / SameSite (trước đây: Bug #17)
+**Phân loại lại: cấu hình triển khai, không phải lỗi sản phẩm tồn đọng.** Phần mã đã xong và có test; việc còn lại là người triển khai đặt `REFRESH_COOKIE_SAMESITE` khi có topology/domain production thật — không cần xử lý trước đó.
+
+**Audit (đọc từ repo, không đoán):** cookie `refresh_token` là `HttpOnly`, `Path=/api/auth`, **`SameSite=Lax` cố định**, `Secure` chỉ khi `NODE_ENV=production`; CORS dùng danh sách origin chính xác từ `CORS_ORIGIN` kèm `credentials: true` (không có `*`); frontend gọi mọi request với `credentials: 'include'`; `vite.config.ts` không có proxy dev; `frontend/.env.example` chỉ có ví dụ giữ chỗ `https://api.example.com/api`.
+
+**Topology production — KHÔNG xác định được từ repo/tài liệu.** `docs/M9_HARDENING_REPORT.md` chỉ nêu frontend dự kiến chạy trên Cloudflare Pages (`_redirects`); không tài liệu/CI/cấu hình nào nêu domain hay host của API. Vì vậy **không tự bịa domain** và không đặt mặc định cho production. Phần có thể kiểm chứng được đã triển khai; phần quyết định triển khai được chuyển thành cấu hình **bắt buộc, không thể quên**.
+
+**Root cause:** chính sách cookie bị đóng cứng `Lax`. Nếu SPA và API ở hai site khác nhau thì trình duyệt không gửi cookie trong fetch credentialed → mỗi lần tải lại trang mất phiên (không có lỗi nào báo). Thêm: thiếu proxy dev nên thiếu `.env` thì `/api` trả HTML và báo "Failed to parse response JSON".
+
+**Files changed:** Backend: `common/utils/auth-cookie.ts` (mới — `refreshCookieBaseOptions(nodeEnv, sameSite)`), `config/cors.ts` (mới — danh sách origin dùng chung), `middleware/trusted-origin.middleware.ts` (mới), `config/env.ts` (`REFRESH_COOKIE_SAMESITE`, từ chối ký tự đại diện), `app.ts`, `modules/auth/auth.controller.ts`, `auth.routes.ts`, `.env.example`; test mới `modules/auth/cookie-topology.test.ts`. Frontend: `services/apiClient.ts` (thông báo rõ khi API không trả JSON), `vite.config.ts` (proxy dev `/api` → `http://localhost:5000`, cảnh báo build thiếu `VITE_API_BASE_URL`), `.env.example`, `apiClient.test.ts`. Tài liệu: `README.md` (mục "Triển khai: cookie refresh và CORS"), `docs/PROJECT_CONTEXT.md`.
+
+**Solution:**
+- `REFRESH_COOKIE_SAMESITE` = `lax` | `strict` | `none`. Ngoài production mặc định `lax` (dev chạy trên localhost như cũ). **Production bắt buộc đặt tường minh, nếu không backend từ chối khởi động.** `none` luôn kéo theo `Secure` (trình duyệt từ chối `SameSite=None` không `Secure`). Cookie đặt/đổi/xóa dùng cùng một bộ thuộc tính.
+- `CORS_ORIGIN`/`FRONTEND_URL` có ký tự đại diện bị từ chối ở mọi môi trường; production vẫn bắt buộc HTTPS; origin được so khớp chính xác (không bao giờ `Access-Control-Allow-Origin: *` cùng credentials).
+- `POST /auth/refresh` và `/auth/logout` (chỉ xác thực bằng cookie) từ chối request có `Origin` không thuộc `CORS_ORIGIN` bằng 403 **trước khi** đụng tới cookie — để `SameSite=None` không mở đường CSRF làm xoay/xóa phiên. Request không có `Origin` (curl, server-to-server) vẫn qua.
+- Dev: proxy Vite đưa `/api` về backend nên app và cookie cùng một origin; production build cảnh báo nếu thiếu `VITE_API_BASE_URL`.
+- Bảng cấu hình theo topology nằm trong README (cùng site → `lax`; khác site → `none` + `CORS_ORIGIN` là origin https chính xác của SPA + `VITE_API_BASE_URL`).
+
+**Tests added:** Backend 28 (`cookie-topology.test.ts`): ma trận chính sách cookie (6 tổ hợp + HttpOnly/Path luôn đúng); `SameSite=None` đầu-cuối cho login/refresh/logout (đặt, xoay, xóa cùng thuộc tính, có `Secure`); kiểm tra env production (thiếu chính sách → không khởi động; `lax`/`none` khởi động; giá trị lạ, ký tự đại diện đơn/trong danh sách, HTTP thường → bị từ chối; development không cần cấu hình); CORS (origin đúng nhận lại chính nó + credentials, origin lạ không nhận gì, không bao giờ `*`, dấu `/` cuối); refresh/logout từ origin lạ → 403 và phiên còn nguyên; không có `Origin` vẫn dùng được; hành trình phiên đầy đủ: đăng nhập → access token hết hạn 401 → refresh → dùng token mới → đăng xuất → cookie bị xóa; request không xác thực; tài khoản bị khóa giữa phiên (refresh 401 + xóa cookie); đổi vai trò giữa phiên (token mới mang vai trò mới); đổi mật khẩu (cookie mới, cookie thiết bị khác chết). Frontend 2: thông báo khi API không trả JSON; mọi request (kể cả refresh) gửi `credentials: 'include'`. Đột biến: bỏ middleware Origin và/hoặc ép `sameSite` về `lax` → 6 test FAIL. E2E trình duyệt thật: cookie `HttpOnly`/`Path=/api/auth`/`SameSite=Lax` quan sát từ trình duyệt, `document.cookie` không đọc được, phiên sống sau reload, đăng xuất xóa cookie, origin lạ không xoay được cookie.
+**Phần chưa thể kết luận:** chưa có triển khai thật để thử `SameSite=None` giữa hai domain thật (không có domain trong repo). Cấu hình và hành vi đã được kiểm bằng test; chọn giá trị cho production là quyết định của người triển khai (xem Release blockers trong `FINAL_RELEASE_AUDIT.md`).
+**Regression:** auth, cookie, change-password, session, CORS (backend toàn bộ 744 test PASS); apiClient (frontend 14 test). **Schema changes:** NONE · **Result: PASS** (phần mã/cấu hình). Topology production chưa xác định → mục cấu hình triển khai, không phải bug mở.
+
+## Bug NEW-1 — Checkbox điều khoản ở trang đăng ký không bắt buộc thật (phát hiện bởi E2E)
+**Root cause:** `RegisterPage.tsx` dùng `<input type="checkbox" required>` không nối react-hook-form, trong form `noValidate` nên thuộc tính `required` của HTML không có tác dụng — đăng ký vẫn tạo tài khoản khi không tick (cùng loại lỗi với #16; đã quét mọi form `noValidate`, đây là trường hợp duy nhất). Severity: Medium-Low.
+
+**Files changed:** `features/auth/schemas.ts` (`DongYDieuKhoan`), `pages/auth/RegisterPage.tsx`, `features/auth/schemas.test.ts`, `pages/auth/RegisterPage.test.tsx`; E2E: `e2e/tests/01-account-session.spec.ts`, `04-partner-owner-lifecycle.spec.ts` (chọn checkbox theo id).
+
+**Solution:** `DongYDieuKhoan: z.boolean().refine(v => v, 'Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật')` trong `registerSchema`; checkbox nối `register('DongYDieuKhoan')` (mặc định `false`), bỏ `required`, lỗi hiện ngay dưới checkbox (`id="register-DongYDieuKhoan-error"`, `aria-invalid`, `aria-describedby`). Trường này chỉ có ở form: payload gửi API giữ nguyên bảy trường cũ, không đổi DB, không đổi giao diện ngoài dòng lỗi, không nới luật nào của đăng ký.
+
+**Tests added:** Frontend 14. Schema (8): chỉ `true` được chấp nhận; `false`/thiếu/`null`/`'true'`/`1`/`'on'` bị từ chối (với `false` đúng thông điệp); email sai, mật khẩu ngắn, xác nhận sai vẫn bị chặn khi đã đồng ý. Trang đăng ký (6): không phải control `required` của HTML; chưa tick → **không gọi API đăng ký**, thông điệp đúng ngay tại checkbox; tick → submit, payload không có cờ, đi tiếp; tick lại sau khi bị chặn → xóa lỗi và đi qua; xác nhận mật khẩu sai vẫn báo và không gửi; chưa tick cùng email sai → hiện cả hai lỗi. Đột biến: vô hiệu hóa luật `refine` → 4 test FAIL, khôi phục → PASS. E2E "registration needs the terms box ticked": không tạo tài khoản, đứng yên ở `/register`, đúng thông điệp tại checkbox — PASS; các luồng đăng ký khác trong E2E vẫn PASS.
+**Regression:** frontend 67 file / 460 test PASS; lint/typecheck/build exit 0; browser E2E 32/32 (hai lượt đầy đủ liên tiếp). **Schema changes:** NONE · **Result: PASS — NEW-1 RESOLVED**
+
 ## Regression
-**Backend (sau cả 7 bug mới):** `eslint .` sạch · `tsc --noEmit` sạch · `npm run build` (prisma generate + tsc) thành công · `vitest run --no-file-parallelism` trên SQL Server thật: **51 file, 623 test, tất cả PASS** (mốc trước: bug #8 — 43 file / 522 test; trước mọi bug — 39 file / 417 test). Các file có tranh chấp khóa/đồng thời (admin guard, inventory guard, refund lifecycle, payments, concurrency đặt phòng, hold consistency) chạy lặp 3 lần liên tiếp: 90/90 mỗi lần, không flaky. Regression của #1/#2/#3/#4/#8 nằm trong cùng lần chạy đó (admin-hotels, bookings-zero-total, stay-dates.api, payments, refund-lifecycle: tất cả PASS).
+**Backend (kiểm toán cuối, sau #17):** `eslint .` exit 0 · `tsc --noEmit` exit 0 · `npm run build` exit 0 · `vitest run --no-file-parallelism` trên SQL Server thật: **57 file, 744 test, 744 PASS, 0 FAIL, 0 skip** (mốc trước hardening: 56 file / 716 test; +28 test của #17). Các file có tranh chấp khóa/đồng thời (concurrency đặt phòng, hold-consistency, booking-expiry, bookings-cancel, bookings-zero-total, owner-inventory-guard, owner-bookings-sweep, accounts-admin-guard, payments + refund-lifecycle: 11 file, 142 test) chạy lặp **3 lần liên tiếp: 142/142 mỗi lần**, không flaky.
 
-**Frontend (sau cả 7 bug mới):** `tsc -b --noEmit` sạch · `npm run build` thành công · `vitest run`: 66 file, 415 test: **413 PASS, 2 FAIL — đã FAIL từ trước mọi thay đổi** (đối chứng bằng `git stash` ở lượt #1–#4): `HomePage guest count` và `HotelListPage guest count` (`getByText('2 khách')` gặp nhiều phần tử) — không phải suite PASS toàn bộ. `eslint .`: **3 lỗi có sẵn từ trước** (`<main>` trong `LoginPage.tsx`, `HotelDetailPage.tsx`, `HotelListPage.tsx`; HEAD đã có sẵn thẻ này), không có lỗi mới.
+**Frontend (kiểm toán cuối):** `eslint .` exit 0 (không còn lỗi) · `tsc -b --noEmit` exit 0 · `npm run build` exit 0 · `vitest run`: **67 file, 460 test, 460 PASS, 0 FAIL** (2 test guest-count và 3 lỗi lint `<main>` đã được xử lý — "Hardening 1"; +2 test của cấu hình cookie, +14 test của NEW-1).
 
-**Database** (sqlcmd trên `HotelBooking_DB0_Test` sau khi chạy toàn bộ test; mọi dòng "expect 0" đều ra 0):
+**Database — kiểm toán cuối** (sqlcmd trên `HotelBooking_DB0_Test` sau backend 744 test + 3 lượt E2E đầy đủ; mọi dòng "expect 0" đều ra 0): đêm bán vượt quỹ phòng 0 · đơn `Chờ thanh toán` quá 15 phút còn sót 0 · booking có hơn 1 payment thành công 0 · payment `Chờ xử lý` trùng 0 · payment có hơn 1 refund 0 · hoàn vượt payment 0 · refund thành công thiếu `NgayHoanTien` 0 · refund thất bại/chờ có `NgayHoanTien` 0 · `NgayHoanTien` < `NgayYeuCau` 0 · refund trên booking chưa hủy 0 · refund `Chờ xử lý` kẹt > 5 phút 0 · booking 0đ có payment/refund hoặc chờ thanh toán 0 · booking `Hoàn tất` mà thời điểm trả phòng ở tương lai 0 · `HangSao` ngoài 1..5 0 · khách sạn chờ duyệt/từ chối mang dấu vết duyệt 0 · review ngoài 4 trạng thái hợp lệ 0 · quản trị viên hoạt động 8 (≥ 1) · dữ liệu E2E còn sót (tài khoản `e2e_`, khách sạn `E2E…`) 0. Số dòng `DIA_PHUONG/CHINH_SACH_HUY/KHUYEN_MAI/KHACH_SAN/DAT_PHONG/TAI_KHOAN` **trước và sau một lượt E2E đầy đủ giống hệt nhau** (12/1/8/26/88/46). Ghi chú: 5 tài khoản quản trị `testuser_…` do các lượt E2E đầu (trước khi sửa thứ tự dọn dẹp) để lại vẫn còn trong DB test — xem Known limitations.
+
+**Database vòng #14–#20** (sqlcmd trên `HotelBooking_DB0_Test` sau khi chạy toàn bộ test): admin hoạt động = 3 · đêm bán vượt quỹ phòng = 0 · `HangSao` ngoài 1..5 = 0 · `GioNhanPhong`/`GioTraPhong` vẫn kiểu `time` (2/2) và không khách sạn thiếu giờ = 0 · payment `SoTien <= 0` = 0 · hoàn vượt payment = 0 · booking 0đ chờ thanh toán/có payment = 0 · booking > 30 đêm = 0 · payment `Chờ xử lý` trùng = 0.
+
+**Database** (vòng trước, sqlcmd trên `HotelBooking_DB0_Test` sau khi chạy toàn bộ test; mọi dòng "expect 0" đều ra 0):
 - Bất biến mới: còn 3 quản trị viên hoạt động (A1), không đêm nào bán vượt quỹ phòng (A2), không đơn "Chờ thanh toán" quá 15 phút còn sót (A3), không đơn "Hoàn tất" mà thời điểm trả phòng còn ở tương lai (A4), không review ngoài 4 trạng thái hợp lệ (A6).
 - Lấy từ các bug trước (cùng lần chạy): payment trùng pending 0 · payment `SoTien <= 0` 0 · booking 0đ chờ thanh toán hoặc có payment 0 · khách sạn chờ duyệt/từ chối mang dấu vết duyệt 0 · booking > 30 đêm 0 · payment có nhiều hơn 1 refund 0 · hoàn vượt payment 0 · refund thành công thiếu `NgayHoanTien` hoặc thất bại/chờ có `NgayHoanTien` 0 · refund trên booking chưa hủy 0 · refund kẹt "Chờ xử lý" quá 5 phút 0.
 - Thông tin (không phải lỗi): 3 review "Hiển thị" thuộc khách sạn không công khai (dữ liệu demo có sẵn) — endpoint công khai trả 404 cho các khách sạn đó. Khách sạn id 84 (dữ liệu test cũ) và id 819 (demo "Chờ duyệt") đã ghi ở lượt trước.
@@ -209,10 +331,10 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 - booking tạo cho kỳ lưu trú đã ở quá khứ: 0 · booking trên 30 đêm: 0
 - Không do thay đổi này: 1 khách sạn "Hoạt động" không có `NgayDuyet` (id 84, dữ liệu test cũ còn sót từ 2026-09-26, tạo trước khi factory được sửa) — không xóa; 1 khách sạn demo "Chờ duyệt" (id 819, Sơn Trà Green Retreat) — giờ đã duyệt được.
 
-**E2E:** chưa chạy E2E trên trình duyệt. Các luồng bắt buộc được chạy qua HTTP thật vào ứng dụng Express với DB thật (supertest): Owner tạo hotel → Admin duyệt → hotel public; Search → ngày hợp lệ → quote → booking → tạo payment mô phỏng; khuyến mãi 100% → total 0 → confirmed ngay; double-click payment → đúng 1 pending. Giao diện được kiểm bằng component/integration test (Testing Library), không bằng thao tác thủ công.
+**E2E (trình duyệt thật):** đã chạy — Playwright + Chrome, frontend là **bản build production** (`vite preview`), backend thật, SQL Server test thật; thư mục `e2e/`. Không mock backend: dữ liệu do fixture server (cùng factory của test backend) tạo và dọn; trang thanh toán VNPAY được thay **trong trình duyệt** bằng một câu trả lời ký HMAC-SHA512 thật gửi vào `/api/payments/vnpay-return` (backend tự xác minh chữ ký, số tiền, mã giao dịch); API hoàn tiền VNPAY được thay bằng một stand-in cục bộ. Kết quả cuối: **32 test, 32 PASS** (sau khi sửa NEW-1). Lịch sử chạy: trước NEW-1, hai lỗi mã test (khẳng định cũ trong smoke test; bộ đếm gọi cổng hoàn tiền dùng chung) đã sửa và NEW-1 là lỗi sản phẩm (31/1 ở hai lượt liên tiếp); sau khi sửa NEW-1, một lượt có 1 lỗi do **race trong test** (chờ nhầm vào nhãn nút thay vì phản hồi kiểm duyệt review — đã sửa bằng `waitForResponse` + `expect.poll`, không chạy lại đến khi xanh), rồi hai lượt đầy đủ liên tiếp đều 32/32; số dòng DB trước/sau giống hệt nhau. Không test skip, không flaky chưa giải thích. Chi tiết: `FINAL_RELEASE_AUDIT.md` mục 5.
 
 ## Schema changes
-NONE (bug #4, #1, #3, #2, #8, #6, #7, #5, #9, #10, #11 và #13)
+NONE (bug #4, #1, #3, #2, #8, #6, #7, #5, #9, #10, #11, #13, #14, #18, #12, #19, #15, #16, #20, #17 và vòng hardening; `git status` không có thay đổi nào trong `backend/prisma/`, migration hay SQL; biến môi trường `REFRESH_COOKIE_SAMESITE` là cấu hình, không phải schema)
 (`KHACH_SAN.TrangThai` nhận thêm giá trị "Từ chối" — cột là open domain không có CHECK nên không phải thay đổi schema. Không thêm bảng/cột/FK, không sửa migration.)
 
 ## Ghi chú hành vi cần biết
@@ -222,7 +344,13 @@ NONE (bug #4, #1, #3, #2, #8, #6, #7, #5, #9, #10, #11 và #13)
 - (#10) DANH_GIA không có cột ngày nên review công khai sắp theo id và không hiện ngày đánh giá.
 - (#11) Khóa `errors` cũ của lỗi validate bị bỏ (thay bằng `details`); trong repo không còn client nào đọc nó, client bên ngoài (nếu có) phải đổi.
 - (#13) Hoàn tất đơn nay xảy ra ở giờ trả phòng của khách sạn (ví dụ 12:00 giờ VN) thay vì 07:00 giờ VN, nên "Hoàn tất" và quyền đánh giá đến muộn hơn tối đa vài giờ so với trước. Bộ lọc `to` của danh sách thanh toán admin giờ bao trọn ngày cuối.
-- Vẫn còn nguyên (ngoài phạm vi các lượt này): #17 (cookie refresh/SameSite), các lỗi nhỏ #12, #14–#16, #18–#20 trong `LOGIC_AUDIT.md`.
+- (#18) Số khách chỉ được kiểm tra lúc báo giá/đặt phòng, không lưu vào DB (`DAT_PHONG` không có cột này), nên không thể kiểm lại sau khi đặt. Tìm kiếm không còn ẩn từng loại phòng nhỏ hơn số khách; trang chi tiết liệt kê mọi loại phòng.
+- (#19) Mọi JSON của API nay trả `GioNhanPhong`/`GioTraPhong` ở dạng "HH:mm" (kể cả trang công khai và chi tiết đặt phòng của owner); client nào còn đọc `1970-01-01T…Z` phải đổi.
+- (#20) Bộ lọc giao diện chỉ còn 3, 4, 5 sao ("từ N sao trở lên"); API vẫn nhận `starRating` 1..5.
+- (#15) Khi backend từ chối mã đang áp dụng, ô nhập mã bị xóa (kèm thông báo có ghi mã) để không chặn nút đặt phòng.
+- (Cấu hình triển khai, trước là #17) Production **bắt buộc** đặt `REFRESH_COOKIE_SAMESITE` (`lax` nếu SPA và API cùng site, `none` nếu khác site) — thiếu thì backend không khởi động; `POST /auth/refresh` và `/auth/logout` từ chối `Origin` ngoài `CORS_ORIGIN`; `CORS_ORIGIN`/`FRONTEND_URL` không được chứa ký tự đại diện. Repo không nêu domain/host production nên chưa thể kiểm `SameSite=None` trên hai domain thật.
+- (Hardening) Thẻ khách sạn ở trang chủ có hai liên kết cùng tên, cùng đích (ảnh và mũi tên) — không phải lỗi chức năng; là điểm có thể gọn lại về trợ năng.
+- (NEW-1, đã sửa) Checkbox điều khoản đăng ký nay được xác thực bằng schema; trường `DongYDieuKhoan` chỉ có ở form, không gửi lên API.
 - Tạo payment khi đã có pending trả lại payment đó với HTTP 201 (không đổi status code để không phá client hiện có).
 - `reject` khách sạn không lưu lý do (không có cột phù hợp).
 - Khách sạn "Từ chối" hiện không có đường nộp lại; cần use case riêng nếu muốn.
@@ -242,4 +370,20 @@ NONE (bug #4, #1, #3, #2, #8, #6, #7, #5, #9, #10, #11 và #13)
 #10 PASS
 #11 PASS
 #13 PASS
-Regression PASS: backend 51 file / 623 test PASS, lint/typecheck/build sạch; frontend typecheck/build sạch, 413/415 test PASS — 2 test và 3 lỗi lint là có sẵn từ baseline, đã đối chứng, không phải do thay đổi này. Chưa chạy E2E trên trình duyệt.
+#14 PASS
+#18 PASS
+#12 PASS
+#19 PASS
+#15 PASS
+#16 PASS
+#20 PASS
+NEW-1 RESOLVED (PASS)
+Hardening 1 (2 test guest-count, 3 lỗi lint `<main>`) PASS
+Cookie / CORS / SameSite: Deployment Configuration (trước là #17) — phần mã PASS; chỉ cần đặt `REFRESH_COOKIE_SAMESITE` khi có topology/domain production thật; không phải bug mở
+Browser E2E: 32/32 PASS
+Backend regression PASS: eslint/tsc/build exit 0; 57 file / 744 test PASS trên SQL Server thật; file concurrency chạy lặp 3 lần đều PASS.
+Frontend regression PASS: eslint/tsc/build exit 0; 67 file / 460 test PASS.
+SQL invariants PASS.
+Schema changes: NONE
+Known baseline failures: KHÔNG CÒN.
+Phán quyết phát hành: **READY WITH KNOWN LIMITATIONS** — xem `docs/FINAL_RELEASE_AUDIT.md` (giới hạn L1–L9).

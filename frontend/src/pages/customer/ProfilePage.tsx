@@ -2,22 +2,21 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { useMe, useUpdateProfile, useSignOut, useForgotPassword } from '../../features/auth/hooks';
+import { useMe, useUpdateProfile, useSignOut, useChangePassword } from '../../features/auth/hooks';
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
-import { updateProfileSchema, UpdateProfileFormValues } from '../../features/auth/schemas';
+import { updateProfileSchema, UpdateProfileFormValues, changePasswordSchema, ChangePasswordFormValues } from '../../features/auth/schemas';
 import { ApiError } from '../../services/apiClient';
 import { applyServerFieldErrors } from '../../lib/apiErrors';
 
-import { cn, maskEmail } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
 
 export default function ProfilePage() {
   const meQuery = useMe();
   const updateMutation = useUpdateProfile();
-  // Changing the password reuses the forgot-password flow: the reset link goes to the account's own email.
-  const changePasswordLink = useForgotPassword();
+  const changePasswordMutation = useChangePassword();
   const navigate = useNavigate();
   const { signOut } = useSignOut();
   // The account menu (bookings, support, sign out) is the customer's; admins and owners are already inside their dashboard.
@@ -42,15 +41,26 @@ export default function ProfilePage() {
     }
   }, [meQuery.data, reset]);
 
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    setError: setPasswordError,
+    reset: resetPasswordForm,
+    formState: { errors: passwordErrors },
+  } = useForm<ChangePasswordFormValues>({ resolver: zodResolver(changePasswordSchema) });
+
+  const onChangePassword = (data: ChangePasswordFormValues) =>
+    changePasswordMutation.mutate(
+      { MatKhauCu: data.MatKhauCu, MatKhauMoi: data.MatKhauMoi },
+      {
+        onSuccess: () => resetPasswordForm(),
+        onError: (error) => applyServerFieldErrors(error, setPasswordError, ['MatKhauCu', 'MatKhauMoi']),
+      }
+    );
+
   const handleLogout = async () => {
     await signOut();
     navigate('/login', { replace: true });
-  };
-
-  const requestPasswordChange = () => {
-    const email = meQuery.data?.Email;
-    if (!email || changePasswordLink.isPending) return;
-    changePasswordLink.mutate({ Email: email });
   };
 
   const onSubmit = (data: UpdateProfileFormValues) =>
@@ -207,25 +217,50 @@ export default function ProfilePage() {
           </div>
 
           <div className="bg-white rounded-xl border border-border shadow-sm p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <h3 className="font-bold text-lg text-ink">Đổi mật khẩu</h3>
+            <p className="text-sm text-ink-muted mt-1 mb-4">Nhập mật khẩu hiện tại và mật khẩu mới. Sau khi đổi, các thiết bị khác sẽ phải đăng nhập lại.</p>
+
+            {changePasswordMutation.isSuccess && (
+              <div role="status" className="mb-4 rounded-lg bg-success-light px-4 py-3 text-sm text-success-ink border border-success/30">
+                Đổi mật khẩu thành công.
+              </div>
+            )}
+            {changePasswordMutation.isError && Object.keys(passwordErrors).length === 0 && (
+              <div role="alert" className="mb-4 rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink border border-danger/30">
+                {changePasswordMutation.error instanceof ApiError ? changePasswordMutation.error.message : 'Không thể đổi mật khẩu lúc này. Vui lòng thử lại sau.'}
+              </div>
+            )}
+
+            <form onSubmit={handlePasswordSubmit(onChangePassword)} noValidate className="grid grid-cols-1 gap-4 max-w-md">
+              {(
+                [
+                  { name: 'MatKhauCu', label: 'Mật khẩu hiện tại', autoComplete: 'current-password' },
+                  { name: 'MatKhauMoi', label: 'Mật khẩu mới', autoComplete: 'new-password' },
+                  { name: 'confirmMatKhauMoi', label: 'Xác nhận mật khẩu mới', autoComplete: 'new-password' },
+                ] as const
+              ).map((field) => (
+                <div key={field.name}>
+                  <label htmlFor={`profile-${field.name}`} className="form-label">{field.label}</label>
+                  <input
+                    id={`profile-${field.name}`}
+                    type="password"
+                    autoComplete={field.autoComplete}
+                    aria-invalid={Boolean(passwordErrors[field.name])}
+                    aria-describedby={passwordErrors[field.name] ? `profile-${field.name}-error` : undefined}
+                    className={cn('input', passwordErrors[field.name] && 'border-danger')}
+                    {...registerPassword(field.name)}
+                  />
+                  {passwordErrors[field.name] && (
+                    <p id={`profile-${field.name}-error`} className="text-xs text-danger mt-1">{passwordErrors[field.name]?.message}</p>
+                  )}
+                </div>
+              ))}
               <div>
-                <h3 className="font-bold text-lg text-ink">Bảo mật tài khoản</h3>
-                <p className="text-sm text-ink-muted mt-1">Chúng tôi sẽ gửi link xác nhận tới email của bạn để đặt mật khẩu mới.</p>
+                <Button type="submit" disabled={changePasswordMutation.isPending}>
+                  {changePasswordMutation.isPending ? 'Đang đổi...' : 'Đổi mật khẩu'}
+                </Button>
               </div>
-              <Button type="button" variant="outline" className="shrink-0" loading={changePasswordLink.isPending} onClick={requestPasswordChange}>
-                {changePasswordLink.isSuccess ? 'Gửi lại link' : 'Đổi mật khẩu'}
-              </Button>
-            </div>
-            {changePasswordLink.isSuccess && (
-              <div role="status" className="mt-4 rounded-lg bg-success-light px-4 py-3 text-sm text-success-ink border border-success/30">
-                Đã gửi link tới <strong>{maskEmail(meQuery.data?.Email ?? '')}</strong>. Mở email và làm theo hướng dẫn để đặt mật khẩu mới (link có hiệu lực 15 phút).
-              </div>
-            )}
-            {changePasswordLink.isError && (
-              <div role="alert" className="mt-4 rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink border border-danger/30">
-                {changePasswordLink.error instanceof ApiError ? changePasswordLink.error.message : 'Không thể gửi email lúc này. Vui lòng thử lại sau.'}
-              </div>
-            )}
+            </form>
           </div>
 
         </div>

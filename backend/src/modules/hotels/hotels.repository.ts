@@ -5,7 +5,6 @@ export interface CandidateHotelParams {
   location?: string;
   starRating?: number;
   amenityIds?: number[];
-  guests: number;
   checkIn: Date;
   checkOut: Date;
 }
@@ -60,13 +59,13 @@ export class HotelsRepository {
               })),
             }
           : {}),
-        LOAI_PHONG: { some: { TrangThai: ROOM_TYPE_STATUS.ACTIVE, SucChua: { gte: params.guests } } },
+        LOAI_PHONG: { some: { TrangThai: ROOM_TYPE_STATUS.ACTIVE } },
       },
       include: {
         DIA_PHUONG: true,
         HINH_ANH_KHACH_SAN: true,
         LOAI_PHONG: {
-          where: { TrangThai: ROOM_TYPE_STATUS.ACTIVE, SucChua: { gte: params.guests } },
+          where: { TrangThai: ROOM_TYPE_STATUS.ACTIVE },
           include: roomTypeInclude(params.checkIn, params.checkOut),
         },
       },
@@ -96,15 +95,13 @@ export class HotelsRepository {
   async findRoomTypesForHotel(
     maKhachSan: number,
     checkIn: Date,
-    checkOut: Date,
-    minCapacity?: number
+    checkOut: Date
   ) {
     const prisma = getPrismaClient();
     return prisma.lOAI_PHONG.findMany({
       where: {
         MaKhachSan: maKhachSan,
         TrangThai: ROOM_TYPE_STATUS.ACTIVE,
-        ...(minCapacity ? { SucChua: { gte: minCapacity } } : {}),
       },
       include: roomTypeInclude(checkIn, checkOut),
       orderBy: { MaLoaiPhong: 'asc' },

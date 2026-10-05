@@ -3,6 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import routes from './routes';
 import { env } from './config/env';
+import { isAllowedOrigin } from './config/cors';
+import { timeOfDayJsonReplacer } from './common/utils/time-of-day';
 import { errorHandler } from './middleware/error.middleware';
 import { notFoundHandler } from './middleware/notFound.middleware';
 import { securityHeaders } from './middleware/security.middleware';
@@ -11,17 +13,13 @@ import { requestLogging } from './middleware/request-logging.middleware';
 const app: Application = express();
 app.disable('x-powered-by');
 app.set('trust proxy', env.TRUST_PROXY);
-
-const allowedOrigins = (env.CORS_ORIGIN || env.FRONTEND_URL)
-  .split(',')
-  .map((origin) => origin.trim().replace(/\/$/, ''))
-  .filter(Boolean);
+app.set('json replacer', timeOfDayJsonReplacer);
 
 // Middlewares
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) return callback(null, true);
+      if (!origin || isAllowedOrigin(origin)) return callback(null, true);
       return callback(null, false);
     },
     credentials: true,

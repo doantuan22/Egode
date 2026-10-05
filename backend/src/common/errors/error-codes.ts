@@ -18,6 +18,8 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
+  /** The rooms chosen cannot hold the number of guests (quote / booking). */
+  CAPACITY_EXCEEDED: 'CAPACITY_EXCEEDED',
   TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;

@@ -23,7 +23,9 @@ describe('HotelListPage guest count', () => {
     renderWithProviders(<HotelListPage />, { route: '/hotels' });
 
     expect(lastParams()).toMatchObject({ guests: 2 });
-    expect(screen.getByText('2 khách')).toBeInTheDocument();
+    // shown in the search box (the 'Số khách' control) AND repeated in the results summary chip
+    expect(screen.getByRole('button', { name: /Số khách\s*2 khách/ })).toBeInTheDocument();
+    expect(screen.getAllByText('2 khách')).toHaveLength(2);
   });
 
   it('keeps the guest count from the link', () => {

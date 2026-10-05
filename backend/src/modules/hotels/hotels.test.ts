@@ -64,18 +64,19 @@ describe('GET /api/hotels (search/filter/pagination)', () => {
     expect(expensiveNames).not.toContain('Saigon Riverside Inn');
   });
 
-  it('filters out hotels active but with no room type meeting the requested guest count', async () => {
+  it('guests are counted over ALL rooms together: a hotel that could never hold the party is not listed', async () => {
     const res = await request(app)
       .get('/api/hotels')
       .query({ location: 'Đà Nẵng', checkIn: addDays(20), checkOut: addDays(22), guests: 4 });
-    // Only "Suite" (SucChua 4) at Da Nang Beach Resort qualifies; still returned.
+    // 4 guests fit in one Suite (SucChua 4) — or in two 2-person rooms; still returned.
     const names = res.body.data.map((h: { TenKhachSan: string }) => h.TenKhachSan);
     expect(names).toContain('Da Nang Beach Resort');
 
     const tooMany = await request(app)
       .get('/api/hotels')
       .query({ location: 'Đà Nẵng', checkIn: addDays(20), checkOut: addDays(22), guests: 50 });
-    expect(tooMany.body.data).toHaveLength(0);
+    // 50 guests exceed everything Da Nang Beach Resort has in stock (all its rooms together), so it is not offered.
+    expect(tooMany.body.data.map((h: { TenKhachSan: string }) => h.TenKhachSan)).not.toContain('Da Nang Beach Resort');
   });
 
   it('rejects an invalid date range (checkOut <= checkIn)', async () => {
@@ -180,13 +181,15 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
     expect(res.status).toBe(400);
   });
 
-  it('filters room types by guest capacity', async () => {
+  it('lists every room type with its capacity — a party can be spread over several rooms, so none is hidden', async () => {
     const res = await request(app)
       .get(`/api/hotels/${grandSaigonId}/rooms`)
       .query({ checkIn: addDays(20), checkOut: addDays(22), guests: 4 });
     const names = res.body.data.map((r: { TenLoaiPhong: string }) => r.TenLoaiPhong);
     expect(names).toContain('Suite'); // SucChua 4
-    expect(names).not.toContain('Standard'); // SucChua 2
+    expect(names).toContain('Standard'); // SucChua 2: two of them hold four guests
+    const standard = res.body.data.find((r: { TenLoaiPhong: string }) => r.TenLoaiPhong === 'Standard');
+    expect(standard.SucChua).toBe(2);
   });
 
   it('returns 404 for rooms of a non-existent hotel', async () => {

@@ -9,6 +9,7 @@ import type {
   UpdateProfilePayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '../../types/auth';
 
 export const meQueryKey = ['auth', 'me'] as const;
@@ -81,6 +82,16 @@ export function useForgotPassword() {
 
 export function useResetPassword() {
   return useMutation({ mutationFn: (payload: ResetPasswordPayload) => authApi.resetPassword(payload) });
+}
+
+/** Changes the signed-in user's password; this device keeps its session through the new access token the server returns. */
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (payload: ChangePasswordPayload) => authApi.changePassword(payload),
+    onSuccess: ({ accessToken }) => {
+      useAuthStore.getState().setAccessToken(accessToken);
+    },
+  });
 }
 
 export function useUpdateProfile() {

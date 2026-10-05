@@ -4,6 +4,7 @@ import { enumerateNights, priceRoomLine, buildBookedByDate, toDateKey, type Nigh
 import { evaluatePromotion } from './promotion-pricing';
 import { AppError } from '../../common/errors/app-error';
 import { releaseExpiredHolds } from '../bookings/booking-lifecycle';
+import { assertCapacity } from '../hotels/capacity';
 import type { QuoteRequestInput } from './quotes.schemas';
 
 const toNumber = (value: unknown): number => Number(value);
@@ -26,6 +27,9 @@ export interface QuoteResponse {
   SoDem: number;
   ChiTietPhong: QuoteRoomLine[];
   KhaDung: boolean;
+  /** The party size this quote was checked for, and what the chosen rooms can hold. */
+  SoKhach: number;
+  TongSucChua: number;
   TongTienPhong: number;
   KhuyenMai: { MaKhuyenMai: number; MaCode: string; LoaiGiamGia: string; GiaTriGiam: number } | null;
   SoTienGiam: number;
@@ -62,6 +66,12 @@ export class QuotesService {
         `Loại phòng không hợp lệ hoặc không thuộc khách sạn này: ${missing.join(', ')}`
       );
     }
+
+    // Not the client's word: capacity comes from LOAI_PHONG.SucChua, the party size is checked against it.
+    const tongSucChua = assertCapacity(
+      input.guests,
+      input.rooms.map((line) => ({ sucChua: roomTypes.find((rt) => rt.MaLoaiPhong === line.maLoaiPhong)!.SucChua, soLuong: line.soLuong }))
+    );
 
     const chiTietPhong: QuoteRoomLine[] = input.rooms.map((line) => {
       const roomType = roomTypes.find((rt) => rt.MaLoaiPhong === line.maLoaiPhong)!;
@@ -150,6 +160,8 @@ export class QuotesService {
       SoDem: nightKeys.length,
       ChiTietPhong: chiTietPhong,
       KhaDung: khaDung,
+      SoKhach: input.guests,
+      TongSucChua: tongSucChua,
       TongTienPhong: tongTienPhong,
       KhuyenMai: khuyenMai,
       SoTienGiam: soTienGiam,

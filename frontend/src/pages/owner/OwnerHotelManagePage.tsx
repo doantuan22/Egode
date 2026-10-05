@@ -51,8 +51,8 @@ export default function OwnerHotelManagePage() {
         DiaChiChiTiet: hotelQuery.data.DiaChiChiTiet,
         HangSao: hotelQuery.data.HangSao,
         MoTa: hotelQuery.data.MoTa ?? '',
-        GioNhanPhong: hotelQuery.data.GioNhanPhong.slice(11, 16),
-        GioTraPhong: hotelQuery.data.GioTraPhong.slice(11, 16),
+        GioNhanPhong: hotelQuery.data.GioNhanPhong,
+        GioTraPhong: hotelQuery.data.GioTraPhong,
         MaDiaPhuong: hotelQuery.data.MaDiaPhuong,
       });
     }

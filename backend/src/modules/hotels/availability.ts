@@ -35,6 +35,22 @@ export const enumerateNights = (checkIn: Date, checkOut: Date): string[] => {
   return nights;
 };
 
+/**
+ * Rooms of a room type that exist on EVERY night of the stay (the smallest nightly stock), regardless of what is
+ * booked; 0 if any night has no stock row at all. The ceiling on how many rooms of it one stay could use.
+ */
+export const stockForStay = (nightKeys: string[], rates: ReadonlyArray<{ NgayApDung: Date; SoLuongPhong: number }>): number => {
+  if (nightKeys.length === 0) return 0;
+  const byNight = new Map(rates.map((r) => [toDateKey(r.NgayApDung), r.SoLuongPhong]));
+  let stock = Infinity;
+  for (const key of nightKeys) {
+    const rooms = byNight.get(key);
+    if (rooms === undefined) return 0;
+    stock = Math.min(stock, rooms);
+  }
+  return Number.isFinite(stock) ? stock : 0;
+};
+
 export interface NightlyRate {
   giaPhong: number;
   soLuongPhong: number;

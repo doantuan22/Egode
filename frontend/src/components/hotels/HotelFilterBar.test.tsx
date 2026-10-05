@@ -12,8 +12,8 @@ describe('HotelFilterBar', () => {
     expect(screen.queryByRole('button', { name: /Đặt lại/ })).not.toBeInTheDocument();
 
     rerender(<HotelFilterBar values={{ starRating: 4, amenities: [2] }} amenities={amenities} {...handlers()} />);
-    expect(screen.getByRole('button', { name: /^4\s*sao$/ })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: /^5\s*sao$/ })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: /^Từ 4 sao trở lên$/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /^Từ 5 sao trở lên$/ })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'Bữa sáng' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: /Đặt lại/ })).toBeInTheDocument();
   });
@@ -23,12 +23,22 @@ describe('HotelFilterBar', () => {
     const { rerender } = render(<HotelFilterBar values={{}} amenities={undefined} {...h} />);
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: /^5\s*sao$/ }));
+    await user.click(screen.getByRole('button', { name: /^Từ 5 sao trở lên$/ }));
     expect(h.onStarChange).toHaveBeenLastCalledWith(5);
 
     rerender(<HotelFilterBar values={{ starRating: 5 }} amenities={undefined} {...h} />);
-    await user.click(screen.getByRole('button', { name: /^5\s*sao$/ }));
+    await user.click(screen.getByRole('button', { name: /^Từ 5 sao trở lên$/ }));
     expect(h.onStarChange).toHaveBeenLastCalledWith(undefined);
+  });
+
+  it('says the rating is a minimum — "Từ N sao trở lên" for 3, 4 and 5 — never "exactly N stars"', () => {
+    render(<HotelFilterBar values={{}} amenities={undefined} {...handlers()} />);
+
+    expect(screen.getByText('Hạng sao tối thiểu')).toBeInTheDocument();
+    for (const star of [3, 4, 5]) {
+      expect(screen.getByRole('button', { name: `Từ ${star} sao trở lên` })).toBeInTheDocument();
+    }
+    expect(screen.queryByRole('button', { name: /^[1-5] sao$/ })).not.toBeInTheDocument();
   });
 
   it('toggles an amenity', async () => {

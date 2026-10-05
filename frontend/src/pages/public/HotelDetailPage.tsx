@@ -110,19 +110,30 @@ export default function HotelDetailPage() {
     Record<number, number>
   >({});
 
+  /*
+   * Mã đang gõ trong ô nhập — CHƯA có hiệu lực.
+   * Chỉ nút "Áp dụng" mới biến nó thành appliedPromo.
+   */
   const [
-    promoCode,
-    setPromoCode,
+    promoInput,
+    setPromoInput,
   ] = useState('');
 
   /*
-   * Mã khuyến mãi thực tế
-   * được dùng để báo giá.
+   * Mã đã áp dụng: duy nhất mã này được gửi lên backend để báo giá / đặt phòng.
+   * Mỗi lần đổi phòng / ngày / số khách, báo giá chạy lại với mã này và backend
+   * quyết định nó còn hợp lệ hay không.
    */
   const [
     appliedPromo,
     setAppliedPromo,
   ] = useState('');
+
+  /* Lý do mã đã bị gỡ (backend báo không hợp lệ / hết hợp lệ). */
+  const [
+    promoNotice,
+    setPromoNotice,
+  ] = useState<string | null>(null);
 
   const [
     ghiChu,
@@ -232,6 +243,7 @@ export default function HotelDetailPage() {
         ? {
             checkIn,
             checkOut,
+            guests,
 
             rooms:
               selectedRoomLines,
@@ -320,6 +332,18 @@ export default function HotelDetailPage() {
     );
 
   /* =========================================================
+     CAPACITY OF THE ROOMS CHOSEN (a hint — the server decides)
+  ========================================================= */
+
+  const selectedCapacity = selectedRoomLines.reduce(
+    (sum, line) =>
+      sum +
+      line.soLuong *
+        (roomsQuery.data?.find((room) => room.MaLoaiPhong === line.maLoaiPhong)?.SucChua ?? 0),
+    0
+  );
+
+  /* =========================================================
      DATE SEARCH
   ========================================================= */
 
@@ -360,10 +384,6 @@ export default function HotelDetailPage() {
     available: number
   ) => {
     bookingMutation.reset();
-
-    setAppliedPromo(
-      promoCode.trim()
-    );
 
     const safeQuantity =
       Math.min(
@@ -411,11 +431,15 @@ export default function HotelDetailPage() {
      PROMO
   ========================================================= */
 
-  const changePromoCode = (
+  const changePromoInput = (
     value: string
   ) => {
-    setPromoCode(
+    setPromoInput(
       value
+    );
+
+    setPromoNotice(
+      null
     );
 
     if (
@@ -430,8 +454,24 @@ export default function HotelDetailPage() {
   const applyPromo = () => {
     bookingMutation.reset();
 
+    setPromoNotice(
+      null
+    );
+
+    const code =
+      promoInput.trim();
+
+    // Same code again: the query key does not change, so ask the backend again explicitly.
+    if (
+      code ===
+        appliedPromo &&
+      code
+    ) {
+      void quoteQuery.refetch();
+    }
+
     setAppliedPromo(
-      promoCode.trim()
+      code
     );
   };
 
@@ -453,7 +493,49 @@ export default function HotelDetailPage() {
 
   const quoteMatchesPromo =
     appliedPromo ===
-    promoCode.trim();
+    promoInput.trim();
+
+  /*
+   * Backend là nguồn quyết định: nếu báo giá cho mã đã áp dụng trả về "không hợp lệ"
+   * (sai mã, hết hạn, không đủ điều kiện sau khi đổi phòng/ngày...), gỡ mã và báo rõ lý do.
+   */
+  const quoteData =
+    quoteQuery.data;
+
+  const quoteFetching =
+    quoteQuery.isFetching;
+
+  useEffect(() => {
+    if (
+      !appliedPromo ||
+      !quoteData ||
+      quoteFetching ||
+      !quoteMatchesSelection ||
+      quoteData.PromoHopLe
+    ) {
+      return;
+    }
+
+    setPromoNotice(
+      `Mã khuyến mãi ${appliedPromo}: ${
+        quoteData.PromoThongBao ??
+        'không hợp lệ'
+      }`
+    );
+
+    setAppliedPromo(
+      ''
+    );
+
+    setPromoInput(
+      ''
+    );
+  }, [
+    appliedPromo,
+    quoteData,
+    quoteFetching,
+    quoteMatchesSelection,
+  ]);
 
   /* =========================================================
      CONFIRM BOOKING
@@ -474,6 +556,7 @@ export default function HotelDetailPage() {
       {
         checkIn,
         checkOut,
+        guests,
 
         rooms:
           selectedRoomLines,
@@ -903,7 +986,7 @@ export default function HotelDetailPage() {
           MAIN CONTENT
       ===================================================== */}
 
-      <main className="page-container py-8 lg:py-10">
+      <div className="page-container py-8 lg:py-10">
 
         <div
           className="
@@ -1105,6 +1188,12 @@ export default function HotelDetailPage() {
               <div className="p-1">
 
                 <BookingPanel
+                  guests={
+                    guests
+                  }
+                  selectedCapacity={
+                    selectedCapacity
+                  }
                   roomTypeCount={
                     selectedRoomLines.length
                   }
@@ -1120,11 +1209,14 @@ export default function HotelDetailPage() {
                   quoteMatchesPromo={
                     quoteMatchesPromo
                   }
-                  promoCode={
-                    promoCode
+                  promoInput={
+                    promoInput
                   }
-                  onPromoCodeChange={
-                    changePromoCode
+                  promoNotice={
+                    promoNotice
+                  }
+                  onPromoInputChange={
+                    changePromoInput
                   }
                   onApplyPromo={
                     applyPromo
@@ -1181,7 +1273,7 @@ export default function HotelDetailPage() {
 
         </div>
 
-      </main>
+      </div>
 
     </div>
   );

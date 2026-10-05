@@ -188,12 +188,14 @@ export class AuthService {
     }
 
     const validCurrent = await verifyPassword(input.MatKhauCu, account.MatKhau);
-    if (!validCurrent) throw AppError.badRequest('Mật khẩu hiện tại không đúng');
+    if (!validCurrent) {
+      throw AppError.badRequest('Mật khẩu hiện tại không đúng', [{ field: 'MatKhauCu', message: 'Mật khẩu hiện tại không đúng' }]);
+    }
 
     // MatKhauCu was just verified against the stored hash, so equality here
     // means the new password is the current one.
     if (input.MatKhauMoi === input.MatKhauCu) {
-      throw AppError.badRequest('Mật khẩu mới phải khác mật khẩu hiện tại');
+      throw AppError.badRequest('Mật khẩu mới phải khác mật khẩu hiện tại', [{ field: 'MatKhauMoi', message: 'Mật khẩu mới phải khác mật khẩu hiện tại' }]);
     }
 
     const role = await this.rolesRepository.findById(account.MaVaiTro);

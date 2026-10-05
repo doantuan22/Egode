@@ -3,6 +3,7 @@ import {
   enumerateNights,
   computeRoomTypeAvailability,
   buildBookedByDate,
+  stockForStay,
   toDateKey,
   type NightlyRate,
 } from './availability';
@@ -75,18 +76,33 @@ export class HotelsService {
       location: query.location,
       starRating: query.starRating,
       amenityIds: query.amenities,
-      guests: query.guests,
       checkIn: query.checkIn,
       checkOut: query.checkOut,
     });
 
-    let items: HotelSearchItem[] = hotels.map((hotel) => {
-      const priced = hotel.LOAI_PHONG.map((rt) => priceRoomType(rt, nightKeys));
-      const availablePrices = priced
-        .filter((p) => p.available > 0 && p.totalPrice !== null)
-        .map((p) => (p.totalPrice as number) / p.nights);
-      const conPhong = availablePrices.length > 0;
-      const giaTuDauTu = conPhong ? Math.min(...availablePrices) : null;
+    // Guests may be split over several rooms, so the question is whether the hotel's rooms TOGETHER can hold the
+    // party: Σ (SucChua × rooms). A hotel that could never hold it (even with every room free) is not listed;
+    // one that could but has too few rooms free on these dates is listed as "hết phòng".
+    const hosts = (hotel: (typeof hotels)[number]) => {
+      let inStock = 0;
+      let free = 0;
+      let cheapest = Infinity;
+      for (const roomType of hotel.LOAI_PHONG) {
+        const priced = priceRoomType(roomType, nightKeys);
+        if (priced.totalPrice === null) continue; // a night without a price cannot be sold
+        inStock += roomType.SucChua * stockForStay(nightKeys, roomType.QUY_PHONG_GIA);
+        free += roomType.SucChua * priced.available;
+        if (priced.available > 0) cheapest = Math.min(cheapest, priced.totalPrice / priced.nights);
+      }
+      return { inStock, free, cheapest };
+    };
+
+    let items: HotelSearchItem[] = hotels
+      .map((hotel) => ({ hotel, capacity: hosts(hotel) }))
+      .filter(({ capacity }) => capacity.inStock >= query.guests)
+      .map(({ hotel, capacity }) => {
+      const conPhong = capacity.free >= query.guests;
+      const giaTuDauTu = conPhong && Number.isFinite(capacity.cheapest) ? capacity.cheapest : null;
       const anhDaiDien =
         hotel.HINH_ANH_KHACH_SAN.find((img) => img.AnhDaiDien)?.URL ??
         hotel.HINH_ANH_KHACH_SAN[0]?.URL ??
@@ -186,12 +202,9 @@ export class HotelsService {
 
     const nightKeys = enumerateNights(query.checkIn, query.checkOut);
     await releaseExpiredHolds();
-    const roomTypes = await this.hotelsRepository.findRoomTypesForHotel(
-      maKhachSan,
-      query.checkIn,
-      query.checkOut,
-      query.guests
-    );
+    // Every active room type is listed with its SucChua: a party can be spread over several rooms, so a room that
+    // is "too small for everyone" is not hidden. The capacity check happens on the quote and the booking.
+    const roomTypes = await this.hotelsRepository.findRoomTypesForHotel(maKhachSan, query.checkIn, query.checkOut);
 
     return roomTypes.map((rt) => {
       const priced = priceRoomType(rt, nightKeys);

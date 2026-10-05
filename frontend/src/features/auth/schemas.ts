@@ -27,6 +27,9 @@ export const registerSchema = z
     GioiTinh: z.enum([...GENDER_OPTIONS, '']).nullish(),
     MatKhau: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
     confirmMatKhau: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
+    // Form-only consent (not sent to the API, no DB column): must be exactly true, so the rule lives in the schema
+    // and not in an HTML `required` attribute (the form is noValidate, which switches that attribute off).
+    DongYDieuKhoan: z.boolean().refine((accepted) => accepted, 'Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật'),
   })
   .refine((data) => data.MatKhau === data.confirmMatKhau, {
     message: 'Mật khẩu xác nhận không khớp',
@@ -50,6 +53,19 @@ export const resetPasswordSchema = z
     path: ['confirmMatKhauMoi'],
   });
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+
+// Same policy as the backend (changePasswordSchema): the current password is required, the new one has 8-128 characters.
+export const changePasswordSchema = z
+  .object({
+    MatKhauCu: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại').max(128),
+    MatKhauMoi: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
+    confirmMatKhauMoi: z.string().min(1, 'Vui lòng xác nhận mật khẩu mới'),
+  })
+  .refine((data) => data.MatKhauMoi === data.confirmMatKhauMoi, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['confirmMatKhauMoi'],
+  });
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 
 export const updateProfileSchema = z.object({
   HoTen: z.string().min(2, 'Họ và tên ít nhất 2 ký tự'),

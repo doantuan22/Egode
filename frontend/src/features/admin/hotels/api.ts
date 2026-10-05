@@ -9,6 +9,7 @@ export interface AdminHotel {
   MoTa: string | null;
   TrangThai: string;
   MaDiaPhuong: number;
+  /** "HH:mm", the same format the owner API uses. */
   GioNhanPhong?: string;
   GioTraPhong?: string;
   DIA_PHUONG?: { TenThanhPho: string; TenTinh?: string };
@@ -18,7 +19,7 @@ export type AdminHotelQuery = { page: number; limit: number; search?: string; Tr
 const queryString = (query: AdminHotelQuery) => { const params = new URLSearchParams({ page: String(query.page), limit: String(query.limit) }); if (query.search) params.set('search', query.search); if (query.TrangThai) params.set('TrangThai', query.TrangThai); return params.toString(); };
 export const listAdminHotels = async (query: AdminHotelQuery): Promise<AdminHotelListResult> => { const result = await apiClient<AdminHotel[], PaginatedApiResponse<AdminHotel>>(`/admin/hotels?${queryString(query)}`); return { items: result.data ?? [], pagination: result.pagination }; };
 export const getAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}`)).data as AdminHotel;
-export type UpdateAdminHotelPayload = Pick<AdminHotel, 'TenKhachSan' | 'DiaChiChiTiet' | 'HangSao' | 'MoTa'>;
+export type UpdateAdminHotelPayload = Pick<AdminHotel, 'TenKhachSan' | 'DiaChiChiTiet' | 'HangSao' | 'MoTa' | 'GioNhanPhong' | 'GioTraPhong'>;
 export const updateAdminHotel = async (id: number, payload: Partial<UpdateAdminHotelPayload>): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })).data as AdminHotel;
 export const approveAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/approve`, { method: 'POST' })).data as AdminHotel;
 export const rejectAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reject`, { method: 'POST' })).data as AdminHotel;

@@ -28,6 +28,13 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Auth endpoints a 401 must NOT trigger a refresh for: they are called without an access token (a 401 there means
+ * "wrong credentials / bad token" — retrying after a refresh would be pointless or loop) or ARE the refresh.
+ * Every other endpoint — including the protected /auth/change-password — refreshes the access token and retries once.
+ */
+const NO_REFRESH_ENDPOINTS = new Set(['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout', '/auth/forgot-password', '/auth/reset-password']);
+
 const buildUrl = (endpoint: string) =>
   `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
@@ -88,10 +95,12 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
 
   const data: TResponse = await response.json().catch(() => ({
     success: false,
-    message: 'Failed to parse response JSON',
+    // Typical cause: the request reached the SPA host (HTML fallback) instead of the API, i.e. VITE_API_BASE_URL is
+    // missing/wrong or the dev proxy / reverse proxy does not forward /api.
+    message: `Máy chủ API không trả về JSON (HTTP ${response.status}). Kiểm tra cấu hình VITE_API_BASE_URL / proxy tới API.`,
   }));
 
-  if (response.status === 401 && !options._retried && !endpoint.startsWith('/auth/')) {
+  if (response.status === 401 && !options._retried && !NO_REFRESH_ENDPOINTS.has(endpoint.split('?')[0])) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       useAuthStore.getState().setAccessToken(newToken);

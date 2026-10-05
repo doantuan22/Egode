@@ -52,6 +52,11 @@ export interface UpdateProfilePayload {
   AnhDaiDien?: string;
 }
 
+export interface ChangePasswordPayload {
+  MatKhauCu: string;
+  MatKhauMoi: string;
+}
+
 export interface ForgotPasswordPayload {
   Email: string;
 }

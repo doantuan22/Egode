@@ -535,7 +535,7 @@ export default function HotelListPage() {
           MAIN
       ===================================================== */}
 
-      <main
+      <div
         className="
           page-container
           pb-14
@@ -1158,7 +1158,7 @@ export default function HotelListPage() {
 
         </section>
 
-      </main>
+      </div>
 
     </div>
   );

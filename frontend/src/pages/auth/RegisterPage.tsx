@@ -41,6 +41,7 @@ export default function RegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: { DongYDieuKhoan: false },
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -988,9 +989,12 @@ export default function RegisterPage() {
                     "
                   >
                     <input
+                      id="register-DongYDieuKhoan"
                       type="checkbox"
-                      required
+                      aria-invalid={errors.DongYDieuKhoan ? 'true' : undefined}
+                      aria-describedby={errors.DongYDieuKhoan ? 'register-DongYDieuKhoan-error' : undefined}
                       className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+                      {...register('DongYDieuKhoan')}
                     />
 
                     <span className="text-sm font-medium leading-5 text-slate-500">
@@ -1009,6 +1013,12 @@ export default function RegisterPage() {
                       của Egode.
                     </span>
                   </label>
+
+                  {errors.DongYDieuKhoan && (
+                    <p id="register-DongYDieuKhoan-error" className="-mt-2 text-xs font-medium text-danger">
+                      {errors.DongYDieuKhoan.message}
+                    </p>
+                  )}
 
                   {/* SUBMIT */}
 

@@ -71,8 +71,8 @@ describe('GET /api/owner/hotels/:hotelId/bookings (UC24)', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.KhachHang.SoDienThoai).toBe('0900000000');
     expect(res.body.data.GhiChu).toBe('Nhận phòng muộn khoảng 22h.');
-    expect(res.body.data.GioNhanPhong.slice(11, 16)).toBe('14:00');
-    expect(res.body.data.GioTraPhong.slice(11, 16)).toBe('12:00');
+    expect(res.body.data.GioNhanPhong).toBe('14:00');
+    expect(res.body.data.GioTraPhong).toBe('12:00');
   });
 
   it('never exposes the guest email or password hash to the hotel', async () => {

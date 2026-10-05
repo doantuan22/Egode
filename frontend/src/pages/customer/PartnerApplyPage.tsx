@@ -28,7 +28,7 @@ export default function PartnerApplyPage() {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<ApplyPartnerFormValues>({ resolver: zodResolver(applyPartnerSchema) });
+  } = useForm<ApplyPartnerFormValues>({ resolver: zodResolver(applyPartnerSchema), defaultValues: { XacNhanThongTin: false } });
 
   const existing = applicationQuery.data;
   useEffect(() => {
@@ -44,8 +44,9 @@ export default function PartnerApplyPage() {
   const hasActiveApplication = displayedApplication && displayedApplication.TrangThaiDuyet !== 'Từ chối';
   const displayedStatus = displayedApplication ? statusLabel[displayedApplication.TrangThaiDuyet] : undefined;
 
-  const onSubmit = (data: ApplyPartnerFormValues) =>
-    applyMutation.mutate(data, { onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
+  // The confirmation is a form-only guard: the API receives the four business fields.
+  const onSubmit = ({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }: ApplyPartnerFormValues) =>
+    applyMutation.mutate({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }, { onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
 
   return (
     <div className="bg-surface-secondary text-ink font-sans antialiased min-h-[80vh] flex flex-col">
@@ -147,11 +148,19 @@ export default function PartnerApplyPage() {
                 <div className="pt-4 border-t border-border">
                   <label className="flex items-start gap-3 cursor-pointer group mb-6">
                     <div className="relative flex items-center justify-center w-5 h-5 mt-0.5">
-                      <input type="checkbox" required className="peer appearance-none w-5 h-5 border border-border-strong rounded bg-white checked:bg-primary checked:border-primary transition-colors cursor-pointer" />
+                      <input
+                        id="partner-apply-confirm"
+                        type="checkbox"
+                        aria-invalid={errors.XacNhanThongTin ? 'true' : undefined}
+                        aria-describedby={errors.XacNhanThongTin ? 'partner-apply-confirm-error' : undefined}
+                        className={cn("peer appearance-none w-5 h-5 border border-border-strong rounded bg-white checked:bg-primary checked:border-primary transition-colors cursor-pointer", errors.XacNhanThongTin && "border-danger")}
+                        {...register('XacNhanThongTin')}
+                      />
                       <i className="ph-bold ph-check absolute text-white text-xs opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></i>
                     </div>
                     <span className="text-sm text-ink group-hover:text-black transition-colors">Tôi xác nhận các thông tin cung cấp ở trên là hoàn toàn chính xác.</span>
                   </label>
+                  {errors.XacNhanThongTin && <p id="partner-apply-confirm-error" className="text-xs text-danger -mt-4 mb-4">{errors.XacNhanThongTin.message}</p>}
                   
                   <Button type="submit" disabled={isSubmitting || applyMutation.isPending} size="lg" className="w-full">
                     {isSubmitting || applyMutation.isPending ? 'Đang gửi...' : 'Nộp hồ sơ đối tác'}

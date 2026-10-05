@@ -95,3 +95,72 @@ describe('apiClient error contract: { message, code, details }', () => {
     expect(error.message).not.toContain('[object');
   });
 });
+
+describe('apiClient refreshes the access token for protected /auth endpoints (change-password), not for credential endpoints', () => {
+  const fresh = () => makeFakeAccessToken({ sub: '1', role: 'Khách hàng', exp: 9999999999 });
+
+  it('change-password: 401 with an expired access token → refresh → the SAME request is retried with the new token and succeeds', async () => {
+    const newToken = fresh();
+    const calls: Array<{ url: string; auth?: string }> = [];
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push({ url: String(url), auth: (init?.headers as Record<string, string> | undefined)?.Authorization });
+      if (String(url).endsWith('/auth/refresh')) return json({ success: true, data: { accessToken: newToken } });
+      const retried = calls.filter((c) => c.url.endsWith('/auth/change-password')).length > 1;
+      return retried ? json({ success: true, data: { accessToken: fresh() } }) : json({ success: false, message: 'Invalid or expired access token', code: 'UNAUTHORIZED' }, 401);
+    }));
+
+    await expect(apiClient('/auth/change-password', { method: 'POST', body: '{}' })).resolves.toMatchObject({ success: true });
+
+    expect(calls.map((c) => c.url.split('/api').pop())).toEqual(['/auth/change-password', '/auth/refresh', '/auth/change-password']);
+    expect(calls[2].auth).toBe(`Bearer ${newToken}`);
+    expect(useAuthStore.getState().sessionExpired).toBe(false);
+  });
+
+  it('change-password: when the refresh fails too the session ends (no retry loop)', async () => {
+    const fetchMock = vi.fn(async (url: string) => (String(url).endsWith('/auth/refresh') ? json({ success: false, message: 'x' }, 401) : json({ success: false, message: 'expired' }, 401)));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(apiClient('/auth/change-password', { method: 'POST', body: '{}' })).rejects.toMatchObject({ statusCode: 401 });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2); // the request, then the refresh — nothing more
+    expect(useAuthStore.getState().sessionExpired).toBe(true);
+  });
+
+  it.each(['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'])('%s: a 401 is final — no refresh is attempted', async (endpoint) => {
+    const fetchMock = vi.fn(async () => json({ success: false, message: 'Sai thông tin', code: 'UNAUTHORIZED' }, 401));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(apiClient(endpoint, { method: 'POST', body: '{}' })).rejects.toMatchObject({ statusCode: 401, message: 'Sai thông tin' });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('apiClient when the API host answers with something that is not JSON (#17: wrong VITE_API_BASE_URL / no proxy)', () => {
+  it('says so and where to look, instead of the opaque "Failed to parse response JSON"', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('<!doctype html><title>SPA</title>', { status: 200, headers: { 'Content-Type': 'text/html' } })));
+
+    const error = await apiClient('/hotels').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).message).toMatch(/không trả về JSON \(HTTP 200\).*VITE_API_BASE_URL/);
+  });
+});
+
+describe('apiClient always sends the session cookie (cross-site deployments need credentials: "include")', () => {
+  it('on normal requests and on the refresh call', async () => {
+    const calls: Array<RequestInit | undefined> = [];
+    const fresh = makeFakeAccessToken({ sub: '1', role: 'Khách hàng', exp: 9999999999 });
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push(init);
+      if (String(url).endsWith('/auth/refresh')) return json({ success: true, data: { accessToken: fresh } });
+      return calls.length === 1 ? json({ success: false, message: 'expired' }, 401) : json({ success: true, data: [] });
+    }));
+
+    await apiClient('/bookings');
+
+    expect(calls).toHaveLength(3); // request, refresh, retry
+    for (const init of calls) expect(init?.credentials).toBe('include');
+    expect(calls[1]?.method).toBe('POST');
+  });
+});

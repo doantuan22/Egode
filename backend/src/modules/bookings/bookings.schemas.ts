@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { refineStayDates } from '../../common/utils/stay-dates';
+import { guestsInputSchema } from '../hotels/capacity';
 
 const bookingRoomLineSchema = z.object({
   maLoaiPhong: z.coerce.number().int().positive(),
@@ -11,6 +12,7 @@ export const createBookingSchema = z
     checkIn: z.coerce.date(),
     checkOut: z.coerce.date(),
     rooms: z.array(bookingRoomLineSchema).min(1, 'Cần chọn ít nhất 1 loại phòng'),
+    guests: guestsInputSchema,
     promoCode: z.string().trim().min(1).optional(),
     ghiChu: z.string().trim().max(1000).optional(),
   })

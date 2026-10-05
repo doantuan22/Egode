@@ -1,7 +1,8 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
-import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
+import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { PAYMENT_STATUS, REFUND_STATUS } from '../../common/constants/payment';
+import { enumerateNights, toDateKey } from '../hotels/availability';
 import { businessInstantFilter } from './date-range';
 
 const toNumber = (value: unknown): number => Number(value ?? 0);
@@ -127,13 +128,17 @@ export class AnalyticsRepository {
   }
 
   /**
-   * Occupancy = booked room-nights / sellable room-nights, computed exactly
-   * (not estimated) by clipping every overlapping booking's stay to
-   * [from, to) in application code — the same technique
-   * hotels/availability.ts uses for a single room type's availability,
-   * generalized across every room type in scope. No new schema needed: it
-   * only reads QUY_PHONG_GIA.SoLuongPhong and CHI_TIET_DAT_PHONG, both
-   * already exact per-night sources of truth.
+   * Occupancy = room-nights sold / room-nights in stock × 100, both counted per (room type, night) from the SAME
+   * rows so the rate can never exceed 100 %:
+   *
+   *  - denominator: SoLuongPhong of every QUY_PHONG_GIA row of the hotel's room types in the range, whatever its
+   *    status — a night closed for sale still had its rooms, and leaving it out would erase history (and shrink the
+   *    denominator below what was really sold);
+   *  - numerator: rooms of "Đã xác nhận" and "Hoàn tất" bookings on each night of the range that HAS such a row,
+   *    capped at that night's SoLuongPhong. "Chờ thanh toán" (not sold yet) and "Đã hủy" never count; a night with
+   *    no stock row has nothing to be a share of; a night recorded as overbooked in old data counts as full, not
+   *    as more than full. Stored data is never altered to get there.
+   * Computed in application code, exactly, with no estimate. Returns null (not 0 %) when there is no stock at all.
    */
   async occupancy(scope: AnalyticsScope): Promise<OccupancyResult> {
     const prisma = getPrismaClient();
@@ -148,35 +153,40 @@ export class AnalyticsRepository {
 
     const rateWhere: Prisma.QUY_PHONG_GIAWhereInput = {
       MaLoaiPhong: { in: roomTypeIds },
-      TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE,
       ...(scope.from || scope.to
         ? { NgayApDung: { ...(scope.from ? { gte: scope.from } : {}), ...(scope.to ? { lt: scope.to } : {}) } }
         : {}),
     };
-    const rates = await prisma.qUY_PHONG_GIA.findMany({ where: rateWhere, select: { SoLuongPhong: true } });
-    const tongPhongCoTheBan = rates.reduce((sum, r) => sum + r.SoLuongPhong, 0);
+    const rates = await prisma.qUY_PHONG_GIA.findMany({ where: rateWhere, select: { MaLoaiPhong: true, NgayApDung: true, SoLuongPhong: true } });
+    const stock = new Map<string, number>(); // "roomType|night" -> rooms in stock
+    let tongPhongCoTheBan = 0;
+    for (const rate of rates) {
+      stock.set(`${rate.MaLoaiPhong}|${toDateKey(rate.NgayApDung)}`, rate.SoLuongPhong);
+      tongPhongCoTheBan += rate.SoLuongPhong;
+    }
     if (tongPhongCoTheBan === 0) return { TongPhongDem: 0, TongPhongCoTheBan: 0, TyLeLapDay: null };
 
     const lines = await prisma.cHI_TIET_DAT_PHONG.findMany({
       where: {
         MaLoaiPhong: { in: roomTypeIds },
         DAT_PHONG: {
-          TrangThai: { not: BOOKING_STATUS.CANCELLED },
+          TrangThai: { in: [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED] },
           ...(scope.to ? { NgayNhanPhong: { lt: scope.to } } : {}),
           ...(scope.from ? { NgayTraPhong: { gt: scope.from } } : {}),
         },
       },
-      select: { SoLuongPhong: true, DAT_PHONG: { select: { NgayNhanPhong: true, NgayTraPhong: true } } },
+      select: { MaLoaiPhong: true, SoLuongPhong: true, DAT_PHONG: { select: { NgayNhanPhong: true, NgayTraPhong: true } } },
     });
 
-    const MS_PER_DAY = 24 * 60 * 60 * 1000;
-    let tongPhongDem = 0;
+    const booked = new Map<string, number>(); // same keys as `stock`
     for (const line of lines) {
-      const start = scope.from && scope.from > line.DAT_PHONG.NgayNhanPhong ? scope.from : line.DAT_PHONG.NgayNhanPhong;
-      const end = scope.to && scope.to < line.DAT_PHONG.NgayTraPhong ? scope.to : line.DAT_PHONG.NgayTraPhong;
-      const nights = Math.round((end.getTime() - start.getTime()) / MS_PER_DAY);
-      if (nights > 0) tongPhongDem += nights * line.SoLuongPhong;
+      for (const night of enumerateNights(line.DAT_PHONG.NgayNhanPhong, line.DAT_PHONG.NgayTraPhong)) {
+        const key = `${line.MaLoaiPhong}|${night}`;
+        if (stock.has(key)) booked.set(key, (booked.get(key) ?? 0) + line.SoLuongPhong);
+      }
     }
+    let tongPhongDem = 0;
+    for (const [key, rooms] of booked) tongPhongDem += Math.min(rooms, stock.get(key) ?? 0);
 
     return {
       TongPhongDem: tongPhongDem,

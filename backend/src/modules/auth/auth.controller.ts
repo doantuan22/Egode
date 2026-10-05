@@ -3,6 +3,7 @@ import { AuthService, AuthResult } from './auth.service';
 import { sendSuccess } from '../../common/utils/response';
 import { AppError } from '../../common/errors/app-error';
 import { env } from '../../config/env';
+import { refreshCookieBaseOptions } from '../../common/utils/auth-cookie';
 import {
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
@@ -12,12 +13,7 @@ import {
 // cookie lives and HOW it is protected (path/domain/httpOnly/secure/sameSite) is here and is used
 // for both setting and clearing, so the two can never drift apart. No `domain` is set today:
 // the cookie is host-only. If one is ever added, add it here and login/logout both follow.
-const REFRESH_COOKIE_BASE_OPTIONS = {
-  httpOnly: true,
-  secure: env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/api/auth',
-};
+const REFRESH_COOKIE_BASE_OPTIONS = refreshCookieBaseOptions(env.NODE_ENV, env.REFRESH_COOKIE_SAMESITE);
 
 // Only setting a cookie carries a lifetime; clearing must not (it expires the cookie immediately).
 const REFRESH_COOKIE_OPTIONS = {

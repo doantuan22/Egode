@@ -21,7 +21,8 @@ interface HotelFilterBarProps {
   onReset: () => void;
 }
 
-const STARS = [5, 4, 3, 2, 1];
+// The filter is a MINIMUM ("starRating=N" lists hotels with HangSao >= N), so these are "Từ N sao trở lên".
+const STARS = [3, 4, 5];
 
 function PriceField({ id, label, value, placeholder, onCommit }: { id: string; label: string; value: number | undefined; placeholder: string; onCommit: (value: string | undefined) => void }) {
   return (
@@ -65,11 +66,11 @@ export function HotelFilterBar({ values, amenities, onPriceChange, onStarChange,
         </div>
 
         <div role="group" aria-labelledby="hotel-filter-stars" className="hotel-filter-bar__group">
-          <p id="hotel-filter-stars" className="hotel-filter-bar__label">Hạng sao</p>
+          <p id="hotel-filter-stars" className="hotel-filter-bar__label">Hạng sao tối thiểu</p>
           <div className="hotel-filter-bar__chips">
             {STARS.map((star) => (
               <FilterChip key={star} pressed={values.starRating === star} onClick={() => onStarChange(values.starRating === star ? undefined : star)}>
-                <span className="inline-flex items-center gap-1">{star} <Icon name="star" weight="fill" className="text-warning" /><span className="sr-only">sao</span></span>
+                <span className="inline-flex items-center gap-1">Từ {star} <Icon name="star" weight="fill" className="text-warning" /><span className="sr-only">sao</span> trở lên</span>
               </FilterChip>
             ))}
           </div>

@@ -56,8 +56,11 @@ beforeAll(async () => {
   cityName = dp.TenThanhPho;
   hotelId = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
   otherHotelId = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
-  await createTestRoomType(hotelId); // a hotel needs an active room type to appear in search
-  await createTestRoomType(otherHotelId);
+  // A hotel appears in search only with an active room type that has stock for the stay.
+  for (const hotel of [hotelId, otherHotelId]) {
+    const roomType = await createTestRoomType(hotel);
+    await prisma().qUY_PHONG_GIA.create({ data: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: new Date(`${day(1)}T00:00:00Z`), GiaPhong: 100000, SoLuongPhong: 2, TrangThai: 'Mở bán' } });
+  }
   policyId = (await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }])).MaChinhSachHuy;
 });
 

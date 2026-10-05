@@ -10,6 +10,7 @@ import {
 } from './auth.schemas';
 import { authenticate } from '../../middleware/auth.middleware';
 import { createRateLimiter } from '../../middleware/security.middleware';
+import { requireTrustedOrigin } from '../../middleware/trusted-origin.middleware';
 
 const router = Router();
 const controller = new AuthController();
@@ -32,8 +33,8 @@ const applyOutsideTests = (middleware: ReturnType<typeof createRateLimiter>) =>
 
 router.post('/register', applyOutsideTests(registerLimiter), validateRequest({ body: registerSchema }), controller.register);
 router.post('/login', applyOutsideTests(loginLimiter), validateRequest({ body: loginSchema }), controller.login);
-router.post('/refresh', applyOutsideTests(refreshLimiter), controller.refresh);
-router.post('/logout', controller.logout);
+router.post('/refresh', requireTrustedOrigin, applyOutsideTests(refreshLimiter), controller.refresh);
+router.post('/logout', requireTrustedOrigin, controller.logout);
 router.post(
   '/forgot-password',
   applyOutsideTests(forgotPasswordLimiter),
