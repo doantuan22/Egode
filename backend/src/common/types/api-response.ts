@@ -2,7 +2,10 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  error?: unknown;
+  /** Machine-readable error code (see common/errors/error-codes.ts); present on every failure. */
+  code?: string;
+  /** For failures with parts, e.g. validation: [{ field, message }]. */
+  details?: unknown;
 }
 
 export interface ApiPaginationMeta {

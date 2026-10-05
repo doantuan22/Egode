@@ -8,7 +8,8 @@ import { AppError } from '../../common/errors/app-error';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { REVIEW_STATUS } from '../../common/constants/review';
 import type { ApiPaginationMeta } from '../../common/types/api-response';
-import type { CreateReviewInput, AdminListReviewsQuery } from './reviews.schemas';
+import type { CreateReviewInput, AdminListReviewsQuery, PublicReviewsQuery } from './reviews.schemas';
+import { maskReviewerName } from './reviewer-name';
 
 const REVIEW_IMAGE_FOLDER = 'hotel-booking/reviews';
 
@@ -119,6 +120,24 @@ export class ReviewsService {
     const review = await this.repository.findByIdAdmin(maDanhGia);
     if (!review) throw AppError.notFound('Không tìm thấy đánh giá');
     return review;
+  }
+
+  /** The visible reviews of a hotel that is itself public, newest first, with the reviewer's name abbreviated. */
+  async listPublicForHotel(maKhachSan: number, query: PublicReviewsQuery) {
+    if (!(await this.repository.isPublicHotel(maKhachSan))) throw AppError.notFound('Không tìm thấy khách sạn');
+    const { items, total } = await this.repository.listPublicByHotel(maKhachSan, query.page, query.limit);
+    const summary = (await this.repository.ratingSummaries([maKhachSan])).get(maKhachSan) ?? { DiemTrungBinh: null, SoLuongDanhGia: 0 };
+    return {
+      items: items.map((review) => ({
+        MaDanhGia: review.MaDanhGia,
+        DiemDanhGia: review.DiemDanhGia,
+        NoiDung: review.NoiDung,
+        TenNguoiDanhGia: maskReviewerName(review.TAI_KHOAN.HoTen),
+        HinhAnh: review.HINH_ANH_DANH_GIA.map((image) => image.URL),
+      })),
+      summary,
+      pagination: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) } satisfies ApiPaginationMeta,
+    };
   }
 
   /** Customer can never reach this — no TrangThai field exists anywhere in the customer-facing create schema, and this action is admin-only routed. */

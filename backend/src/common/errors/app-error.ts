@@ -1,11 +1,15 @@
+import { codeForStatus, type ErrorCode } from './error-codes';
+
 export class AppError extends Error {
   public readonly statusCode: number;
+  public readonly code: ErrorCode;
   public readonly isOperational: boolean;
   public readonly details?: unknown;
 
   constructor(message: string, statusCode = 500, details?: unknown, isOperational = true) {
     super(message);
     this.statusCode = statusCode;
+    this.code = codeForStatus(statusCode);
     this.details = details;
     this.isOperational = isOperational;
     Object.setPrototypeOf(this, new.target.prototype);
@@ -28,8 +32,8 @@ export class AppError extends Error {
     return new AppError(message, 404);
   }
 
-  static conflict(message = 'Conflict'): AppError {
-    return new AppError(message, 409);
+  static conflict(message = 'Conflict', details?: unknown): AppError {
+    return new AppError(message, 409, details);
   }
 
   static internal(message = 'Internal Server Error'): AppError {

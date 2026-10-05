@@ -8,6 +8,7 @@ import { useHotelDetail, useHotelRooms } from '../../features/hotels/hooks';
 import { useQuote } from '../../features/quotes/hooks';
 import { useCreateBooking } from '../../features/bookings/hooks';
 import { useLocations } from '../../features/locations/hooks';
+import { useHotelReviews } from '../../features/reviews/hooks';
 import { shareUrl } from '../../lib/share';
 import { useAuthStore } from '../../lib/authStore';
 import { ApiError } from '../../services/apiClient';
@@ -18,6 +19,7 @@ vi.mock('../../features/hotels/hooks');
 vi.mock('../../features/quotes/hooks');
 vi.mock('../../features/bookings/hooks');
 vi.mock('../../features/locations/hooks');
+vi.mock('../../features/reviews/hooks');
 vi.mock('../../lib/share');
 
 const image = (id: number) => ({ MaHinhAnh: id, URL: `https://img.test/${id}.jpg`, AnhDaiDien: id === 1 });
@@ -41,6 +43,7 @@ beforeEach(() => {
   mockQuote({});
   vi.mocked(useCreateBooking).mockReturnValue(idle as unknown as ReturnType<typeof useCreateBooking>);
   vi.mocked(useLocations).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useLocations>);
+  vi.mocked(useHotelReviews).mockReturnValue({ isLoading: false, isError: false, data: { items: [], summary: { DiemTrungBinh: null, SoLuongDanhGia: 0 }, pagination: { page: 1, limit: 5, total: 0, totalPages: 1 } } } as unknown as ReturnType<typeof useHotelReviews>);
   vi.mocked(shareUrl).mockReset();
   Element.prototype.scrollIntoView = vi.fn();
 });
@@ -348,7 +351,7 @@ describe('HotelDetailPage page sections', () => {
     const tabTargets = tabs().map((tab) => tab.getAttribute('href'));
     const sectionsOnPage = [...document.querySelectorAll('section[id]')].map((section) => `#${section.id}`).filter((id) => tabTargets.includes(id));
 
-    expect(tabs().map((tab) => tab.textContent)).toEqual(['Loại phòng & Giá', 'Tổng quan', 'Tiện nghi']);
+    expect(tabs().map((tab) => tab.textContent)).toEqual(['Loại phòng & Giá', 'Tổng quan', 'Tiện nghi', 'Đánh giá']);
     expect(sectionsOnPage).toEqual(tabTargets);
   });
 

@@ -4,14 +4,14 @@ import type { OwnerAnalytics } from './types';
 
 describe('lastDaysRanges', () => {
   it('returns the last N days and the N days before them, ends included', () => {
-    expect(lastDaysRanges(30, new Date(2030, 0, 31))).toEqual({
+    expect(lastDaysRanges(30, '2030-01-31')).toEqual({
       current: { from: '2030-01-02', to: '2030-01-31' },
       previous: { from: '2029-12-03', to: '2030-01-01' },
     });
   });
 
   it('does not shift a day across a month end or a year end', () => {
-    expect(lastDaysRanges(7, new Date(2030, 0, 3)).previous).toEqual({ from: '2029-12-21', to: '2029-12-27' });
+    expect(lastDaysRanges(7, '2030-01-03').previous).toEqual({ from: '2029-12-21', to: '2029-12-27' });
   });
 });
 

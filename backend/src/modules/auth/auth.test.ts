@@ -425,7 +425,10 @@ describe('POST /api/auth/change-password', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ MatKhauCu: plainPassword, MatKhauMoi: NEW_PASSWORD });
 
-    expect(res.status).toBe(403);
+    // The locked account is stopped by the authentication middleware itself (401), before the endpoint runs.
+    expect(res.status).toBe(401);
+    const stored = await getPrismaClient().tAI_KHOAN.findUniqueOrThrow({ where: { MaTaiKhoan: account.MaTaiKhoan } });
+    expect(stored.TrangThai).toBe(ACCOUNT_STATUS.LOCKED);
   });
 
   it('does not let PATCH /profile/me change the password', async () => {

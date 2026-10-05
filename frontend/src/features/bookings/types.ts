@@ -92,6 +92,12 @@ export interface PaymentView {
  */
 export interface BookingDetail extends Omit<Booking, 'ChiTietPhong'> {
   ChiTietPhong: BookingRoomLine[];
+  /** Hotel check-in / check-out wall-clock times in Vietnam time, "HH:mm". */
+  GioNhanPhong: string;
+  GioTraPhong: string;
+  /** The instants (ISO, UTC) the cancellation tiers are measured to and the stay ends at. */
+  ThoiDiemNhanPhong: string;
+  ThoiDiemTraPhong: string;
   TenKhachSan: string;
   DiaChiChiTiet: string;
   AnhDaiDien: string | null;

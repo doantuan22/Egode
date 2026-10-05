@@ -47,7 +47,7 @@ export default function BookingDetailPage() {
   const booking = bookingQuery.data;
   const canCancel = CANCELLABLE_BOOKING_STATUSES.includes(booking.TrangThai);
   const successfulPaid = booking.ThanhToan.filter((p) => p.TrangThai === 'Thành công').reduce((sum, p) => sum + p.SoTien, 0);
-  const previewHours = hoursBeforeCheckIn(booking.NgayNhanPhong);
+  const previewHours = hoursBeforeCheckIn(booking.ThoiDiemNhanPhong);
   const previewPercent = selectRefundPercentPreview(booking.ChinhSachHuy.ChiTiet, previewHours);
   const previewAmount = computeRefundAmountPreview(successfulPaid, previewPercent);
 
@@ -131,10 +131,12 @@ export default function BookingDetailPage() {
               <div>
                 <p className="block text-[12px] text-muted mb-1">Nhận phòng</p>
                 <span className="text-[15px] font-semibold text-heading">{formatDateVi(booking.NgayNhanPhong)}</span>
+                <span className="block text-[12px] text-muted">Từ {booking.GioNhanPhong}</span>
               </div>
               <div>
                 <p className="block text-[12px] text-muted mb-1">Trả phòng</p>
                 <span className="text-[15px] font-semibold text-heading">{formatDateVi(booking.NgayTraPhong)}</span>
+                <span className="block text-[12px] text-muted">Trước {booking.GioTraPhong}</span>
               </div>
             </div>
           </div>

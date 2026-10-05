@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { codeForStatus } from '../errors/error-codes';
 import { ApiResponse, PaginatedApiResponse, ApiPaginationMeta } from '../types/api-response';
 
 export const sendSuccess = <T>(
@@ -35,12 +36,13 @@ export const sendError = (
   res: Response,
   message: string,
   statusCode = 500,
-  error?: unknown
+  details?: unknown
 ): Response => {
   const response: ApiResponse = {
     success: false,
     message,
-    ...(error !== undefined ? { error } : {}),
+    code: codeForStatus(statusCode),
+    ...(details !== undefined ? { details } : {}),
   };
   return res.status(statusCode).json(response);
 };

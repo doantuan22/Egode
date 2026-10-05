@@ -57,7 +57,7 @@ afterAll(async () => {
 
 interface Endpoint {
   name: string;
-  call: (checkIn: string, checkOut: string) => Promise<{ status: number; body: { errors?: Array<{ field: string; message: string }> } }>;
+  call: (checkIn: string, checkOut: string) => Promise<{ status: number; body: { details?: Array<{ field: string; message: string }> } }>;
   /** What an accepted stay answers; booking may legitimately answer 409 (no stock/prices) once validation passed. */
   accepted: (status: number) => boolean;
 }
@@ -109,7 +109,7 @@ describe.each(endpoints)('stay-date rule on $name', (endpoint) => {
   it.each(rejected)('rejects: $name', async ({ checkIn, checkOut, message }) => {
     const res = await endpoint.call(day(checkIn), day(checkOut));
     expect(res.status).toBe(400);
-    expect(res.body.errors?.map((e) => e.message)).toContain(message);
+    expect(res.body.details?.map((e) => e.message)).toContain(message);
   });
 
   it.each(accepted)('accepts: $name', async ({ checkIn, checkOut }) => {

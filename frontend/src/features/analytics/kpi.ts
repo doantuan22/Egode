@@ -1,4 +1,4 @@
-import { toDateInputValue } from '../../lib/utils';
+import { addDaysToDateKey, businessToday } from '../../lib/stayDates';
 import type { DateRangeQuery, OwnerAnalytics } from './types';
 
 export interface PeriodRanges {
@@ -6,13 +6,14 @@ export interface PeriodRanges {
   previous: Required<DateRangeQuery>;
 }
 
-const addDays = (date: Date, days: number) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-
-/** The last `days` days up to and including `today`, and the `days` days right before them (both ends inclusive, YYYY-MM-DD). */
-export function lastDaysRanges(days: number, today: Date = new Date()): PeriodRanges {
+/**
+ * The last `days` days up to and including `today`, and the `days` days right before them (both ends inclusive,
+ * YYYY-MM-DD). `today` is a day of the business calendar (Asia/Ho_Chi_Minh), the same one the server cuts its reports by.
+ */
+export function lastDaysRanges(days: number, today: string = businessToday()): PeriodRanges {
   return {
-    current: { from: toDateInputValue(addDays(today, -(days - 1))), to: toDateInputValue(today) },
-    previous: { from: toDateInputValue(addDays(today, -(2 * days - 1))), to: toDateInputValue(addDays(today, -days)) },
+    current: { from: addDaysToDateKey(today, -(days - 1)), to: today },
+    previous: { from: addDaysToDateKey(today, -(2 * days - 1)), to: addDaysToDateKey(today, -days) },
   };
 }
 

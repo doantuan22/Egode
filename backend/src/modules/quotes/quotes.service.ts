@@ -3,6 +3,7 @@ import { CancellationPoliciesRepository } from '../cancellation-policies/cancell
 import { enumerateNights, priceRoomLine, buildBookedByDate, toDateKey, type NightlyRate } from '../hotels/availability';
 import { evaluatePromotion } from './promotion-pricing';
 import { AppError } from '../../common/errors/app-error';
+import { releaseExpiredHolds } from '../bookings/booking-lifecycle';
 import type { QuoteRequestInput } from './quotes.schemas';
 
 const toNumber = (value: unknown): number => Number(value);
@@ -51,6 +52,7 @@ export class QuotesService {
 
     const nightKeys = enumerateNights(input.checkIn, input.checkOut);
     const requestedIds = input.rooms.map((r) => r.maLoaiPhong);
+    await releaseExpiredHolds();
     const roomTypes = await this.repository.findRoomTypesByIds(maKhachSan, requestedIds, input.checkIn, input.checkOut);
 
     const foundIds = new Set(roomTypes.map((rt) => rt.MaLoaiPhong));

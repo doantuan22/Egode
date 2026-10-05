@@ -13,7 +13,7 @@ import cancellationPoliciesRoutes from '../modules/cancellation-policies/cancell
 import quotesRoutes from '../modules/quotes/quotes.routes';
 import bookingsRoutes, { myBookingsRoutes } from '../modules/bookings/bookings.routes';
 import { paymentsBookingRoutes, paymentsGatewayRoutes } from '../modules/payments/payments.routes';
-import { reviewsBookingRoutes, adminReviewsRoutes } from '../modules/reviews/reviews.routes';
+import { reviewsBookingRoutes, adminReviewsRoutes, hotelReviewsRoutes } from '../modules/reviews/reviews.routes';
 import { supportRoutes, adminSupportRoutes } from '../modules/support/support.routes';
 import promotionsRoutes from '../modules/promotions/promotions.routes';
 import ownerAnalyticsRoutes from '../modules/owner/owner-analytics.routes';
@@ -57,6 +57,7 @@ router.use('/owner/hotels', ownerAnalyticsRoutes);
 // After-sales: review + support/complaint (M7)
 router.use('/bookings', reviewsBookingRoutes);
 router.use('/admin/reviews', adminReviewsRoutes);
+router.use('/hotels', hotelReviewsRoutes);
 router.use('/support', supportRoutes);
 router.use('/admin/support', adminSupportRoutes);
 

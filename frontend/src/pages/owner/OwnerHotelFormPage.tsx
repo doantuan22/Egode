@@ -5,6 +5,7 @@ import { useCreateHotel } from '../../features/owner/hooks';
 import { useLocations } from '../../features/locations/hooks';
 import { hotelFormSchema, HotelFormSchemaValues } from '../../features/owner/schemas';
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { cn } from '../../lib/utils';
 import { Combobox } from '../../components/common/Combobox';
 import { FormErrorSummary } from '../../components/common/FormErrorSummary';
@@ -19,6 +20,7 @@ export default function OwnerHotelFormPage() {
     register,
     control,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<HotelFormSchemaValues>({
     resolver: zodResolver(hotelFormSchema),
@@ -29,8 +31,8 @@ export default function OwnerHotelFormPage() {
     try {
       const hotel = await createMutation.mutateAsync(values);
       navigate(`/owner/hotels/${hotel.MaKhachSan}`, { replace: true });
-    } catch {
-      // handled
+    } catch (error) {
+      applyServerFieldErrors(error, setError, ['TenKhachSan', 'DiaChiChiTiet', 'HangSao', 'MoTa', 'GioNhanPhong', 'GioTraPhong', 'MaDiaPhuong']);
     }
   };
 

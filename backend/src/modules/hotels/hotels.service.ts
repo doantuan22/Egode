@@ -7,6 +7,8 @@ import {
   type NightlyRate,
 } from './availability';
 import { AppError } from '../../common/errors/app-error';
+import { releaseExpiredHolds } from '../bookings/booking-lifecycle';
+import { ReviewsRepository } from '../reviews/reviews.repository';
 import type { SearchHotelsQuery, HotelRoomsQuery } from './hotels.schemas';
 import type { ApiPaginationMeta } from '../../common/types/api-response';
 
@@ -53,14 +55,22 @@ export interface HotelSearchItem {
   AnhDaiDien: string | null;
   GiaTuDauTu: number | null;
   ConPhong: boolean;
+  /** Visible reviews only; null average when there is none. */
+  DiemTrungBinh: number | null;
+  SoLuongDanhGia: number;
 }
 
 export class HotelsService {
-  constructor(private readonly hotelsRepository: HotelsRepository = new HotelsRepository()) {}
+  constructor(
+    private readonly hotelsRepository: HotelsRepository = new HotelsRepository(),
+    private readonly reviewsRepository: ReviewsRepository = new ReviewsRepository()
+  ) {}
 
   async search(query: SearchHotelsQuery): Promise<{ items: HotelSearchItem[]; pagination: ApiPaginationMeta }> {
     const nightKeys = enumerateNights(query.checkIn, query.checkOut);
 
+    // An unpaid hold past its timeout must not hide rooms from the result.
+    await releaseExpiredHolds();
     const hotels = await this.hotelsRepository.findCandidateHotels({
       location: query.location,
       starRating: query.starRating,
@@ -91,6 +101,8 @@ export class HotelsService {
         AnhDaiDien: anhDaiDien,
         GiaTuDauTu: giaTuDauTu,
         ConPhong: conPhong,
+        DiemTrungBinh: null,
+        SoLuongDanhGia: 0,
       };
     });
 
@@ -110,6 +122,13 @@ export class HotelsService {
     const total = items.length;
     const start = (query.page - 1) * query.limit;
     const paged = items.slice(start, start + query.limit);
+
+    // Ratings are looked up for the page being returned only, in one grouped query.
+    const ratings = await this.reviewsRepository.ratingSummaries(paged.map((item) => item.MaKhachSan));
+    for (const item of paged) {
+      const rating = ratings.get(item.MaKhachSan);
+      if (rating) Object.assign(item, rating);
+    }
 
     return {
       items: paged,
@@ -141,7 +160,9 @@ export class HotelsService {
     const hotel = await this.hotelsRepository.findActiveHotelById(maKhachSan);
     if (!hotel) throw AppError.notFound('Không tìm thấy khách sạn');
 
+    const rating = (await this.reviewsRepository.ratingSummaries([maKhachSan])).get(maKhachSan);
     return {
+      DanhGia: rating ?? { DiemTrungBinh: null, SoLuongDanhGia: 0 },
       MaKhachSan: hotel.MaKhachSan,
       TenKhachSan: hotel.TenKhachSan,
       DiaChiChiTiet: hotel.DiaChiChiTiet,
@@ -164,6 +185,7 @@ export class HotelsService {
     if (!exists) throw AppError.notFound('Không tìm thấy khách sạn');
 
     const nightKeys = enumerateNights(query.checkIn, query.checkOut);
+    await releaseExpiredHolds();
     const roomTypes = await this.hotelsRepository.findRoomTypesForHotel(
       maKhachSan,
       query.checkIn,

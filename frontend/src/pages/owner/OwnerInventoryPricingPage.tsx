@@ -9,6 +9,7 @@ import { ALL_WEEKDAYS, WEEKDAYS, buildRatePayload, countDays } from '../../featu
 import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { formatCurrencyVND, formatDateRangeVi, formatDateVi, toDateInputValue } from '../../lib/utils';
 import { ApiError } from '../../services/apiClient';
+import { addDaysToDateKey, businessToday } from '../../lib/stayDates';
 import { useScopedHotels } from '../../components/owner/useScopedHotels';
 import { Button } from '../../components/common/Button';
 
@@ -18,13 +19,14 @@ export default function OwnerInventoryPricingPage() {
   const [params, setParams] = useSearchParams();
   const roomTypeId = Number(params.get('roomTypeId') ?? roomTypesQuery.data?.[0]?.MaLoaiPhong ?? 0);
   const roomType = roomTypesQuery.data?.find((item) => item.MaLoaiPhong === roomTypeId);
-  const start = toDateInputValue(new Date());
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 13);
+  const start = businessToday();
   const [from, setFrom] = useState(start);
-  const [to, setTo] = useState(toDateInputValue(endDate));
+  const [to, setTo] = useState(addDaysToDateKey(start, 13));
   const [view, setView] = useState<'calendar' | 'table'>('calendar');
-  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [month, setMonth] = useState(() => {
+    const [year, monthNumber] = businessToday().split('-').map(Number);
+    return new Date(year, monthNumber - 1, 1);
+  });
   const monthFrom = toDateInputValue(month);
   const monthTo = toDateInputValue(new Date(month.getFullYear(), month.getMonth() + 1, 0));
   const monthRates = useRates(roomType?.MaLoaiPhong ?? 0, monthFrom, monthTo);
@@ -147,7 +149,7 @@ export default function OwnerInventoryPricingPage() {
                 </label>
                 <label>
                   Từ ngày
-                  <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+                  <input type="date" min={businessToday()} value={from} onChange={(event) => setFrom(event.target.value)} />
                 </label>
                 <label>
                   Đến ngày

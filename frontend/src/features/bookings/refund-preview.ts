@@ -21,8 +21,10 @@ export const selectRefundPercentPreview = (tiers: readonly CancellationTier[], h
 export const computeRefundAmountPreview = (amountPaid: number, refundPercent: number): number =>
   Math.min(Math.round((amountPaid * refundPercent) / 100), amountPaid);
 
-/** Same reference instant as the backend: check-in midnight (NgayNhanPhong has no time-of-day — it's a SQL DATE column). */
-export const hoursBeforeCheckIn = (ngayNhanPhongIso: string, now: Date = new Date()): number => {
-  const checkIn = new Date(`${ngayNhanPhongIso}T00:00:00.000Z`);
-  return (checkIn.getTime() - now.getTime()) / 3_600_000;
-};
+/**
+ * Hours from `now` to the moment guests may check in — the same instant the server cuts the refund tiers at: the
+ * stay's date plus the hotel's check-in time, in Vietnam time. The server sends it ready-made
+ * (BookingDetail.ThoiDiemNhanPhong, an ISO instant), so no time-zone arithmetic happens in the browser.
+ */
+export const hoursBeforeCheckIn = (thoiDiemNhanPhongIso: string, now: Date = new Date()): number =>
+  (Date.parse(thoiDiemNhanPhongIso) - now.getTime()) / 3_600_000;

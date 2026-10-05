@@ -51,12 +51,13 @@ describe('apiClient session expiry', () => {
   });
 });
 
-describe('apiClient validation errors', () => {
-  it("shows the server's own validation messages instead of a generic \"Validation failed\"", async () => {
+describe('apiClient error contract: { message, code, details }', () => {
+  it('validation: the banner text is the field messages, details keep [{ field, message }], code is kept', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json({
       success: false,
-      message: 'Validation failed',
-      errors: [
+      message: 'Dữ liệu không hợp lệ',
+      code: 'VALIDATION_ERROR',
+      details: [
         { field: 'checkIn', message: 'Ngày nhận phòng không được trước hôm nay' },
         { field: 'checkOut', message: 'Mỗi lần đặt tối đa 30 đêm' },
         { field: 'checkOut', message: 'Mỗi lần đặt tối đa 30 đêm' },
@@ -66,13 +67,31 @@ describe('apiClient validation errors', () => {
     const error = await apiClient('/hotels').catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(ApiError);
-    expect((error as ApiError).message).toBe('Ngày nhận phòng không được trước hôm nay. Mỗi lần đặt tối đa 30 đêm');
-    expect((error as ApiError).statusCode).toBe(400);
-    expect((error as ApiError).details).toHaveLength(3);
+    const apiError = error as ApiError;
+    expect(apiError.message).toBe('Ngày nhận phòng không được trước hôm nay. Mỗi lần đặt tối đa 30 đêm');
+    expect(apiError.statusCode).toBe(400);
+    expect(apiError.code).toBe('VALIDATION_ERROR');
+    expect(apiError.details).toHaveLength(3);
+    expect(apiError.fieldErrors).toEqual({ checkIn: 'Ngày nhận phòng không được trước hôm nay', checkOut: 'Mỗi lần đặt tối đa 30 đêm' });
   });
 
-  it('keeps the plain message for errors that carry no validation list', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => json({ success: false, message: 'Không tìm thấy khách sạn' }, 404)));
-    await expect(apiClient('/hotels/9')).rejects.toMatchObject({ message: 'Không tìm thấy khách sạn', statusCode: 404 });
+  it('a business error keeps the server message and code, and its details if it has any', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ success: false, message: 'Không thể giảm số phòng', code: 'CONFLICT', details: [{ field: 'NgayApDung:2030-01-01', message: 'Đã có 3 phòng được đặt' }] }, 409)));
+    await expect(apiClient('/owner/room-types/1/rates')).rejects.toMatchObject({ message: 'Không thể giảm số phòng', statusCode: 409, code: 'CONFLICT' });
+  });
+
+  it('keeps the plain message for errors that carry no details', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ success: false, message: 'Không tìm thấy khách sạn', code: 'NOT_FOUND' }, 404)));
+    const error = (await apiClient('/hotels/9').catch((e: unknown) => e)) as ApiError;
+    expect(error).toMatchObject({ message: 'Không tìm thấy khách sạn', statusCode: 404, code: 'NOT_FOUND' });
+    expect(error.fieldErrors).toEqual({});
+  });
+
+  it('an unreadable body still ends as a clean ApiError, never a raw object', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('<html>502</html>', { status: 502 })));
+    const error = (await apiClient('/hotels').catch((e: unknown) => e)) as ApiError;
+    expect(error).toBeInstanceOf(ApiError);
+    expect(typeof error.message).toBe('string');
+    expect(error.message).not.toContain('[object');
   });
 });

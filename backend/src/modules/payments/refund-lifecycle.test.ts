@@ -22,18 +22,15 @@ import { BookingsService } from '../bookings/bookings.service';
 import { PaymentsService } from './payments.service';
 import { encodeGatewayRef, signVnpayParams } from './vnpay';
 import type { RefundGateway, RefundRequestInput, RefundResult } from './refund-gateway';
+import { addDaysToDateKey, businessToday } from '../../common/utils/business-time';
 
 /**
  * Bug #8 — the refund simulation is never called while a database transaction is open, and HOAN_TIEN keeps
  * ONE row per refund through its whole life (Chờ xử lý → Thành công / Thất bại), however often it is retried.
  * Everything runs against the real SQL Server test database.
  */
-const addDays = (days: number): Date => {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d;
-};
+// A stay date is a Vietnam calendar day; refund tiers are measured from its check-in INSTANT (date + hotel check-in time).
+const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 
 const IP = '127.0.0.1';
 let refSeq = 0;
@@ -142,7 +139,7 @@ const bookingStatus = async (id: number) => (await prisma().dAT_PHONG.findUnique
 describe('cancel → refund lifecycle', () => {
   it('1. a cancellation that earns no refund (0% tier): booking "Đã hủy", no HOAN_TIEN, gateway untouched', async () => {
     const gateway = new ProbingGateway();
-    const { booking, payment } = await paidBooking(1_000_000, 1);
+    const { booking, payment } = await paidBooking(1_000_000, 0); // check-in today: always < 24 h away
 
     const result = await bookingsService(gateway).cancelBooking(booking.MaDatPhong, customerId, {}, IP);
 

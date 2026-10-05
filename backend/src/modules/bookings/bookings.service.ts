@@ -6,6 +6,7 @@ import { expireStalePendingBookings, paymentHold } from './booking-expiry';
 import { completeFinishedBookings } from './booking-completion';
 import { selectRefundPercent, computeRefundAmount } from './refund-policy';
 import { AppError } from '../../common/errors/app-error';
+import { checkInInstant, checkOutInstant, hoursUntil, timeOfDayOf } from '../../common/utils/business-time';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { getPrismaClient } from '../../config/prisma';
 import type { RefundGateway } from '../payments/refund-gateway';
@@ -88,6 +89,12 @@ export interface PaymentSummary {
 
 export interface BookingDetail extends Omit<BookingResponse, 'ChiTietPhong'> {
   ChiTietPhong: BookingRoomLine[];
+  /** Hotel check-in / check-out wall-clock times (Vietnam time), "HH:mm". */
+  GioNhanPhong: string;
+  GioTraPhong: string;
+  /** The instants (ISO, UTC) cancellation is measured to and the stay ends at. */
+  ThoiDiemNhanPhong: string;
+  ThoiDiemTraPhong: string;
   TenKhachSan: string;
   DiaChiChiTiet: string;
   AnhDaiDien: string | null;
@@ -100,7 +107,9 @@ export class BookingsService {
     private readonly repository: BookingsRepository = new BookingsRepository(),
     refundGateway: RefundGateway = new VnpayRefundGateway(),
     private readonly refunds: RefundsRepository = new RefundsRepository(),
-    private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds)
+    private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds),
+    /** The moment the cancellation cut-off is measured from (hours until check-in); only tests replace it. */
+    private readonly clock: () => Date = () => new Date()
   ) {}
 
   async createBooking(
@@ -339,11 +348,11 @@ export class BookingsService {
       throw AppError.badRequest(`Không thể hủy đặt phòng ở trạng thái "${booking.TrangThai}"`);
     }
 
-    const now = new Date();
-    // Reference instant is check-in midnight — the same convention the
-    // frontend preview (refund-preview.ts) uses, so the number shown before
-    // confirming never disagrees with what the backend actually charges.
-    const hoursBeforeCheckIn = (booking.NgayNhanPhong.getTime() - now.getTime()) / 3_600_000;
+    const now = new Date(); // timestamps written to the database are always real time
+    // The cut-off is measured to the moment guests may check in: the stay's date at the hotel's check-in time,
+    // in Vietnam time. The booking detail exposes that same instant (ThoiDiemNhanPhong) for the refund preview,
+    // so the number shown before confirming is the one that is charged.
+    const hoursBeforeCheckIn = hoursUntil(checkInInstant(booking.NgayNhanPhong, booking.KHACH_SAN.GioNhanPhong), this.clock());
     const tiers = booking.CHINH_SACH_HUY.CHI_TIET_CHINH_SACH_HUY.map((c) => ({
       soGioTruocNhanPhong: c.SoGioTruocNhanPhong,
       tyLeHoanTien: toNumber(c.TyLeHoanTien),
@@ -402,6 +411,10 @@ export class BookingsService {
       DiaChiChiTiet: booking.KHACH_SAN.DiaChiChiTiet,
       AnhDaiDien: booking.KHACH_SAN.HINH_ANH_KHACH_SAN[0]?.URL ?? null,
       MaTaiKhoanKhachHang: booking.MaTaiKhoanKhachHang,
+      GioNhanPhong: timeOfDayOf(booking.KHACH_SAN.GioNhanPhong),
+      GioTraPhong: timeOfDayOf(booking.KHACH_SAN.GioTraPhong),
+      ThoiDiemNhanPhong: checkInInstant(booking.NgayNhanPhong, booking.KHACH_SAN.GioNhanPhong).toISOString(),
+      ThoiDiemTraPhong: checkOutInstant(booking.NgayTraPhong, booking.KHACH_SAN.GioTraPhong).toISOString(),
       NgayNhanPhong: booking.NgayNhanPhong.toISOString().slice(0, 10),
       NgayTraPhong: booking.NgayTraPhong.toISOString().slice(0, 10),
       SoDem: enumerateNights(booking.NgayNhanPhong, booking.NgayTraPhong).length,

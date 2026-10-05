@@ -92,3 +92,31 @@ describe('evaluatePromotion', () => {
     expect(result.reason).toMatch(/không hoạt động/i);
   });
 });
+
+describe('evaluatePromotion — the promotion window is read in Vietnam time (Asia/Ho_Chi_Minh)', () => {
+  const promo = (start: string, end: string) => ({
+    MaKhuyenMai: 1, MaCode: 'TZ', LoaiGiamGia: 'Phần trăm', GiaTriGiam: 10, GiaTriDonToiThieu: 0, MucGiamToiDa: 0, SoLuongGioiHan: 0,
+    NgayBatDau: new Date(`${start}T00:00:00Z`), NgayKetThuc: new Date(`${end}T00:00:00Z`), TrangThai: 'Hoạt động',
+  });
+  const run = (p: ReturnType<typeof promo>, now: string) => evaluatePromotion(p, 1_000_000, new Date(now), 0);
+
+  it('starts at 00:00 on its first day in Vietnam, i.e. 17:00 UTC the evening before', () => {
+    const starting = promo('2026-03-11', '2026-03-20');
+    expect(run(starting, '2026-03-10T16:59:59Z')).toMatchObject({ valid: false, reason: 'Mã khuyến mãi chưa bắt đầu áp dụng' });
+    expect(run(starting, '2026-03-10T17:00:00Z')).toMatchObject({ valid: true, discount: 100_000 });
+  });
+
+  it('is still valid until 23:59:59 on its last day in Vietnam, and expires at 17:00 UTC', () => {
+    const ending = promo('2026-03-01', '2026-03-10');
+    expect(run(ending, '2026-03-10T16:59:59Z')).toMatchObject({ valid: true });
+    expect(run(ending, '2026-03-10T17:00:00Z')).toMatchObject({ valid: false, reason: 'Mã khuyến mãi đã hết hạn' });
+  });
+
+  it('a one-day promotion is valid for exactly that Vietnam day', () => {
+    const oneDay = promo('2026-03-10', '2026-03-10');
+    expect(run(oneDay, '2026-03-09T16:59:59Z').valid).toBe(false);
+    expect(run(oneDay, '2026-03-09T17:00:00Z').valid).toBe(true);
+    expect(run(oneDay, '2026-03-10T16:59:59Z').valid).toBe(true);
+    expect(run(oneDay, '2026-03-10T17:00:00Z').valid).toBe(false);
+  });
+});

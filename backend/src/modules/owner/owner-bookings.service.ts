@@ -1,9 +1,7 @@
 import { AppError } from '../../common/errors/app-error';
 import { OwnerHotelsService } from './owner-hotels.service';
 import { OwnerBookingsRepository } from './owner-bookings.repository';
-import { expireStalePendingBookings } from '../bookings/booking-expiry';
-import { completeFinishedBookings } from '../bookings/booking-completion';
-import { getPrismaClient } from '../../config/prisma';
+import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
 import type { OwnerBookingsQuery } from './owner-bookings.schemas';
 
 const toNumber = (value: unknown) => Number(value);
@@ -31,8 +29,7 @@ export class OwnerBookingsService {
    * sweeps are system-wide UPDATEs and a rejected request must not trigger them.
    */
   private async refreshBookingLifecycle(): Promise<void> {
-    await expireStalePendingBookings(getPrismaClient());
-    await completeFinishedBookings(getPrismaClient());
+    await reconcileBookingLifecycle();
   }
 
   async list(ownerId: number, hotelId: number, query: OwnerBookingsQuery) {

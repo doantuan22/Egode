@@ -11,6 +11,7 @@ import {
 import type { UpdateAccountPayload } from '../../types/auth';
 import { ApiError } from '../../services/apiClient';
 import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useMe } from '../../features/auth/hooks';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
 
@@ -25,6 +26,8 @@ export default function AdminAccountDetailPage() {
   const lockMutation = useLockAccount();
   const unlockMutation = useUnlockAccount();
   const deleteMutation = useDeleteAccount();
+  // The server refuses it too; an administrator is simply not offered locking or deleting their own account.
+  const isSelf = useMe().data?.MaTaiKhoan === accountId;
 
   const { register, handleSubmit, reset, formState: { isDirty } } = useForm<UpdateAccountPayload>();
 
@@ -108,7 +111,7 @@ export default function AdminAccountDetailPage() {
           )}
           {(updateMutation.isError || lockMutation.isError || unlockMutation.isError || deleteMutation.isError) && (
             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-              Thao tác thất bại, vui lòng thử lại
+              {[updateMutation, lockMutation, unlockMutation, deleteMutation].map((m) => m.error).find((e) => e instanceof ApiError)?.message ?? 'Thao tác thất bại, vui lòng thử lại'}
             </div>
           )}
           {deleteMutation.isSuccess && !deleteMutation.data?.hardDeleted && (
@@ -168,8 +171,9 @@ export default function AdminAccountDetailPage() {
               <i className="ph-fill ph-shield-warning text-warning"></i> Quản lý bảo mật & Trạng thái
             </h4>
             
+            {isSelf && <p className="text-xs text-ink-muted">Đây là tài khoản của bạn: không thể tự khóa hoặc xóa chính mình.</p>}
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
-              {isLocked ? (
+              {isSelf ? null : isLocked ? (
                 <Button
                   type="button"
                   onClick={() => unlockMutation.mutate(accountId)}
@@ -189,9 +193,11 @@ export default function AdminAccountDetailPage() {
                 </Button>
               )}
 
-              <Button type="button" onClick={onDelete} disabled={deleteMutation.isPending} variant="danger-outline" className="flex-1">
-                <i className="ph ph-trash" aria-hidden="true"></i> {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa tài khoản'}
-              </Button>
+              {!isSelf && (
+                <Button type="button" onClick={onDelete} disabled={deleteMutation.isPending} variant="danger-outline" className="flex-1">
+                  <i className="ph ph-trash" aria-hidden="true"></i> {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa tài khoản'}
+                </Button>
+              )}
             </div>
           </div>
           

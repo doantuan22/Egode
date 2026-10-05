@@ -7,12 +7,15 @@ import { useLocations } from '../../features/locations/hooks';
 import { useAmenities } from '../../features/amenities/hooks';
 import { hotelFormSchema, HotelFormSchemaValues } from '../../features/owner/schemas';
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { fileToDataUrl, imageFileError, cn } from '../../lib/utils';
 import { useConfirm } from '../../components/common/FeedbackProvider';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { Combobox } from '../../components/common/Combobox';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+
+const HOTEL_FORM_FIELDS = ['TenKhachSan', 'DiaChiChiTiet', 'HangSao', 'MoTa', 'GioNhanPhong', 'GioTraPhong', 'MaDiaPhuong'] as const;
 
 export default function OwnerHotelManagePage() {
   const { hotelId: hotelParam } = useParams<{ hotelId: string }>();
@@ -36,6 +39,7 @@ export default function OwnerHotelManagePage() {
     register,
     control,
     handleSubmit,
+    setError,
     reset,
     formState: { errors, isDirty },
   } = useForm<HotelFormSchemaValues>({ resolver: zodResolver(hotelFormSchema) });
@@ -130,7 +134,7 @@ export default function OwnerHotelManagePage() {
       {reactivateMutation.isError && <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">{reactivateMutation.error instanceof ApiError ? reactivateMutation.error.message : 'Không thể bật lại khách sạn'}</div>}
       {deactivateMutation.isError && <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">{deactivateMutation.error instanceof ApiError ? deactivateMutation.error.message : 'Không thể ngừng kinh doanh khách sạn'}</div>}
 
-      <form id="owner-hotel-editor" onSubmit={handleSubmit((v) => updateMutation.mutate(v))} noValidate className="flex flex-col gap-5">
+      <form id="owner-hotel-editor" onSubmit={handleSubmit((v) => updateMutation.mutate(v, { onError: (error) => applyServerFieldErrors(error, setError, HOTEL_FORM_FIELDS) }))} noValidate className="flex flex-col gap-5">
         {updateMutation.isError && (
           <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">
             {updateMutation.error instanceof ApiError ? updateMutation.error.message : 'Cập nhật thất bại'}

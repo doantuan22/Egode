@@ -2,7 +2,10 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  error?: unknown;
+  /** Machine-readable error code on every failure (VALIDATION_ERROR, NOT_FOUND, CONFLICT, ...). */
+  code?: string;
+  /** For failures with parts, e.g. validation: [{ field, message }]. */
+  details?: unknown;
 }
 
 export interface ApiPaginationMeta {

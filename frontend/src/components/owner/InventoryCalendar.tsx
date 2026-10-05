@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WEEKDAYS } from '../../features/owner/rate-range';
 import { cn, formatDateVi, toDateInputValue } from '../../lib/utils';
+import { businessToday } from '../../lib/stayDates';
 import { Button } from '../common/Button';
 import { Icon } from '../common/Icon';
 
@@ -38,7 +39,7 @@ export function InventoryCalendar({ month, cells, selected, onSelect, onMonthCha
   // Monday-first: JS Sunday is 0, so shift it to the end.
   const leadingBlanks = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-  const today = toDateInputValue(new Date());
+  const today = businessToday(); // a night is "past" by Vietnam's calendar, the same day the server uses
 
   const pick = (iso: string) => {
     if (!anchor) {

@@ -17,6 +17,7 @@ import {
   RoomTypeFormSchemaValues,
 } from '../../features/owner/schemas';
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { fileToDataUrl, imageFileError, cn } from '../../lib/utils';
 import { useConfirm } from '../../components/common/FeedbackProvider';
 import { StatusBadge } from '../../components/domain/StatusBadge';
@@ -43,6 +44,7 @@ export default function OwnerRoomTypeManagePage() {
   const {
     register,
     handleSubmit,
+    setError,
     reset,
     formState: { errors, isDirty },
   } = useForm<RoomTypeFormSchemaValues>({ resolver: zodResolver(roomTypeFormSchema) });
@@ -119,7 +121,7 @@ export default function OwnerRoomTypeManagePage() {
         <StatusBadge domain="roomType" status={roomType.TrangThai} />
       </div>
 
-      <form onSubmit={handleSubmit((v) => updateMutation.mutate(v))} noValidate className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit((v) => updateMutation.mutate(v, { onError: (error) => applyServerFieldErrors(error, setError, ['TenLoaiPhong', 'SoGiuong', 'SucChua', 'DienTich', 'LoaiGiuong', 'MoTa']) }))} noValidate className="flex flex-col gap-5">
         {updateMutation.isError && (
           <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">
             {updateMutation.error instanceof ApiError ? updateMutation.error.message : 'Cập nhật thất bại'}

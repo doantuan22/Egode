@@ -1,4 +1,5 @@
 import { PROMOTION_STATUS, DISCOUNT_TYPE } from '../../common/constants/commercial';
+import { businessToday, dateKeyOf } from '../../common/utils/business-time';
 
 export interface PromotionRecord {
   MaKhuyenMai: number;
@@ -19,8 +20,7 @@ export interface PromotionEvalResult {
   discount: number;
 }
 
-const toDateOnly = (d: Date): number =>
-  Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+/** A promotion runs on calendar days (DATE columns); "today" is the Vietnam day, compared as `YYYY-MM-DD` strings. */
 
 /**
  * Pure evaluation of a single promotion against a quote subtotal — no DB
@@ -38,11 +38,11 @@ export function evaluatePromotion(
     return { valid: false, reason: 'Mã khuyến mãi hiện không hoạt động', discount: 0 };
   }
 
-  const today = toDateOnly(now);
-  if (today < toDateOnly(promo.NgayBatDau)) {
+  const today = businessToday(now);
+  if (today < dateKeyOf(promo.NgayBatDau)) {
     return { valid: false, reason: 'Mã khuyến mãi chưa bắt đầu áp dụng', discount: 0 };
   }
-  if (today > toDateOnly(promo.NgayKetThuc)) {
+  if (today > dateKeyOf(promo.NgayKetThuc)) {
     return { valid: false, reason: 'Mã khuyến mãi đã hết hạn', discount: 0 };
   }
 

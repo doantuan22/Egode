@@ -45,6 +45,7 @@ import {
   HotelOverview,
 } from '../../components/hotels/detail/HotelAbout';
 
+import { HotelReviews } from '../../components/hotels/detail/HotelReviews';
 import { BookingPanel } from '../../components/hotels/detail/BookingPanel';
 import { MobileBookingBar } from '../../components/hotels/detail/MobileBookingBar';
 
@@ -72,6 +73,10 @@ const PAGE_SECTIONS = [
   {
     id: 'tien-nghi',
     label: 'Tiện nghi',
+  },
+  {
+    id: 'danh-gia-khach',
+    label: 'Đánh giá',
   },
 ] as const;
 
@@ -1001,6 +1006,14 @@ export default function HotelDetailPage() {
                 }
               />
             </div>
+
+            {/* Guest reviews */}
+
+            <HotelReviews
+              hotelId={
+                hotelId
+              }
+            />
 
           </div>
 

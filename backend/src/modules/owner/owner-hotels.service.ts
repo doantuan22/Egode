@@ -9,6 +9,9 @@ import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 
 const HOTEL_IMAGE_FOLDER = 'hotel-booking/hotels';
 
+/** The profile fields an owner may still correct while the hotel is suspended by an administrator. */
+const SUSPENDED_EDITABLE_FIELDS = ['TenKhachSan', 'DiaChiChiTiet', 'MoTa'] as const;
+
 export class OwnerHotelsService {
   constructor(private readonly repository: OwnerHotelsRepository = new OwnerHotelsRepository()) {}
 
@@ -48,7 +51,15 @@ export class OwnerHotelsService {
   }
 
   async update(ownerId: number, maKhachSan: number, input: UpdateHotelInput) {
-    await this.getOwnedHotel(ownerId, maKhachSan);
+    const hotel = await this.getOwnedHotel(ownerId, maKhachSan);
+
+    // A suspended hotel may be corrected (to fix the violation) but not reconfigured: only the profile text can change.
+    if (hotel.TrangThai === HOTEL_STATUS.SUSPENDED) {
+      const forbidden = Object.keys(input).filter((key) => !SUSPENDED_EDITABLE_FIELDS.includes(key as (typeof SUSPENDED_EDITABLE_FIELDS)[number]));
+      if (forbidden.length > 0) {
+        throw AppError.forbidden(`Khách sạn đang bị đình chỉ: chỉ được sửa tên, địa chỉ và mô tả (không được sửa: ${forbidden.join(', ')})`);
+      }
+    }
 
     if (input.MaDiaPhuong !== undefined) {
       const ok = await this.repository.diaPhuongExists(input.MaDiaPhuong);

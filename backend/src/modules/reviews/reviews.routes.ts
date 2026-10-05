@@ -3,7 +3,7 @@ import { ReviewsController } from './reviews.controller';
 import { authenticate, requireRole, requireAdmin } from '../../middleware/auth.middleware';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { ROLE_NAMES } from '../../common/constants/roles';
-import { bookingIdParamSchema, reviewIdParamSchema, createReviewSchema, moderateReviewSchema, adminListReviewsQuerySchema } from './reviews.schemas';
+import { hotelIdParamSchema, publicReviewsQuerySchema, bookingIdParamSchema, reviewIdParamSchema, createReviewSchema, moderateReviewSchema, adminListReviewsQuerySchema } from './reviews.schemas';
 
 const controller = new ReviewsController();
 
@@ -25,6 +25,10 @@ reviewsBookingRoutes.get(
   validateRequest({ params: bookingIdParamSchema }),
   controller.getMine
 );
+
+/** Mounted at `/hotels` — what everybody (guest or signed-in) may read: the visible reviews of a public hotel. */
+export const hotelReviewsRoutes = Router();
+hotelReviewsRoutes.get('/:id/reviews', validateRequest({ params: hotelIdParamSchema, query: publicReviewsQuerySchema }), controller.listPublic);
 
 /** Mounted at `/admin/reviews` — moderation only, never reachable by a customer. */
 export const adminReviewsRoutes = Router();

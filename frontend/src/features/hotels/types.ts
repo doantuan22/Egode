@@ -26,6 +26,9 @@ export interface HotelSearchItem {
   AnhDaiDien: string | null;
   GiaTuDauTu: number | null;
   ConPhong: boolean;
+  /** Visible reviews only; null average = no review yet. */
+  DiemTrungBinh?: number | null;
+  SoLuongDanhGia?: number;
 }
 
 export interface HotelDetail {
@@ -36,6 +39,7 @@ export interface HotelDetail {
   HangSao: number;
   GioNhanPhong: string;
   GioTraPhong: string;
+  DanhGia?: { DiemTrungBinh: number | null; SoLuongDanhGia: number };
   DiaPhuong: DiaPhuong;
   HinhAnh: Array<{ MaHinhAnh: number; URL: string; AnhDaiDien: boolean }>;
   TienNghi: Amenity[];

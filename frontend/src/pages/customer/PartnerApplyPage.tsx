@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useApplyPartner, useMyPartnerApplication } from '../../features/partners/hooks';
 import { applyPartnerSchema, ApplyPartnerFormValues } from '../../features/partners/schemas';
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { refreshSession } from '../../services/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { meQueryKey } from '../../features/auth/hooks';
@@ -25,6 +26,7 @@ export default function PartnerApplyPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ApplyPartnerFormValues>({ resolver: zodResolver(applyPartnerSchema) });
 
@@ -42,7 +44,8 @@ export default function PartnerApplyPage() {
   const hasActiveApplication = displayedApplication && displayedApplication.TrangThaiDuyet !== 'Từ chối';
   const displayedStatus = displayedApplication ? statusLabel[displayedApplication.TrangThaiDuyet] : undefined;
 
-  const onSubmit = (data: ApplyPartnerFormValues) => applyMutation.mutate(data);
+  const onSubmit = (data: ApplyPartnerFormValues) =>
+    applyMutation.mutate(data, { onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
 
   return (
     <div className="bg-surface-secondary text-ink font-sans antialiased min-h-[80vh] flex flex-col">

@@ -1,6 +1,6 @@
 import { apiClient } from '../../services/apiClient';
 import type { ApiPaginationMeta, PaginatedApiResponse } from '../../types/api';
-import type { AdminReviewDetail, AdminReviewListItem, AdminReviewListQuery, CreateReviewRequest, Review } from './types';
+import type { AdminReviewDetail, AdminReviewListItem, AdminReviewListQuery, CreateReviewRequest, PublicReview, RatingSummary, Review } from './types';
 
 export const createReview = async (bookingId: number, payload: CreateReviewRequest): Promise<Review> => {
   const res = await apiClient<Review>(`/bookings/${bookingId}/review`, {
@@ -13,6 +13,17 @@ export const createReview = async (bookingId: number, payload: CreateReviewReque
 export const getMyReview = async (bookingId: number): Promise<Review | null> => {
   const res = await apiClient<Review | null>(`/bookings/${bookingId}/review`);
   return res.data ?? null;
+};
+
+export interface PublicReviewsPage {
+  items: PublicReview[];
+  pagination: ApiPaginationMeta;
+  summary: RatingSummary;
+}
+
+export const getHotelReviews = async (hotelId: number, page: number, limit: number): Promise<PublicReviewsPage> => {
+  const res = await apiClient<PublicReview[], PaginatedApiResponse<PublicReview> & { summary: RatingSummary }>(`/hotels/${hotelId}/reviews?page=${page}&limit=${limit}`);
+  return { items: res.data ?? [], pagination: res.pagination, summary: res.summary };
 };
 
 const buildQuery = (query: AdminReviewListQuery): string => {

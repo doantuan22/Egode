@@ -3,6 +3,7 @@ import type { HotelDetail } from '../../../features/hotels/types';
 import { Button } from '../../common/Button';
 import { Icon } from '../../common/Icon';
 import { cn } from '../../../lib/utils';
+import { formatRating } from '../../../features/reviews/rating';
 
 /** Breadcrumb, hotel name, star rating, address and the share action. */
 export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: () => void }) {
@@ -33,6 +34,11 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
                 ))}
               </div>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary-50 text-primary border border-primary-200">{hotel.HangSao} Sao</span>
+              {(hotel.DanhGia?.SoLuongDanhGia ?? 0) > 0 && (
+                <a href="#danh-gia-khach" className="text-xs font-semibold text-ink hover:text-primary">
+                  {formatRating(hotel.DanhGia?.DiemTrungBinh ?? null)}/5 · {hotel.DanhGia?.SoLuongDanhGia} đánh giá
+                </a>
+              )}
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight">{hotel.TenKhachSan}</h1>
             <p className="flex items-center flex-wrap gap-2 text-sm text-ink-muted mt-2">

@@ -23,7 +23,8 @@ export const registerSchema = z
     SoDienThoai: z.string().regex(/^\+?[0-9]{8,15}$/, 'Số điện thoại không hợp lệ'),
     // DDI-01 (resolved): optional — nullable in the baseline, not required at registration.
     NgaySinh: z.string().optional(),
-    GioiTinh: z.enum([...GENDER_OPTIONS, '']).optional(),
+    // An untouched radio group reports null, not undefined: both mean "not chosen".
+    GioiTinh: z.enum([...GENDER_OPTIONS, '']).nullish(),
     MatKhau: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
     confirmMatKhau: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
   })

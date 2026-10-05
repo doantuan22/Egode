@@ -1,5 +1,6 @@
 import { getPrismaClient } from '../../config/prisma';
 import { AppError } from '../../common/errors/app-error';
+import { addDaysToDateKey, businessDayStart, dateKeyOf } from '../../common/utils/business-time';
 import type { PaymentsQuery } from './admin-payments.schemas';
 
 // Deliberately select only staff-operational data. Credentials, email, payment-provider
@@ -21,7 +22,7 @@ export class AdminPaymentsService {
       ...(query.TrangThai ? { TrangThai: query.TrangThai } : {}),
       ...(query.PhuongThucThanhToan ? { PhuongThucThanhToan: query.PhuongThucThanhToan } : {}),
       ...(query.coHoanTien === true ? { HOAN_TIEN: { some: {} } } : query.coHoanTien === false ? { HOAN_TIEN: { none: {} } } : {}),
-      ...((query.from || query.to) ? { ThoiGianGiaoDich: { ...(query.from ? { gte: query.from } : {}), ...(query.to ? { lte: query.to } : {}) } } : {}),
+      ...((query.from || query.to) ? { ThoiGianGiaoDich: { ...(query.from ? { gte: businessDayStart(dateKeyOf(query.from)) } : {}), ...(query.to ? { lt: businessDayStart(addDaysToDateKey(dateKeyOf(query.to), 1)) } : {}) } } : {}),
       ...(query.search ? { OR: [{ MaGiaoDichDoiTac: { contains: query.search } }, { DAT_PHONG: { MaXacNhanDatPhong: { contains: query.search } } }] } : {}),
     };
     const [items, total] = await Promise.all([

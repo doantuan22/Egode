@@ -1,6 +1,7 @@
 import { AnalyticsRepository } from './analytics.repository';
 import { AdminAnalyticsRepository } from './admin-analytics.repository';
 import { toExclusiveEnd } from './date-range';
+import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
 import type { DateRangeQuery } from './date-range';
 
 const toIsoDate = (d?: Date): string | null => (d ? d.toISOString().slice(0, 10) : null);
@@ -12,6 +13,7 @@ export class AdminAnalyticsService {
   ) {}
 
   async getSystemAnalytics(query: DateRangeQuery) {
+    await reconcileBookingLifecycle();
     const range = { from: query.from, to: query.to ? toExclusiveEnd(query.to) : undefined };
 
     const [

@@ -1,4 +1,5 @@
 import type { RefinementCtx } from 'zod';
+import { businessToday, MS_PER_DAY } from './business-time';
 
 /**
  * The one place that decides whether a stay's dates are acceptable. Search, room availability, quote
@@ -13,30 +14,15 @@ import type { RefinementCtx } from 'zod';
  * `enumerateNights` does. Everything below works on day numbers, never on a per-night loop, so a
  * ridiculous range is rejected in O(1) before anything iterates it.
  */
-export const BUSINESS_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+export { BUSINESS_TIME_ZONE, businessToday, addDaysToDateKey } from './business-time';
 export const MAX_NIGHTS = 30;
 export const MAX_ADVANCE_DAYS = 365;
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-const businessDateFormat = new Intl.DateTimeFormat('en-CA', {
-  timeZone: BUSINESS_TIME_ZONE,
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-/** Today's calendar date in the business time zone, as `YYYY-MM-DD`. */
-export const businessToday = (now: Date = new Date()): string => businessDateFormat.format(now);
 
 /** Whole days since the epoch of a Date's UTC calendar day. */
 const utcDayNumber = (date: Date): number => Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / MS_PER_DAY);
 
 const keyDayNumber = (key: string): number => Math.floor(Date.parse(`${key}T00:00:00Z`) / MS_PER_DAY);
-
-/** `YYYY-MM-DD` shifted by a number of days (negative = earlier). */
-export const addDaysToDateKey = (key: string, days: number): string =>
-  new Date(Date.parse(`${key}T00:00:00Z`) + days * MS_PER_DAY).toISOString().slice(0, 10);
 
 export interface StayDateIssue {
   path: 'checkIn' | 'checkOut';

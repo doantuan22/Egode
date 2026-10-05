@@ -14,6 +14,21 @@ export interface Review {
   HINH_ANH_DANH_GIA: ReviewImage[];
 }
 
+/** One review as the public sees it (GET /hotels/:id/reviews): abbreviated name, no account or booking data. */
+export interface PublicReview {
+  MaDanhGia: number;
+  DiemDanhGia: number;
+  NoiDung: string | null;
+  TenNguoiDanhGia: string;
+  HinhAnh: string[];
+}
+
+/** Average and count of the VISIBLE reviews only. */
+export interface RatingSummary {
+  DiemTrungBinh: number | null;
+  SoLuongDanhGia: number;
+}
+
 export interface AdminReviewListItem extends Review {
   TAI_KHOAN: { MaTaiKhoan: number; HoTen: string; Email: string };
   KHACH_SAN: { MaKhachSan: number; TenKhachSan: string };

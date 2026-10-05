@@ -1,4 +1,5 @@
 import { getPrismaClient } from '../../config/prisma';
+import { businessInstantFilter } from './date-range';
 
 export interface CountByLabel {
   Label: string;
@@ -40,7 +41,7 @@ export class AdminAnalyticsRepository {
       by: ['TrangThai'],
       where:
         range.from || range.to
-          ? { ThoiGianGiaoDich: { ...(range.from ? { gte: range.from } : {}), ...(range.to ? { lt: range.to } : {}) } }
+          ? { ThoiGianGiaoDich: businessInstantFilter(range) }
           : {},
       _count: { _all: true },
     });
@@ -54,7 +55,7 @@ export class AdminAnalyticsRepository {
       by: ['TrangThai'],
       where:
         range.from || range.to
-          ? { NgayYeuCau: { ...(range.from ? { gte: range.from } : {}), ...(range.to ? { lt: range.to } : {}) } }
+          ? { NgayYeuCau: businessInstantFilter(range) }
           : {},
       _count: { _all: true },
     });
@@ -73,7 +74,7 @@ export class AdminAnalyticsRepository {
     const rows = await prisma.yEU_CAU_HO_TRO.groupBy({
       by: ['TrangThai'],
       where:
-        range.from || range.to ? { NgayTao: { ...(range.from ? { gte: range.from } : {}), ...(range.to ? { lt: range.to } : {}) } } : {},
+        range.from || range.to ? { NgayTao: businessInstantFilter(range) } : {},
       _count: { _all: true },
     });
     return rows.map((r) => ({ Label: r.TrangThai, SoLuong: r._count._all }));

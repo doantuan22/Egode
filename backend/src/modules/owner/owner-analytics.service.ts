@@ -1,4 +1,5 @@
 import { OwnerHotelsService } from './owner-hotels.service';
+import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
 import { AnalyticsRepository } from '../analytics/analytics.repository';
 import { toExclusiveEnd } from '../analytics/date-range';
 import type { DateRangeQuery } from '../analytics/date-range';
@@ -14,6 +15,7 @@ export class OwnerAnalyticsService {
   /** getOwnedHotel throws 404 (no such hotel) or 403 (someone else's) before any analytics query runs — an owner never even reaches the aggregation step for a hotel that isn't theirs. */
   async getHotelAnalytics(ownerId: number, maKhachSan: number, query: DateRangeQuery) {
     await this.ownerHotelsService.getOwnedHotel(ownerId, maKhachSan);
+    await reconcileBookingLifecycle(); // counts must not show expired holds as "Chờ thanh toán" or finished stays as "Đã xác nhận"
 
     const scope = { maKhachSan, from: query.from, to: query.to ? toExclusiveEnd(query.to) : undefined };
 

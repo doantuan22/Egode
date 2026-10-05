@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ReviewsService } from './reviews.service';
 import { sendSuccess, sendPaginated } from '../../common/utils/response';
-import type { CreateReviewInput, ModerateReviewInput, AdminListReviewsQuery } from './reviews.schemas';
+import type { CreateReviewInput, ModerateReviewInput, AdminListReviewsQuery, PublicReviewsQuery } from './reviews.schemas';
 
 export class ReviewsController {
   constructor(private readonly service: ReviewsService = new ReviewsService()) {}
@@ -21,6 +21,17 @@ export class ReviewsController {
       const { id } = req.params as unknown as { id: number };
       const review = await this.service.getMyReview(id, req.user!.maTaiKhoan);
       sendSuccess(res, review);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /** GET /hotels/:id/reviews — public, no sign-in needed. */
+  listPublic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params as unknown as { id: number };
+      const { items, summary, pagination } = await this.service.listPublicForHotel(id, req.query as unknown as PublicReviewsQuery);
+      res.json({ success: true, data: items, summary, pagination });
     } catch (error) {
       next(error);
     }

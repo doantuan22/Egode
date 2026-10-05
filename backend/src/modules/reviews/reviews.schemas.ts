@@ -18,6 +18,13 @@ export const moderateReviewSchema = z.object({
 });
 export type ModerateReviewInput = z.infer<typeof moderateReviewSchema>;
 
+export const hotelIdParamSchema = z.object({ id: z.coerce.number().int().positive() });
+export const publicReviewsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+export type PublicReviewsQuery = z.infer<typeof publicReviewsQuerySchema>;
+
 export const adminListReviewsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),

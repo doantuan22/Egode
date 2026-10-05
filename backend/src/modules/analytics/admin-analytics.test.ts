@@ -157,7 +157,7 @@ describe('GET /admin/analytics — date range validation (BUG-007)', () => {
     const res = await get({ from: '2021-06-30', to: '2021-06-01' });
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.errors[0].field).toBe('from');
+    expect(res.body.details[0].field).toBe("from");
     expect(res.body.data).toBeUndefined();
   });
 

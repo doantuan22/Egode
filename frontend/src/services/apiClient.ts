@@ -2,30 +2,31 @@ import { ApiResponse } from '../types/api';
 import { AuthResult } from '../types/auth';
 import { getAccessToken, useAuthStore } from '../lib/authStore';
 import { clearUserCache } from '../lib/queryClient';
+import { fieldErrorsOf, joinIssueMessages } from '../lib/apiErrors';
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || '/api';
 
 export class ApiError extends Error {
   public statusCode: number;
+  /** Server error `details` as sent (for validation: [{ field, message }]). */
   public details?: unknown;
+  /** Server error `code` (VALIDATION_ERROR, NOT_FOUND, CONFLICT, ...); branch on this, not on the message. */
+  public code?: string;
 
-  constructor(message: string, statusCode = 500, details?: unknown) {
+  constructor(message: string, statusCode = 500, details?: unknown, code?: string) {
     super(message);
     this.name = 'ApiError';
     this.statusCode = statusCode;
     this.details = details;
+    this.code = code;
+  }
+
+  /** Server messages per request field, ready to put on form inputs. */
+  get fieldErrors(): Record<string, string> {
+    return fieldErrorsOf(this);
   }
 }
-
-/** The distinct messages of a server validation error list ([{ field, message }]), or null when there is none. */
-const validationMessage = (errors: unknown): string | null => {
-  if (!Array.isArray(errors)) return null;
-  const messages = errors
-    .map((item) => (item && typeof (item as { message?: unknown }).message === 'string' ? (item as { message: string }).message : ''))
-    .filter(Boolean);
-  return messages.length > 0 ? [...new Set(messages)].join('. ') : null;
-};
 
 const buildUrl = (endpoint: string) =>
   `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
@@ -102,9 +103,10 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
   }
 
   if (!response.ok || !data.success) {
-    // A 400 from request validation lists what is wrong in `errors`; show that instead of a generic "Validation failed".
-    const fieldErrors = (data as { errors?: unknown }).errors;
-    throw new ApiError(validationMessage(fieldErrors) ?? (data.message || 'Request failed'), response.status, fieldErrors ?? data.error);
+    // Error contract: { message, code, details }. Validation lists each problem in `details`; the banner text is
+    // those messages (more useful than a generic "invalid data"), and the same list drives the per-field errors.
+    const message = (data.code === 'VALIDATION_ERROR' ? joinIssueMessages(data.details) : null) ?? (data.message || 'Request failed');
+    throw new ApiError(message, response.status, data.details, data.code);
   }
 
   return data;

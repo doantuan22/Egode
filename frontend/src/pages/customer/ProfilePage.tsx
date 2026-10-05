@@ -7,6 +7,7 @@ import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
 import { updateProfileSchema, UpdateProfileFormValues } from '../../features/auth/schemas';
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 
 import { cn, maskEmail } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
+    setError,
     reset,
     formState: { errors, isDirty },
   } = useForm<UpdateProfileFormValues>({ resolver: zodResolver(updateProfileSchema) });
@@ -52,12 +54,15 @@ export default function ProfilePage() {
   };
 
   const onSubmit = (data: UpdateProfileFormValues) =>
-    updateMutation.mutate({
-      HoTen: data.HoTen,
-      SoDienThoai: data.SoDienThoai,
-      NgaySinh: data.NgaySinh || undefined,
-      GioiTinh: data.GioiTinh ? data.GioiTinh : undefined,
-    });
+    updateMutation.mutate(
+      {
+        HoTen: data.HoTen,
+        SoDienThoai: data.SoDienThoai,
+        NgaySinh: data.NgaySinh || undefined,
+        GioiTinh: data.GioiTinh ? data.GioiTinh : undefined,
+      },
+      { onError: (error) => applyServerFieldErrors(error, setError, ['HoTen', 'SoDienThoai', 'NgaySinh', 'GioiTinh']) }
+    );
 
   if (meQuery.isLoading) {
     return <PageSpinner />;

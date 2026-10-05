@@ -98,6 +98,19 @@ export const openApiSpec = {
         },
       },
     },
+    '/hotels/{id}/reviews': {
+      get: {
+        summary: 'Public reviews of a hotel (no sign-in needed), paginated, newest first',
+        description: 'Only reviews in the "Hiển thị" state are returned and counted. The reviewer is shown as an abbreviated name ("Nguyễn V. A."); no account, e-mail or booking data is exposed. "summary" is the average score (1 decimal, null when none) and count of ALL visible reviews of the hotel, not just the page. Hotel detail (GET /hotels/{id}) and every search item carry the same summary as DanhGia / DiemTrungBinh + SoLuongDanhGia.',
+        tags: ['Reviews'],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 50, default: 10 } },
+        ],
+        responses: { '200': { description: 'Page of visible reviews + summary + pagination' }, '400': { description: 'Invalid page/limit' }, '404': { description: 'Hotel not found or not public' } },
+      },
+    },
     '/hotels/{id}/bookings': {
       post: {
         summary: 'Create a real booking (M5, authenticated customer only)',

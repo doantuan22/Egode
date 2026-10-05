@@ -1,6 +1,6 @@
 # FIX VERIFICATION REPORT
 
-Ngày: 2026-10-04 · Nhánh: `tuntun` · Phạm vi: bug #4 → #1 → #3 → #2 → #8 trong `docs/LOGIC_AUDIT.md`.
+Ngày: 2026-10-04 · Nhánh: `tuntun` · Phạm vi: bug #4 → #1 → #3 → #2 → #8, rồi #6 → #7 → #5 → #9 → #10 → #11 → #13 trong `docs/LOGIC_AUDIT.md`.
 Mọi kết quả PASS bên dưới có bằng chứng từ lần chạy thật (SQL Server `HotelBooking_DB0_Test`), không chỉ đọc code.
 
 ## Bug #4 — Nhiều payment "Chờ xử lý" cho một booking
@@ -116,12 +116,93 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 - **Limitation / Change Gate candidate — "Chờ xử lý" bị kẹt:** HOAN_TIEN không có timestamp cho "lần thử này bắt đầu lúc nào", và `NgayYeuCau` không được dùng thay thế (nó là ngày yêu cầu hoàn tiền, ghi một lần). Vì vậy DB không phân biệt được "đang chạy" với "bị kẹt". Một dòng "Chờ xử lý" do tiến trình chết giữa commit (bước 1) và chốt (bước 3) sẽ ở đó mãi: retry luôn trả 409 và không có job nền tự xử lý; cần can thiệp tay (đưa về "Thất bại" bằng SQL). Cách xử lý đúng cần schema: thêm một cột thời điểm cho lần thử (ví dụ `NgayCapNhat`/`NgayBatDauXuLy` trên HOAN_TIEN) hoặc trạng thái "Đang xử lý" cùng hạn thuê (lease). **Đề xuất Change Gate, chưa thực hiện.** Cửa sổ rủi ro chỉ là khoảng giữa hai lệnh DB liên tiếp quanh một lời gọi gateway (tối đa ~8 giây nếu tiến trình chết đúng lúc đó).
 - Thông tin giao dịch hoàn của VNPAY (ví dụ `vnp_TransactionNo` của lệnh refund) không được lưu riêng: adapter không trả về và HOAN_TIEN không có cột cho nó; `MaGiaoDichDoiTac` giữ refund id của hệ thống, được ghi lúc tạo dòng.
 
+## Bug #6 — Token còn hạn sau khi khóa tài khoản / đổi vai trò
+**Root cause:** `authenticate` chỉ kiểm tra chữ ký JWT; `req.user.role` lấy từ token. Tài khoản bị khóa vẫn gọi API tới 15 phút, vai trò cũ còn hiệu lực. `resetPassword` không xét tài khoản khóa.
+
+**Files changed:** `backend/src/middleware/auth.middleware.ts`, `backend/src/modules/auth/auth.service.ts`, `backend/src/modules/auth/auth.test.ts` (test cũ đổi 403 → 401), test mới `backend/src/middleware/auth-live-state.test.ts`. Frontend: không đổi (401 → thử refresh → refresh bị từ chối với tài khoản khóa → phiên kết thúc).
+
+**Solution:** sau khi xác minh chữ ký, middleware đọc `TAI_KHOAN` (trạng thái + `VAI_TRO.TenVaiTro`) trong DB cho mỗi request: không tồn tại hoặc "Khóa" → 401 "Tài khoản không khả dụng"; vai trò là vai trò HIỆN TẠI trong DB, bỏ qua `role` trong token. Chi phí: một truy vấn khóa chính mỗi request đã xác thực. `forgotPassword` không gửi mail cho tài khoản khóa; `resetPassword` từ chối token (kể cả token cấp trước khi khóa), không đổi mật khẩu và không đổi trạng thái.
+
+**Tests added:** 11 test (SQL Server thật): khóa khi token còn hạn → 401, mở khóa thì cùng token dùng lại được; owner/admin bị khóa mất endpoint; token của tài khoản không còn tồn tại → 401; token hỏng/thiếu → 401; customer thăng owner (token cũ vào endpoint owner, mất endpoint customer); admin hạ customer (mất toàn bộ endpoint admin ngay); token tự nhận role admin nhưng DB là customer → 403; ma trận quyền customer/owner/admin trước và sau khi hoán đổi vai trò; reset sau khi khóa → 400, vẫn khóa, mật khẩu không đổi, đăng nhập mật khẩu mới không được; forgot-password không gửi mail cho tài khoản khóa nhưng gửi cho tài khoản hoạt động; reset bình thường vẫn chạy và giữ trạng thái hoạt động.
+**SQL verification:** mục A1/A7 (còn quản trị viên hoạt động) — xem bảng cuối.
+**Regression:** auth, profile, accounts, partners, middleware: 126 test PASS.
+**Schema changes:** NONE · **Result: PASS**
+
+## Bug #7 — Admin tự khóa / xóa / hạ quyền; mất admin cuối
+**Root cause:** `accounts.service` (`lock`, `safeDelete`, `update` với `MaVaiTro`) không biết ai đang thao tác và không đếm quản trị viên còn lại.
+
+**Files changed:** `modules/accounts/accounts.service.ts`, `accounts.repository.ts` (thao tác nhận transaction, khóa tập admin), `accounts.controller.ts` (truyền `req.user`), test mới `accounts-admin-guard.test.ts`. Frontend: `pages/admin/AdminAccountDetailPage.tsx` (ẩn nút khóa/xóa tài khoản của chính mình, hiện lý do server từ chối), test mới `AdminAccountDetailPage.test.tsx`.
+
+**Solution:** khóa/xóa/đổi vai trò chạy trong một transaction: (1) tự thao tác lên chính mình → 400; (2) `SELECT … WITH (UPDLOCK, HOLDLOCK)` toàn bộ tài khoản có vai trò admin (khóa cả dải khóa), (3) nếu đích là admin đang hoạt động mà không còn admin hoạt động nào khác → 409; (4) ghi thay đổi trong cùng transaction. Hai admin thao tác cùng lúc xếp hàng ở bước 2 nên người đến sau thấy kết quả đã commit. Xóa admin có lịch sử (vốn chỉ khóa) cũng đi qua cùng kiểm tra.
+
+**Tests added:** 12 test + 3 test frontend. HTTP: tự khóa/xóa/hạ quyền → 400 và không đổi gì; vẫn sửa được hồ sơ của mình; khóa/hạ quyền/xóa admin KHÁC khi còn admin khác → 200. Service (repository chỉ đếm "admin còn lại" trong nhóm tài khoản test, vì DB test dùng chung có admin thật — phần khóa, transaction, kiểm tra, ghi là code thật): admin duy nhất bị khóa/xóa/hạ quyền → 409 không đổi gì; hai admin: một người bị khóa được, người còn lại thành admin cuối được bảo vệ; admin đã bị khóa không tính là "còn lại"; khóa người không phải admin không bị ảnh hưởng. Đồng thời (3 vòng mỗi loại): hai admin cùng khóa nhau, cùng xóa nhau, và một khóa + một hạ quyền → đúng 1 thành công, 1 bị 409, còn đúng 1 admin hoạt động. Kiểm chứng bằng đột biến: bỏ khóa `UPDLOCK/HOLDLOCK` → 3 test đồng thời FAIL; khôi phục → PASS.
+**SQL verification:** A1 = 3 quản trị viên hoạt động, A7 = 0.
+**Regression:** accounts (32 test) PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #5 — Booking "Chờ thanh toán" hết hạn vẫn chiếm phòng ở search/rooms/quote/analytics
+**Root cause:** chỉ đặt phòng, thanh toán, danh sách đơn và owner bookings gọi `expireStalePendingBookings`; search, rooms, quote và analytics đọc thẳng DB nên vẫn tính đơn quá 15 phút là đang chiếm phòng / đang chờ thanh toán.
+
+**Files changed:** `modules/bookings/booking-lifecycle.ts` (mới: `releaseExpiredHolds`, `reconcileBookingLifecycle`), `hotels/hotels.service.ts` (search, rooms), `quotes/quotes.service.ts`, `owner/owner-analytics.service.ts`, `analytics/admin-analytics.service.ts`, `owner/owner-bookings.service.ts` (dùng hàm chung), test mới `bookings/hold-consistency.test.ts`.
+
+**Solution:** TTL giữ nguyên (`PAYMENT_TIMEOUT_MINUTES` = 15). Mọi nơi mà câu trả lời phụ thuộc vào tồn kho hoặc trạng thái booking gọi cùng một hàm lazy-expire trước khi đọc (không có job nền): search, rooms, quote, tạo booking (đã có), analytics owner/admin, owner bookings. Một quy tắc, một nơi.
+
+**Tests added:** 7 test: trong TTL (14 phút) search/rooms/quote/đặt phòng đều báo "hết phòng" (409) và analytics vẫn đếm đơn chờ; quá TTL (16 phút) search, rooms, quote đều thấy phòng trống và đơn bị chuyển "Đã hủy", đặt phòng ngay sau quote thành công (201), analytics owner không còn đếm "Chờ thanh toán" và không còn đơn pending quá hạn nào; một kịch bản: cả search/rooms/quote cùng "hết" rồi cùng "còn" sau khi đơn già đi 16 phút. Đột biến: biến `releaseExpiredHolds` thành no-op → 4 test FAIL; khôi phục → PASS.
+**SQL verification:** A3 = 0 (không còn đơn "Chờ thanh toán" quá 15 phút sau các lần đọc), A2 = 0.
+**Regression:** bookings, hotels, quotes, owner, analytics: 242 test PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #9 — Owner sửa quỹ phòng / khách sạn
+**Root cause:** `bulkUpsert` ghi thẳng không kiểm tra số phòng đã đặt, không chặn ngày quá khứ, không xét khách sạn bị đình chỉ; `update` hồ sơ khách sạn cho sửa mọi trường khi bị đình chỉ.
+
+**Files changed:** `owner/owner-rates.repository.ts` (khóa → kiểm tra → ghi trong một transaction), `owner/owner-rates.service.ts`, `owner/owner-hotels.service.ts`, `common/errors/app-error.ts` (`conflict` mang `details`), test mới `owner/owner-inventory-guard.test.ts`. Frontend: `pages/owner/OwnerInventoryPricingPage.tsx`, `components/owner/InventoryCalendar.tsx` ("quá khứ" theo ngày Việt Nam; ô ngày bắt đầu `min=hôm nay`).
+
+**Solution:** transaction lấy CHÍNH khóa mà đặt phòng lấy (`QUY_PHONG_GIA WITH (UPDLOCK, HOLDLOCK)` trên loại phòng + dải ngày, gồm cả ngày chưa có dòng), dọn đơn pending quá hạn, tính số phòng đang chiếm mỗi đêm (mọi đơn không hủy), rồi từ chối cả yêu cầu bằng 409 nếu bất kỳ đêm nào bị đặt `SoLuongPhong` thấp hơn số phòng đã đặt (thông báo nêu ngày và số phòng, `details` liệt kê mọi ngày vi phạm); chỉ khi qua hết mới upsert, cùng transaction. Thứ tự khóa trùng thứ tự của đặt phòng (quỹ phòng trước) nên không deadlock. Ngày trước hôm nay (giờ VN) → 400 và không ghi gì. Khách sạn "Đình chỉ" → 403 với quỹ phòng/giá; hồ sơ khi đình chỉ chỉ sửa được tên, địa chỉ, mô tả (trường khác → 403 nêu tên trường). Đóng bán một đêm (không đổi số phòng) vẫn được và không đụng booking. Ngừng khách sạn / loại phòng vốn chỉ đổi `TrangThai` và chỉ chặn booking mới — test chứng minh đơn đã xác nhận vẫn xem được, hủy được.
+
+**Tests added:** 11 test: cập nhật nhiều ngày hợp lệ (ngày không booking giảm về 0, ngày đúng bằng số đã đặt, đơn đã hủy không tính, đơn giữ chỗ còn hạn tính); một ngày vi phạm → 409 và KHÔNG lưu gì (kể cả ngày hợp lệ khác trong cùng yêu cầu); đơn giữ chỗ quá hạn không chặn giảm; đóng bán giữ nguyên booking nhưng đóng bán cũng không cho phép giảm; ngày quá khứ → 400 và không lưu phần còn lại; hôm nay vẫn sửa được; khách sạn đình chỉ → 403 cho quỹ phòng, hồ sơ chỉ sửa tên/mô tả; khách sạn hoạt động sửa mọi trường; ngừng khách sạn → đơn xác nhận còn nguyên/xem được/hủy được, đặt mới 404; ngừng loại phòng → đơn còn nguyên, đặt mới 400; đua giữa 6 yêu cầu đặt phòng và một lần giảm số phòng (4 vòng): tồn kho cuối luôn ≥ số phòng đã đặt. Đột biến: bỏ khóa → test đua FAIL trong 1/3 lần chạy (mang tính xác suất); các test logic còn lại là xác định.
+**SQL verification:** A2 = 0 (không đêm nào có số phòng bán vượt quỹ phòng).
+**Regression:** owner, bookings, hotels, quotes (244 test) + frontend owner/admin (30) PASS. **Schema changes:** NONE · **Result: PASS**
+
+## Bug #10 — Review công khai
+**Root cause:** không có endpoint công khai nào trả review hay điểm trung bình; kiểm duyệt (Hiển thị / Ẩn / Vi phạm) không ảnh hưởng gì tới người dùng cuối.
+
+**Files changed:** Backend: `reviews/reviews.repository.ts`, `reviews.service.ts`, `reviews.controller.ts`, `reviews.routes.ts`, `reviews.schemas.ts`, `reviews/reviewer-name.ts` (mới), `routes/index.ts`, `hotels/hotels.service.ts`, `config/openapi.ts`, test mới `reviews/public-reviews.test.ts`. Frontend: `features/reviews/{api,hooks,types,rating}.ts`, `features/hotels/types.ts`, `components/hotels/detail/HotelReviews.tsx` (mới), `HotelHeader.tsx`, `HotelCard.tsx`, `pages/public/HotelDetailPage.tsx`, CSS thẻ khách sạn, test `HotelReviews.test.tsx` + cập nhật `HotelDetailPage.test.tsx`.
+
+**Solution:** `GET /api/hotels/:id/reviews?page&limit` (công khai — khách vãng lai và khách đăng nhập nhận cùng kết quả): chỉ review "Hiển thị" của khách sạn đang công khai (khách sạn không công khai → 404), mới nhất trước (DANH_GIA không có cột ngày nên sắp theo id), phân trang (`limit` ≤ 50), kèm `summary`. Mỗi review chỉ gồm `MaDanhGia`, `DiemDanhGia`, `NoiDung`, `TenNguoiDanhGia` (viết tắt: "Nguyễn Văn An" → "Nguyễn V. A.") và URL ảnh — không email, id tài khoản/đặt phòng, số điện thoại, trạng thái. Chi tiết khách sạn trả `DanhGia: { DiemTrungBinh, SoLuongDanhGia }` và mỗi item tìm kiếm trả `DiemTrungBinh`, `SoLuongDanhGia` (tính một truy vấn `GROUP BY` cho các khách sạn của trang đang trả). Điểm trung bình làm tròn 1 chữ số, `null` khi chưa có; chỉ tính review "Hiển thị" nên "Chờ duyệt", "Ẩn", "Vi phạm" không vào tổng. Tên trường dùng tiếng Việt theo quy ước hiện có (tương ứng averageRating / reviewCount). Frontend: mục "Đánh giá của khách" (có tab) với phân trang, điểm ở đầu trang và trên thẻ kết quả tìm kiếm.
+
+**Tests added:** Backend 16: viết tắt tên (6 ca); review chờ duyệt vô hình/không tính tới khi admin duyệt; hiển thị 3 review + ẩn/vi phạm/chờ không lọt vào danh sách hoặc điểm (trung bình 4, đếm 3); kiểm duyệt đổi danh sách và tổng ở cả hai chiều (kể cả xóa an toàn UC37); review khách sạn này không tính cho khách sạn khác; khách vãng lai = khách đăng nhập; không lộ email/tên đầy đủ/id/trạng thái; phân trang 5 review limit 2 (3 trang, thứ tự, tổng); limit/page sai → 400, khách sạn không tồn tại hoặc bị đình chỉ → 404; search có điểm/đếm chỉ của review Hiển thị và đi theo kiểm duyệt. Frontend 6: điểm + đếm + tên viết tắt; không có review; chuyển trang; lỗi server; thẻ khách sạn có/không có điểm.
+**SQL verification:** A6 = 0 (mọi review có trạng thái hợp lệ). A5 = 3: 3 review "Hiển thị" thuộc khách sạn không công khai (dữ liệu demo có sẵn) — endpoint công khai trả 404 cho các khách sạn đó nên không lộ.
+**Regression:** reviews, hotels, quotes (cùng nhóm) và frontend `pages/public`, `components/hotels`, `features` PASS (trừ 2 test có sẵn). **Schema changes:** NONE · **Result: PASS**
+
+## Bug #11 — Hợp đồng lỗi FE ↔ BE
+**Root cause:** backend trả lỗi validate ở khóa `errors` và lỗi nghiệp vụ ở `details`, không có `code`; frontend đọc `data.error` (không tồn tại) nên field error mất và hiện chuỗi chung "Validation failed".
+
+**Files changed:** Backend: `common/errors/error-codes.ts` (mới), `common/errors/app-error.ts`, `middleware/error.middleware.ts` (viết lại), `notFound.middleware.ts`, `security.middleware.ts`, `common/types/api-response.ts`, `common/utils/response.ts`, `auth.service.ts` & `accounts.service.ts` (trùng email/tên đăng nhập mang `details`), các test cũ đọc `errors`, test mới `middleware/error-contract.test.ts`. Frontend: `services/apiClient.ts`, `types/api.ts`, `lib/apiErrors.ts` (mới), `features/auth/schemas.ts`, các form `RegisterPage`, `OwnerHotelFormPage`, `OwnerHotelManagePage`, `OwnerRoomTypeManagePage`, `PartnerApplyPage`, `ProfilePage`; test mới `apiErrors.test.ts`, `RegisterPage.test.tsx`, `schemas.test.ts`, cập nhật `apiClient.test.ts`.
+
+**Solution:** mọi lỗi trả cùng một dạng `{ success:false, message, code, details? }`. `code` ổn định: `VALIDATION_ERROR`, `INVALID_JSON`, `PAYLOAD_TOO_LARGE`, `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`. Validate: `message` "Dữ liệu không hợp lệ", `details: [{ field, message }]` (đường dẫn lồng nhau nối bằng dấu chấm). Lỗi 5xx và lỗi không xác định chỉ trả "Internal server error" + `INTERNAL_ERROR` — không stack, SQL hay thông điệp nội bộ (ghi log phía server). Khóa `errors` cũ bị bỏ. Frontend: `ApiError` có `message`, `statusCode`, `code`, `details`, `fieldErrors`; với `VALIDATION_ERROR` nội dung banner là các thông điệp field đã loại trùng; `applyServerFieldErrors` đặt lỗi lên đúng input (chỉ các trường form có, input đầu tiên được focus), phần còn lại vẫn nằm ở banner; lỗi không phải ApiError chỉ hiện câu dự phòng, không bao giờ hiện đối tượng thô. Luồng refresh/hết phiên không đổi. Tìm ra và sửa kèm một lỗi có sẵn: bỏ trống giới tính ở form đăng ký làm RHF trả `null`, schema từ chối ngầm nên form không gửi đi và không báo gì — nay `GioiTinh` chấp nhận `null`.
+
+**Tests added:** Backend 17: validate (body, query/param) đúng dạng và không còn `errors`; 401 / 403 / 404 (route và tài nguyên) / 400 JSON hỏng / 413 / 429 đều theo hợp đồng; unit của error handler (AppError giữ message/details/status, mã theo status, ZodError lồng nhau, lỗi lạ không rò rỉ thông điệp/stack, AppError 5xx ẩn chi tiết, `codeForStatus`). Frontend 17: `ApiError` (validate, nghiệp vụ, không có details, thân phản hồi không đọc được), `apiErrors` helpers (6), form đăng ký (lỗi trùng email gắn vào ô Email, nhiều ô cùng lúc, lỗi không có field vẫn qua banner), schema giới tính (7).
+**SQL verification:** không áp dụng (không đụng dữ liệu).
+**Regression:** auth, accounts, middleware, analytics, owner-analytics, stay-dates API (157 test) + frontend lib/services/pages/components PASS (trừ 2 test có sẵn). **Schema changes:** NONE · **Result: PASS**
+
+## Bug #13 — Múi giờ nghiệp vụ Asia/Ho_Chi_Minh
+**Root cause:** hạn hủy tính từ 00:00 UTC của ngày nhận phòng (= 07:00 giờ VN, bỏ qua `GioNhanPhong` của khách sạn); `Hoàn tất` chuyển ở 00:00 UTC của ngày trả phòng (5 giờ trước giờ trả phòng thực); khuyến mãi xét theo ngày UTC; báo cáo/bộ lọc ngày so sánh mốc 00:00 UTC với timestamp UTC; frontend tính "hôm nay" theo múi giờ trình duyệt.
+
+**Files changed:** Backend: `common/utils/business-time.ts` (mới — tiện ích duy nhất), `stay-dates.ts` (dùng lại), `bookings/bookings.service.ts` (hạn hủy, `BookingDetail` thêm `GioNhanPhong`, `GioTraPhong`, `ThoiDiemNhanPhong`, `ThoiDiemTraPhong`, clock inject cho test), `bookings.repository.ts`, `booking-completion.ts`, `quotes/promotion-pricing.ts`, `analytics/date-range.ts`, `analytics.repository.ts`, `admin-analytics.repository.ts`, `admin-payments/admin-payments.service.ts`; test: `business-time.test.ts`, `bookings/timezone-rules.test.ts`, `promotion-pricing.test.ts`, `bookings-cancel.test.ts` và `refund-lifecycle.test.ts` (không còn phụ thuộc giờ chạy). Frontend: `features/bookings/refund-preview.ts`, `types.ts`, `BookingDetailPage.tsx`, `features/analytics/kpi.ts`, `OwnerDashboardPage.tsx`, `OwnerInventoryPricingPage.tsx`; test `refund-preview.test.ts`, `kpi.test.ts`.
+
+**Solution:** quy ước lưu trữ: cột DATE là ngày lịch (UTC 00:00 của ngày đó), cột TIME là giờ treo tường của khách sạn, timestamp là thời điểm UTC; mọi quy tắc nghiệp vụ đổi sang giờ Việt Nam (UTC+7, không có DST) qua `business-time.ts`. Hạn hủy đo đến **thời điểm nhận phòng = `NgayNhanPhong` + `GioNhanPhong`**; `Hoàn tất` khi **thời điểm trả phòng = `NgayTraPhong` + `GioTraPhong`** đã qua (SQL Server tính trực tiếp). Khuyến mãi chạy từ 00:00 ngày bắt đầu đến 23:59:59 ngày kết thúc giờ VN. Báo cáo owner/admin: "từ ngày – đến ngày" là ngày lịch VN, đổi thành mốc UTC (17:00 UTC hôm trước) khi so với timestamp; cột vốn là ngày (`NgayApDung`, `NgayNhanPhong`) giữ so sánh theo ngày. Bộ lọc `to` của danh sách thanh toán admin nay bao trọn ngày cuối (trước đây loại cả ngày đó). Server gửi sẵn `ThoiDiemNhanPhong` (ISO) cho chi tiết đơn nên bản xem trước hoàn tiền ở trình duyệt dùng đúng mốc đó, không tự tính múi giờ; các trang owner dùng ngày VN cho "hôm nay".
+
+**Tests added:** Backend 14 + 10 + 3: hạn hủy — một phút hai bên mốc 72 giờ (07:00 UTC ba ngày trước) lật 100% ↔ 50%, mốc 24 giờ lật 50% ↔ 0% (không có HOAN_TIEN), đúng mốc tính là đạt (≥), ca chứng minh khác kết quả cách tính cũ (06:00 UTC ba ngày trước vẫn 100%), theo `GioNhanPhong` riêng của khách sạn (14:00 vs 22:00); chi tiết đơn trả đúng giờ và thời điểm; hoàn tất — 04:59 UTC chưa, 05:01 UTC rồi với giờ trả 12:00, 03:00 UTC (mốc cũ) chưa, giờ trả 18:00 → 11:00 UTC, đơn đã hủy không bị hoàn tất; báo cáo — 4 mốc quanh hai lần nửa đêm VN (23:59:59 / 00:00:00) vào đúng ngày; analytics admin cùng ranh giới; danh sách thanh toán admin `to` bao ngày cuối; khuyến mãi bắt đầu/kết thúc đúng nửa đêm VN, ngày duy nhất; tiện ích (đọc cột DATE/TIME, nhận/trả phòng, `hoursUntil`, đổi ngày, qua tháng/năm). Frontend 4: xem trước hoàn tiền chính xác đến phút, mốc 72 giờ tại 07:00 UTC, sau giờ nhận phòng hoàn 0.
+**SQL verification:** A4 = 0 (không có đơn "Hoàn tất" mà thời điểm trả phòng còn ở tương lai).
+**Regression:** bookings, payments, reviews, owner, analytics, quotes, promotions, admin-payments (316 test) và frontend features/customer/owner (131) PASS. **Schema changes:** NONE · **Result: PASS**
+
 ## Regression
-**Backend:** `eslint .` sạch · `tsc --noEmit` sạch · `npm run build` (prisma generate + tsc) exit 0 · `vitest run`: **43 file, 522 test, tất cả PASS** (sau bug #8; sau bug #2: 42 file / 502 test; trước khi sửa: 39 file / 417 test). Gồm concurrency đặt phòng, khuyến mãi, callback idempotency, hủy/hoàn tiền, lịch sử đặt phòng, cô lập owner, phân quyền admin, analytics, search/hotel detail.
+**Backend (sau cả 7 bug mới):** `eslint .` sạch · `tsc --noEmit` sạch · `npm run build` (prisma generate + tsc) thành công · `vitest run --no-file-parallelism` trên SQL Server thật: **51 file, 623 test, tất cả PASS** (mốc trước: bug #8 — 43 file / 522 test; trước mọi bug — 39 file / 417 test). Các file có tranh chấp khóa/đồng thời (admin guard, inventory guard, refund lifecycle, payments, concurrency đặt phòng, hold consistency) chạy lặp 3 lần liên tiếp: 90/90 mỗi lần, không flaky. Regression của #1/#2/#3/#4/#8 nằm trong cùng lần chạy đó (admin-hotels, bookings-zero-total, stay-dates.api, payments, refund-lifecycle: tất cả PASS).
 
-**Frontend:** `tsc -b --noEmit` sạch · `npm run build` thành công · `vitest run`: 60 file, 384 test: **382 PASS, 2 FAIL — đã FAIL từ trước khi sửa** (xác nhận bằng `git stash` trên cùng 3 file test): `HomePage guest count` và `HotelListPage guest count` (`getByText('2 khách')` gặp nhiều phần tử). · `eslint .`: **3 lỗi có sẵn từ trước** (`<main>` trong `LoginPage.tsx`, `HotelDetailPage.tsx`, `HotelListPage.tsx`; HEAD đã có sẵn thẻ này), không có lỗi mới.
+**Frontend (sau cả 7 bug mới):** `tsc -b --noEmit` sạch · `npm run build` thành công · `vitest run`: 66 file, 415 test: **413 PASS, 2 FAIL — đã FAIL từ trước mọi thay đổi** (đối chứng bằng `git stash` ở lượt #1–#4): `HomePage guest count` và `HotelListPage guest count` (`getByText('2 khách')` gặp nhiều phần tử) — không phải suite PASS toàn bộ. `eslint .`: **3 lỗi có sẵn từ trước** (`<main>` trong `LoginPage.tsx`, `HotelDetailPage.tsx`, `HotelListPage.tsx`; HEAD đã có sẵn thẻ này), không có lỗi mới.
 
-**Database** (kiểm tra bằng sqlcmd trên DB test sau khi chạy test):
+**Database** (sqlcmd trên `HotelBooking_DB0_Test` sau khi chạy toàn bộ test; mọi dòng "expect 0" đều ra 0):
+- Bất biến mới: còn 3 quản trị viên hoạt động (A1), không đêm nào bán vượt quỹ phòng (A2), không đơn "Chờ thanh toán" quá 15 phút còn sót (A3), không đơn "Hoàn tất" mà thời điểm trả phòng còn ở tương lai (A4), không review ngoài 4 trạng thái hợp lệ (A6).
+- Lấy từ các bug trước (cùng lần chạy): payment trùng pending 0 · payment `SoTien <= 0` 0 · booking 0đ chờ thanh toán hoặc có payment 0 · khách sạn chờ duyệt/từ chối mang dấu vết duyệt 0 · booking > 30 đêm 0 · payment có nhiều hơn 1 refund 0 · hoàn vượt payment 0 · refund thành công thiếu `NgayHoanTien` hoặc thất bại/chờ có `NgayHoanTien` 0 · refund trên booking chưa hủy 0 · refund kẹt "Chờ xử lý" quá 5 phút 0.
+- Thông tin (không phải lỗi): 3 review "Hiển thị" thuộc khách sạn không công khai (dữ liệu demo có sẵn) — endpoint công khai trả 404 cho các khách sạn đó. Khách sạn id 84 (dữ liệu test cũ) và id 819 (demo "Chờ duyệt") đã ghi ở lượt trước.
 - khách sạn có hơn một payment `Chờ xử lý`: 0 · payment `SoTien <= 0`: 0
 - booking tổng 0 còn "Chờ thanh toán": 0 · booking tổng 0 có dòng THANH_TOAN: 0
 - khách sạn "Chờ duyệt"/"Từ chối" có `NgayDuyet`/`MaTaiKhoanDuyet`: 0 (chưa duyệt thì không có dấu vết duyệt; chỉ "Hoạt động" mới public)
@@ -131,10 +212,17 @@ Cổng VNPAY sandbox hiện tại chỉ có lệnh `refund`; adapter chưa có l
 **E2E:** chưa chạy E2E trên trình duyệt. Các luồng bắt buộc được chạy qua HTTP thật vào ứng dụng Express với DB thật (supertest): Owner tạo hotel → Admin duyệt → hotel public; Search → ngày hợp lệ → quote → booking → tạo payment mô phỏng; khuyến mãi 100% → total 0 → confirmed ngay; double-click payment → đúng 1 pending. Giao diện được kiểm bằng component/integration test (Testing Library), không bằng thao tác thủ công.
 
 ## Schema changes
-NONE (bug #4, #1, #3, #2 và #8)
+NONE (bug #4, #1, #3, #2, #8, #6, #7, #5, #9, #10, #11 và #13)
 (`KHACH_SAN.TrangThai` nhận thêm giá trị "Từ chối" — cột là open domain không có CHECK nên không phải thay đổi schema. Không thêm bảng/cột/FK, không sửa migration.)
 
 ## Ghi chú hành vi cần biết
+- (#6) Tài khoản bị khóa nhận 401 (không phải 403) ở mọi endpoint cần đăng nhập; mỗi request đã xác thực tốn thêm một truy vấn theo khóa chính.
+- (#5) Lazy-expire nghĩa là các GET công khai (search, rooms, quote) có thể ghi (UPDATE đơn quá hạn thành "Đã hủy"); không có job nền.
+- (#9) Test đua giữa đặt phòng và giảm quỹ phòng mang tính xác suất khi bỏ khóa (bắt được 1/3 lần); các kiểm tra logic khác là xác định.
+- (#10) DANH_GIA không có cột ngày nên review công khai sắp theo id và không hiện ngày đánh giá.
+- (#11) Khóa `errors` cũ của lỗi validate bị bỏ (thay bằng `details`); trong repo không còn client nào đọc nó, client bên ngoài (nếu có) phải đổi.
+- (#13) Hoàn tất đơn nay xảy ra ở giờ trả phòng của khách sạn (ví dụ 12:00 giờ VN) thay vì 07:00 giờ VN, nên "Hoàn tất" và quyền đánh giá đến muộn hơn tối đa vài giờ so với trước. Bộ lọc `to` của danh sách thanh toán admin giờ bao trọn ngày cuối.
+- Vẫn còn nguyên (ngoài phạm vi các lượt này): #17 (cookie refresh/SameSite), các lỗi nhỏ #12, #14–#16, #18–#20 trong `LOGIC_AUDIT.md`.
 - Tạo payment khi đã có pending trả lại payment đó với HTTP 201 (không đổi status code để không phá client hiện có).
 - `reject` khách sạn không lưu lý do (không có cột phù hợp).
 - Khách sạn "Từ chối" hiện không có đường nộp lại; cần use case riêng nếu muốn.
@@ -147,4 +235,11 @@ NONE (bug #4, #1, #3, #2 và #8)
 #3 PASS
 #2 PASS
 #8 PASS
-Regression PASS (backend toàn bộ; frontend trừ 2 test và 3 lỗi lint đã có từ trước, ghi ở trên)
+#6 PASS
+#7 PASS
+#5 PASS
+#9 PASS
+#10 PASS
+#11 PASS
+#13 PASS
+Regression PASS: backend 51 file / 623 test PASS, lint/typecheck/build sạch; frontend typecheck/build sạch, 413/415 test PASS — 2 test và 3 lỗi lint là có sẵn từ baseline, đã đối chứng, không phải do thay đổi này. Chưa chạy E2E trên trình duyệt.

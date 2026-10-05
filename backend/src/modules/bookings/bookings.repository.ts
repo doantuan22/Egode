@@ -235,6 +235,7 @@ export class BookingsRepository {
             TenKhachSan: true,
             DiaChiChiTiet: true,
             GioNhanPhong: true,
+            GioTraPhong: true,
             HINH_ANH_KHACH_SAN: {
               where: { AnhDaiDien: true },
               select: { URL: true },

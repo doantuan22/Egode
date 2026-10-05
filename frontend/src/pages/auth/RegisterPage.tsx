@@ -10,12 +10,15 @@ import {
 } from '../../features/auth/schemas';
 
 import { ApiError } from '../../services/apiClient';
+import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/common/Button';
 
 type RegisterIntent = 'customer' | 'partner' | null;
 
 const LOGO_SRC = '/egode_logo.png';
+
+const REGISTER_FIELDS = ['TenDangNhap', 'Email', 'HoTen', 'SoDienThoai', 'NgaySinh', 'GioiTinh', 'MatKhau'] as const;
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -34,6 +37,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -54,8 +58,9 @@ export default function RegisterPage() {
       navigate(intent === 'partner' ? '/partner/apply' : '/', {
         replace: true,
       });
-    } catch {
-      // Lỗi hiển thị thông qua registerMutation
+    } catch (error) {
+      // Field problems go onto their inputs; the banner (registerMutation.error) still says what happened.
+      applyServerFieldErrors(error, setError, REGISTER_FIELDS);
     }
   };
 

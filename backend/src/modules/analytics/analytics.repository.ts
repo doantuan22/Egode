@@ -2,6 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
 import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { PAYMENT_STATUS, REFUND_STATUS } from '../../common/constants/payment';
+import { businessInstantFilter } from './date-range';
 
 const toNumber = (value: unknown): number => Number(value ?? 0);
 
@@ -50,7 +51,7 @@ export class AnalyticsRepository {
       where: {
         ...(scope.maKhachSan ? { MaKhachSan: scope.maKhachSan } : {}),
         ...(scope.from || scope.to
-          ? { NgayTao: { ...(scope.from ? { gte: scope.from } : {}), ...(scope.to ? { lt: scope.to } : {}) } }
+          ? { NgayTao: businessInstantFilter(scope) }
           : {}),
       },
       _count: { _all: true },
@@ -71,7 +72,7 @@ export class AnalyticsRepository {
     const where: Prisma.THANH_TOANWhereInput = {
       TrangThai: PAYMENT_STATUS.SUCCESS,
       ...(scope.from || scope.to
-        ? { ThoiGianGiaoDich: { ...(scope.from ? { gte: scope.from } : {}), ...(scope.to ? { lt: scope.to } : {}) } }
+        ? { ThoiGianGiaoDich: businessInstantFilter(scope) }
         : {}),
       ...(scope.maKhachSan ? { DAT_PHONG: { MaKhachSan: scope.maKhachSan } } : {}),
     };
@@ -85,7 +86,7 @@ export class AnalyticsRepository {
     const where: Prisma.HOAN_TIENWhereInput = {
       TrangThai: REFUND_STATUS.SUCCESS,
       ...(scope.from || scope.to
-        ? { NgayHoanTien: { ...(scope.from ? { gte: scope.from } : {}), ...(scope.to ? { lt: scope.to } : {}) } }
+        ? { NgayHoanTien: businessInstantFilter(scope) }
         : {}),
       ...(scope.maKhachSan ? { THANH_TOAN: { DAT_PHONG: { MaKhachSan: scope.maKhachSan } } } : {}),
     };
@@ -103,7 +104,7 @@ export class AnalyticsRepository {
           TrangThai: { not: BOOKING_STATUS.CANCELLED },
           ...(scope.maKhachSan ? { MaKhachSan: scope.maKhachSan } : {}),
           ...(scope.from || scope.to
-            ? { NgayTao: { ...(scope.from ? { gte: scope.from } : {}), ...(scope.to ? { lt: scope.to } : {}) } }
+            ? { NgayTao: businessInstantFilter(scope) }
             : {}),
         },
       },

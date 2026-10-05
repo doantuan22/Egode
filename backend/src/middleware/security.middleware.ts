@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { env } from '../config/env';
+import { ERROR_CODES } from '../common/errors/error-codes';
 
 export const securityHeaders = (_req: Request, res: Response, next: NextFunction): void => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -44,7 +45,7 @@ export const createRateLimiter = ({ windowMs, max, keyPrefix }: RateLimitOptions
     if (entry.count > max) {
       const retryAfter = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
       res.setHeader('Retry-After', String(retryAfter));
-      res.status(429).json({ success: false, message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau.' });
+      res.status(429).json({ success: false, message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau.', code: ERROR_CODES.TOO_MANY_REQUESTS });
       return;
     }
 

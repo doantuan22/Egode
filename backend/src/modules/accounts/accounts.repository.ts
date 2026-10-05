@@ -1,5 +1,5 @@
 import { getPrismaClient } from '../../config/prisma';
-import type { Prisma } from '../../generated/prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import type { ListAccountsQuery } from './accounts.schemas';
 
 // Role name travels with the account so clients never have to map MaVaiTro
@@ -57,14 +57,37 @@ export class AccountsRepository {
     return prisma.tAI_KHOAN.create({ data, include: withRole });
   }
 
-  async update(maTaiKhoan: number, data: Prisma.TAI_KHOANUpdateInput) {
-    const prisma = getPrismaClient();
-    return prisma.tAI_KHOAN.update({ where: { MaTaiKhoan: maTaiKhoan }, data, include: withRole });
+  async runInTransaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+    return getPrismaClient().$transaction(fn);
   }
 
-  async setStatus(maTaiKhoan: number, trangThai: string) {
-    const prisma = getPrismaClient();
-    return prisma.tAI_KHOAN.update({
+  /**
+   * Locks (U + HOLDLOCK, so the whole key range) every account holding the administrator role until the
+   * transaction ends. Two admins acting on administrator accounts at the same moment queue here; whoever
+   * comes second then counts the admins that are really left.
+   */
+  async lockAdministrators(tx: Prisma.TransactionClient, adminRoleId: number): Promise<void> {
+    await tx.$queryRaw(Prisma.sql`
+      SELECT MaTaiKhoan FROM TAI_KHOAN WITH (UPDLOCK, HOLDLOCK, ROWLOCK) WHERE MaVaiTro = ${adminRoleId}
+    `);
+  }
+
+  async countActiveAdministratorsExcept(tx: Prisma.TransactionClient, adminRoleId: number, exceptMaTaiKhoan: number, activeStatus: string): Promise<number> {
+    return tx.tAI_KHOAN.count({
+      where: { MaVaiTro: adminRoleId, TrangThai: activeStatus, MaTaiKhoan: { not: exceptMaTaiKhoan } },
+    });
+  }
+
+  async findByIdIn(tx: Prisma.TransactionClient, maTaiKhoan: number) {
+    return tx.tAI_KHOAN.findUnique({ where: { MaTaiKhoan: maTaiKhoan }, include: withRole });
+  }
+
+  async update(maTaiKhoan: number, data: Prisma.TAI_KHOANUpdateInput, db: Prisma.TransactionClient = getPrismaClient()) {
+    return db.tAI_KHOAN.update({ where: { MaTaiKhoan: maTaiKhoan }, data, include: withRole });
+  }
+
+  async setStatus(maTaiKhoan: number, trangThai: string, db: Prisma.TransactionClient = getPrismaClient()) {
+    return db.tAI_KHOAN.update({
       where: { MaTaiKhoan: maTaiKhoan },
       data: { TrangThai: trangThai, NgayCapNhat: new Date() },
       include: withRole,
@@ -72,9 +95,8 @@ export class AccountsRepository {
   }
 
   /** G0-10: never hard-delete an account that has related history. */
-  async hasDependentRecords(maTaiKhoan: number): Promise<boolean> {
-    const prisma = getPrismaClient();
-    const counts = await prisma.tAI_KHOAN.findUnique({
+  async hasDependentRecords(maTaiKhoan: number, db: Prisma.TransactionClient = getPrismaClient()): Promise<boolean> {
+    const counts = await db.tAI_KHOAN.findUnique({
       where: { MaTaiKhoan: maTaiKhoan },
       select: {
         _count: {
@@ -101,8 +123,7 @@ export class AccountsRepository {
     return prisma.vAI_TRO.findMany({ select: { MaVaiTro: true, TenVaiTro: true, MoTa: true }, orderBy: { MaVaiTro: 'asc' } });
   }
 
-  async hardDelete(maTaiKhoan: number) {
-    const prisma = getPrismaClient();
-    return prisma.tAI_KHOAN.delete({ where: { MaTaiKhoan: maTaiKhoan } });
+  async hardDelete(maTaiKhoan: number, db: Prisma.TransactionClient = getPrismaClient()) {
+    return db.tAI_KHOAN.delete({ where: { MaTaiKhoan: maTaiKhoan } });
   }
 }

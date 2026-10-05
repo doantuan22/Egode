@@ -52,8 +52,8 @@ export class AuthService {
       this.authRepository.findByEmail(input.Email),
       this.authRepository.findByUsername(input.TenDangNhap),
     ]);
-    if (existingEmail) throw AppError.conflict('Email đã được sử dụng');
-    if (existingUsername) throw AppError.conflict('Tên đăng nhập đã được sử dụng');
+    if (existingEmail) throw AppError.conflict('Email đã được sử dụng', [{ field: 'Email', message: 'Email đã được sử dụng' }]);
+    if (existingUsername) throw AppError.conflict('Tên đăng nhập đã được sử dụng', [{ field: 'TenDangNhap', message: 'Tên đăng nhập đã được sử dụng' }]);
 
     const customerRole = await this.rolesRepository.findByName(ROLE_NAMES.CUSTOMER);
     if (!customerRole) {
@@ -137,7 +137,8 @@ export class AuthService {
   /** Always preserves the same observable result for known/unknown emails. */
   async forgotPassword(input: ForgotPasswordInput): Promise<void> {
     const account = await this.authRepository.findByEmail(input.Email);
-    if (!account) return;
+    // A locked account gets no reset mail either: same observable result as an unknown email.
+    if (!account || account.TrangThai === ACCOUNT_STATUS.LOCKED) return;
 
     const token = signPasswordResetToken(account.MaTaiKhoan, account.MatKhau);
     const resetUrl = new URL('/reset-password', env.FRONTEND_URL);
@@ -162,6 +163,11 @@ export class AuthService {
 
     const account = await this.authRepository.findById(decoded.maTaiKhoan);
     if (!account || !matchesPasswordFingerprint(decoded.fp, account.MatKhau)) {
+      throw AppError.badRequest('Token đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng');
+    }
+    // Only an administrator unlocks an account. A reset token minted before the lock must not be a way around it
+    // (and the password is left untouched, so nothing changes for a locked account).
+    if (account.TrangThai === ACCOUNT_STATUS.LOCKED) {
       throw AppError.badRequest('Token đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng');
     }
 

@@ -17,6 +17,7 @@ import {
 import { FakeRefundGateway } from '../../test/fakes';
 import { getPrismaClient } from '../../config/prisma';
 import { env } from '../../config/env';
+import { addDaysToDateKey, businessToday } from '../../common/utils/business-time';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { PAYMENT_STATUS, REFUND_STATUS } from '../../common/constants/payment';
@@ -27,12 +28,8 @@ import { PaymentsRepository } from '../payments/payments.repository';
 import { encodeGatewayRef, signVnpayParams } from '../payments/vnpay';
 import { env } from '../../config/env';
 
-const addDays = (days: number): Date => {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d;
-};
+// A stay date is a Vietnam calendar day; refund tiers are measured from its check-in INSTANT (date + hotel check-in time).
+const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 
 const loginAndGetToken = async (email: string, password: string) => {
   const res = await request(app).post('/api/auth/login').send({ identifier: email, MatKhau: password });
@@ -329,11 +326,11 @@ describe('BookingsService.cancelBooking — refund tier selection & amount (serv
     expect(result.ThanhToan[0].HoanTien[0].SoTienHoan).toBe(500_000);
   });
 
-  it('<24h before check-in → 0% refund, no HOAN_TIEN row at all', async () => {
+  it('<24h before check-in → 0% refund, no HOAN_TIEN row at all (check-in today: always within 24h of now)', async () => {
     const fakeGateway = new FakeRefundGateway({ success: true, message: 'ok' });
     const service = new BookingsService(new BookingsRepository(), fakeGateway);
 
-    const booking = await makeBooking(BOOKING_STATUS.CONFIRMED, addDays(1), addDays(2), { tongTienPhong: 1_000_000 });
+    const booking = await makeBooking(BOOKING_STATUS.CONFIRMED, addDays(0), addDays(1), { tongTienPhong: 1_000_000 });
     await createTestPayment(booking.MaDatPhong, 1_000_000, PAYMENT_STATUS.SUCCESS, encodeGatewayRef('PAYTEST3', '900003', '20260101000000'));
 
     const result = await service.cancelBooking(booking.MaDatPhong, customerId, {}, '127.0.0.1');

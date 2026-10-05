@@ -1,6 +1,16 @@
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { adminGetReview, adminListReviews, createReview, getMyReview, moderateReview, removeViolationReview } from './api';
+import { adminGetReview, adminListReviews, createReview, getHotelReviews, getMyReview, moderateReview, removeViolationReview } from './api';
 import type { AdminReviewListQuery, CreateReviewRequest } from './types';
+
+/** Public reviews of a hotel (no sign-in needed). Keyed under "hotels" so they stay cached across sessions like the rest of the catalogue. */
+export function useHotelReviews(hotelId: number, page: number, limit: number) {
+  return useQuery({
+    queryKey: ['hotels', 'reviews', hotelId, page, limit],
+    queryFn: () => getHotelReviews(hotelId, page, limit),
+    enabled: Number.isFinite(hotelId) && hotelId > 0,
+    placeholderData: keepPreviousData,
+  });
+}
 
 export function useMyReview(bookingId: number, enabled = true) {
   return useQuery({

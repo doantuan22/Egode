@@ -1,6 +1,8 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
 import type { AdminListReviewsQuery } from './reviews.schemas';
+import { REVIEW_STATUS } from '../../common/constants/review';
+import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 
 // Moderation responses replace the cached admin detail, so retain all relations.
 const adminReviewDetailInclude = {
@@ -19,7 +21,60 @@ export interface CreateReviewData {
   trangThai: string;
 }
 
+export interface RatingSummary {
+  DiemTrungBinh: number | null;
+  SoLuongDanhGia: number;
+}
+
 export class ReviewsRepository {
+  /** Only "Hiển thị" reviews are public; every other status (Chờ duyệt, Ẩn, Vi phạm) is invisible and uncounted. */
+  async listPublicByHotel(maKhachSan: number, page: number, limit: number) {
+    const prisma = getPrismaClient();
+    const where = { MaKhachSan: maKhachSan, TrangThai: REVIEW_STATUS.VISIBLE };
+    const [items, total] = await Promise.all([
+      prisma.dANH_GIA.findMany({
+        where,
+        orderBy: { MaDanhGia: 'desc' }, // DANH_GIA has no date column; ids grow with time
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          MaDanhGia: true,
+          DiemDanhGia: true,
+          NoiDung: true,
+          HINH_ANH_DANH_GIA: { select: { URL: true }, orderBy: { MaHinhAnhDanhGia: 'asc' } },
+          TAI_KHOAN: { select: { HoTen: true } },
+        },
+      }),
+      prisma.dANH_GIA.count({ where }),
+    ]);
+    return { items, total };
+  }
+
+  /** Average score and count of the visible reviews, for several hotels in one query. */
+  async ratingSummaries(maKhachSanList: number[]): Promise<Map<number, RatingSummary>> {
+    const summaries = new Map<number, RatingSummary>();
+    if (maKhachSanList.length === 0) return summaries;
+    const prisma = getPrismaClient();
+    const rows = await prisma.dANH_GIA.groupBy({
+      by: ['MaKhachSan'],
+      where: { MaKhachSan: { in: maKhachSanList }, TrangThai: REVIEW_STATUS.VISIBLE },
+      _avg: { DiemDanhGia: true },
+      _count: { _all: true },
+    });
+    for (const row of rows) {
+      summaries.set(row.MaKhachSan, {
+        DiemTrungBinh: row._avg.DiemDanhGia === null ? null : Math.round(row._avg.DiemDanhGia * 10) / 10,
+        SoLuongDanhGia: row._count._all,
+      });
+    }
+    return summaries;
+  }
+
+  async isPublicHotel(maKhachSan: number): Promise<boolean> {
+    const prisma = getPrismaClient();
+    return (await prisma.kHACH_SAN.count({ where: { MaKhachSan: maKhachSan, TrangThai: HOTEL_STATUS.ACTIVE } })) > 0;
+  }
+
   async findBookingForReview(maDatPhong: number) {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.findUnique({

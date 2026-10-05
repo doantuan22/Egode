@@ -46,7 +46,7 @@ export class AccountsController {
   update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };
-      const account = await this.accountsService.update(id, req.body);
+      const account = await this.accountsService.update(id, req.user!.maTaiKhoan, req.body);
       sendSuccess(res, account, 'Cập nhật tài khoản thành công');
     } catch (error) {
       next(error);
@@ -56,7 +56,7 @@ export class AccountsController {
   lock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };
-      const account = await this.accountsService.lock(id);
+      const account = await this.accountsService.lock(id, req.user!.maTaiKhoan);
       sendSuccess(res, account, 'Đã khóa tài khoản');
     } catch (error) {
       next(error);
@@ -76,7 +76,7 @@ export class AccountsController {
   remove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };
-      const result = await this.accountsService.safeDelete(id);
+      const result = await this.accountsService.safeDelete(id, req.user!.maTaiKhoan);
       sendSuccess(
         res,
         result,

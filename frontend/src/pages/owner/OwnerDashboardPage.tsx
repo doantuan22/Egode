@@ -7,7 +7,8 @@ import { PageSpinner } from '../../components/common/PageSpinner';
 import { OwnerScopeGate } from '../../components/owner/OwnerScopeGate';
 import { useScopedHotels } from '../../components/owner/useScopedHotels';
 import { useOwnerHotelAnalytics } from '../../features/analytics/hooks';
-import { formatCurrencyVND, toDateInputValue } from '../../lib/utils';
+import { formatCurrencyVND } from '../../lib/utils';
+import { businessToday } from '../../lib/stayDates';
 import { BOOKING_STATUS } from '../../features/bookings/status';
 import { changeVersusPrevious, computeKpis, lastDaysRanges } from '../../features/analytics/kpi';
 import type { OwnerAnalytics } from '../../features/analytics/types';
@@ -28,7 +29,7 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
   const ranges = useMemo(() => lastDaysRanges(KPI_PERIOD_DAYS), []);
   const currentAnalytics = useOwnerHotelAnalytics(analyticsHotelId, ranges.current);
   const previousAnalytics = useOwnerHotelAnalytics(analyticsHotelId, ranges.previous);
-  const today = toDateInputValue(new Date());
+  const today = businessToday();
   const checkInsToday = useOwnerBookings(analyticsHotelId, { page: 1, limit: 1, from: today, to: today, trangThai: BOOKING_STATUS.CONFIRMED });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
