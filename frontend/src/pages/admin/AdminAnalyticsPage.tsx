@@ -24,8 +24,11 @@ export default function AdminAnalyticsPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Button 
-            onClick={() => analyticsQuery.refetch()} variant="outline"
+          <Button
+            type="button"
+            onClick={() => analyticsQuery.refetch()}
+            disabled={analyticsQuery.isFetching}
+            variant="outline"
           >
             <i className={`ph ph-arrows-clockwise text-[16px] ${analyticsQuery.isFetching ? 'animate-spin' : ''}`}></i>
             <span>Làm mới dữ liệu</span>

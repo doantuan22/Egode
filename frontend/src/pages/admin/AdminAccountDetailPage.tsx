@@ -84,9 +84,6 @@ export default function AdminAccountDetailPage() {
         {/* Header */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg uppercase">
-              {account.HoTen.charAt(0)}
-            </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold text-heading">{account.HoTen}</h3>

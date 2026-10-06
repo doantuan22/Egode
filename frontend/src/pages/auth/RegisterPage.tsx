@@ -1,1280 +1,2413 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
 import { useForm } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Link,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
 
-import { useLogin } from '../../features/auth/hooks';
+import { Link, useNavigate } from 'react-router-dom';
+
+
+
+import { useRegister } from '../../features/auth/hooks';
 
 import {
-  loginSchema,
-  type LoginFormValues,
+
+  registerSchema,
+
+  RegisterFormValues,
+
 } from '../../features/auth/schemas';
 
+
+
 import { ApiError } from '../../services/apiClient';
-import { ROLE_HOME } from '../../lib/roles';
-import { decodeAccessToken } from '../../lib/jwt';
-import { useAuthStore } from '../../lib/authStore';
+
 import { cn } from '../../lib/utils';
 
 import { Button } from '../../components/common/Button';
 
-const LOGO_SRC = '/egode_logo.png';
 
-export default function LoginPage() {
+
+type RegisterIntent = 'customer' | 'partner' | null;
+
+
+
+export default function RegisterPage() {
+
   const navigate = useNavigate();
 
-  const location = useLocation() as {
-    state?: {
-      from?: {
-        pathname?: string;
-        search?: string;
-      };
-    };
-  };
 
-  const loginMutation = useLogin();
 
-  const [showSessionExpired] = useState(
-    () => useAuthStore.getState().sessionExpired
-  );
+  const [intent, setIntent] =
+
+    useState<RegisterIntent>(null);
+
+
+
+  const [selectedIntent, setSelectedIntent] =
+
+    useState<Exclude<RegisterIntent, null> | null>(
+
+      null
+
+    );
+
+
 
   const [showPwd, setShowPwd] = useState(false);
 
-  useEffect(() => {
-    useAuthStore
-      .getState()
-      .acknowledgeSessionExpired();
-  }, []);
+  const [showConfirmPwd, setShowConfirmPwd] =
+
+    useState(false);
+
+
+
+  const registerMutation = useRegister();
+
+
 
   const {
+
     register,
+
     handleSubmit,
 
-    formState: {
-      errors,
-      isSubmitting,
-    },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    formState: { errors, isSubmitting },
+
+  } = useForm<RegisterFormValues>({
+
+    resolver: zodResolver(registerSchema),
+
   });
 
+
+
   const onSubmit = async (
-    data: LoginFormValues
+
+    data: RegisterFormValues
+
   ) => {
+
     try {
-      const result =
-        await loginMutation.mutateAsync(data);
 
-      const decoded =
-        decodeAccessToken(
-          result.accessToken
-        );
+      await registerMutation.mutateAsync({
 
-      const fallback =
-        (decoded &&
-          ROLE_HOME[decoded.role]) ||
-        '/';
+        TenDangNhap: data.TenDangNhap,
 
-      const returnTo =
-        location.state?.from;
+        Email: data.Email,
+
+        MatKhau: data.MatKhau,
+
+        HoTen: data.HoTen,
+
+        SoDienThoai: data.SoDienThoai,
+
+        NgaySinh:
+
+          data.NgaySinh || undefined,
+
+        GioiTinh:
+
+          data.GioiTinh || undefined,
+
+      });
+
+
 
       navigate(
-        returnTo?.pathname
-          ? `${returnTo.pathname}${
-              returnTo.search ?? ''
-            }`
-          : fallback,
-        {
-          replace: true,
-        }
+
+        intent === 'partner'
+
+          ? '/partner/apply'
+
+          : '/',
+
+        { replace: true }
+
       );
+
     } catch {
-      // Error displayed below
+
+      // lỗi hiển thị qua registerMutation
+
     }
+
   };
 
-  const busy =
-    isSubmitting ||
-    loginMutation.isPending;
 
-  const inputClass = (
-    hasError?: boolean
-  ) =>
+
+  const inputClass = (hasError?: boolean) =>
+
     cn(
+
       `
-        h-[54px]
+
         w-full
-        rounded-[14px]
+
+        rounded-xl
+
         border
-        bg-white
-        py-0
-        text-[14px]
-        font-medium
-        leading-none
-        text-slate-800
+
+        bg-white/95
+
+        py-3
+
+        text-sm
+
+        text-slate-900
+
         outline-none
 
         transition-all
+
         duration-200
 
-        placeholder:font-normal
         placeholder:text-slate-400
 
-        hover:border-slate-300
-
         focus:border-blue-500
+
         focus:ring-4
+
         focus:ring-blue-500/10
+
       `,
+
       hasError
-        ? `
-            border-red-400
-            bg-red-50/30
-          `
-        : `
-            border-slate-200
-          `
+
+        ? 'border-danger bg-danger-light/30'
+
+        : 'border-slate-200 hover:border-slate-300'
+
     );
 
-  return (
-    <main
-      className="
-        relative
-        isolate
-        min-h-[calc(100vh-var(--header-height))]
-        overflow-hidden
-        bg-slate-950
-        bg-cover
-        bg-center
-        bg-no-repeat
-      "
-      style={{
-        backgroundImage:
-          "url('/login_bg.jpg')",
 
-        fontFamily:
-          '"Be Vietnam Pro", sans-serif',
+
+  return (
+
+    <div
+
+      className="
+
+        relative
+
+        min-h-[calc(100vh-64px)]
+
+        overflow-hidden
+
+        bg-cover
+
+        bg-center
+
+        bg-no-repeat
+
+      "
+
+      style={{
+
+        backgroundImage:
+
+          "url('/register_bg.jpg')",
+
       }}
+
     >
-      {/* ==========================
-          BACKGROUND
-      ========================== */}
+
+      {/* BACKGROUND */}
 
       <div
+
         className="
+
           absolute
+
           inset-0
-          -z-10
 
           bg-gradient-to-r
 
-          from-slate-950/80
-          via-slate-950/42
-          to-slate-900/5
+          from-slate-950/86
+
+          via-slate-950/62
+
+          to-sky-950/28
+
         "
+
       />
 
+
+
       <div
+
         className="
+
           absolute
+
+          inset-0
+
+          bg-[radial-gradient(circle_at_78%_18%,rgba(56,189,248,0.14),transparent_28%)]
+
+        "
+
+      />
+
+
+
+      <div
+
+        className="
+
+          absolute
+
           inset-x-0
+
           bottom-0
-          -z-10
-          h-[55%]
+
+          h-[42%]
 
           bg-gradient-to-t
-          from-slate-950/55
-          via-slate-950/15
+
+          from-slate-950/38
+
           to-transparent
+
         "
+
       />
 
-      {/* Blue glow */}
+
+
+      {/* CONTENT */}
 
       <div
+
         className="
-          pointer-events-none
-          absolute
-          -left-40
-          top-[22%]
-          -z-10
 
-          h-[500px]
-          w-[500px]
+          relative
 
-          rounded-full
+          z-10
 
-          bg-cyan-400/10
-
-          blur-[130px]
-        "
-      />
-
-      {/* ==========================
-          PAGE
-      ========================== */}
-
-      <div
-        className="
           mx-auto
 
           flex
 
-          min-h-[calc(100vh-var(--header-height))]
+          min-h-[calc(100vh-64px)]
 
-          w-full
           max-w-[1500px]
 
           items-center
 
-          px-6
-          py-8
+          px-5
+
+          py-10
+
+          sm:px-8
 
           lg:px-12
 
           xl:px-16
+
         "
+
       >
+
         <div
+
           className="
+
             grid
+
             w-full
+
             items-center
 
-            gap-10
+            gap-12
 
-            lg:grid-cols-[minmax(0,1.15fr)_minmax(430px,520px)]
+            lg:grid-cols-[0.95fr_1.05fr]
 
             xl:gap-20
+
           "
+
         >
 
-          {/* ==========================================
-              LEFT
-          ========================================== */}
+          {/* ============================
 
-          <section
-            className="
-              hidden
-              lg:block
-            "
-          >
-            <div className="max-w-[760px]">
+              LEFT HERO
 
-              {/* Mini badge */}
+          ============================ */}
 
-              <div
-                className="
-                  mb-7
+          <div className="hidden lg:block">
 
-                  inline-flex
-                  items-center
-                  gap-2.5
+            {/* BADGE */}
 
-                  rounded-full
+            <div
 
-                  border
-                  border-white/20
-
-                  bg-slate-950/35
-
-                  px-5
-                  py-2.5
-
-                  text-[14px]
-                  font-semibold
-
-                  text-slate-100
-
-                  shadow-lg
-
-                  backdrop-blur-md
-                "
-              >
-                <i
-                  className="
-                    ph
-                    ph-map-pin
-
-                    text-[19px]
-                    text-cyan-300
-                  "
-                  aria-hidden="true"
-                />
-
-                Đặt phòng dễ dàng cùng Egode
-              </div>
-
-              {/* MAIN HEADLINE */}
-
-              <h1
-                className="
-                  max-w-[720px]
-
-                  text-[clamp(3rem,4.3vw,4.65rem)]
-
-                  font-extrabold
-
-                  leading-[1.12]
-
-                  tracking-[-0.045em]
-                "
-                style={{
-                  color: '#ffffff',
-
-                  textShadow:
-                    '0 4px 18px rgba(0,0,0,0.55)',
-                }}
-              >
-                <span
-                  className="
-                    block
-                    !text-white
-                  "
-                >
-                  Chào mừng trở lại
-                </span>
-
-                <span
-                  className="
-                    mt-2
-                    block
-
-                    bg-gradient-to-r
-                    from-cyan-300
-                    via-sky-300
-                    to-blue-400
-
-                    bg-clip-text
-
-                    !text-transparent
-
-                    drop-shadow-[0_4px_12px_rgba(14,165,233,0.25)]
-                  "
-                >
-                  cùng Egode.
-                </span>
-              </h1>
-
-              {/* decorative line */}
-
-              <div
-                className="
-                  relative
-
-                  mt-6
-
-                  h-[4px]
-                  w-[150px]
-
-                  overflow-hidden
-
-                  rounded-full
-
-                  bg-white/15
-                "
-              >
-                <div
-                  className="
-                    absolute
-                    inset-y-0
-                    left-0
-
-                    w-[80%]
-
-                    rounded-full
-
-                    bg-gradient-to-r
-                    from-cyan-300
-                    to-blue-500
-
-                    shadow-[0_0_18px_rgba(56,189,248,0.85)]
-                  "
-                />
-              </div>
-
-              {/* DESCRIPTION */}
-
-              <p
-                className="
-                  mt-6
-
-                  max-w-[670px]
-
-                  text-[16px]
-
-                  font-medium
-
-                  leading-[1.9]
-
-                  !text-white
-                "
-                style={{
-                  textShadow:
-                    '0 2px 8px rgba(0,0,0,0.75)',
-                }}
-              >
-                Đăng nhập để tiếp tục tìm kiếm
-                khách sạn, quản lý chuyến đi và
-                hoàn tất những kỳ nghỉ bạn đang
-                lên kế hoạch.
-              </p>
-
-              {/* ======================================
-                  FEATURE CARDS
-              ====================================== */}
-
-              <div
-                className="
-                  mt-9
-
-                  grid
-
-                  max-w-[720px]
-
-                  grid-cols-3
-
-                  gap-4
-                "
-              >
-                <LoginFeatureCard
-                  icon="ph-map-pin"
-                  title="Khám phá"
-                  description="Tìm kiếm điểm đến và khách sạn phù hợp."
-                />
-
-                <LoginFeatureCard
-                  icon="ph-shield-check"
-                  title="An tâm"
-                  description="Thông tin tài khoản của bạn được bảo vệ."
-                />
-
-                <LoginFeatureCard
-                  icon="ph-lightning"
-                  title="Nhanh chóng"
-                  description="Tiếp tục đặt phòng chỉ trong vài bước."
-                />
-              </div>
-
-            </div>
-          </section>
-
-          {/* ==========================================
-              RIGHT
-          ========================================== */}
-
-          <div
-            className="
-              flex
-              w-full
-
-              justify-center
-
-              lg:justify-end
-            "
-          >
-            <section
               className="
-                w-full
-                max-w-[510px]
 
-                rounded-[30px]
+                mb-7
+
+                inline-flex
+
+                items-center
+
+                gap-2.5
+
+                rounded-full
 
                 border
-                border-white/70
 
-                bg-white/95
+                border-white/20
 
-                px-8
-                py-9
+                bg-slate-950/35
 
-                shadow-[0_30px_100px_rgba(15,23,42,0.38)]
+                px-5
+
+                py-2.5
+
+                text-sm
+
+                font-bold
+
+                tracking-wide
+
+                text-slate-100
+
+                shadow-lg
 
                 backdrop-blur-xl
 
-                sm:px-10
               "
+
             >
 
-              {/* ======================================
-                  HEADER
-              ====================================== */}
+              <i className="ph ph-buildings text-lg text-sky-300" />
 
-              <header
+              <span>EGODE</span>
+
+            </div>
+
+
+
+            {/* TITLE */}
+
+            <h1
+
+              className="
+
+                max-w-[680px]
+
+                text-[48px]
+
+                font-bold
+
+                leading-[1.08]
+
+                tracking-[-0.03em]
+
+                !text-white
+
+                xl:text-[62px]
+
+              "
+
+              style={{
+
+                fontFamily:
+
+                  '"Georgia", "Times New Roman", serif',
+
+                color: '#FFFFFF',
+
+                textShadow:
+
+                  '0 3px 8px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.30)',
+
+              }}
+
+            >
+
+              Khám phá kỳ nghỉ
+
+
+
+              <span
+
                 className="
-                  mb-9
 
-                  flex
-                  flex-col
+                  mt-1
 
-                  items-center
+                  block
 
-                  text-center
+                  bg-gradient-to-r
+
+                  from-cyan-200
+
+                  via-sky-300
+
+                  to-blue-400
+
+                  bg-clip-text
+
+                  !text-transparent
+
                 "
+
+                style={{
+
+                  textShadow: 'none',
+
+                }}
+
               >
 
-                {/* LOGO */}
+                theo cách của bạn.
+
+              </span>
+
+            </h1>
+
+
+
+            {/* DESCRIPTION */}
+
+            <p
+
+              className="
+
+                mt-6
+
+                max-w-[600px]
+
+                text-[17px]
+
+                font-medium
+
+                leading-8
+
+                !text-white
+
+              "
+
+              style={{
+
+                color: '#FFFFFF',
+
+                textShadow:
+
+                  '0 2px 6px rgba(0,0,0,0.78)',
+
+              }}
+
+            >
+
+              Tạo tài khoản Egode để tìm kiếm khách
+
+              sạn, đặt phòng nhanh chóng và quản lý
+
+              toàn bộ chuyến đi của bạn trên một nền
+
+              tảng duy nhất.
+
+            </p>
+
+
+
+            {/* FEATURE CARDS */}
+
+            <div
+
+              className="
+
+                mt-9
+
+                grid
+
+                max-w-[680px]
+
+                grid-cols-3
+
+                gap-4
+
+              "
+
+            >
+
+              <RegisterFeatureCard
+
+                icon="ph-magnifying-glass"
+
+                title="Dễ tìm kiếm"
+
+                description="Tìm nơi lưu trú phù hợp nhanh chóng."
+
+              />
+
+
+
+              <RegisterFeatureCard
+
+                icon="ph-shield-check"
+
+                title="An toàn"
+
+                description="Quản lý tài khoản và đơn đặt phòng."
+
+              />
+
+
+
+              <RegisterFeatureCard
+
+                icon="ph-lightning"
+
+                title="Tiện lợi"
+
+                description="Trải nghiệm đặt phòng đơn giản."
+
+              />
+
+            </div>
+
+          </div>
+
+
+
+          {/* ============================
+
+              RIGHT
+
+          ============================ */}
+
+          <div className="flex justify-center lg:justify-end">
+
+            {intent === null ? (
+
+              <div
+
+                className="
+
+                  w-full
+
+                  max-w-[570px]
+
+                  rounded-[32px]
+
+                  border
+
+                  border-white/70
+
+                  bg-white/95
+
+                  p-7
+
+                  shadow-[0_30px_100px_rgba(15,23,42,0.32)]
+
+                  backdrop-blur-2xl
+
+                  sm:p-10
+
+                "
+
+              >
 
                 <div
+
                   className="
-                    mb-6
+
+                    mx-auto
+
+                    mb-5
 
                     flex
-                    h-[66px]
+
+                    h-16
+
+                    w-16
 
                     items-center
+
                     justify-center
+
+                    rounded-[20px]
+
+                    bg-gradient-to-br
+
+                    from-blue-50
+
+                    to-blue-100
+
+                    text-blue-600
+
+                    shadow-sm
+
                   "
+
                 >
-                  <img
-                    src={LOGO_SRC}
-                    alt="Egode"
 
-                    className="
-                      h-[60px]
-                      w-auto
+                  <i className="ph ph-user-plus text-[28px]" />
 
-                      object-contain
-
-                      drop-shadow-[0_5px_10px_rgba(37,99,235,0.15)]
-                    "
-                  />
                 </div>
 
-                {/* TITLE */}
 
-                <h2
-                  className="
-                    !m-0
 
-                    bg-gradient-to-r
-                    from-slate-900
-                    via-blue-900
-                    to-blue-600
+                <div className="mb-8 text-center">
 
-                    bg-clip-text
+                  <h1
 
-                    text-[31px]
-
-                    font-extrabold
-
-                    leading-[1.3]
-
-                    tracking-[-0.035em]
-
-                    !text-transparent
-                  "
-                >
-                  Đăng nhập
-                </h2>
-
-                {/* SUBTITLE */}
-
-                <p
-                  className="
-                    mx-auto
-                    mt-3
-
-                    max-w-[365px]
-
-                    text-[14px]
-
-                    font-normal
-
-                    leading-6
-
-                    !text-slate-500
-                  "
-                >
-                  Chào mừng bạn quay lại.
-                  Đăng nhập để tiếp tục trải nghiệm{' '}
-                  <span
                     className="
-                      font-semibold
-                      text-blue-600
+
+                      text-[30px]
+
+                      font-extrabold
+
+                      tracking-[-0.025em]
+
+                      text-slate-900
+
                     "
+
                   >
-                    cùng Egode.
+
+                    Tạo tài khoản
+
+                  </h1>
+
+
+
+                  <p className="mt-2 text-[15px] text-slate-500">
+
+                    Chọn cách bạn muốn sử dụng
+
+                    Egode
+
+                  </p>
+
+                </div>
+
+
+
+                <fieldset className="space-y-4">
+
+                  <legend className="sr-only">
+
+                    Chọn mục đích đăng ký
+
+                  </legend>
+
+
+
+                  {/* CUSTOMER */}
+
+                  <label
+
+                    className={cn(
+
+                      `
+
+                        group
+
+                        flex
+
+                        cursor-pointer
+
+                        items-center
+
+                        gap-4
+
+                        rounded-2xl
+
+                        border-2
+
+                        p-5
+
+                        transition-all
+
+                        duration-200
+
+                      `,
+
+                      selectedIntent === 'customer'
+
+                        ? `
+
+                            border-blue-500
+
+                            bg-blue-50/70
+
+                            shadow-[0_8px_25px_rgba(37,99,235,0.10)]
+
+                          `
+
+                        : `
+
+                            border-slate-200
+
+                            bg-white
+
+                            hover:-translate-y-0.5
+
+                            hover:border-blue-300
+
+                            hover:shadow-lg
+
+                          `
+
+                    )}
+
+                  >
+
+                    <input
+
+                      type="radio"
+
+                      name="register-intent"
+
+                      value="customer"
+
+                      checked={
+
+                        selectedIntent ===
+
+                        'customer'
+
+                      }
+
+                      onChange={() =>
+
+                        setSelectedIntent(
+
+                          'customer'
+
+                        )
+
+                      }
+
+                      className="sr-only"
+
+                    />
+
+
+
+                    <div
+
+                      className={cn(
+
+                        `
+
+                          flex
+
+                          h-14
+
+                          w-14
+
+                          shrink-0
+
+                          items-center
+
+                          justify-center
+
+                          rounded-2xl
+
+                          text-[24px]
+
+                          transition-all
+
+                        `,
+
+                        selectedIntent === 'customer'
+
+                          ? 'bg-blue-600 text-white shadow-md'
+
+                          : 'bg-sky-50 text-sky-600'
+
+                      )}
+
+                    >
+
+                      <i className="ph ph-suitcase-rolling" />
+
+                    </div>
+
+
+
+                    <div className="min-w-0 flex-1">
+
+                      <div className="flex items-center justify-between gap-3">
+
+                        <strong className="text-[17px] font-bold text-slate-900">
+
+                          Khách hàng
+
+                        </strong>
+
+
+
+                        {selectedIntent ===
+
+                          'customer' && (
+
+                          <i className="ph-fill ph-check-circle text-[22px] text-blue-600" />
+
+                        )}
+
+                      </div>
+
+
+
+                      <p className="mt-1.5 text-sm leading-6 text-slate-500">
+
+                        Đặt phòng, quản lý chuyến đi,
+
+                        đánh giá khách sạn và nhận ưu
+
+                        đãi.
+
+                      </p>
+
+                    </div>
+
+                  </label>
+
+
+
+                  {/* PARTNER */}
+
+                  <label
+
+                    className={cn(
+
+                      `
+
+                        group
+
+                        flex
+
+                        cursor-pointer
+
+                        items-center
+
+                        gap-4
+
+                        rounded-2xl
+
+                        border-2
+
+                        p-5
+
+                        transition-all
+
+                        duration-200
+
+                      `,
+
+                      selectedIntent === 'partner'
+
+                        ? `
+
+                            border-emerald-500
+
+                            bg-emerald-50/70
+
+                            shadow-[0_8px_25px_rgba(16,185,129,0.10)]
+
+                          `
+
+                        : `
+
+                            border-slate-200
+
+                            bg-white
+
+                            hover:-translate-y-0.5
+
+                            hover:border-emerald-300
+
+                            hover:shadow-lg
+
+                          `
+
+                    )}
+
+                  >
+
+                    <input
+
+                      type="radio"
+
+                      name="register-intent"
+
+                      value="partner"
+
+                      checked={
+
+                        selectedIntent ===
+
+                        'partner'
+
+                      }
+
+                      onChange={() =>
+
+                        setSelectedIntent(
+
+                          'partner'
+
+                        )
+
+                      }
+
+                      className="sr-only"
+
+                    />
+
+
+
+                    <div
+
+                      className={cn(
+
+                        `
+
+                          flex
+
+                          h-14
+
+                          w-14
+
+                          shrink-0
+
+                          items-center
+
+                          justify-center
+
+                          rounded-2xl
+
+                          text-[24px]
+
+                          transition-all
+
+                        `,
+
+                        selectedIntent === 'partner'
+
+                          ? 'bg-emerald-600 text-white shadow-md'
+
+                          : 'bg-emerald-50 text-emerald-600'
+
+                      )}
+
+                    >
+
+                      <i className="ph ph-buildings" />
+
+                    </div>
+
+
+
+                    <div className="min-w-0 flex-1">
+
+                      <div className="flex items-center justify-between gap-3">
+
+                        <strong className="text-[17px] font-bold text-slate-900">
+
+                          Đối tác khách sạn
+
+                        </strong>
+
+
+
+                        {selectedIntent ===
+
+                          'partner' && (
+
+                          <i className="ph-fill ph-check-circle text-[22px] text-emerald-600" />
+
+                        )}
+
+                      </div>
+
+
+
+                      <p className="mt-1.5 text-sm leading-6 text-slate-500">
+
+                        Đăng khách sạn, quản lý
+
+                        phòng, giá bán và hoạt động
+
+                        kinh doanh.
+
+                      </p>
+
+                    </div>
+
+                  </label>
+
+                </fieldset>
+
+
+
+                <Button
+
+                  type="button"
+
+                  size="lg"
+
+                  className="mt-7 w-full"
+
+                  disabled={!selectedIntent}
+
+                  onClick={() =>
+
+                    selectedIntent &&
+
+                    setIntent(selectedIntent)
+
+                  }
+
+                >
+
+                  Tiếp tục
+
+                  <i className="ph ph-arrow-right ml-1 text-lg" />
+
+                </Button>
+
+
+
+                <div className="my-7 flex items-center gap-4">
+
+                  <div className="h-px flex-1 bg-slate-200" />
+
+                  <span className="text-xs font-medium text-slate-400">
+
+                    hoặc
+
                   </span>
-                </p>
-              </header>
 
-              {/* SESSION EXPIRED */}
+                  <div className="h-px flex-1 bg-slate-200" />
 
-              {showSessionExpired &&
-                !loginMutation.isError && (
-                  <div
-                    role="alert"
+                </div>
+
+
+
+                <p className="text-center text-sm text-slate-500">
+
+                  Đã có tài khoản?{' '}
+
+                  <Link
+
+                    to="/login"
 
                     className="
+
+                      font-bold
+
+                      text-blue-600
+
+                      transition
+
+                      hover:text-blue-700
+
+                      hover:underline
+
+                    "
+
+                  >
+
+                    Đăng nhập
+
+                  </Link>
+
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div
+
+                className="
+
+                  w-full
+
+                  max-w-[730px]
+
+                  overflow-hidden
+
+                  rounded-[30px]
+
+                  border
+
+                  border-white/70
+
+                  bg-white/95
+
+                  shadow-[0_30px_100px_rgba(15,23,42,0.32)]
+
+                  backdrop-blur-2xl
+
+                "
+
+              >
+
+                {/* FORM HEADER */}
+
+                <div className="border-b border-slate-100 px-7 pb-6 pt-7 sm:px-9">
+
+                  <button
+
+                    type="button"
+
+                    onClick={() =>
+
+                      setIntent(null)
+
+                    }
+
+                    className="
+
                       mb-5
 
                       flex
+
+                      items-center
+
+                      gap-1.5
+
+                      rounded-lg
+
+                      px-2
+
+                      py-1
+
+                      text-sm
+
+                      font-semibold
+
+                      text-slate-500
+
+                      transition
+
+                      hover:bg-slate-100
+
+                      hover:text-slate-900
+
+                    "
+
+                  >
+
+                    <i className="ph ph-arrow-left" />
+
+                    Quay lại
+
+                  </button>
+
+
+
+                  <div className="flex items-start gap-4">
+
+                    <div
+
+                      className="
+
+                        flex
+
+                        h-[52px]
+
+                        w-[52px]
+
+                        shrink-0
+
+                        items-center
+
+                        justify-center
+
+                        rounded-2xl
+
+                        bg-blue-50
+
+                        text-[22px]
+
+                        text-blue-600
+
+                      "
+
+                    >
+
+                      <i
+
+                        className={
+
+                          intent === 'customer'
+
+                            ? 'ph ph-user'
+
+                            : 'ph ph-buildings'
+
+                        }
+
+                      />
+
+                    </div>
+
+
+
+                    <div>
+
+                      <h1 className="text-[25px] font-extrabold tracking-[-0.02em] text-slate-900">
+
+                        Tạo tài khoản{' '}
+
+                        {intent === 'customer'
+
+                          ? 'khách hàng'
+
+                          : 'đối tác'}
+
+                      </h1>
+
+
+
+                      <p className="mt-1.5 text-sm leading-6 text-slate-500">
+
+                        {intent === 'customer'
+
+                          ? 'Điền thông tin để bắt đầu đặt phòng trên Egode.'
+
+                          : 'Tạo tài khoản trước khi đăng ký khách sạn của bạn.'}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+
+                {/* FORM */}
+
+                <form
+
+                  onSubmit={handleSubmit(
+
+                    onSubmit
+
+                  )}
+
+                  className="space-y-5 p-7 sm:p-9"
+
+                  noValidate
+
+                >
+
+                  {registerMutation.isError && (
+
+                    <div
+
+                      role="alert"
+
+                      className="
+
+                        flex
+
+                        items-start
+
+                        gap-3
+
+                        rounded-xl
+
+                        border
+
+                        border-danger/25
+
+                        bg-danger-light
+
+                        px-4
+
+                        py-3
+
+                        text-sm
+
+                        text-danger-ink
+
+                      "
+
+                    >
+
+                      <i className="ph-fill ph-warning-circle mt-0.5 text-lg" />
+
+                      <span>
+
+                        {registerMutation.error instanceof
+
+                        ApiError
+
+                          ? registerMutation.error
+
+                              .message
+
+                          : 'Đăng ký thất bại, vui lòng thử lại'}
+
+                      </span>
+
+                    </div>
+
+                  )}
+
+
+
+                  <div className="grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2">
+
+                    {/* HỌ TÊN */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-HoTen"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Họ tên
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+                        <input
+
+                          id="register-HoTen"
+
+                          type="text"
+
+                          placeholder="Nguyễn Văn A"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.HoTen
+
+                            ),
+
+                            'pl-10 pr-3.5'
+
+                          )}
+
+                          {...register('HoTen')}
+
+                        />
+
+                      </div>
+
+
+
+                      {errors.HoTen && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {errors.HoTen.message}
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* NGÀY SINH */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-NgaySinh"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Ngày sinh
+
+                      </label>
+
+
+
+                      <input
+
+                        id="register-NgaySinh"
+
+                        type="date"
+
+                        className={cn(
+
+                          inputClass(
+
+                            !!errors.NgaySinh
+
+                          ),
+
+                          'px-3.5'
+
+                        )}
+
+                        {...register('NgaySinh')}
+
+                      />
+
+                    </div>
+
+
+
+                    {/* USERNAME */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-TenDangNhap"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Tên đăng nhập
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-identification-card absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+                        <input
+
+                          id="register-TenDangNhap"
+
+                          type="text"
+
+                          placeholder="nguyenvana123"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.TenDangNhap
+
+                            ),
+
+                            'pl-10 pr-3.5'
+
+                          )}
+
+                          {...register(
+
+                            'TenDangNhap'
+
+                          )}
+
+                        />
+
+                      </div>
+
+
+
+                      {errors.TenDangNhap && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {
+
+                            errors
+
+                              .TenDangNhap
+
+                              .message
+
+                          }
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* GENDER */}
+
+                    <div className="space-y-1.5">
+
+                      <p className="block text-xs font-bold uppercase tracking-wide text-slate-700">
+
+                        Giới tính
+
+                      </p>
+
+
+
+                      <div className="flex min-h-[46px] items-center gap-2">
+
+                        {[
+
+                          'Nam',
+
+                          'Nữ',
+
+                          'Khác',
+
+                        ].map(
+
+                          (gender) => (
+
+                            <label
+
+                              key={gender}
+
+                              className="cursor-pointer"
+
+                            >
+
+                              <input
+
+                                type="radio"
+
+                                value={gender}
+
+                                {...register(
+
+                                  'GioiTinh'
+
+                                )}
+
+                                className="peer sr-only"
+
+                              />
+
+
+
+                              <span
+
+                                className="
+
+                                  inline-flex
+
+                                  rounded-xl
+
+                                  border
+
+                                  border-slate-200
+
+                                  bg-white
+
+                                  px-4
+
+                                  py-2.5
+
+                                  text-sm
+
+                                  font-semibold
+
+                                  text-slate-500
+
+                                  transition
+
+                                  hover:border-blue-300
+
+                                  peer-checked:border-blue-500
+
+                                  peer-checked:bg-blue-50
+
+                                  peer-checked:text-blue-600
+
+                                "
+
+                              >
+
+                                {gender}
+
+                              </span>
+
+                            </label>
+
+                          )
+
+                        )}
+
+                      </div>
+
+                    </div>
+
+
+
+                    {/* EMAIL */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-Email"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Email
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-envelope-simple absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+                        <input
+
+                          id="register-Email"
+
+                          type="email"
+
+                          placeholder="example@gmail.com"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.Email
+
+                            ),
+
+                            'pl-10 pr-3.5'
+
+                          )}
+
+                          {...register('Email')}
+
+                        />
+
+                      </div>
+
+
+
+                      {errors.Email && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {errors.Email.message}
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* PHONE */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-SoDienThoai"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Số điện thoại
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+                        <input
+
+                          id="register-SoDienThoai"
+
+                          type="tel"
+
+                          placeholder="0901234567"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.SoDienThoai
+
+                            ),
+
+                            'pl-10 pr-3.5'
+
+                          )}
+
+                          {...register(
+
+                            'SoDienThoai'
+
+                          )}
+
+                        />
+
+                      </div>
+
+
+
+                      {errors.SoDienThoai && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {
+
+                            errors
+
+                              .SoDienThoai
+
+                              .message
+
+                          }
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* PASSWORD */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-MatKhau"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Mật khẩu
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-lock-simple absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+
+
+                        <input
+
+                          id="register-MatKhau"
+
+                          type={
+
+                            showPwd
+
+                              ? 'text'
+
+                              : 'password'
+
+                          }
+
+                          placeholder="Tối thiểu 8 ký tự"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.MatKhau
+
+                            ),
+
+                            'pl-10 pr-11'
+
+                          )}
+
+                          {...register(
+
+                            'MatKhau'
+
+                          )}
+
+                        />
+
+
+
+                        <button
+
+                          type="button"
+
+                          onClick={() =>
+
+                            setShowPwd(
+
+                              !showPwd
+
+                            )
+
+                          }
+
+                          className="
+
+                            absolute
+
+                            right-3.5
+
+                            top-1/2
+
+                            -translate-y-1/2
+
+                            text-slate-400
+
+                            transition
+
+                            hover:text-slate-800
+
+                          "
+
+                          aria-label={
+
+                            showPwd
+
+                              ? 'Ẩn mật khẩu'
+
+                              : 'Hiện mật khẩu'
+
+                          }
+
+                        >
+
+                          <i
+
+                            className={cn(
+
+                              'ph text-lg',
+
+                              showPwd
+
+                                ? 'ph-eye'
+
+                                : 'ph-eye-slash'
+
+                            )}
+
+                          />
+
+                        </button>
+
+                      </div>
+
+
+
+                      {errors.MatKhau && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {errors.MatKhau.message}
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+
+
+                    {/* CONFIRM PASSWORD */}
+
+                    <div className="space-y-1.5">
+
+                      <label
+
+                        htmlFor="register-confirmMatKhau"
+
+                        className="block text-xs font-bold uppercase tracking-wide text-slate-700"
+
+                      >
+
+                        Xác nhận mật khẩu
+
+                        <span className="text-danger">
+
+                          *
+
+                        </span>
+
+                      </label>
+
+
+
+                      <div className="relative">
+
+                        <i className="ph ph-lock-key absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-slate-400" />
+
+
+
+                        <input
+
+                          id="register-confirmMatKhau"
+
+                          type={
+
+                            showConfirmPwd
+
+                              ? 'text'
+
+                              : 'password'
+
+                          }
+
+                          placeholder="Nhập lại mật khẩu"
+
+                          className={cn(
+
+                            inputClass(
+
+                              !!errors.confirmMatKhau
+
+                            ),
+
+                            'pl-10 pr-11'
+
+                          )}
+
+                          {...register(
+
+                            'confirmMatKhau'
+
+                          )}
+
+                        />
+
+
+
+                        <button
+
+                          type="button"
+
+                          onClick={() =>
+
+                            setShowConfirmPwd(
+
+                              !showConfirmPwd
+
+                            )
+
+                          }
+
+                          className="
+
+                            absolute
+
+                            right-3.5
+
+                            top-1/2
+
+                            -translate-y-1/2
+
+                            text-slate-400
+
+                            transition
+
+                            hover:text-slate-800
+
+                          "
+
+                          aria-label={
+
+                            showConfirmPwd
+
+                              ? 'Ẩn mật khẩu'
+
+                              : 'Hiện mật khẩu'
+
+                          }
+
+                        >
+
+                          <i
+
+                            className={cn(
+
+                              'ph text-lg',
+
+                              showConfirmPwd
+
+                                ? 'ph-eye'
+
+                                : 'ph-eye-slash'
+
+                            )}
+
+                          />
+
+                        </button>
+
+                      </div>
+
+
+
+                      {errors.confirmMatKhau && (
+
+                        <p className="flex items-center gap-1 text-xs font-medium text-danger">
+
+                          <i className="ph-fill ph-warning-circle" />
+
+                          {
+
+                            errors
+
+                              .confirmMatKhau
+
+                              .message
+
+                          }
+
+                        </p>
+
+                      )}
+
+                    </div>
+
+                  </div>
+
+
+
+                  {/* TERMS */}
+
+                  <label
+
+                    className="
+
+                      flex
+
+                      cursor-pointer
+
                       items-start
 
-                      gap-2.5
+                      gap-3
 
                       rounded-xl
 
                       border
-                      border-amber-200
 
-                      bg-amber-50
+                      border-slate-100
 
-                      px-4
-                      py-3
+                      bg-slate-50
 
-                      text-sm
-                      font-medium
+                      p-4
 
-                      text-amber-800
+                      transition
+
+                      hover:bg-slate-100
+
                     "
+
                   >
-                    <i
+
+                    <input
+
+                      type="checkbox"
+
+                      required
+
                       className="
-                        ph-fill
-                        ph-warning-circle
 
                         mt-0.5
 
+                        h-4
+
+                        w-4
+
                         shrink-0
 
-                        text-lg
+                        accent-blue-600
+
                       "
-                      aria-hidden="true"
+
                     />
 
-                    <span>
-                      Phiên đăng nhập đã hết hạn.
-                      Vui lòng đăng nhập lại.
+
+
+                    <span className="text-sm leading-6 text-slate-500">
+
+                      Tôi đồng ý với{' '}
+
+                      <span className="font-bold text-blue-600">
+
+                        Điều khoản sử dụng
+
+                      </span>{' '}
+
+                      và{' '}
+
+                      <span className="font-bold text-blue-600">
+
+                        Chính sách bảo mật
+
+                      </span>{' '}
+
+                      của Egode.
+
                     </span>
-                  </div>
-                )}
 
-              {/* LOGIN ERROR */}
-
-              {loginMutation.isError && (
-                <div
-                  role="alert"
-
-                  className="
-                    mb-5
-
-                    flex
-                    items-start
-
-                    gap-2.5
-
-                    rounded-xl
-
-                    border
-                    border-red-200
-
-                    bg-red-50
-
-                    px-4
-                    py-3
-
-                    text-sm
-                    font-medium
-
-                    text-red-700
-                  "
-                >
-                  <i
-                    className="
-                      ph-fill
-                      ph-warning-circle
-
-                      mt-0.5
-
-                      shrink-0
-
-                      text-lg
-                    "
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    {loginMutation.error
-                      instanceof ApiError
-                      ? loginMutation.error.message
-                      : 'Đăng nhập thất bại, vui lòng thử lại'}
-                  </span>
-                </div>
-              )}
-
-              {/* ======================================
-                  FORM
-              ====================================== */}
-
-              <form
-                onSubmit={
-                  handleSubmit(onSubmit)
-                }
-
-                className="space-y-5"
-
-                noValidate
-              >
-
-                {/* USERNAME */}
-
-                <div>
-                  <label
-                    htmlFor="identifier"
-
-                    className="
-                      mb-2
-
-                      block
-
-                      text-[13px]
-
-                      font-bold
-
-                      leading-5
-
-                      !text-slate-700
-                    "
-                  >
-                    Email hoặc tên đăng nhập
-
-                    <span className="ml-1 text-red-500">
-                      *
-                    </span>
                   </label>
 
-                  <div className="relative">
 
-                    <i
-                      className="
-                        ph
-                        ph-user
 
-                        pointer-events-none
+                  {/* SUBMIT */}
 
-                        absolute
+                  <Button
 
-                        left-4
-                        top-1/2
+                    type="submit"
 
-                        -translate-y-1/2
+                    disabled={
 
-                        text-[20px]
+                      isSubmitting ||
 
-                        text-slate-400
-                      "
-                      aria-hidden="true"
-                    />
+                      registerMutation.isPending
 
-                    <input
-                      type="text"
+                    }
 
-                      id="identifier"
+                    size="lg"
 
-                      placeholder="Email hoặc tên đăng nhập"
+                    className="w-full"
 
-                      autoComplete="username"
-
-                      className={cn(
-                        inputClass(
-                          !!errors.identifier
-                        ),
-                        'pl-12 pr-4'
-                      )}
-
-                      {...register(
-                        'identifier'
-                      )}
-                    />
-                  </div>
-
-                  {errors.identifier && (
-                    <p
-                      className="
-                        mt-1.5
-
-                        text-xs
-
-                        font-medium
-
-                        text-red-500
-                      "
-                    >
-                      {
-                        errors.identifier
-                          .message
-                      }
-                    </p>
-                  )}
-                </div>
-
-                {/* PASSWORD */}
-
-                <div>
-                  <label
-                    htmlFor="MatKhau"
-
-                    className="
-                      mb-2
-
-                      block
-
-                      text-[13px]
-
-                      font-bold
-
-                      leading-5
-
-                      !text-slate-700
-                    "
                   >
-                    Mật khẩu
 
-                    <span className="ml-1 text-red-500">
-                      *
-                    </span>
-                  </label>
+                    {isSubmitting ||
 
-                  <div className="relative">
+                    registerMutation.isPending ? (
 
-                    <i
-                      className="
-                        ph
-                        ph-lock-key
+                      <>
 
-                        pointer-events-none
+                        Đang xử lý...
 
-                        absolute
+                        <div
 
-                        left-4
-                        top-1/2
+                          className="
 
-                        -translate-y-1/2
+                            spinner
 
-                        text-[19px]
+                            h-4
 
-                        text-slate-400
-                      "
-                      aria-hidden="true"
-                    />
+                            w-4
 
-                    <input
-                      type={
-                        showPwd
-                          ? 'text'
-                          : 'password'
-                      }
+                            border-2
 
-                      id="MatKhau"
+                            border-white/20
 
-                      placeholder="Nhập mật khẩu"
+                            border-t-white
 
-                      autoComplete="current-password"
+                          "
 
-                      className={cn(
-                        inputClass(
-                          !!errors.MatKhau
-                        ),
-                        'pl-12 pr-12'
-                      )}
+                          aria-hidden="true"
 
-                      {...register(
-                        'MatKhau'
-                      )}
-                    />
+                        />
 
-                    <button
-                      type="button"
+                      </>
 
-                      onClick={() =>
-                        setShowPwd(
-                          (value) => !value
-                        )
-                      }
+                    ) : (
+
+                      <>
+
+                        Đăng ký tài khoản
+
+                        <i className="ph ph-arrow-right ml-1 text-lg" />
+
+                      </>
+
+                    )}
+
+                  </Button>
+
+
+
+                  {/* LOGIN */}
+
+                  <p className="text-center text-sm text-slate-500">
+
+                    Đã có tài khoản?{' '}
+
+                    <Link
+
+                      to="/login"
 
                       className="
-                        absolute
 
-                        right-3
-                        top-1/2
+                        font-bold
 
-                        flex
-
-                        h-8
-                        w-8
-
-                        -translate-y-1/2
-
-                        items-center
-                        justify-center
-
-                        rounded-lg
-
-                        text-slate-400
+                        text-blue-600
 
                         transition
 
-                        hover:bg-slate-100
-                        hover:text-blue-600
+                        hover:text-blue-700
+
+                        hover:underline
+
                       "
 
-                      aria-label={
-                        showPwd
-                          ? 'Ẩn mật khẩu'
-                          : 'Hiện mật khẩu'
-                      }
                     >
-                      <i
-                        className={cn(
-                          'ph text-lg',
 
-                          showPwd
-                            ? 'ph-eye'
-                            : 'ph-eye-slash'
-                        )}
-                      />
-                    </button>
-
-                  </div>
-
-                  {errors.MatKhau && (
-                    <p
-                      className="
-                        mt-1.5
-
-                        text-xs
-
-                        font-medium
-
-                        text-red-500
-                      "
-                    >
-                      {
-                        errors.MatKhau
-                          .message
-                      }
-                    </p>
-                  )}
-                </div>
-
-                {/* FORGOT PASSWORD */}
-
-                <div
-                  className="
-                    flex
-                    justify-end
-                  "
-                >
-                  <Link
-                    to="/forgot-password"
-
-                    className="
-                      text-[13px]
-
-                      font-semibold
-
-                      text-slate-600
-
-                      transition-colors
-
-                      hover:text-blue-600
-                    "
-                  >
-                    Quên mật khẩu?
-                  </Link>
-                </div>
-
-                {/* LOGIN BUTTON */}
-
-                <Button
-                  type="submit"
-
-                  size="lg"
-
-                  disabled={busy}
-
-                  className="
-                    min-h-[54px]
-
-                    w-full
-
-                    justify-center
-
-                    rounded-[12px]
-
-                    bg-gradient-to-r
-                    from-blue-600
-                    to-blue-500
-
-                    text-[15px]
-
-                    font-bold
-
-                    text-white
-
-                    shadow-[0_8px_24px_rgba(37,99,235,0.24)]
-
-                    transition-all
-
-                    duration-200
-
-                    hover:-translate-y-[1px]
-                    hover:shadow-[0_12px_30px_rgba(37,99,235,0.32)]
-                  "
-                >
-                  {busy ? (
-                    <>
-                      Đang xử lý...
-
-                      <span
-                        className="
-                          spinner
-
-                          h-4
-                          w-4
-
-                          border-2
-
-                          border-white/20
-                          border-t-white
-                        "
-                      />
-                    </>
-                  ) : (
-                    <>
                       Đăng nhập
 
-                      <i
-                        className="
-                          ph
-                          ph-arrow-right
+                    </Link>
 
-                          text-lg
-                        "
-                      />
-                    </>
-                  )}
-                </Button>
+                  </p>
 
-              </form>
+                </form>
 
-              {/* ======================================
-                  DIVIDER
-              ====================================== */}
-
-              <div
-                className="
-                  my-7
-
-                  flex
-                  items-center
-
-                  gap-4
-                "
-              >
-                <div
-                  className="
-                    h-px
-                    flex-1
-
-                    bg-slate-200
-                  "
-                />
-
-                <span
-                  className="
-                    text-xs
-                    font-medium
-
-                    text-slate-400
-                  "
-                >
-                  hoặc
-                </span>
-
-                <div
-                  className="
-                    h-px
-                    flex-1
-
-                    bg-slate-200
-                  "
-                />
               </div>
 
-              {/* REGISTER */}
+            )}
 
-              <p
-                className="
-                  text-center
-
-                  text-[14px]
-
-                  !text-slate-500
-                "
-              >
-                Chưa có tài khoản?{' '}
-
-                <Link
-                  to="/register"
-
-                  className="
-                    font-bold
-
-                    text-blue-600
-
-                    transition-colors
-
-                    hover:text-blue-700
-                  "
-                >
-                  Đăng ký ngay
-                </Link>
-              </p>
-
-            </section>
           </div>
 
         </div>
+
       </div>
-    </main>
+
+    </div>
+
   );
+
 }
 
-/* ==========================================================
-   FEATURE CARD
-========================================================== */
 
-interface LoginFeatureCardProps {
+
+/* =========================================================
+   REGISTER FEATURE CARD
+   Đồng bộ trực tiếp với card của Login
+========================================================= */
+
+interface RegisterFeatureCardProps {
   icon: string;
   title: string;
   description: string;
 }
 
-function LoginFeatureCard({
+function RegisterFeatureCard({
   icon,
   title,
   description,
-}: LoginFeatureCardProps) {
+}: RegisterFeatureCardProps) {
   return (
-    <article
+    <div
       className="
-        group
-
-        min-h-[168px]
-
         rounded-[22px]
-
         border
-        border-white/20
-
-        bg-slate-950/55
-
+        border-white/25
+        bg-[#102033]/84
         p-5
-
-        shadow-[0_18px_45px_rgba(0,0,0,0.22)]
-
-        backdrop-blur-md
-
-        transition-all
+        shadow-lg
+        backdrop-blur-xl
+        transition
         duration-300
-
         hover:-translate-y-1
-
-        hover:border-cyan-300/35
-
-        hover:bg-slate-900/70
-
-        hover:shadow-[0_22px_55px_rgba(0,0,0,0.30)]
+        hover:bg-[#152A42]/94
       "
     >
-
-      {/* ICON */}
-
       <div
         className="
           mb-4
-
           flex
-
           h-12
           w-12
-
           items-center
           justify-center
-
-          rounded-[14px]
-
+          rounded-2xl
           border
-          border-cyan-200/20
-
-          bg-gradient-to-br
-          from-cyan-300/15
-          to-blue-500/15
-
-          text-cyan-300
-
-          shadow-inner
-
-          transition
-
-          duration-300
-
-          group-hover:scale-105
-
-          group-hover:border-cyan-300/40
+          border-white/20
+          bg-white/10
+          text-sky-300
         "
       >
         <i
-          className={`ph ${icon} text-[25px]`}
+          className={`ph ${icon} text-[26px]`}
           aria-hidden="true"
         />
       </div>
 
-      {/* TITLE */}
-
-      <h3
+      <p
         className="
-          !text-[16px]
-
-          !font-bold
-
-          !leading-6
-
+          text-[17px]
+          font-extrabold
           !text-white
         "
-        style={{
-          textShadow:
-            '0 2px 7px rgba(0,0,0,0.65)',
-        }}
       >
         {title}
-      </h3>
-
-      {/* DESCRIPTION */}
+      </p>
 
       <p
         className="
-          mt-1.5
-
+          mt-2
           text-[13px]
-
-          font-normal
-
-          leading-5
-
+          font-medium
+          leading-6
           !text-slate-200
         "
       >
         {description}
       </p>
-
-    </article>
+    </div>
   );
 }

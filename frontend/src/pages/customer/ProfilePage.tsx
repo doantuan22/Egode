@@ -101,14 +101,6 @@ export default function ProfilePage() {
             <div className="flex flex-col lg:flex-row gap-10">
               
               <div className="flex flex-col items-center shrink-0 w-full lg:w-48">
-                <div className="relative group cursor-pointer mb-4">
-                  <div className="w-32 h-32 rounded-full border-4 border-white shadow-sm bg-primary-100 flex items-center justify-center text-primary text-4xl font-bold">
-                    {meQuery.data?.HoTen?.charAt(0) || 'U'}
-                  </div>
-                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i className="ph-fill ph-camera text-white text-xl"></i>
-                  </div>
-                </div>
                 <h3 className="font-bold text-lg text-ink mb-1 text-center">{meQuery.data?.HoTen}</h3>
                 <p className="text-[13px] text-ink-muted mb-3 text-center">{meQuery.data?.TenDangNhap}</p>
               </div>

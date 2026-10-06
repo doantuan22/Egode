@@ -1,0 +1,4 @@
+EGODE frontend - Admin UI only
+Customer/public UI is preserved from the uploaded frontend.
+Only admin styling is applied under .dashboard-shell--admin and admin page classes.
+No customer routes/pages were intentionally modified.

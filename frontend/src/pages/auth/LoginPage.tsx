@@ -72,7 +72,6 @@ export default function LoginPage() {
         }
       );
     } catch {
-      // Lỗi hiển thị bằng loginMutation.isError
     }
   };
 
@@ -187,183 +186,113 @@ export default function LoginPage() {
           <section className="hidden lg:block">
             <div className="max-w-[760px]">
 
-              {/* DÒNG 1 */}
-
-              <h1
-                className="
-                  whitespace-nowrap
-                  text-[clamp(3rem,4vw,4.3rem)]
-                  font-bold
-                  italic
-                  leading-[1]
-                  tracking-[-0.035em]
-                "
-                style={{
-                  fontFamily:
-                    'Georgia, "Times New Roman", serif',
-
-                  color: '#FFFFFF',
-
-                  textShadow:
-                    '0 3px 6px rgba(0,0,0,0.85), 0 10px 26px rgba(0,0,0,0.55)',
-                }}
-              >
-                Chào mừng trở lại
-              </h1>
-
-              {/* DÒNG 2 */}
+              {/* MAIN HEADLINE */}
 
               <div
                 className="
-                  mt-1
-                  whitespace-nowrap
-                  text-[clamp(3.05rem,4.15vw,4.5rem)]
-                  font-extrabold
-                  italic
-                  leading-[1]
-                  tracking-[-0.045em]
+                  max-w-[760px]
+                  overflow-visible
                 "
                 style={{
                   fontFamily:
-                    '"Segoe UI", Arial, Helvetica, sans-serif',
+                    '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
                 }}
               >
-                <span
-                  style={{
-                    color: '#FFFFFF',
-
-                    textShadow:
-                      '0 3px 6px rgba(0,0,0,0.85), 0 8px 22px rgba(0,0,0,0.50)',
-                  }}
-                >
-                  cùng{' '}
-                </span>
-
-                <span
-                  style={{
-                    color: '#66D9FF',
-
-                    textShadow:
-                      '0 3px 6px rgba(0,0,0,0.75), 0 8px 20px rgba(0,0,0,0.45)',
-                  }}
-                >
-                  Egode.
-                </span>
-              </div>
-
-              {/* =================================================
-                  BRUSH WAVE
-              ================================================= */}
-
-              <div className="mt-2 ml-[62px]">
-                <svg
-                  viewBox="0 0 560 48"
-                  fill="none"
+                <h1
                   className="
-                    h-[32px]
-                    w-[430px]
+                    m-0
                     overflow-visible
+                    whitespace-nowrap
+
+                    text-[clamp(2.85rem,3.8vw,4rem)]
+                    leading-[1.08]
+                    tracking-[-0.04em]
+
+                    !text-white
                   "
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
+                  style={{
+                    fontFamily:
+                      '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+                    fontWeight: 800,
+                    fontStyle: 'normal',
+                    textShadow:
+                      '0 4px 18px rgba(0,0,0,0.50)',
+                  }}
                 >
-                  <defs>
-                    <linearGradient
-                      id="loginWaveGradient"
-                      x1="0"
-                      y1="0"
-                      x2="560"
-                      y2="0"
-                      gradientUnits="userSpaceOnUse"
-                    >
-                      <stop
-                        offset="0%"
-                        stopColor="#8BE8FF"
-                        stopOpacity="0.08"
-                      />
+                  Chào mừng trở lại
+                </h1>
 
-                      <stop
-                        offset="12%"
-                        stopColor="#75E2FF"
-                        stopOpacity="0.95"
-                      />
+                <div
+                  className="
+                    mt-3
 
-                      <stop
-                        offset="50%"
-                        stopColor="#55CEF5"
-                      />
+                    flex
+                    items-baseline
+                    gap-3
 
-                      <stop
-                        offset="86%"
-                        stopColor="#72DFFF"
-                        stopOpacity="0.9"
-                      />
+                    overflow-visible
+                    whitespace-nowrap
 
-                      <stop
-                        offset="100%"
-                        stopColor="#A2EEFF"
-                        stopOpacity="0.08"
-                      />
-                    </linearGradient>
-
-                    <filter
-                      id="loginWaveGlow"
-                      x="-20%"
-                      y="-100%"
-                      width="140%"
-                      height="300%"
-                    >
-                      <feGaussianBlur
-                        stdDeviation="1.2"
-                        result="blur"
-                      />
-
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
-                    </filter>
-                  </defs>
-
-                  <path
-                    d="
-                      M8 26
-                      C86 12 167 8 252 10
-                      C335 12 416 21 548 24
-
-                      C431 27 343 24 255 21
-                      C169 18 90 20 8 31
-                      Z
+                    text-[clamp(2.85rem,3.8vw,4rem)]
+                    leading-[1.08]
+                    tracking-[-0.04em]
+                  "
+                >
+                  <span
+                    className="
+                      overflow-visible
+                      !text-white
                     "
-                    fill="url(#loginWaveGradient)"
-                    opacity="0.98"
-                    filter="url(#loginWaveGlow)"
-                  />
+                    style={{
+                      fontFamily:
+                        '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+                      fontWeight: 800,
+                      fontStyle: 'normal',
+                      textShadow:
+                        '0 4px 18px rgba(0,0,0,0.50)',
+                    }}
+                  >
+                    cùng
+                  </span>
 
-                  <path
-                    d="
-                      M118 36
-                      C184 31 257 30 325 32
-                      C383 34 430 37 477 41
+                  <span
+                    className="
+                      inline-block
+                      overflow-visible
 
-                      C421 39 373 38 319 37
-                      C252 35 186 35 118 39
-                      Z
+                      pr-[0.16em]
+                      pb-[0.08em]
+
+                      bg-gradient-to-r
+                      from-cyan-300
+                      via-sky-300
+                      to-blue-400
+
+                      bg-clip-text
+                      !text-transparent
+
+                      drop-shadow-[0_4px_12px_rgba(14,165,233,0.24)]
                     "
-                    fill="#82E5FF"
-                    opacity="0.32"
-                  />
-                </svg>
+                    style={{
+                      fontFamily:
+                        '"Be Vietnam Pro", "Segoe UI", Arial, sans-serif',
+                      fontWeight: 800,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    Egode
+                  </span>
+                </div>
               </div>
 
               {/* DESCRIPTION */}
 
               <p
                 className="
-                  mt-3
-                  max-w-[650px]
-                  text-[16px]
-                  font-semibold
+                  mt-2
+                  max-w-[620px]
+                  text-[15px]
+                  font-medium
                   leading-7
                 "
                 style={{
@@ -435,7 +364,7 @@ export default function LoginPage() {
             >
               {/* LOGO */}
 
-              <div className="mb-4 flex justify-center">
+              <div className="mb-3 flex justify-center">
                 <img
                   src={LOGO_SRC}
                   alt="Egode"
@@ -450,9 +379,10 @@ export default function LoginPage() {
 
               {/* HEADER */}
 
-              <div className="mb-7 text-center">
+              <div className="mb-6 text-center">
                 <h1
                   className="
+                    m-0
                     text-[30px]
                     font-extrabold
                     tracking-[-0.025em]
@@ -462,20 +392,19 @@ export default function LoginPage() {
                   Đăng nhập
                 </h1>
 
+                {/* Đã tháo max-w, xóa khoảng trắng thừa, căn giữa tuyệt đối */}
                 <p
                   className="
-                    mx-auto
-                    mt-1.5
-                    max-w-[390px]
+                    mt-2
+                    w-full
+                    text-center
                     text-sm
                     font-medium
-                    leading-6
+                    leading-relaxed
                     text-slate-500
                   "
                 >
-                  Chào mừng bạn quay lại!
-                  Đăng nhập để tiếp tục trải nghiệm
-                  cùng Egode.
+                Đăng nhập để tiếp tục trải nghiệm cùng Egode.
                 </p>
               </div>
 

@@ -21,7 +21,7 @@ const STATUSES = ['Chờ duyệt', 'Hiển thị', 'Ẩn', 'Vi phạm'];
 const FILTER_DEFAULTS = { search: '', status: '', star: '' };
 
 export default function AdminReviewsPage() {
-  const { values, page, setValue, setPage } = useListParams(FILTER_DEFAULTS);
+  const { values, page, setValue, setPage, reset } = useListParams(FILTER_DEFAULTS);
   const [searchInput, setSearchInput] = useUrlSearchInput(values.search, (value) => setValue('search', value));
   const search = values.search;
   const status = values.status;
@@ -43,6 +43,8 @@ export default function AdminReviewsPage() {
     setSearchInput(val);
     setPage(1);
   };
+
+  const resetFilters = () => reset();
 
   const visibleReviews = query.data?.items
     // The star filter is also applied locally so a stale cached page never shows the wrong score.
@@ -92,7 +94,7 @@ export default function AdminReviewsPage() {
     <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
       <PageHeader title="Kiểm duyệt đánh giá" description="Rà soát phản hồi từ du khách, xử lý báo cáo vi phạm nội dung không chuẩn mực." />
 
-      <FilterBar>
+      <FilterBar onReset={resetFilters}>
         <div role="group" aria-label="Lọc theo trạng thái đánh giá" className="flex basis-full gap-2 overflow-x-auto">
           {['ALL', ...STATUSES].map((st) => (
             <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>

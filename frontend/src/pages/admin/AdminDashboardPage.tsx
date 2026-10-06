@@ -260,7 +260,9 @@ export default function AdminDashboardPage() {
 
   const pendingApplications =
     useAdminPartnerApplications(
-      'Chờ duyệt'
+      'Chờ duyệt',
+      1,
+      1
     );
 
   /* =======================================================
@@ -315,8 +317,8 @@ export default function AdminDashboardPage() {
       count:
         pendingApplications
           .data
-          ?.items
-          .length,
+          ?.pagination
+          .total,
 
       icon:
         'file-text',

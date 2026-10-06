@@ -3,7 +3,7 @@ import * as partnersApi from './api';
 import type { ApplyPartnerPayload } from '../../types/auth';
 
 const myApplicationKey = ['partners', 'me'] as const;
-const adminListKey = (status?: string) => ['admin', 'partner-applications', status] as const;
+const adminListKey = (status?: string, page = 1, limit = 10) => ['admin', 'partner-applications', status, page, limit] as const;
 const adminDetailKey = (id: number) => ['admin', 'partner-applications', 'detail', id] as const;
 
 export function useMyPartnerApplication() {
@@ -18,8 +18,11 @@ export function useApplyPartner() {
   });
 }
 
-export function useAdminPartnerApplications(status?: string) {
-  return useQuery({ queryKey: adminListKey(status), queryFn: () => partnersApi.listPartnerApplications(status) });
+export function useAdminPartnerApplications(status?: string, page = 1, limit = 10) {
+  return useQuery({
+    queryKey: adminListKey(status, page, limit),
+    queryFn: () => partnersApi.listPartnerApplications(status, page, limit),
+  });
 }
 
 export function useAdminPartnerApplication(id: number | null) {

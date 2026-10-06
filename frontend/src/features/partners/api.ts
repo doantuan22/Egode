@@ -25,8 +25,12 @@ export const getMyPartnerApplication = async (): Promise<PartnerApplication | nu
   return res.data ?? null;
 };
 
-export const listPartnerApplications = async (trangThaiDuyet?: string): Promise<AdminPartnerApplicationListResult> => {
-  const params = new URLSearchParams({ page: '1', limit: '100' });
+export const listPartnerApplications = async (
+  trangThaiDuyet?: string,
+  page = 1,
+  limit = 10,
+): Promise<AdminPartnerApplicationListResult> => {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (trangThaiDuyet) params.set('trangThaiDuyet', trangThaiDuyet);
   const res = await apiClient<AdminPartnerApplication[], PaginatedApiResponse<AdminPartnerApplication>>('/admin/partner-applications?' + params.toString());
   return { items: res.data ?? [], pagination: res.pagination as PaginationMeta };

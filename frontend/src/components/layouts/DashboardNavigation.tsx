@@ -456,15 +456,6 @@ export function DashboardTopbar({
         >
           <span
             className="
-              site-header__avatar
-              dashboard-user-avatar
-            "
-          >
-            {name.charAt(0).toUpperCase()}
-          </span>
-
-          <span
-            className="
               dashboard-user-meta
               hidden
               text-left

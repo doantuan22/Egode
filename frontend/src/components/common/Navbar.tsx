@@ -201,12 +201,6 @@ export function Navbar() {
                   }
                   aria-haspopup="menu"
                 >
-                  <div className="site-header__avatar site-header__avatar--initial">
-                    {meQuery.data?.HoTen?.charAt(
-                      0
-                    ) ?? 'U'}
-                  </div>
-
                   <span className="site-header__user-name">
                     {meQuery.data?.HoTen ??
                       'Tài khoản'}
