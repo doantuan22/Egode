@@ -94,8 +94,10 @@ export interface RoomTypeFormValues {
 
 export interface RateItemInput {
   NgayApDung: string;
-  GiaPhong: number;
-  SoLuongPhong: number;
+  /** Omitted = keep the stored price of that day (only valid for a day that already has a row). */
+  GiaPhong?: number;
+  /** Omitted = keep the stored room count of that day (only valid for a day that already has a row). */
+  SoLuongPhong?: number;
   TrangThai?: string;
 }
 export interface OwnerBooking { MaDatPhong: number; MaXacNhanDatPhong: string; KhachHang: { MaTaiKhoan: number; HoTen: string; SoDienThoai: string }; NgayNhanPhong: string; NgayTraPhong: string; TongTienThanhToan: number; TrangThai: string; NgayTao: string; GhiChu: string | null; GioNhanPhong: string; GioTraPhong: string; ChiTietPhong: Array<{ MaLoaiPhong: number; TenLoaiPhong: string; SoLuong: number }>; ThanhToan: Array<{ MaThanhToan: number; TrangThai: string; PhuongThucThanhToan: string; SoTien: number; ThoiGianGiaoDich: string }>; }

@@ -18,9 +18,6 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
             <Icon name="caret-right" className="text-sm text-border-strong" />
             <span className="font-semibold text-ink truncate max-w-[200px] sm:max-w-none">{hotel.TenKhachSan}</span>
           </nav>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/hotels"><Icon name="arrow-left" /><span>Quay lại kết quả tìm kiếm</span></Link>
-          </Button>
         </div>
       </section>
 

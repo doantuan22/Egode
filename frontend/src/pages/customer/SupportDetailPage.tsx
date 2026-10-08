@@ -1,7 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useMySupportRequest } from '../../features/support/hooks';
 import { ApiError } from '../../services/apiClient';
-import { CustomerCenterNavigation } from '../../components/layouts/CustomerCenterNavigation';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { formatDateTimeVi } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
@@ -26,7 +25,6 @@ export default function SupportDetailPage() {
 
   return (
     <div className="page-container support-page support-page--detail">
-      <CustomerCenterNavigation />
       <Link to="/support" className="breadcrumb w-fit">
         <i className="ph ph-arrow-left"></i>
         <span>Quay lại danh sách yêu cầu</span>

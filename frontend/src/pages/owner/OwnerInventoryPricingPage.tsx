@@ -12,6 +12,8 @@ import { ApiError } from '../../services/apiClient';
 import { addDaysToDateKey, businessToday } from '../../lib/stayDates';
 import { useScopedHotels } from '../../components/owner/useScopedHotels';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
+import { DateField } from '../../components/common/DateField';
 
 export default function OwnerInventoryPricingPage() {
   const scope = useScopedHotels();
@@ -69,24 +71,47 @@ export default function OwnerInventoryPricingPage() {
       return;
     }
     const data = new FormData(event.currentTarget);
-    const rates = buildRatePayload({
-      from,
-      to,
-      weekdays,
-      price: Number(data.get('price')),
-      quantity: Number(data.get('quantity')),
-      status: String(data.get('status')),
-    });
+    // A blank price / quantity means "leave it as it is": the owner may only want to open or close the days.
+    const optionalNumber = (name: string) => {
+      const raw = String(data.get(name) ?? '').trim();
+      return raw === '' ? undefined : Number(raw);
+    };
+    const price = optionalNumber('price');
+    const quantity = optionalNumber('quantity');
+    const status = String(data.get('status'));
+    const keepsStoredValues = price === undefined || quantity === undefined;
+    // Without both values a day can only be changed if it already has a rate row, so only those days are sent.
+    const existingDates = keepsStoredValues ? new Set(rows.map((row) => row.NgayApDung.slice(0, 10))) : undefined;
+    const rates = buildRatePayload({ from, to, weekdays, price, quantity, status, onlyDates: existingDates });
     if (rates.length === 0) {
-      setError('Không có ngày nào trong khoảng đã chọn rơi vào các thứ đã tick.');
+      setError(
+        keepsStoredValues && countDays(from, to) > 0 && weekdays.length > 0
+          ? 'Các ngày đã chọn chưa có giá/quỹ phòng. Hãy nhập cả giá và số lượng phòng để tạo mới.'
+          : 'Không có ngày nào trong khoảng đã chọn rơi vào các thứ đã tick.'
+      );
       return;
     }
-    const ok = await confirm({
-      title: 'Ghi đè giá và quỹ phòng?',
-      description: `${rates.length} ngày (${formatDateRangeVi(from, to)}) của "${roomType.TenLoaiPhong}" sẽ được đặt: giá ${formatCurrencyVND(rates[0].GiaPhong)}, ${rates[0].SoLuongPhong} phòng, ${rates[0].TrangThai}. Dữ liệu hiện có của các ngày này sẽ bị thay thế.`,
-      confirmLabel: 'Ghi đè',
-      variant: 'danger',
-    });
+    const kept = [price === undefined && 'giá', quantity === undefined && 'số lượng phòng'].filter(Boolean).join(' và ');
+    const ok = await confirm(
+      keepsStoredValues
+        ? {
+            title: price === undefined && quantity === undefined ? 'Đổi trạng thái bán?' : 'Cập nhật các ngày đã chọn?',
+            description: `${rates.length} ngày (${formatDateRangeVi(from, to)}) của "${roomType.TenLoaiPhong}" sẽ được đặt: ${[
+              price === undefined ? null : `giá ${formatCurrencyVND(price)}`,
+              quantity === undefined ? null : `${quantity} phòng`,
+              status,
+            ]
+              .filter(Boolean)
+              .join(', ')}. Giữ nguyên ${kept} hiện có của từng ngày.`,
+            confirmLabel: 'Xác nhận',
+          }
+        : {
+            title: 'Ghi đè giá và quỹ phòng?',
+            description: `${rates.length} ngày (${formatDateRangeVi(from, to)}) của "${roomType.TenLoaiPhong}" sẽ được đặt: giá ${formatCurrencyVND(price)}, ${quantity} phòng, ${status}. Dữ liệu hiện có của các ngày này sẽ bị thay thế.`,
+            confirmLabel: 'Ghi đè',
+            variant: 'danger',
+          }
+    );
     if (!ok) return;
     try {
       await update.mutateAsync(rates);
@@ -128,7 +153,7 @@ export default function OwnerInventoryPricingPage() {
               <section className="owner-module__filters">
                 <label>
                   Loại phòng
-                  <select
+                  <Select
                     aria-label="Loại phòng"
                     value={roomType?.MaLoaiPhong ?? ''}
                     onChange={(event) => {
@@ -145,15 +170,15 @@ export default function OwnerInventoryPricingPage() {
                         {item.TenLoaiPhong}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   Từ ngày
-                  <input type="date" min={businessToday()} value={from} onChange={(event) => setFrom(event.target.value)} />
+                  <DateField type="date" min={businessToday()} value={from} onChange={(event) => setFrom(event.target.value)} />
                 </label>
                 <label>
                   Đến ngày
-                  <input type="date" min={from} value={to} onChange={(event) => setTo(event.target.value)} />
+                  <DateField type="date" min={from} value={to} onChange={(event) => setTo(event.target.value)} />
                 </label>
               </section>
               <section className="owner-module__data">
@@ -222,8 +247,9 @@ export default function OwnerInventoryPricingPage() {
               <form className="owner-module__form" onSubmit={updateRange}>
                 <h2>Cập nhật khoảng ngày đã chọn</h2>
                 <p>
-                  Đặt cùng một giá, số lượng và trạng thái cho các ngày đã chọn (có thể chỉ một số thứ trong tuần). Bạn sẽ được hỏi xác nhận
-                  trước khi ghi đè.
+                  Đặt cùng một giá, số lượng và trạng thái cho các ngày đã chọn (có thể chỉ một số thứ trong tuần). Để trống giá hoặc số
+                  lượng phòng nếu chỉ muốn đổi trạng thái: giá trị hiện có của từng ngày được giữ nguyên. Bạn sẽ được hỏi xác nhận trước khi
+                  cập nhật.
                 </p>
                 {error && (
                   <p role="alert" className="is-error">
@@ -233,18 +259,18 @@ export default function OwnerInventoryPricingPage() {
                 <div className="owner-module__form-grid">
                   <label>
                     Giá phòng
-                    <input name="price" type="number" min="0" step="1000" required />
+                    <input name="price" type="number" min="0" step="1000" placeholder="Giữ nguyên" />
                   </label>
                   <label>
                     Số lượng phòng
-                    <input name="quantity" type="number" min="0" step="1" required />
+                    <input name="quantity" type="number" min="0" step="1" placeholder="Giữ nguyên" />
                   </label>
                   <label>
                     Trạng thái
-                    <select name="status" defaultValue="Mở bán">
+                    <Select name="status" defaultValue="Mở bán">
                       <option value="Mở bán">Mở bán</option>
                       <option value="Đóng bán">Đóng bán</option>
-                    </select>
+                    </Select>
                   </label>
                 </div>
                 <fieldset className="owner-module__weekdays">
@@ -265,7 +291,7 @@ export default function OwnerInventoryPricingPage() {
                   ))}
                 </fieldset>
                 <Button disabled={update.isPending || !roomType}>
-                  {update.isPending ? 'Đang lưu…' : 'Cập nhật khoảng ngày'}
+                  {update.isPending ? 'Đang lưu…' : 'Cập nhật thông tin'}
                 </Button>
               </form>
             </>

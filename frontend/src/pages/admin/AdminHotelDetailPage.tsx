@@ -6,6 +6,7 @@ import { useConfirm } from '../../components/common/FeedbackProvider';
 import { approveAdminHotel, getAdminHotel, reactivateAdminHotel, rejectAdminHotel, suspendAdminHotel, updateAdminHotel, type UpdateAdminHotelPayload } from '../../features/admin/hotels/api';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
 
 type HotelAction = 'update' | 'approve' | 'reject' | 'suspend' | 'reactivate';
 
@@ -70,6 +71,8 @@ export default function AdminHotelDetailPage() {
   const isActive = hotel.TrangThai === 'Hoạt động';
   const isPending = hotel.TrangThai === 'Chờ duyệt';
   const isSuspended = hotel.TrangThai === 'Đình chỉ';
+  const owner = hotel.TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN;
+  const images = hotel.HINH_ANH_KHACH_SAN ?? [];
 
   return (
     <div className="flex flex-col gap-6 max-w-[800px] mx-auto w-full">
@@ -94,6 +97,7 @@ export default function AdminHotelDetailPage() {
                 </span>
               </div>
               <p className="text-xs text-ink-muted mt-0.5 font-mono">Mã cơ sở: #{hotel.MaKhachSan}</p>
+              {owner && <p className="text-xs text-ink-sub mt-0.5">Chủ khách sạn: <strong className="text-heading">{owner.HoTen}</strong></p>}
             </div>
           </div>
         </div>
@@ -109,6 +113,55 @@ export default function AdminHotelDetailPage() {
               {mutation.error instanceof ApiError ? mutation.error.message : 'Thao tác thất bại, vui lòng thử lại'}
             </div>
           )}
+
+          {/* Chủ khách sạn */}
+          <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
+            <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <i className="ph-fill ph-user-circle text-primary"></i> Chủ khách sạn
+            </h4>
+            {owner ? (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-bold text-heading">{owner.HoTen}</div>
+                  <div className="text-xs text-ink-muted">
+                    {owner.Email}
+                    {owner.SoDienThoai ? ` · ${owner.SoDienThoai}` : ''}
+                  </div>
+                </div>
+                <Link to={`/admin/accounts/${owner.MaTaiKhoan}`} className="admin-row-link">
+                  <span>Xem tài khoản</span>
+                  <i className="ph ph-caret-right"></i>
+                </Link>
+              </div>
+            ) : (
+              <p className="text-sm text-ink-muted">Không có thông tin chủ khách sạn.</p>
+            )}
+          </div>
+
+          {/* Hình ảnh khách sạn */}
+          <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
+            <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <i className="ph-fill ph-images text-primary"></i> Hình ảnh khách sạn ({images.length})
+            </h4>
+            {images.length === 0 ? (
+              <p role="status" className="text-sm text-warning-ink bg-warning-light border border-warning/30 rounded-xl px-3 py-2">
+                Khách sạn này chưa có hình ảnh nào. Mỗi khách sạn cần có ít nhất một ảnh trước khi được duyệt.
+              </p>
+            ) : (
+              <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {images.map((image) => (
+                  <li key={image.MaHinhAnh} className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-white">
+                    <a href={image.URL} target="_blank" rel="noreferrer" aria-label="Mở ảnh khách sạn ở tab mới">
+                      <img src={image.URL} alt={`Ảnh của ${hotel.TenKhachSan}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    </a>
+                    {image.AnhDaiDien && (
+                      <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">Ảnh đại diện</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           {/* Form Thông tin */}
           <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
@@ -129,13 +182,13 @@ export default function AdminHotelDetailPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="admin-hotel-detail-HangSao" className="text-xs font-semibold text-ink-sub block">Hạng sao <span className="text-danger">*</span></label>
-                  <select id="admin-hotel-detail-HangSao" name="HangSao" defaultValue={hotel.HangSao} required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
+                  <Select id="admin-hotel-detail-HangSao" name="HangSao" defaultValue={hotel.HangSao} required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
                     <option value="5">★★★★★ (5 sao)</option>
                     <option value="4">★★★★☆ (4 sao)</option>
                     <option value="3">★★★☆☆ (3 sao)</option>
                     <option value="2">★★☆☆☆ (2 sao)</option>
                     <option value="1">★☆☆☆☆ (1 sao)</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 

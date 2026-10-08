@@ -4,6 +4,7 @@ import { createAccount } from '../../features/admin/accounts/api';
 import { useRoles } from '../../features/admin/accounts/hooks';
 import { ApiError } from '../../services/apiClient';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
 
 export default function AdminCreateAccountPage() {
   const nav = useNavigate();
@@ -85,12 +86,12 @@ export default function AdminCreateAccountPage() {
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="create-MaVaiTro" className="text-xs font-semibold text-ink-sub block">Vai trò hệ thống <span className="text-danger" aria-hidden="true">*</span></label>
-                <select id="create-MaVaiTro" name="MaVaiTro" required defaultValue="" disabled={roles.isLoading || roles.isError} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
+                <Select id="create-MaVaiTro" name="MaVaiTro" required defaultValue="" disabled={roles.isLoading || roles.isError} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
                   <option value="" disabled>{roles.isLoading ? 'Đang tải vai trò...' : 'Chọn vai trò'}</option>
                   {roles.data?.map((role) => (
                     <option key={role.MaVaiTro} value={role.MaVaiTro}>{role.TenVaiTro}</option>
                   ))}
-                </select>
+                </Select>
                 {roles.isError && <p role="alert" className="text-[11px] text-danger">Không tải được danh sách vai trò.</p>}
               </div>
             </div>
@@ -102,9 +103,9 @@ export default function AdminCreateAccountPage() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4 mt-4 border-t border-border">
-              <Link to="/admin/accounts" className="px-4 py-2 bg-white text-ink-sub border border-border rounded-xl text-sm font-semibold hover:bg-surface-secondary transition">
-                Hủy bỏ
-              </Link>
+              <Button asChild variant="ghost">
+                <Link to="/admin/accounts">Hủy bỏ</Link>
+              </Button>
               <Button type="submit" disabled={saving}>
                 {saving ? 'Đang tạo...' : 'Lưu tài khoản'}
               </Button>

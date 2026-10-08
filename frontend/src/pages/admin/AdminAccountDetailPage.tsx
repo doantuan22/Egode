@@ -14,6 +14,8 @@ import { useConfirm } from '../../components/common/FeedbackProvider';
 import { useMe } from '../../features/auth/hooks';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
+import { DateField } from '../../components/common/DateField';
 
 export default function AdminAccountDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -145,16 +147,16 @@ export default function AdminAccountDetailPage() {
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="admin-account-detail-NgaySinh" className="text-xs font-semibold text-ink-sub block">Ngày sinh</label>
-                  <input id="admin-account-detail-NgaySinh" type="date" {...register('NgaySinh')} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" />
+                  <DateField id="admin-account-detail-NgaySinh" type="date" {...register('NgaySinh')} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" />
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="admin-account-detail-GioiTinh" className="text-xs font-semibold text-ink-sub block">Giới tính</label>
-                  <select id="admin-account-detail-GioiTinh" {...register('GioiTinh')} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
+                  <Select id="admin-account-detail-GioiTinh" {...register('GioiTinh')} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition">
                     <option value="">Không chọn</option>
                     <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>
                     <option value="Khác">Khác</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 

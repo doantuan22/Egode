@@ -11,6 +11,8 @@ import { DataTable, type Column } from '../../components/common/DataTable';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import type { AdminSupportListItem } from '../../features/support/types';
+import { Icon } from '../../components/common/Icon';
+import { AdminListPanel } from '../../components/admin/AdminListPanel';
 
 const PAGE_SIZE = 10;
 const STATUSES = ['Mới', 'Đang xử lý', 'Đã xử lý'];
@@ -40,54 +42,67 @@ export default function AdminSupportPage() {
     setPage(1);
   };
 
+  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(status && status !== 'ALL')) + Number(Boolean(type));
+
   const columns: Column<AdminSupportListItem>[] = [
     { key: 'id', header: 'Mã Ticket', cell: (r) => <span className="font-mono text-sm font-bold text-primary-600">#TCK-{r.MaYeuCauHoTro}</span> },
     { key: 'customer', header: 'Khách hàng', cell: (r) => <span className="font-bold text-heading">{r.TAI_KHOAN_YEU_CAU_HO_TRO_MaTaiKhoanKhachHangToTAI_KHOAN.HoTen}</span> },
-    { key: 'type', header: 'Phân loại', align: 'center', cell: (r) => <span className="rounded-md bg-surface-tertiary px-2 py-0.5 text-[11px] font-medium text-ink-sub">{r.LoaiYeuCau}</span> },
+    { key: 'type', header: 'Phân loại', align: 'center', cell: (r) => <span className="admin-neutral-tag">{r.LoaiYeuCau}</span> },
     { key: 'title', header: 'Tiêu đề yêu cầu', cell: (r) => <span className="font-medium text-ink">{r.TieuDe}</span> },
     { key: 'status', header: 'Trạng thái', align: 'center', cell: (r) => <StatusBadge domain="support" status={r.TrangThai} /> },
-    { key: 'actions', header: 'Xử lý', align: 'center', cell: (r) => <Link to={`/admin/support/${r.MaYeuCauHoTro}`} className="admin-row-link">Phản hồi</Link> },
+    { key: 'actions', header: 'Xử lý', align: 'center', cell: (r) => <Link to={`/admin/support/${r.MaYeuCauHoTro}`} className="admin-row-link"><span>Phản hồi</span><Icon name="caret-right" size={14} /></Link> },
   ];
 
   const resetFilters = () => reset();
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
+    <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
       <PageHeader title="Hỗ trợ & Khiếu nại" description="Tiếp nhận yêu cầu trợ giúp, xử lý mâu thuẫn đặt phòng từ khách hàng và đối tác." />
 
-      <FilterBar onReset={resetFilters}>
-        <div role="group" aria-label="Lọc theo trạng thái yêu cầu" className="flex basis-full gap-2 overflow-x-auto">
-          {['ALL', ...STATUSES].map((st) => (
-            <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
-              {st === 'ALL' ? 'Tất cả ticket' : st}
-            </FilterChip>
-          ))}
-        </div>
-        <div className="min-w-[240px] flex-[2]">
-          <Input label="Tìm yêu cầu" type="text" value={searchInput} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Tìm mã ticket, tiêu đề hoặc khách hàng..." />
-        </div>
-        <div className="min-w-[180px] flex-1">
-          <Select label="Phân loại" value={type} onChange={(e) => { setType(e.target.value); setPage(1); }}>
-            <option value="">Tất cả phân loại</option>
-            {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-          </Select>
-        </div>
-      </FilterBar>
-
-      <DataTable
-        caption="Danh sách yêu cầu hỗ trợ và khiếu nại"
-        columns={columns}
-        rows={query.data?.items}
-        getRowKey={(r) => r.MaYeuCauHoTro}
-        isLoading={query.isLoading}
-        error={query.isError ? (query.error instanceof ApiError ? query.error.message : 'Không thể tải danh sách yêu cầu') : null}
-        emptyTitle="Không tìm thấy yêu cầu nào"
-        emptyDescription="Chưa có ticket nào phù hợp với bộ lọc."
-        emptyIcon="chat-circle-dots"
-        footer={query.data && (
-          <Pagination page={page} totalPages={query.data.pagination.totalPages} total={query.data.pagination.total} itemLabel="yêu cầu" onPageChange={setPage} />
-        )}
-      />
+      <AdminListPanel
+        itemLabel="yêu cầu"
+        total={query.data?.pagination.total}
+        activeFilterCount={activeFilterCount}
+        onRefresh={() => void query.refetch()}
+        refreshing={query.isFetching}
+        filters={
+          <FilterBar onReset={activeFilterCount > 0 ? resetFilters : undefined}>
+            <div role="group" aria-label="Lọc theo trạng thái yêu cầu" className="admin-quick-filters basis-full">
+              <span>Trạng thái</span>
+              {['ALL', ...STATUSES].map((st) => (
+                <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
+                  {st === 'ALL' ? 'Tất cả ticket' : st}
+                </FilterChip>
+              ))}
+            </div>
+            <div className="min-w-[240px] flex-[2]">
+              <Input label="Tìm yêu cầu" type="text" value={searchInput} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Tìm mã ticket, tiêu đề hoặc khách hàng..." />
+            </div>
+            <div className="min-w-[180px] flex-1">
+              <Select label="Phân loại" value={type} onChange={(e) => { setType(e.target.value); setPage(1); }}>
+                <option value="">Tất cả phân loại</option>
+                {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </Select>
+            </div>
+          </FilterBar>
+        }
+      >
+        <DataTable
+          bare
+          caption="Danh sách yêu cầu hỗ trợ và khiếu nại"
+          columns={columns}
+          rows={query.data?.items}
+          getRowKey={(r) => r.MaYeuCauHoTro}
+          isLoading={query.isLoading}
+          error={query.isError ? (query.error instanceof ApiError ? query.error.message : 'Không thể tải danh sách yêu cầu') : null}
+          emptyTitle="Không tìm thấy yêu cầu nào"
+          emptyDescription="Chưa có ticket nào phù hợp với bộ lọc."
+          emptyIcon="chat-circle-dots"
+          footer={query.data && (
+            <Pagination page={page} totalPages={query.data.pagination.totalPages} total={query.data.pagination.total} itemLabel="yêu cầu" onPageChange={setPage} />
+          )}
+        />
+      </AdminListPanel>
     </div>
   );
 }

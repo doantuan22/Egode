@@ -3,6 +3,9 @@ import { AppError } from '../../common/errors/app-error';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 import type { ListHotelsQuery, UpdateHotelInput } from './admin-hotels.schemas';
 
+/** What an admin needs to know about who owns a hotel (never the password hash or other profile fields). */
+const OWNER_SUMMARY = { MaTaiKhoan: true, HoTen: true, Email: true, SoDienThoai: true } as const;
+
 /**
  * Hotel approval state machine (admin side):
  *   Chờ duyệt ── approve ─→ Hoạt động      Hoạt động ── suspend ───→ Đình chỉ
@@ -20,7 +23,12 @@ export class AdminHotelsService {
     const [items, total] = await Promise.all([
       prisma.kHACH_SAN.findMany({
         where,
-        include: { DIA_PHUONG: true },
+        include: {
+          DIA_PHUONG: true,
+          TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { select: OWNER_SUMMARY },
+          // Only the cover (or, failing that, the first photo): the list shows a thumbnail, not the gallery.
+          HINH_ANH_KHACH_SAN: { orderBy: [{ AnhDaiDien: 'desc' }, { MaHinhAnh: 'asc' }], take: 1 },
+        },
         skip: (q.page - 1) * q.limit,
         take: q.limit,
         orderBy: { NgayDangKy: 'desc' },
@@ -36,7 +44,12 @@ export class AdminHotelsService {
   async getOne(id: number) {
     const hotel = await getPrismaClient().kHACH_SAN.findUnique({
       where: { MaKhachSan: id },
-      include: { DIA_PHUONG: true, HINH_ANH_KHACH_SAN: true, KHACH_SAN_TIEN_NGHI: { include: { TIEN_NGHI: true } } },
+      include: {
+        DIA_PHUONG: true,
+        TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { select: OWNER_SUMMARY },
+        HINH_ANH_KHACH_SAN: { orderBy: [{ AnhDaiDien: 'desc' }, { MaHinhAnh: 'asc' }] },
+        KHACH_SAN_TIEN_NGHI: { include: { TIEN_NGHI: true } },
+      },
     });
     if (!hotel) throw AppError.notFound('Không tìm thấy khách sạn');
     return hotel;

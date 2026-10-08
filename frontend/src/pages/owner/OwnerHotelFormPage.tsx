@@ -10,6 +10,7 @@ import { cn } from '../../lib/utils';
 import { Combobox } from '../../components/common/Combobox';
 import { FormErrorSummary } from '../../components/common/FormErrorSummary';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
 
 export default function OwnerHotelFormPage() {
   const navigate = useNavigate();
@@ -85,12 +86,12 @@ export default function OwnerHotelFormPage() {
             <div>
               <label htmlFor="owner-hotel-form-HangSao" className="form-label">Xếp hạng sao tiêu chuẩn <span className="text-danger">*</span></label>
               <div className="relative">
-                <select id="owner-hotel-form-HangSao" className={cn("select", errors.HangSao && "border-danger")} {...register('HangSao', { valueAsNumber: true })}>
+                <Select id="owner-hotel-form-HangSao" className={cn("select", errors.HangSao && "border-danger")} {...register('HangSao', { valueAsNumber: true })}>
                   <option value="">-- Chọn xếp hạng sao --</option>
                   {[1, 2, 3, 4, 5].map((s) => (
                     <option key={s} value={s}>{s} Sao</option>
                   ))}
-                </select>
+                </Select>
                 <i className="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none"></i>
               </div>
             </div>

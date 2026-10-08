@@ -5,17 +5,24 @@ import { AppErrorBoundary } from '../common/AppErrorBoundary';
 import { DashboardNavigation, DashboardTopbar } from './DashboardNavigation';
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
+import { DashboardUiContext } from '../common/DashboardUiContext';
 
 export function MainLayout() {
   const location = useLocation();
   const role = useAuthStore((state) => state.role);
   const isAdminDashboard = role === ROLE_NAMES.ADMIN && location.pathname.startsWith('/admin');
-  const isDashboard =
-    isAdminDashboard ||
-    (role === ROLE_NAMES.PARTNER && (location.pathname.startsWith('/owner') || location.pathname.startsWith('/partner')));
+  const isPartnerDashboard =
+    role === ROLE_NAMES.PARTNER && (location.pathname.startsWith('/owner') || location.pathname.startsWith('/partner'));
+  const isDashboard = isAdminDashboard || isPartnerDashboard;
+  const dashboardShellClass = isAdminDashboard
+    ? 'dashboard-shell dashboard-shell--admin'
+    : isPartnerDashboard
+      ? 'dashboard-shell dashboard-shell--owner'
+      : '';
 
   return (
-    <div className={isDashboard ? `dashboard-shell${isAdminDashboard ? ' dashboard-shell--admin' : ''}` : ''}>
+    <DashboardUiContext.Provider value={isDashboard}>
+    <div className={dashboardShellClass}>
       <a href="#main-content" className="sr-only z-50 rounded bg-white px-4 py-2 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Chuyển đến nội dung chính</a>
       <NavigationEffects />
       
@@ -25,7 +32,9 @@ export function MainLayout() {
           <div className="dashboard-main">
             <DashboardTopbar role={role} />
             <main id="main-content" tabIndex={-1} className="dashboard-content focus:outline-none">
-              <AppErrorBoundary inline resetKey={location.pathname}><Outlet /></AppErrorBoundary>
+              <div className="dashboard-content__canvas">
+                <AppErrorBoundary inline resetKey={location.pathname}><Outlet /></AppErrorBoundary>
+              </div>
             </main>
           </div>
         </>
@@ -62,6 +71,7 @@ export function MainLayout() {
         </>
       )}
     </div>
+    </DashboardUiContext.Provider>
   );
 }
 

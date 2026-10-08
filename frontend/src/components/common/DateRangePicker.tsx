@@ -3,7 +3,6 @@ import { vi } from 'react-day-picker/locale';
 import 'react-day-picker/style.css';
 import { fromDateInputValue, toDateInputValue } from '../../lib/utils';
 import { addDaysToDateKey } from '../../lib/stayDates';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 export interface DateRangeValue {
   /** YYYY-MM-DD, or '' while nothing is chosen. */
@@ -24,7 +23,6 @@ export interface DateRangePickerProps {
 
 /** Inline check-in / check-out calendar. Works on `YYYY-MM-DD` strings so callers keep their string state and URL params. */
 export function DateRangePicker({ value, onChange, min, maxCheckIn, maxNights }: DateRangePickerProps) {
-  const twoMonths = useMediaQuery('(min-width: 768px)');
   const selected: DateRange = { from: fromDateInputValue(value.from), to: fromDateInputValue(value.to) };
   const minDate = fromDateInputValue(min);
   const waitingForCheckOut = Boolean(value.from) && !value.to;
@@ -53,7 +51,7 @@ export function DateRangePicker({ value, onChange, min, maxCheckIn, maxNights }:
         mode="range"
         locale={vi}
         weekStartsOn={1}
-        numberOfMonths={twoMonths ? 2 : 1}
+        numberOfMonths={1}
         defaultMonth={selected.from ?? minDate}
         selected={selected}
         disabled={disabled.length > 0 ? disabled : undefined}

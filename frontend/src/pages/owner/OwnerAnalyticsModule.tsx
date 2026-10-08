@@ -8,6 +8,7 @@ import { formatCurrencyVND } from '../../lib/utils';
 import { ApiError } from '../../services/apiClient';
 import { useScopedHotels } from '../../components/owner/useScopedHotels';
 import { Button } from '../../components/common/Button';
+import { DateField } from '../../components/common/DateField';
 
 export default function OwnerAnalyticsModule({ mode }: { mode: 'revenue' | 'reports' }) {
   const scope = useScopedHotels();
@@ -48,11 +49,11 @@ export default function OwnerAnalyticsModule({ mode }: { mode: 'revenue' | 'repo
           <form className="owner-module__filters" onSubmit={setRange}>
             <label>
               Từ ngày
-              <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+              <DateField type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
             </label>
             <label>
               Đến ngày
-              <input type="date" min={from || undefined} value={to} onChange={(event) => setTo(event.target.value)} />
+              <DateField type="date" min={from || undefined} value={to} onChange={(event) => setTo(event.target.value)} />
             </label>
             <Button variant="secondary">Áp dụng khoảng ngày</Button>
           </form>

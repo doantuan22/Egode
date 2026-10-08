@@ -1,5 +1,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { useDashboardUi } from './DashboardUiContext';
+import { SelectMenu } from './SelectMenu';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   /** Renders a `<label>` wired to the select via id/htmlFor. Omit for a standalone filter select that supplies its own `aria-label`. */
@@ -16,9 +18,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const selectId = id ?? generatedId;
     const errorId = `${selectId}-error`;
     const hintId = `${selectId}-hint`;
+    // In the dashboards the dropdown list is drawn by SelectMenu; the native <select> stays underneath as the real control.
+    const Control = useDashboardUi() ? SelectMenu : 'select';
 
     const field = (
-      <select
+      <Control
         ref={ref}
         id={selectId}
         aria-invalid={error ? true : undefined}
@@ -30,7 +34,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {...props}
       >
         {children}
-      </select>
+      </Control>
     );
 
     if (!label && !error && !hint) return field;

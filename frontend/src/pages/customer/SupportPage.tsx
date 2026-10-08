@@ -4,7 +4,6 @@ import { useMyBookings } from '../../features/bookings/hooks';
 import { useCreateSupportRequest, useMySupportRequests } from '../../features/support/hooks';
 import { cn, formatDateVi } from '../../lib/utils';
 import { ApiError } from '../../services/apiClient';
-import { CustomerCenterNavigation } from '../../components/layouts/CustomerCenterNavigation';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { DataTable, type Column } from '../../components/common/DataTable';
 import { Button } from '../../components/common/Button';
@@ -72,7 +71,6 @@ export default function SupportPage() {
 
   return (
     <div className="page-container support-page">
-      <CustomerCenterNavigation />
       <div className="page-header">
         <div>
           <h1>Hỗ trợ & Khiếu nại</h1>

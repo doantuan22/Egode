@@ -14,6 +14,8 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Alert } from '../../components/common/Alert';
 import type { AdminReviewListItem } from '../../features/reviews/types';
+import { Icon } from '../../components/common/Icon';
+import { AdminListPanel } from '../../components/admin/AdminListPanel';
 
 const PAGE_SIZE = 10;
 const STATUSES = ['Chờ duyệt', 'Hiển thị', 'Ẩn', 'Vi phạm'];
@@ -47,6 +49,8 @@ export default function AdminReviewsPage() {
   const visibleReviews = query.data?.items
     // The star filter is also applied locally so a stale cached page never shows the wrong score.
     .filter((r) => star === 'ALL' || star === '' || r.DiemDanhGia.toString() === star);
+
+  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(status && status !== 'ALL')) + Number(Boolean(star && star !== 'ALL'));
 
   const columns: Column<AdminReviewListItem>[] = [
     {
@@ -82,7 +86,7 @@ export default function AdminReviewsPage() {
               Xóa/gỡ
             </Button>
           )}
-          <Link to={`/admin/reviews/${r.MaDanhGia}`} className="admin-row-link">Chi tiết</Link>
+          <Link to={`/admin/reviews/${r.MaDanhGia}`} className="admin-row-link"><span>Chi tiết</span><Icon name="caret-right" size={14} /></Link>
         </div>
       ),
     },
@@ -91,37 +95,8 @@ export default function AdminReviewsPage() {
   const resetFilters = () => reset();
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
+    <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
       <PageHeader title="Kiểm duyệt đánh giá" description="Rà soát phản hồi từ du khách, xử lý báo cáo vi phạm nội dung không chuẩn mực." />
-
-      <FilterBar onReset={resetFilters}>
-        <div role="group" aria-label="Lọc theo trạng thái đánh giá" className="flex basis-full gap-2 overflow-x-auto">
-          {['ALL', ...STATUSES].map((st) => (
-            <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
-              {st === 'ALL' ? 'Tất cả đánh giá' : st}
-            </FilterChip>
-          ))}
-        </div>
-        <div className="min-w-[240px] flex-[2]">
-          <Input
-            label="Tìm kiếm đánh giá"
-            type="text"
-            value={searchInput}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Tìm kiếm đánh giá theo tên khách sạn, tên người dùng..."
-          />
-        </div>
-        <div className="min-w-[180px] flex-1">
-          <Select label="Hạng sao" value={star} onChange={(e) => { setStar(e.target.value); setPage(1); }}>
-            <option value="ALL">Tất cả điểm sao</option>
-            <option value="1">1 sao (Kém)</option>
-            <option value="2">2 sao</option>
-            <option value="3">3 sao</option>
-            <option value="4">4 sao</option>
-            <option value="5">5 sao (Tốt)</option>
-          </Select>
-        </div>
-      </FilterBar>
 
       {removeMutation.isError && (
         <Alert tone="error">{removeMutation.error instanceof ApiError ? removeMutation.error.message : 'Không thể gỡ đánh giá'}</Alert>
@@ -130,20 +105,60 @@ export default function AdminReviewsPage() {
         <Alert tone="success">Đánh giá đã được gỡ khỏi phần hiển thị công khai; dữ liệu lịch sử vẫn được lưu.</Alert>
       )}
 
-      <DataTable
-        caption="Danh sách đánh giá"
-        columns={columns}
-        rows={visibleReviews}
-        getRowKey={(r) => r.MaDanhGia}
-        isLoading={query.isLoading}
-        error={query.isError ? (query.error instanceof ApiError ? query.error.message : 'Không thể tải danh sách đánh giá') : null}
-        emptyTitle="Không tìm thấy đánh giá nào"
-        emptyDescription="Chưa có đánh giá nào phù hợp với bộ lọc."
-        emptyIcon="star"
-        footer={query.data && (
-          <Pagination page={page} totalPages={query.data.pagination.totalPages} total={query.data.pagination.total} itemLabel="đánh giá" onPageChange={setPage} />
-        )}
-      />
+      <AdminListPanel
+        itemLabel="đánh giá"
+        total={query.data?.pagination.total}
+        activeFilterCount={activeFilterCount}
+        onRefresh={() => void query.refetch()}
+        refreshing={query.isFetching}
+        filters={
+          <FilterBar onReset={activeFilterCount > 0 ? resetFilters : undefined}>
+            <div role="group" aria-label="Lọc theo trạng thái đánh giá" className="admin-quick-filters basis-full">
+              <span>Trạng thái</span>
+              {['ALL', ...STATUSES].map((st) => (
+                <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
+                  {st === 'ALL' ? 'Tất cả đánh giá' : st}
+                </FilterChip>
+              ))}
+            </div>
+            <div className="min-w-[240px] flex-[2]">
+              <Input
+                label="Tìm kiếm đánh giá"
+                type="text"
+                value={searchInput}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Tìm kiếm đánh giá theo tên khách sạn, tên người dùng..."
+              />
+            </div>
+            <div className="min-w-[180px] flex-1">
+              <Select label="Hạng sao" value={star} onChange={(e) => { setStar(e.target.value); setPage(1); }}>
+                <option value="ALL">Tất cả điểm sao</option>
+                <option value="1">1 sao (Kém)</option>
+                <option value="2">2 sao</option>
+                <option value="3">3 sao</option>
+                <option value="4">4 sao</option>
+                <option value="5">5 sao (Tốt)</option>
+              </Select>
+            </div>
+          </FilterBar>
+        }
+      >
+        <DataTable
+          bare
+          caption="Danh sách đánh giá"
+          columns={columns}
+          rows={visibleReviews}
+          getRowKey={(r) => r.MaDanhGia}
+          isLoading={query.isLoading}
+          error={query.isError ? (query.error instanceof ApiError ? query.error.message : 'Không thể tải danh sách đánh giá') : null}
+          emptyTitle="Không tìm thấy đánh giá nào"
+          emptyDescription="Chưa có đánh giá nào phù hợp với bộ lọc."
+          emptyIcon="star"
+          footer={query.data && (
+            <Pagination page={page} totalPages={query.data.pagination.totalPages} total={query.data.pagination.total} itemLabel="đánh giá" onPageChange={setPage} />
+          )}
+        />
+      </AdminListPanel>
     </div>
   );
 }

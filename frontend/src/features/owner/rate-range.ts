@@ -21,6 +21,9 @@ export const countDays = (from: string, to: string): number => Math.floor((utcMi
 /**
  * One rate row per day of the range that falls on a selected weekday. Dates are worked out in UTC from the
  * YYYY-MM-DD strings, so neither the browser timezone nor daylight saving can shift a day.
+ *
+ * `price` / `quantity` left undefined are left out of the rows, so the server keeps the stored value of each day.
+ * `onlyDates` limits the rows to days that already have a rate row (needed when a value is left out).
  */
 export function buildRatePayload({
   from,
@@ -29,19 +32,28 @@ export function buildRatePayload({
   price,
   quantity,
   status,
+  onlyDates,
 }: {
   from: string;
   to: string;
   weekdays: readonly number[];
-  price: number;
-  quantity: number;
+  price?: number;
+  quantity?: number;
   status: string;
+  onlyDates?: ReadonlySet<string>;
 }): RateItemInput[] {
   const rows: RateItemInput[] = [];
   for (let index = 0; index < countDays(from, to); index++) {
     const day = new Date(utcMidnight(from) + index * DAY_MS);
     if (!weekdays.includes(day.getUTCDay())) continue;
-    rows.push({ NgayApDung: day.toISOString().slice(0, 10), GiaPhong: price, SoLuongPhong: quantity, TrangThai: status });
+    const date = day.toISOString().slice(0, 10);
+    if (onlyDates && !onlyDates.has(date)) continue;
+    rows.push({
+      NgayApDung: date,
+      ...(price === undefined ? {} : { GiaPhong: price }),
+      ...(quantity === undefined ? {} : { SoLuongPhong: quantity }),
+      TrangThai: status,
+    });
   }
   return rows;
 }

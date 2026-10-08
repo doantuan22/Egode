@@ -94,32 +94,53 @@ export function DashboardNavigation({ role }: { role: DashboardRole }) {
     <>
       <aside
         ref={sidebarRef}
-        className={cn('dashboard-sidebar', isSidebarOpen && 'open')}
+        className={cn('dashboard-sidebar', role === ROLE_NAMES.ADMIN && 'dashboard-sidebar--admin', isSidebarOpen && 'open')}
         aria-label={`Điều hướng ${label}`}
         role={drawerOpen ? 'dialog' : undefined}
         aria-modal={drawerOpen ? true : undefined}
         inert={isOffCanvas && !isSidebarOpen}
       >
         <div className="dashboard-sidebar__brand">
-          <Link to="/" className="site-header__logo" onClick={closeSidebar}>
-            <img src="/egode_logo.png" alt="" className="site-header__logo-image" />
-            <span>Egode</span>
+          <Link to="/" className="dashboard-brand" onClick={closeSidebar} aria-label="Egode">
+            <span className="dashboard-brand__mark dashboard-brand__mark--logo">
+              <img src="/egode_logo.png" alt="" />
+            </span>
+            <span className="dashboard-brand__copy">
+              <strong>Egode</strong>
+              <small>{role === ROLE_NAMES.ADMIN ? 'Admin Center' : 'Partner Center'}</small>
+            </span>
           </Link>
-          <span className="badge badge-primary">{label}</span>
+          <span className="dashboard-role-pill">{label}</span>
         </div>
         <nav className="dashboard-sidebar__nav">
           {groups.map((group) => (
-            <div key={group.title}>
+            <div className="dashboard-sidebar__group" key={group.title}>
               <p className="dashboard-sidebar__group-title">{group.title}</p>
-              {group.items.map((item) => {
-                const active = activePath(location.pathname, item.to);
-                return <Link key={`${item.to}-${item.label}`} to={destinationFor(item.to)} onClick={closeSidebar} className={cn('dashboard-sidebar__item', active && 'active')} aria-current={active ? 'page' : undefined}><Icon name={item.icon} size={18} /><span>{item.label}</span></Link>;
-              })}
+              <div className="dashboard-sidebar__group-items">
+                {group.items.map((item) => {
+                  const active = activePath(location.pathname, item.to);
+                  return (
+                    <Link
+                      key={`${item.to}-${item.label}`}
+                      to={destinationFor(item.to)}
+                      onClick={closeSidebar}
+                      className={cn('dashboard-sidebar__item', active && 'active')}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      <span className="dashboard-sidebar__item-icon"><Icon name={item.icon} size={18} /></span>
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </nav>
         <div className="dashboard-sidebar__footer">
-          <button type="button" className="dashboard-sidebar__item text-danger hover:bg-danger-light" onClick={logout} disabled={isSigningOut}><Icon name="sign-out" size={18} /><span>{isSigningOut ? 'Đang thoát...' : 'Đăng xuất'}</span></button>
+          <button type="button" className="dashboard-sidebar__item dashboard-sidebar__logout" onClick={logout} disabled={isSigningOut}>
+            <span className="dashboard-sidebar__item-icon"><Icon name="sign-out" size={18} /></span>
+            <span>{isSigningOut ? 'Đang thoát...' : 'Đăng xuất'}</span>
+          </button>
         </div>
       </aside>
       {isSidebarOpen && <button type="button" aria-label="Đóng menu" className="sidebar-scrim open" onClick={closeSidebar} />}
@@ -134,5 +155,26 @@ export function DashboardTopbar({ role }: { role: DashboardRole }) {
   const name = meQuery.data?.HoTen ?? (role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Đối tác');
   const profilePath = profilePathFor(role);
   const pageLabel = useMemo(() => (role === ROLE_NAMES.ADMIN ? currentPageLabel(pathname, adminGroups) : null), [role, pathname]);
-  return <header className="dashboard-topbar"><button type="button" className="dashboard-sidebar-toggle btn btn-icon btn-ghost" onClick={toggleSidebar} aria-label="Mở menu"><Icon name="list" size={20} /></button>{pageLabel && <div className="dashboard-topbar__context"><span className="dashboard-topbar__eyebrow">Hệ thống quản trị</span><strong className="dashboard-topbar__title">{pageLabel}</strong></div>}<div className="dashboard-topbar__actions"><Link to={profilePath} className="site-header__user"><span className="site-header__avatar dashboard-user-avatar">{name.charAt(0).toUpperCase()}</span><span className="dashboard-user-meta hidden text-left sm:block"><strong>{name}</strong><small>{role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Chủ khách sạn'}</small></span><Icon name="caret-down" size={16} className="text-ink-muted" /></Link></div></header>;
+  return (
+    <header className="dashboard-topbar">
+      <button type="button" className="dashboard-sidebar-toggle btn btn-icon btn-ghost" onClick={toggleSidebar} aria-label="Mở menu">
+        <Icon name="list" size={20} />
+      </button>
+      {role === ROLE_NAMES.ADMIN && (
+        <div className="dashboard-topbar__context">
+          <span className="dashboard-topbar__eyebrow">Hệ thống quản trị</span>
+          <strong className="dashboard-topbar__title">{pageLabel}</strong>
+        </div>
+      )}
+      <div className="dashboard-topbar__actions">
+        <Link to={profilePath} className="site-header__user dashboard-profile-link">
+          <span className="dashboard-user-meta hidden text-left sm:block">
+            <strong>{name}</strong>
+            <small>{role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Chủ khách sạn'}</small>
+          </span>
+          <Icon name="caret-down" size={16} className="text-ink-muted" />
+        </Link>
+      </div>
+    </header>
+  );
 }

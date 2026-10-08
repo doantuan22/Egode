@@ -32,6 +32,30 @@ describe('admin hotel management (UC33/UC34)', () => {
     expect(updated.status).toBe(200); expect(updated.body.data).toMatchObject({ MaKhachSan: hotelId, TenKhachSan: 'Hotel updated by admin', HangSao: 4 });
   });
 
+  it('shows the owner (name, email, phone only) and the photos, cover first, in the detail and the list', async () => {
+    const prisma = getPrismaClient();
+    await prisma.hINH_ANH_KHACH_SAN.createMany({
+      data: [
+        { MaKhachSan: hotelId, URL: 'https://example.com/second.jpg', AnhDaiDien: false },
+        { MaKhachSan: hotelId, URL: 'https://example.com/cover.jpg', AnhDaiDien: true },
+      ],
+    });
+    const detail = await request(app).get(`/api/admin/hotels/${hotelId}`).set('Authorization', `Bearer ${adminToken}`);
+    expect(detail.status).toBe(200);
+    const owner = detail.body.data.TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN;
+    expect(Object.keys(owner).sort()).toEqual(['Email', 'HoTen', 'MaTaiKhoan', 'SoDienThoai']);
+    expect(detail.body.data.HINH_ANH_KHACH_SAN.map((image: { URL: string }) => image.URL)).toEqual([
+      'https://example.com/cover.jpg',
+      'https://example.com/second.jpg',
+    ]);
+
+    const list = await request(app).get('/api/admin/hotels?page=1&limit=100').set('Authorization', `Bearer ${adminToken}`);
+    const row = list.body.data.find((hotel: { MaKhachSan: number }) => hotel.MaKhachSan === hotelId);
+    expect(row.TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN.HoTen).toBe(owner.HoTen);
+    expect(row.HINH_ANH_KHACH_SAN).toHaveLength(1);
+    expect(row.HINH_ANH_KHACH_SAN[0].URL).toBe('https://example.com/cover.jpg');
+  });
+
   it('suspends a hotel so it disappears from public sellable discovery, then reactivates it', async () => {
     const suspended = await request(app).post(`/api/admin/hotels/${hotelId}/suspend`).set('Authorization', `Bearer ${adminToken}`);
     expect(suspended.status).toBe(200); expect(suspended.body.data.TrangThai).toBe(HOTEL_STATUS.SUSPENDED);

@@ -7,8 +7,10 @@ import { buildBookedByDate, toDateKey } from '../hotels/availability';
 
 export interface RateUpsertItem {
   NgayApDung: Date;
-  GiaPhong: number;
-  SoLuongPhong: number;
+  /** Omitted = keep the stored price of that day. */
+  GiaPhong?: number;
+  /** Omitted = keep the stored room count of that day. */
+  SoLuongPhong?: number;
   TrangThai: string;
 }
 
@@ -32,6 +34,9 @@ export class OwnerRatesRepository {
    * row yet). A booking being created at the same moment therefore either commits first — and is counted below —
    * or waits until this update commits and then sees the new quantity. Lock order is the booking's own order
    * (rates first), so the two cannot deadlock.
+   *
+   * An item may omit GiaPhong and/or SoLuongPhong to change only the status: the stored value of that day is kept
+   * (and an unchanged room count cannot conflict with bookings). A day with no row yet needs both to be created.
    */
   async bulkUpsertGuarded(maLoaiPhong: number, items: RateUpsertItem[]) {
     const prisma = getPrismaClient();
@@ -59,8 +64,28 @@ export class OwnerRatesRepository {
         lines.map((l) => ({ ngayNhanPhong: l.DAT_PHONG.NgayNhanPhong, ngayTraPhong: l.DAT_PHONG.NgayTraPhong, soLuongPhong: l.SoLuongPhong }))
       );
 
+      const partial = items.filter((item) => item.GiaPhong === undefined || item.SoLuongPhong === undefined);
+      if (partial.length > 0) {
+        const existing = await tx.qUY_PHONG_GIA.findMany({
+          where: { MaLoaiPhong: maLoaiPhong, NgayApDung: { in: partial.map((item) => item.NgayApDung) } },
+          select: { NgayApDung: true },
+        });
+        const have = new Set(existing.map((row) => toDateKey(row.NgayApDung)));
+        const missing = partial.map((item) => toDateKey(item.NgayApDung)).filter((key) => !have.has(key)).sort();
+        if (missing.length > 0) {
+          throw AppError.badRequest(
+            `Ngày ${missing[0]}${missing.length > 1 ? ` và ${missing.length - 1} ngày khác` : ''} chưa có giá/quỹ phòng: cần nhập cả giá và số lượng để tạo mới`,
+            missing.map((key) => ({ field: `NgayApDung:${key}`, message: 'Chưa có giá/quỹ phòng, cần nhập giá và số lượng' }))
+          );
+        }
+      }
+
       const conflicts = items
-        .map((item) => ({ date: toDateKey(item.NgayApDung), booked: booked.get(toDateKey(item.NgayApDung)) ?? 0, requested: item.SoLuongPhong }))
+        .flatMap((item) =>
+          item.SoLuongPhong === undefined
+            ? []
+            : [{ date: toDateKey(item.NgayApDung), booked: booked.get(toDateKey(item.NgayApDung)) ?? 0, requested: item.SoLuongPhong }]
+        )
         .filter((c) => c.requested < c.booked)
         .sort((a, b) => a.date.localeCompare(b.date));
       if (conflicts.length > 0) {
@@ -76,12 +101,17 @@ export class OwnerRatesRepository {
         saved.push(
           await tx.qUY_PHONG_GIA.upsert({
             where: { MaLoaiPhong_NgayApDung: { MaLoaiPhong: maLoaiPhong, NgayApDung: item.NgayApDung } },
-            update: { GiaPhong: item.GiaPhong, SoLuongPhong: item.SoLuongPhong, TrangThai: item.TrangThai },
+            update: {
+              ...(item.GiaPhong === undefined ? {} : { GiaPhong: item.GiaPhong }),
+              ...(item.SoLuongPhong === undefined ? {} : { SoLuongPhong: item.SoLuongPhong }),
+              TrangThai: item.TrangThai,
+            },
+            // Both are present here: a day without a row and without both values was rejected above.
             create: {
               MaLoaiPhong: maLoaiPhong,
               NgayApDung: item.NgayApDung,
-              GiaPhong: item.GiaPhong,
-              SoLuongPhong: item.SoLuongPhong,
+              GiaPhong: item.GiaPhong ?? 0,
+              SoLuongPhong: item.SoLuongPhong ?? 0,
               TrangThai: item.TrangThai,
             },
           })

@@ -420,45 +420,18 @@ export default function HomePage() {
       ===================================================== */}
 
       <section className="egode-home-cta">
-
         <div className="egode-home-container">
-
           <div className="egode-home-cta__content">
-
-            <div className="egode-home-cta__icon">
-              <i className="ph ph-suitcase-rolling" />
+            <div className="egode-home-cta__copy">
+              <h2>Sẵn sàng cho chuyến đi tiếp theo?</h2>
+              <p>Chọn điểm đến, ngày lưu trú và bắt đầu tìm khách sạn trên Egode.</p>
             </div>
-
-            <div>
-
-              <span>
-                SẴN SÀNG CHO CHUYẾN ĐI?
-              </span>
-
-              <h2>
-                Tìm nơi nghỉ phù hợp ngay hôm nay
-              </h2>
-
-              <p>
-                Chọn điểm đến, ngày lưu trú và bắt đầu
-                tìm khách sạn trên Egode.
-              </p>
-
-            </div>
-
-            <Link
-              to="/hotels"
-              className="egode-home-cta__button"
-            >
+            <Link to="/hotels" className="egode-home-cta__button">
               Khám phá khách sạn
-
               <i className="ph ph-arrow-right" />
             </Link>
-
           </div>
-
         </div>
-
       </section>
 
     </div>

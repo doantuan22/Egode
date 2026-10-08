@@ -13,7 +13,12 @@ export interface AdminHotel {
   GioNhanPhong?: string;
   GioTraPhong?: string;
   DIA_PHUONG?: { TenThanhPho: string; TenTinh?: string };
+  TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN?: AdminHotelOwner;
+  /** Cover first. The list carries only that one photo; the detail carries them all. */
+  HINH_ANH_KHACH_SAN?: AdminHotelImage[];
 }
+export interface AdminHotelOwner { MaTaiKhoan: number; HoTen: string; Email: string; SoDienThoai: string | null }
+export interface AdminHotelImage { MaHinhAnh: number; URL: string; AnhDaiDien: boolean }
 export interface AdminHotelListResult { items: AdminHotel[]; pagination: { page: number; limit: number; total: number; totalPages: number }; }
 export type AdminHotelQuery = { page: number; limit: number; search?: string; TrangThai?: string };
 const queryString = (query: AdminHotelQuery) => { const params = new URLSearchParams({ page: String(query.page), limit: String(query.limit) }); if (query.search) params.set('search', query.search); if (query.TrangThai) params.set('TrangThai', query.TrangThai); return params.toString(); };

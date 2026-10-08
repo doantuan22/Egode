@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { DateField } from './DateField';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Renders a `<label>` wired to the input via id/htmlFor. Omit for a standalone filter/search input that supplies its own `aria-label`. Accepts a node so callers can add an inline link/badge next to the text. */
@@ -22,19 +23,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const errorId = `${inputId}-error`;
     const hintId = `${inputId}-hint`;
 
-    const field = (
-      <input
-        ref={ref}
-        id={inputId}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : hint ? hintId : undefined}
-        className={cn(
-          'ui-field',
-          className
-        )}
-        {...props}
-      />
-    );
+    const fieldProps = {
+      id: inputId,
+      'aria-invalid': error ? true : undefined,
+      'aria-describedby': error ? errorId : hint ? hintId : undefined,
+      className: cn('ui-field', className),
+      ...props,
+    };
+    // A date field gets the calendar button inside the dashboards; it is the plain native input elsewhere.
+    const field = props.type === 'date' ? <DateField ref={ref} {...fieldProps} /> : <input ref={ref} {...fieldProps} />;
 
     if (!label && !error && !hint) return field;
 

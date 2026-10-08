@@ -212,12 +212,12 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .quantity-stepper__button:disabled { cursor: not-allowed; opacity: .45; }
 .quantity-stepper__value { min-width: 20px; color: var(--color-text-primary); font-size: 14px; font-weight: 600; text-align: center; }
 .search-form__guest-action { display: grid; grid-template-columns: minmax(110px, 1fr) auto; align-items: end; gap: 10px; }
-.hotel-card-v2 { display: grid; grid-template-columns: minmax(190px, 250px) minmax(0, 1fr) minmax(180px, 220px); min-height: 190px; overflow: hidden; border: 1px solid var(--color-border-default); border-radius: var(--radius-surface); background: var(--color-surface-raised); transition: border-color var(--transition-base); }
+.hotel-card-v2 { display: grid; grid-template-columns: minmax(190px, 250px) minmax(0, 1fr) minmax(200px, 240px); min-height: 190px; overflow: hidden; border: 1px solid var(--color-border-default); border-radius: var(--radius-surface); background: var(--color-surface-raised); transition: border-color var(--transition-base); }
 .hotel-card-v2:hover { border-color: var(--color-border-strong); }
 .hotel-card-v2__media { min-height: 190px; background: var(--color-surface-subtle); }
 .hotel-card-v2__media img { width: 100%; height: 100%; object-fit: cover; }
 .hotel-card-v2__fallback { display: grid; height: 100%; min-height: 190px; place-items: center; color: var(--color-text-muted); font-size: 28px; }
-.hotel-card-v2__identity { display: grid; align-content: start; gap: 12px; min-width: 0; padding: 20px; }
+.hotel-card-v2__identity { display: grid; align-content: center; gap: 12px; min-width: 0; padding: 20px 24px; }
 .hotel-card-v2__title-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
 .hotel-card-v2__title-row h2 { min-width: 0; font-size: 18px; overflow-wrap: anywhere; }
 .hotel-card-v2__title-row h2 a:hover { color: var(--color-action-primary); }
@@ -229,10 +229,10 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .hotel-card-v2__availability { font-size: 12px; font-weight: 600; }
 .hotel-card-v2__availability.is-available { color: var(--color-success-text); }
 .hotel-card-v2__availability.is-unavailable { color: var(--color-text-muted); }
-.hotel-card-v2__commercial { display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: 5px; padding: 18px; border-left: 1px solid var(--color-border-default); text-align: right; }
+.hotel-card-v2__commercial { display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: 4px; padding: 20px 24px; border-left: 1px solid var(--color-border-default); text-align: left; }
 .hotel-card-v2__price-label { color: var(--color-text-muted); font-size: 12px; }
 .hotel-card-v2__commercial > strong { color: var(--color-text-primary); font-size: 20px; overflow-wrap: anywhere; }
-.hotel-card-v2__action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; width: 100%; margin-top: 12px; padding: 8px 12px; border-radius: var(--radius-control); background: var(--color-action-primary); color: white; font-size: 13px; font-weight: 600; }
+.hotel-card-v2__action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; width: 100%; margin-top: 14px; padding: 8px 12px; border-radius: var(--radius-control); background: var(--color-action-primary); color: white; font-size: 13px; font-weight: 600; }
 .hotel-card-v2__action:hover { background: var(--color-action-primary-hover); }
 /* Fixed summary of the selected rooms on small screens; the booking panel is at the bottom of the page there. */
 .hotel-mobile-bar { position: fixed; inset-inline: 0; bottom: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px var(--gutter); padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: var(--color-surface-raised); border-top: 1px solid var(--color-border-default); box-shadow: var(--elevation-2); }
@@ -297,7 +297,8 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .toast__content strong { color: var(--color-text-primary); }
 .toast__close { flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin: -5px -5px 0 auto; border: 0; border-radius: var(--radius-control-sm); color: var(--color-text-muted); background: transparent; }
 .toast__close:hover { background: var(--color-surface-subtle); color: var(--color-text-primary); }
-.confirm-dialog { width: min(440px, calc(100vw - 32px)); max-width: none; padding: 0; border: 1px solid var(--color-border-default); border-radius: var(--radius-surface); color: var(--color-text-secondary); background: var(--color-surface-raised); box-shadow: var(--elevation-3); }
+/* margin: auto centres a modal <dialog>; the CSS reset zeroes every margin, which would pin it to the top-left corner. */
+.confirm-dialog { margin: auto; width: min(440px, calc(100vw - 32px)); max-width: none; padding: 0; border: 1px solid var(--color-border-default); border-radius: var(--radius-surface); color: var(--color-text-secondary); background: var(--color-surface-raised); box-shadow: var(--elevation-3); }
 .confirm-dialog::backdrop { background: rgb(15 23 42 / 42%); }
 .confirm-dialog__content { padding: 24px; }
 .confirm-dialog h2 { font-size: 18px; }
@@ -383,6 +384,9 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
 .data-table { width: 100%; border-collapse: collapse; min-width: 640px; }
 .data-table tbody td a:not(.btn):hover { text-decoration: underline; }
+/* Column alignment applies to the header cell too (the th rule above would otherwise pin every header to the left). */
+.data-table thead th.text-center { text-align: center; }
+.data-table thead th.text-right { text-align: right; }
 .data-table thead th {
   text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;
   color: var(--color-muted); background: var(--color-bg-secondary);
@@ -609,7 +613,8 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .owner-module__weekdays { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0; padding: 0; border: 0; }
 .owner-module__weekdays legend { padding: 0; margin-bottom: 6px; color: var(--color-text-secondary); font-size: 12px; font-weight: 600; }
 .owner-module__weekdays label { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-primary); font-size: 13px; }
-.owner-module__form-grid input, .owner-module__filters input, .owner-module__filters select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--color-border-default); border-radius: 8px; background: var(--color-surface-raised); color: var(--color-text-primary); font: inherit; font-size: 14px; }
+.owner-module__form-grid input, .owner-module__form-grid select, .owner-module__filters input, .owner-module__filters select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--color-border-default); border-radius: 8px; background: var(--color-surface-raised); color: var(--color-text-primary); font: inherit; font-size: 14px; }
+.owner-module__form-grid select, .owner-module__filters select { appearance: none; padding-right: 38px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
 .owner-module__filters { justify-content: flex-start; flex-wrap: wrap; }
 .owner-module__filters label { min-width: min(100%, 190px); }
 .owner-rate-table-wrap { overflow-x: auto; }
@@ -643,7 +648,7 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 @media (max-width: 800px) {
   .hotel-card-v2 { grid-template-columns: minmax(0, 1fr); }
   .hotel-card-v2__media, .hotel-card-v2__fallback { min-height: 210px; max-height: 260px; }
-  .hotel-card-v2__identity { padding: 16px 16px 4px; }
+  .hotel-card-v2__identity { padding: 16px 16px 14px; }
   .hotel-card-v2__commercial { align-items: stretch; padding: 12px 16px 16px; border-left: 0; border-top: 1px solid var(--color-border-default); text-align: left; }
   .hotel-card-v2__commercial > strong { font-size: 18px; }
   .room-offer { grid-template-columns: minmax(0, 1fr); }
@@ -673,7 +678,7 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .travel-search__submit:hover { background: var(--color-action-primary-hover, var(--color-primary)); }
 .travel-search__submit:disabled { cursor: wait; opacity: .72; }
 .travel-search__editor { position: absolute; z-index: 90; top: calc(100% + 10px); left: 0; width: min(390px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--color-border-default); border-radius: var(--radius-surface); background: var(--color-surface-raised); box-shadow: var(--elevation-3); }
-.travel-search__editor--dates { width: min(660px, calc(100vw - 32px)); }
+.travel-search__editor--dates { width: min(360px, calc(100vw - 32px)); }
 .travel-search__segment-wrap:nth-last-child(-n+2) .travel-search__editor:not(.travel-search__editor--destination) { right: 0; left: auto; }
 .travel-search--stay .travel-search__segment-wrap:first-child .travel-search__editor { right: auto; left: 0; }
 .travel-search__editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; color: var(--color-text-primary); font-size: 14px; }

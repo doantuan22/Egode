@@ -45,7 +45,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     const user = userEvent.setup();
     await fillRange(user);
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
 
     expect(await screen.findByText('Ghi đè giá và quỹ phòng?')).toBeInTheDocument();
     const dialog = screen.getByRole('dialog');
@@ -62,7 +62,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     open();
     const user = userEvent.setup();
     await fillRange(user);
-    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
 
     await user.click(await screen.findByRole('button', { name: 'Ghi đè' }));
 
@@ -79,7 +79,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     // Everything is ticked by default: leave only Monday.
     for (const day of ['T3', 'T4', 'T5', 'T6', 'T7', 'CN']) await user.click(screen.getByRole('checkbox', { name: day }));
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
     expect(await screen.findByText(/2 ngày/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Ghi đè' }));
 
@@ -93,9 +93,58 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     await fillRange(user);
     for (const day of ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']) await user.click(screen.getByRole('checkbox', { name: day }));
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Chọn ít nhất một thứ trong tuần');
+    expect(mutateAsync).not.toHaveBeenCalled();
+  });
+});
+
+describe('OwnerInventoryPricingPage status-only change', () => {
+  const pickRange = async (user: ReturnType<typeof userEvent.setup>) => {
+    const from = screen.getByLabelText('Từ ngày');
+    const to = screen.getByLabelText('Đến ngày');
+    await user.clear(from);
+    await user.type(from, '2030-01-01');
+    await user.clear(to);
+    await user.type(to, '2030-01-04');
+  };
+
+  it('closes days without asking for a price or quantity, sending only the days that already have a rate and the new status', async () => {
+    vi.mocked(useRates).mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: [
+        { MaQuyPhong: 1, MaLoaiPhong: 11, NgayApDung: '2030-01-02T00:00:00.000Z', GiaPhong: 600000, SoLuongPhong: 3, TrangThai: 'Mở bán' },
+        { MaQuyPhong: 2, MaLoaiPhong: 11, NgayApDung: '2030-01-03T00:00:00.000Z', GiaPhong: 600000, SoLuongPhong: 3, TrangThai: 'Mở bán' },
+      ],
+    } as unknown as ReturnType<typeof useRates>);
+    open();
+    const user = userEvent.setup();
+    await pickRange(user);
+    await user.selectOptions(screen.getByLabelText('Trạng thái'), 'Đóng bán');
+
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+
+    expect(await screen.findByText('Đổi trạng thái bán?')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Xác nhận' }));
+
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledOnce());
+    expect(mutateAsync.mock.calls[0][0]).toEqual([
+      { NgayApDung: '2030-01-02', TrangThai: 'Đóng bán' },
+      { NgayApDung: '2030-01-03', TrangThai: 'Đóng bán' },
+    ]);
+  });
+
+  it('explains what to do when none of the chosen days has a rate yet, and sends nothing', async () => {
+    open();
+    const user = userEvent.setup();
+    await pickRange(user);
+    await user.selectOptions(screen.getByLabelText('Trạng thái'), 'Đóng bán');
+
+    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('chưa có giá/quỹ phòng');
     expect(mutateAsync).not.toHaveBeenCalled();
   });
 });

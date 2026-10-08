@@ -113,3 +113,38 @@ describe('AdminHotelDetailPage check-in / check-out time ("HH:mm", same contract
     expect(payload.GioNhanPhong).toMatch(/^([01]\d|2[0-3]):[0-5]\d$/);
   });
 });
+
+describe('AdminHotelDetailPage shows who owns the hotel and its photos', () => {
+  const render = async (extra: Record<string, unknown>) => {
+    vi.mocked(hotelsApi.getAdminHotel).mockResolvedValue({ ...hotel('Chờ duyệt'), ...extra });
+    renderWithProviders(
+      <FeedbackProvider>
+        <Routes><Route path="/admin/hotels/:id" element={<AdminHotelDetailPage />} /></Routes>
+      </FeedbackProvider>,
+      { route: '/admin/hotels/7' }
+    );
+    await screen.findByRole('heading', { name: 'Khách sạn thử' });
+  };
+
+  it('names the owner and links to their account, and lists every photo with the cover marked', async () => {
+    await render({
+      TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { MaTaiKhoan: 42, HoTen: 'Nguyễn Văn Chủ', Email: 'chu@example.com', SoDienThoai: '0912345678' },
+      HINH_ANH_KHACH_SAN: [
+        { MaHinhAnh: 1, URL: 'https://example.com/cover.jpg', AnhDaiDien: true },
+        { MaHinhAnh: 2, URL: 'https://example.com/b.jpg', AnhDaiDien: false },
+      ],
+    });
+
+    expect(screen.getAllByText('Nguyễn Văn Chủ').length).toBeGreaterThan(0);
+    expect(screen.getByText(/chu@example.com/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Xem tài khoản/ })).toHaveAttribute('href', '/admin/accounts/42');
+    expect(screen.getAllByRole('img', { name: /Ảnh của Khách sạn thử/ })).toHaveLength(2);
+    expect(screen.getByText('Ảnh đại diện')).toBeInTheDocument();
+  });
+
+  it('warns that the hotel has no photo instead of showing an empty gallery', async () => {
+    await render({ HINH_ANH_KHACH_SAN: [] });
+    expect(screen.getByRole('status')).toHaveTextContent('chưa có hình ảnh');
+    expect(screen.queryByRole('img', { name: /Ảnh của/ })).not.toBeInTheDocument();
+  });
+});

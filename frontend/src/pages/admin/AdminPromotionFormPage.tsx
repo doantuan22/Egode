@@ -6,6 +6,8 @@ import type { PromotionFormValues } from '../../features/promotions/types';
 import { useConfirm } from '../../components/common/FeedbackProvider';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+import { Select } from '../../components/common/Select';
+import { DateField } from '../../components/common/DateField';
 
 const DISCOUNT_TYPES = ['Phần trăm', 'Số tiền cố định'];
 
@@ -127,14 +129,14 @@ export default function AdminPromotionFormPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label htmlFor="admin-promotion-form-field-2" className="text-xs font-semibold text-ink-sub block">Loại giảm giá <span className="text-danger">*</span></label>
-                    <select id="admin-promotion-form-field-2" 
+                    <Select id="admin-promotion-form-field-2" 
                       required
                       value={form.LoaiGiamGia}
                       onChange={(e) => setForm((f) => ({ ...f, LoaiGiamGia: e.target.value }))}
                       className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition"
                     >
                       {DISCOUNT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
+                    </Select>
                   </div>
                   <div className="space-y-1.5">
                     <label htmlFor="admin-promotion-form-ml-1" className="text-xs font-semibold text-ink-sub block">
@@ -192,7 +194,7 @@ export default function AdminPromotionFormPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label htmlFor="admin-promotion-form-field-6" className="text-xs font-semibold text-ink-sub block">Ngày bắt đầu <span className="text-danger">*</span></label>
-                    <input id="admin-promotion-form-field-6" 
+                    <DateField id="admin-promotion-form-field-6" 
                       type="date" 
                       required 
                       value={form.NgayBatDau}
@@ -202,7 +204,7 @@ export default function AdminPromotionFormPage() {
                   </div>
                   <div className="space-y-1.5">
                     <label htmlFor="admin-promotion-form-field-7" className="text-xs font-semibold text-ink-sub block">Ngày kết thúc <span className="text-danger">*</span></label>
-                    <input id="admin-promotion-form-field-7" 
+                    <DateField id="admin-promotion-form-field-7" 
                       type="date" 
                       required 
                       value={form.NgayKetThuc}
@@ -218,20 +220,20 @@ export default function AdminPromotionFormPage() {
                   </Button>
                   
                   {isEdit && detailQuery.data && (
-                    <button
+                    <Button
                       type="button"
                       disabled={statusMutation.isPending}
+                      loading={statusMutation.isPending}
+                      variant={detailQuery.data.TrangThai === 'Hoạt động' ? 'danger-outline' : 'success-outline'}
+                      className="flex-1"
                       onClick={async () => {
                         const activating = detailQuery.data!.TrangThai !== 'Hoạt động';
                         if (!activating && !await confirm({ title: 'Ngừng mã khuyến mãi?', description: 'Khách hàng sẽ không thể dùng mã này cho đặt phòng mới.', confirmLabel: 'Ngừng mã', variant: 'danger' })) return;
                         statusMutation.mutate({ id: promotionId, active: activating });
                       }}
-                      className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition border ${
-                        detailQuery.data.TrangThai === 'Hoạt động' ? 'bg-danger-light text-danger-ink border-danger/30 hover:bg-danger-light' : 'bg-success-light text-success-ink border-success/30 hover:bg-success-light'
-                      }`}
                     >
                       {detailQuery.data.TrangThai === 'Hoạt động' ? 'Tắt mã' : 'Bật mã'}
-                    </button>
+                    </Button>
                   )}
                 </div>
 

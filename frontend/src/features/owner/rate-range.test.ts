@@ -25,6 +25,30 @@ describe('buildRatePayload', () => {
     expect(rows.map((row) => row.NgayApDung)).toEqual(['2030-01-05', '2030-01-06', '2030-01-12', '2030-01-13']);
   });
 
+  it('leaves out the price and quantity when they are not given, so the stored values are kept', () => {
+    const rows = buildRatePayload({ from: '2030-01-01', to: '2030-01-02', weekdays: ALL_WEEKDAYS, status: 'Đóng bán' });
+    expect(rows).toEqual([
+      { NgayApDung: '2030-01-01', TrangThai: 'Đóng bán' },
+      { NgayApDung: '2030-01-02', TrangThai: 'Đóng bán' },
+    ]);
+    expect(buildRatePayload({ from: '2030-01-01', to: '2030-01-01', weekdays: ALL_WEEKDAYS, status: 'Mở bán', price: 1 })[0]).toEqual({
+      NgayApDung: '2030-01-01',
+      GiaPhong: 1,
+      TrangThai: 'Mở bán',
+    });
+  });
+
+  it('keeps only the days listed in onlyDates', () => {
+    const rows = buildRatePayload({
+      from: '2030-01-01',
+      to: '2030-01-04',
+      weekdays: ALL_WEEKDAYS,
+      status: 'Đóng bán',
+      onlyDates: new Set(['2030-01-02', '2030-01-04']),
+    });
+    expect(rows.map((row) => row.NgayApDung)).toEqual(['2030-01-02', '2030-01-04']);
+  });
+
   it('is empty when no day of the range falls on a selected weekday', () => {
     expect(buildRatePayload({ ...base, from: '2030-01-01', to: '2030-01-03', weekdays: [1] })).toEqual([]);
   });

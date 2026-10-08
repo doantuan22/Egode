@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AdminAccountsPage from './AdminAccountsPage';
-import { useAccountList } from '../../features/admin/accounts/hooks';
+import { useAccountList, useRoles } from '../../features/admin/accounts/hooks';
 import { renderWithProviders } from '../../test/testUtils';
 
 vi.mock('../../features/admin/accounts/hooks');
@@ -24,6 +24,13 @@ const open = (search = '') =>
 const lastQuery = () => vi.mocked(useAccountList).mock.calls.at(-1)?.[0];
 
 beforeEach(() => {
+  vi.mocked(useRoles).mockReset().mockReturnValue({
+    data: [
+      { MaVaiTro: 1, TenVaiTro: 'Quản trị hệ thống', MoTa: '' },
+      { MaVaiTro: 2, TenVaiTro: 'Khách hàng', MoTa: '' },
+      { MaVaiTro: 3, TenVaiTro: 'Chủ khách sạn', MoTa: '' },
+    ],
+  } as unknown as ReturnType<typeof useRoles>);
   vi.mocked(useAccountList).mockReset();
   vi.mocked(useAccountList).mockReturnValue({
     isLoading: false, isError: false,
@@ -81,5 +88,34 @@ describe('AdminAccountsPage filters live in the URL', () => {
     expect(screen.getByTestId('search')).toBeEmptyDOMElement();
     await waitFor(() => expect(screen.getByPlaceholderText(/Nhập họ tên/)).toHaveValue(''));
     expect(lastQuery()).toEqual({ page: 1, limit: 10, search: undefined, TrangThai: undefined });
+  });
+});
+
+describe('AdminAccountsPage role filter', () => {
+  it('offers customers and hotel owners first, and filters the list by the chosen role', async () => {
+    open();
+    const select = screen.getByLabelText('Vai trò');
+    expect(Array.from(select.querySelectorAll('option')).map((option) => option.textContent)).toEqual([
+      'Tất cả vai trò',
+      'Khách hàng',
+      'Chủ khách sạn',
+      'Quản trị hệ thống',
+    ]);
+
+    await userEvent.setup().selectOptions(select, 'Chủ khách sạn');
+
+    await waitFor(() => expect(lastQuery()).toMatchObject({ page: 1, MaVaiTro: 3 }));
+    expect(screen.getByTestId('search')).toHaveTextContent('role=3');
+    expect(screen.getByRole('button', { name: /Vai trò: Chủ khách sạn/ })).toBeInTheDocument();
+  });
+
+  it('starts from the role in the link and clears it with its chip', async () => {
+    open('?role=2');
+    expect(lastQuery()).toMatchObject({ MaVaiTro: 2 });
+    expect(screen.getByLabelText('Vai trò')).toHaveValue('2');
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /Vai trò: Khách hàng/ }));
+
+    await waitFor(() => expect(lastQuery()?.MaVaiTro).toBeUndefined());
   });
 });

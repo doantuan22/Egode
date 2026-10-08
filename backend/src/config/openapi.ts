@@ -656,13 +656,13 @@ export const openApiSpec = {
         responses: { '200': { description: 'Rate rows in range' } },
       },
       put: {
-        summary: 'Bulk create/update price + inventory per day (upsert on (MaLoaiPhong, NgayApDung) — never duplicates)',
+        summary: 'Bulk create/update price + inventory per day (upsert on (MaLoaiPhong, NgayApDung) — never duplicates). GiaPhong/SoLuongPhong may be omitted to keep the stored value of an existing day (e.g. status-only change)',
         tags: ['Owner'],
         security: [{ BearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: {
           '200': { description: 'Upserted rows' },
-          '400': { description: 'Duplicate date within the same request, or GiaPhong/SoLuongPhong < 0' },
+          '400': { description: 'Duplicate date within the same request, GiaPhong/SoLuongPhong < 0, or a day with no row yet that omits GiaPhong/SoLuongPhong' },
           '403': { description: 'Forbidden' },
         },
       },

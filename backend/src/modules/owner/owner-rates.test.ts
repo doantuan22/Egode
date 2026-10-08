@@ -95,6 +95,48 @@ describe('PUT /api/owner/room-types/:id/rates (bulk create/update)', () => {
     expect(rows[0].SoLuongPhong).toBe(4);
   });
 
+  it('changes only the status when price and quantity are omitted, keeping the stored values', async () => {
+    const { token, roomType } = await makeOwnerWithRoomType();
+    const dates = [addDays(50), addDays(51)];
+    const put = (rates: unknown[]) =>
+      request(app).put(`/api/owner/room-types/${roomType.MaLoaiPhong}/rates`).set('Authorization', `Bearer ${token}`).send({ rates });
+
+    expect((await put(dates.map((d) => ({ NgayApDung: d, GiaPhong: 610000, SoLuongPhong: 7 })))).status).toBe(200);
+    const closeRes = await put(dates.map((d) => ({ NgayApDung: d, TrangThai: 'Đóng bán' })));
+    expect(closeRes.status).toBe(200);
+
+    const rows = await getPrismaClient().qUY_PHONG_GIA.findMany({ where: { MaLoaiPhong: roomType.MaLoaiPhong } });
+    expect(rows).toHaveLength(2);
+    for (const row of rows) {
+      expect(row.TrangThai).toBe('Đóng bán');
+      expect(Number(row.GiaPhong)).toBe(610000);
+      expect(row.SoLuongPhong).toBe(7);
+    }
+
+    // price only: the quantity of the day is kept
+    expect((await put([{ NgayApDung: dates[0], GiaPhong: 650000, TrangThai: 'Mở bán' }])).status).toBe(200);
+    const first = await getPrismaClient().qUY_PHONG_GIA.findFirstOrThrow({
+      where: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: new Date(`${dates[0]}T00:00:00.000Z`) },
+    });
+    expect(Number(first.GiaPhong)).toBe(650000);
+    expect(first.SoLuongPhong).toBe(7);
+    expect(first.TrangThai).toBe('Mở bán');
+  });
+
+  it('rejects a status-only change for a day that has no rate row yet (400) and writes nothing', async () => {
+    const { token, roomType } = await makeOwnerWithRoomType();
+    const date = addDays(60);
+
+    const res = await request(app)
+      .put(`/api/owner/room-types/${roomType.MaLoaiPhong}/rates`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ rates: [{ NgayApDung: date, TrangThai: 'Đóng bán' }] });
+    expect(res.status).toBe(400);
+
+    const rows = await getPrismaClient().qUY_PHONG_GIA.findMany({ where: { MaLoaiPhong: roomType.MaLoaiPhong } });
+    expect(rows).toHaveLength(0);
+  });
+
   it('rejects duplicate (MaLoaiPhong, NgayApDung) within the same bulk request', async () => {
     const { token, roomType } = await makeOwnerWithRoomType();
     const date = addDays(50);
