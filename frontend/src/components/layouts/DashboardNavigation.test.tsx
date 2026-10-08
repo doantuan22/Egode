@@ -26,14 +26,19 @@ describe('DashboardTopbar', () => {
     expect(screen.queryByRole('button', { name: 'Thông báo' })).not.toBeInTheDocument();
   });
 
-  it.each([
-    [ROLE_NAMES.PARTNER, '/owner/profile'],
-    [ROLE_NAMES.ADMIN, '/admin/profile'],
-  ])('still offers the menu toggle and the profile link for %s', (role, profile) => {
-    renderWithProviders(<DashboardTopbar role={role} />);
+  it('keeps the partner menu toggle because the sidebar can become a drawer', () => {
+    renderWithProviders(<DashboardTopbar role={ROLE_NAMES.PARTNER} />);
 
     expect(screen.getByRole('button', { name: 'Mở menu' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Quản trị viên|Đối tác/ })).toHaveAttribute('href', profile);
+    expect(screen.getByRole('link', { name: /Đối tác/ })).toHaveAttribute('href', '/owner/profile');
+  });
+
+  it('does not show a redundant menu toggle or theme switch in the admin topbar', () => {
+    renderWithProviders(<DashboardTopbar role={ROLE_NAMES.ADMIN} />);
+
+    expect(screen.queryByRole('button', { name: 'Mở menu' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /giao diện/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Quản trị viên/ })).toHaveAttribute('href', '/admin/profile');
   });
 });
 

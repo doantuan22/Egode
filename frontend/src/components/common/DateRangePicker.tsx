@@ -432,136 +432,18 @@ export function DateRangePicker({
 
         animate
 
-        className="
-          !m-0
-
-          !w-full
-        "
+        className="egode-date-range !m-0 !w-full"
 
         /* =================================================
            CUSTOM MODIFIERS
         ================================================= */
 
         modifiersClassNames={{
-          /* ===============================================
-             CHECK-IN
-          =============================================== */
-
-          checkIn: `
-            bg-gradient-to-r
-
-            from-transparent
-            from-50%
-
-            to-blue-50
-            to-50%
-
-            [&>button]:
-            !bg-blue-600
-
-            [&>button]:
-            !text-white
-
-            [&>button]:
-            !font-bold
-
-            [&>button]:
-            shadow-[0_5px_16px_rgba(37,99,235,0.30)]
-
-            [&>button:hover]:
-            !bg-blue-700
-          `,
-
-          /* ===============================================
-             CHECK-OUT
-          =============================================== */
-
-          checkOut: `
-            bg-gradient-to-r
-
-            from-blue-50
-            from-50%
-
-            to-transparent
-            to-50%
-
-            [&>button]:
-            !bg-blue-600
-
-            [&>button]:
-            !text-white
-
-            [&>button]:
-            !font-bold
-
-            [&>button]:
-            shadow-[0_5px_16px_rgba(37,99,235,0.30)]
-
-            [&>button:hover]:
-            !bg-blue-700
-          `,
-
-          /* ===============================================
-             SELECTED RANGE
-          =============================================== */
-
-          rangeMiddle: `
-            bg-blue-50
-
-            [&>button]:
-            !rounded-none
-
-            [&>button]:
-            !bg-transparent
-
-            [&>button]:
-            !text-blue-700
-
-            [&>button:hover]:
-            !bg-blue-100
-          `,
-
-          /* ===============================================
-             HOVER PREVIEW
-          =============================================== */
-
-          previewMiddle: `
-            bg-blue-50/60
-
-            [&>button]:
-            !rounded-none
-
-            [&>button]:
-            !bg-transparent
-
-            [&>button]:
-            !text-blue-600
-          `,
-
-          previewEnd: `
-            bg-gradient-to-r
-
-            from-blue-50/60
-            from-50%
-
-            to-transparent
-            to-50%
-
-            [&>button]:
-            !border-blue-500
-
-            [&>button]:
-            !bg-white
-
-            [&>button]:
-            !text-blue-600
-
-            [&>button]:
-            ring-1
-
-            [&>button]:
-            ring-blue-500
-          `,
+          checkIn: 'egode-date-range__check-in',
+          checkOut: 'egode-date-range__check-out',
+          rangeMiddle: 'egode-date-range__middle',
+          previewMiddle: 'egode-date-range__preview-middle',
+          previewEnd: 'egode-date-range__preview-end',
         }}
 
         /* =================================================
@@ -788,48 +670,12 @@ export function DateRangePicker({
           `,
 
           day_button: `
-            relative
-            z-10
-
-            grid
-
-            h-9
-            w-9
-
-            place-items-center
-
-            rounded-full
-
-            border
-            border-transparent
-
-            text-[13px]
-            font-medium
-
-            text-slate-700
-
-            outline-none
-
-            transition-all
-            duration-150
-
-            hover:
-            bg-blue-50
-
-            hover:
-            text-blue-700
-
-            active:
-            scale-[0.92]
-
-            focus-visible:
-            ring-2
-
-            focus-visible:
-            ring-blue-500
-
-            focus-visible:
-            ring-offset-1
+            relative z-10 grid h-10 w-10 place-items-center
+            rounded-full border-0 bg-transparent
+            text-[13px] font-medium text-slate-700 outline-none
+            transition-colors duration-150
+            hover:bg-blue-50 hover:text-blue-700
+            focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
           `,
 
           /* ===============================================
@@ -837,17 +683,8 @@ export function DateRangePicker({
           =============================================== */
 
           today: `
-            [&>button]:
-            font-bold
-
-            [&>button]:
-            text-blue-600
-
-            [&>button]:
-            ring-1
-
-            [&>button]:
-            ring-blue-200
+            [&>button]:font-bold
+            [&>button]:text-blue-600
           `,
 
           /* ===============================================

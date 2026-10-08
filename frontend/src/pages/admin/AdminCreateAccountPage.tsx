@@ -102,9 +102,9 @@ export default function AdminCreateAccountPage() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4 mt-4 border-t border-border">
-              <Link to="/admin/accounts" className="px-4 py-2 bg-white text-ink-sub border border-border rounded-xl text-sm font-semibold hover:bg-surface-secondary transition">
-                Hủy bỏ
-              </Link>
+              <Button asChild variant="ghost">
+                <Link to="/admin/accounts">Hủy bỏ</Link>
+              </Button>
               <Button type="submit" disabled={saving}>
                 {saving ? 'Đang tạo...' : 'Lưu tài khoản'}
               </Button>

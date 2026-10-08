@@ -218,20 +218,20 @@ export default function AdminPromotionFormPage() {
                   </Button>
                   
                   {isEdit && detailQuery.data && (
-                    <button
+                    <Button
                       type="button"
                       disabled={statusMutation.isPending}
+                      loading={statusMutation.isPending}
+                      variant={detailQuery.data.TrangThai === 'Hoạt động' ? 'danger-outline' : 'success-outline'}
+                      className="flex-1"
                       onClick={async () => {
                         const activating = detailQuery.data!.TrangThai !== 'Hoạt động';
                         if (!activating && !await confirm({ title: 'Ngừng mã khuyến mãi?', description: 'Khách hàng sẽ không thể dùng mã này cho đặt phòng mới.', confirmLabel: 'Ngừng mã', variant: 'danger' })) return;
                         statusMutation.mutate({ id: promotionId, active: activating });
                       }}
-                      className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition border ${
-                        detailQuery.data.TrangThai === 'Hoạt động' ? 'bg-danger-light text-danger-ink border-danger/30 hover:bg-danger-light' : 'bg-success-light text-success-ink border-success/30 hover:bg-success-light'
-                      }`}
                     >
-                      {detailQuery.data.TrangThai === 'Hoạt động' ? 'Tắt mã' : 'Bật mã'}
-                    </button>
+                      {detailQuery.data.TrangThai === 'Hoạt động' ? 'Ngừng áp dụng' : 'Kích hoạt lại'}
+                    </Button>
                   )}
                 </div>
 

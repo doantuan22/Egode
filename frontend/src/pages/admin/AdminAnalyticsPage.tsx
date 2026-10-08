@@ -16,7 +16,7 @@ export default function AdminAnalyticsPage() {
   const data = analyticsQuery.data;
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
+    <div className="admin-analytics flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-heading">Báo cáo & thống kê hệ thống</h1>
@@ -36,7 +36,7 @@ export default function AdminAnalyticsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[16px] border border-border shadow-sm p-5 space-y-4">
+      <div className="admin-analytics__filters bg-white rounded-[16px] border border-border shadow-sm p-5 space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-end">
            <div className="flex-1">
              <DateRangeFilter
@@ -68,7 +68,7 @@ export default function AdminAnalyticsPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* KPI 1 */}
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng tài khoản</p>
                 <h3 className="text-2xl font-bold text-heading mt-1">{data.TongTaiKhoan.toLocaleString('vi-VN')}</h3>
@@ -79,7 +79,7 @@ export default function AdminAnalyticsPage() {
             </div>
 
             {/* KPI 2 */}
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng khách sạn</p>
                 <h3 className="text-2xl font-bold text-heading mt-1">{data.TongKhachSan.toLocaleString('vi-VN')}</h3>
@@ -90,7 +90,7 @@ export default function AdminAnalyticsPage() {
             </div>
 
             {/* KPI 3 */}
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng lượt booking</p>
                 <h3 className="text-2xl font-bold text-success mt-1">{data.TongSoBooking.toLocaleString('vi-VN')}</h3>
@@ -101,7 +101,7 @@ export default function AdminAnalyticsPage() {
             </div>
 
             {/* KPI 4 */}
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng giao dịch</p>
                 <h3 className="text-2xl font-bold text-heading mt-1">{data.TongGiaoDich.toLocaleString('vi-VN')}</h3>
@@ -113,7 +113,7 @@ export default function AdminAnalyticsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-             <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+             <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-bold text-ink-muted uppercase tracking-wider">Doanh thu hệ thống (GMV)</p>
                 <h3 className="text-xl font-black text-heading mt-1">{formatCurrencyVND(data.DoanhThuHeThong)}</h3>
@@ -123,7 +123,7 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
             
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-bold text-danger uppercase tracking-wider">Đã hoàn tiền</p>
                 <h3 className="text-xl font-black text-danger mt-1">{formatCurrencyVND(data.TongHoanTien)}</h3>
@@ -133,7 +133,7 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between relative overflow-hidden">
+            <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between relative overflow-hidden">
               <div className="absolute top-0 right-0 p-3 text-success/10">
                  <i className="ph-fill ph-trend-up text-6xl"></i>
               </div>
@@ -145,7 +145,7 @@ export default function AdminAnalyticsPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-users-three text-primary"></i> Tài khoản theo vai trò
                </h3>
@@ -154,7 +154,7 @@ export default function AdminAnalyticsPage() {
                </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-buildings text-primary-500"></i> Khách sạn theo trạng thái
                </h3>
@@ -163,7 +163,7 @@ export default function AdminAnalyticsPage() {
                </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-calendar-check text-success"></i> Đặt phòng theo trạng thái
                </h3>
@@ -172,7 +172,7 @@ export default function AdminAnalyticsPage() {
                </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-credit-card text-warning"></i> Thanh toán & Hoàn tiền
                </h3>
@@ -188,7 +188,7 @@ export default function AdminAnalyticsPage() {
                </div>
             </div>
             
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-star text-warning"></i> Đánh giá theo trạng thái (Toàn thời gian)
                </h3>
@@ -197,7 +197,7 @@ export default function AdminAnalyticsPage() {
                </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
+            <div className="admin-analytics__panel bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col">
                <h3 className="text-sm font-bold text-heading flex items-center gap-2 mb-4 pb-3 border-b border-surface-tertiary">
                  <i className="ph-fill ph-lifebuoy text-danger"></i> Yêu cầu hỗ trợ/khiếu nại
                </h3>

@@ -990,3 +990,778 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
   .dashboard-shell--admin .admin-grid--4 { grid-template-columns: 1fr; }
   .dashboard-shell--admin .admin-management-list__copy small { white-space: normal; }
 }
+
+/* ========================================================================== 
+   BOOKING DATE RANGE — FILLED DATES, NO OUTLINED DAY BOXES
+   ========================================================================== */
+.egode-date-range .rdp-day { position: relative; }
+.egode-date-range .rdp-day_button { border: 0 !important; box-shadow: none !important; }
+.egode-date-range .egode-date-range__check-in > button,
+.egode-date-range .egode-date-range__check-out > button {
+  background: var(--color-action-primary) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.egode-date-range .egode-date-range__check-in > button:hover,
+.egode-date-range .egode-date-range__check-out > button:hover { background: var(--color-action-primary-hover) !important; }
+.egode-date-range .egode-date-range__middle { background: var(--color-action-primary-subtle); }
+.egode-date-range .egode-date-range__middle > button {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-action-primary-active) !important;
+  box-shadow: none !important;
+}
+.egode-date-range .egode-date-range__middle > button:hover { background: color-mix(in srgb, var(--color-action-primary) 9%, white) !important; }
+.egode-date-range .egode-date-range__preview-middle { background: color-mix(in srgb, var(--color-action-primary) 6%, white); }
+.egode-date-range .egode-date-range__preview-middle > button {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--color-action-primary) !important;
+  box-shadow: none !important;
+}
+.egode-date-range .egode-date-range__preview-end > button {
+  border: 0 !important;
+  background: color-mix(in srgb, var(--color-action-primary) 14%, white) !important;
+  color: var(--color-action-primary-active) !important;
+  box-shadow: none !important;
+}
+.egode-date-range .rdp-today:not(.egode-date-range__check-in):not(.egode-date-range__check-out) > button {
+  color: var(--color-action-primary) !important;
+  font-weight: 700 !important;
+  box-shadow: inset 0 -2px 0 var(--color-action-primary) !important;
+  border-radius: 0 !important;
+}
+
+/* ========================================================================== 
+   ADMIN LIST WORKSPACE — FILTERS + TOOLBAR + TABLE IN ONE FLAT SURFACE
+   ========================================================================== */
+.dashboard-shell--admin .admin-list-panel {
+  overflow: hidden;
+  border: 1px solid var(--admin-border, #e5e7eb);
+  border-radius: 8px;
+  background: #fff;
+}
+.dashboard-shell--admin .admin-list-panel__filters { border-bottom: 1px solid #e5e7eb; background: #fff; }
+.dashboard-shell--admin .admin-list-panel__filters > [role='search'] {
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+.dashboard-shell--admin .admin-list-panel__toolbar {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px 8px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+.dashboard-shell--admin .admin-list-panel__summary {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  color: #64748b;
+  font-size: 12px;
+}
+.dashboard-shell--admin .admin-list-panel__summary strong { color: #0f172a; font-size: 14px; font-weight: 750; }
+.dashboard-shell--admin .admin-list-panel__filter-count {
+  margin-left: 7px;
+  padding-left: 10px;
+  border-left: 1px solid #dbe2ea;
+  color: #2563eb;
+  font-weight: 600;
+}
+.dashboard-shell--admin .admin-list-panel__refresh { min-width: max-content; border: 1px solid #dbe2ea; background: #fff; }
+.dashboard-shell--admin .admin-list-panel__table .data-table { min-width: 760px; }
+.dashboard-shell--admin .admin-list-panel__table .pagination {
+  min-height: 50px;
+  padding: 8px 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+}
+.dashboard-shell--admin .admin-filter-chips,
+.dashboard-shell--admin .admin-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff;
+}
+.dashboard-shell--admin .admin-filter-chips__label,
+.dashboard-shell--admin .admin-quick-filters > span:first-child {
+  margin-right: 2px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.dashboard-shell--admin .admin-quick-filters {
+  flex-basis: 100%;
+  padding: 10px 0 0;
+  border-top: 1px solid #eef2f7;
+}
+.dashboard-shell--admin .admin-neutral-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+}
+.dashboard-shell--admin .admin-row-link {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #dbe2ea;
+  border-radius: 6px;
+  background: #fff;
+  color: #2563eb;
+  text-decoration: none;
+}
+.dashboard-shell--admin .admin-row-link:hover { border-color: #bfdbfe; background: #eff6ff; text-decoration: none; }
+
+/* Keep the admin workspace visually flat even when legacy utility classes remain. */
+.dashboard-shell--admin .admin-page-shell { gap: 16px; }
+.dashboard-shell--admin .admin-page-shell > .page-header,
+.dashboard-shell--admin .admin-analytics > div:first-child { margin-bottom: 0; }
+.dashboard-shell--admin .admin-analytics__filters,
+.dashboard-shell--admin .admin-analytics__metric,
+.dashboard-shell--admin .admin-analytics__panel { border-radius: 8px !important; box-shadow: none !important; }
+.dashboard-shell--admin .admin-analytics__metric,
+.dashboard-shell--admin .admin-analytics__panel { border-color: #e5e7eb !important; }
+.dashboard-shell--admin .admin-analytics__metric > div:last-child { border-radius: 6px !important; box-shadow: none !important; }
+.dashboard-shell--admin .admin-kpi-card__icon--blue,
+.dashboard-shell--admin .admin-kpi-card__icon--green,
+.dashboard-shell--admin .admin-kpi-card__icon--violet,
+.dashboard-shell--admin .admin-kpi-card__icon--amber { background: #eff6ff; color: #2563eb; }
+.dashboard-shell--admin .admin-management-list__icon { background: #f8fafc; color: #2563eb; }
+.dashboard-shell--admin .admin-dashboard__report-link,
+.dashboard-shell--admin .btn-outline { border-color: #cbd5e1; background: #fff; color: #1d4ed8; }
+.dashboard-shell--admin .admin-dashboard__report-link:hover,
+.dashboard-shell--admin .btn-outline:hover { border-color: #bfdbfe; background: #eff6ff; }
+
+/* Flatten remaining legacy utility surfaces inside admin without touching public/customer UI. */
+.dashboard-shell--admin [class~='rounded-2xl'],
+.dashboard-shell--admin [class~='rounded-[16px]'] { border-radius: 8px !important; }
+.dashboard-shell--admin [class~='rounded-xl']:not(.status-badge) { border-radius: 7px !important; }
+.dashboard-shell--admin [class~='shadow-sm'] { box-shadow: none !important; }
+
+@media (max-width: 700px) {
+  .dashboard-shell--admin .admin-list-panel__toolbar { align-items: flex-start; }
+  .dashboard-shell--admin .admin-list-panel__filter-count {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ========================================================================== 
+   ADMIN THEMED SURFACES — unified light/dark color system
+   ========================================================================== */
+.dashboard-shell--admin .admin-dashboard__hero,
+.dashboard-shell--admin .admin-hero-panel,
+.dashboard-shell--admin .admin-queue-card,
+.dashboard-shell--admin .admin-kpi-card,
+.dashboard-shell--admin .admin-stat-card,
+.dashboard-shell--admin .admin-section-card,
+.dashboard-shell--admin .admin-management-panel,
+.dashboard-shell--admin .admin-dashboard__note,
+.dashboard-shell--admin .admin-empty-state,
+.dashboard-shell--admin .admin-list-panel,
+.dashboard-shell--admin .admin-partner-review__body,
+.dashboard-shell--admin .admin-payment-detail__body,
+.dashboard-shell--admin .admin-support-detail__body,
+.dashboard-shell--admin .admin-partner-review__decision,
+.dashboard-shell--admin .admin-payment-detail__timeline,
+.dashboard-shell--admin .admin-analytics__filters,
+.dashboard-shell--admin .admin-analytics__metric,
+.dashboard-shell--admin .admin-analytics__panel,
+.dashboard-shell--admin .surface-card,
+.dashboard-shell--admin .card,
+.dashboard-shell--admin .table-wrap,
+.dashboard-shell--admin [role='search'].surface-card,
+.dashboard-shell--admin .bg-white {
+  border-color: var(--admin-border) !important;
+  background: var(--admin-surface) !important;
+  color: var(--admin-text);
+  box-shadow: none !important;
+}
+
+.dashboard-shell--admin .admin-dashboard__hero h1,
+.dashboard-shell--admin .admin-hero-panel h1,
+.dashboard-shell--admin .admin-hero-panel h2,
+.dashboard-shell--admin .admin-section-heading h2,
+.dashboard-shell--admin .admin-management-panel__heading h2,
+.dashboard-shell--admin .admin-section-card__head h2,
+.dashboard-shell--admin .admin-section-card__head h3,
+.dashboard-shell--admin .admin-queue-card__value,
+.dashboard-shell--admin .admin-queue-card__label,
+.dashboard-shell--admin .admin-kpi-card strong,
+.dashboard-shell--admin .admin-management-list__copy strong,
+.dashboard-shell--admin .admin-dashboard__note h2,
+.dashboard-shell--admin .admin-empty-state h3,
+.dashboard-shell--admin .admin-list-panel__summary strong,
+.dashboard-shell--admin .data-table tbody td,
+.dashboard-shell--admin .text-heading,
+.dashboard-shell--admin .text-ink {
+  color: var(--admin-text) !important;
+}
+
+.dashboard-shell--admin .admin-dashboard__hero p,
+.dashboard-shell--admin .admin-hero-panel p,
+.dashboard-shell--admin .admin-section-heading p,
+.dashboard-shell--admin .admin-management-panel__heading p,
+.dashboard-shell--admin .admin-section-card__head p,
+.dashboard-shell--admin .admin-queue-card small,
+.dashboard-shell--admin .admin-kpi-card p,
+.dashboard-shell--admin .admin-kpi-card small,
+.dashboard-shell--admin .admin-management-list__copy small,
+.dashboard-shell--admin .admin-dashboard__note p,
+.dashboard-shell--admin .admin-empty-state p,
+.dashboard-shell--admin .admin-list-panel__summary,
+.dashboard-shell--admin .admin-filter-chips__label,
+.dashboard-shell--admin .admin-quick-filters > span:first-child,
+.dashboard-shell--admin .data-table thead th,
+.dashboard-shell--admin .text-ink-muted,
+.dashboard-shell--admin .text-ink-sub {
+  color: var(--admin-muted) !important;
+}
+
+.dashboard-shell--admin .admin-management-panel__heading,
+.dashboard-shell--admin .admin-list-panel__filters,
+.dashboard-shell--admin .admin-list-panel__filters > [role='search'],
+.dashboard-shell--admin .admin-list-panel__table .pagination,
+.dashboard-shell--admin .admin-filter-chips,
+.dashboard-shell--admin .admin-quick-filters,
+.dashboard-shell--admin .pagination {
+  border-color: var(--admin-border) !important;
+  background: var(--admin-surface) !important;
+}
+
+.dashboard-shell--admin .admin-list-panel__toolbar,
+.dashboard-shell--admin .data-table thead th,
+.dashboard-shell--admin .bg-surface-secondary,
+.dashboard-shell--admin .bg-surface-tertiary {
+  border-color: var(--admin-border) !important;
+  background: var(--admin-surface-subtle) !important;
+}
+
+.dashboard-shell--admin .admin-management-list__item,
+.dashboard-shell--admin .data-table tbody td,
+.dashboard-shell--admin .admin-active-filters,
+.dashboard-shell--admin .admin-quick-filters,
+.dashboard-shell--admin .admin-list-panel__toolbar,
+.dashboard-shell--admin .admin-list-panel__table .pagination {
+  border-color: var(--admin-border) !important;
+}
+
+.dashboard-shell--admin .admin-management-list__item:hover,
+.dashboard-shell--admin .admin-queue-card:hover,
+.dashboard-shell--admin .data-table tbody tr:hover {
+  background: var(--admin-surface-hover) !important;
+}
+
+.dashboard-shell--admin .admin-queue-card__icon,
+.dashboard-shell--admin .admin-kpi-card__icon,
+.dashboard-shell--admin .admin-stat-card__icon,
+.dashboard-shell--admin .admin-management-list__icon,
+.dashboard-shell--admin .admin-dashboard__note-icon {
+  background: var(--admin-surface-subtle) !important;
+  color: var(--admin-accent) !important;
+}
+
+/* Keep semantic status colors useful, but remove unrelated multicolor dashboard decoration. */
+.dashboard-shell--admin .admin-kpi-card__icon--blue,
+.dashboard-shell--admin .admin-kpi-card__icon--green,
+.dashboard-shell--admin .admin-kpi-card__icon--violet,
+.dashboard-shell--admin .admin-kpi-card__icon--amber,
+.dashboard-shell--admin .admin-queue-card--blue .admin-queue-card__icon,
+.dashboard-shell--admin .admin-queue-card--violet .admin-queue-card__icon,
+.dashboard-shell--admin .admin-queue-card--amber .admin-queue-card__icon {
+  background: var(--admin-accent-soft) !important;
+  color: var(--admin-accent) !important;
+}
+
+.dashboard-shell--admin .admin-queue-card--red .admin-queue-card__icon {
+  background: var(--admin-danger-soft) !important;
+  color: var(--admin-danger) !important;
+}
+
+.dashboard-shell--admin .admin-dashboard__report-link,
+.dashboard-shell--admin .btn-outline,
+.dashboard-shell--admin .admin-row-link,
+.dashboard-shell--admin .admin-list-panel__refresh,
+.dashboard-shell--admin .btn-ghost {
+  border-color: var(--admin-border-strong) !important;
+  background: var(--admin-surface) !important;
+  color: var(--admin-text-secondary) !important;
+  box-shadow: none !important;
+}
+
+.dashboard-shell--admin .admin-dashboard__report-link:hover,
+.dashboard-shell--admin .btn-outline:hover,
+.dashboard-shell--admin .admin-row-link:hover,
+.dashboard-shell--admin .admin-list-panel__refresh:hover,
+.dashboard-shell--admin .btn-ghost:hover {
+  border-color: var(--admin-accent) !important;
+  background: var(--admin-accent-soft) !important;
+  color: var(--admin-accent) !important;
+}
+
+.dashboard-shell--admin .btn-primary {
+  border-color: var(--admin-accent) !important;
+  background: var(--admin-accent) !important;
+  color: #fff !important;
+}
+
+.dashboard-shell--admin .btn-primary:hover {
+  border-color: var(--admin-accent-hover) !important;
+  background: var(--admin-accent-hover) !important;
+}
+
+.dashboard-shell--admin .input,
+.dashboard-shell--admin .select,
+.dashboard-shell--admin .textarea,
+.dashboard-shell--admin .ui-field,
+.dashboard-shell--admin input:not([type='checkbox']):not([type='radio']),
+.dashboard-shell--admin select,
+.dashboard-shell--admin textarea {
+  border-color: var(--admin-border-strong) !important;
+  background: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+  box-shadow: none !important;
+}
+
+.dashboard-shell--admin input::placeholder,
+.dashboard-shell--admin textarea::placeholder {
+  color: var(--admin-muted) !important;
+}
+
+.dashboard-shell--admin .input:hover,
+.dashboard-shell--admin .select:hover,
+.dashboard-shell--admin .textarea:hover,
+.dashboard-shell--admin .ui-field:hover,
+.dashboard-shell--admin input:not([type='checkbox']):not([type='radio']):hover,
+.dashboard-shell--admin select:hover,
+.dashboard-shell--admin textarea:hover {
+  border-color: var(--admin-muted) !important;
+}
+
+.dashboard-shell--admin .input:focus,
+.dashboard-shell--admin .select:focus,
+.dashboard-shell--admin .textarea:focus,
+.dashboard-shell--admin .ui-field:focus,
+.dashboard-shell--admin input:not([type='checkbox']):not([type='radio']):focus,
+.dashboard-shell--admin select:focus,
+.dashboard-shell--admin textarea:focus {
+  border-color: var(--admin-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 16%, transparent) !important;
+}
+
+.dashboard-shell--admin .admin-active-filters button:not(.admin-active-filters__clear),
+.dashboard-shell--admin .admin-neutral-tag {
+  border-color: var(--admin-border) !important;
+  background: var(--admin-surface-subtle) !important;
+  color: var(--admin-text-secondary) !important;
+}
+
+.dashboard-shell--admin .admin-list-panel__filter-count,
+.dashboard-shell--admin .admin-dashboard__eyebrow {
+  color: var(--admin-accent) !important;
+}
+
+.dashboard-shell--admin .admin-list-panel__filter-count {
+  border-color: var(--admin-border) !important;
+}
+
+.dashboard-shell--admin .admin-management-list__arrow,
+.dashboard-shell--admin .admin-queue-card__open {
+  color: var(--admin-muted) !important;
+}
+
+/* Analytics uses Tailwind utility surfaces. Scope them back into the Admin theme. */
+.dashboard-shell--admin .admin-analytics .border-border,
+.dashboard-shell--admin .admin-analytics .border-surface-tertiary {
+  border-color: var(--admin-border) !important;
+}
+
+.dashboard-shell--admin .admin-analytics .bg-primary-50,
+.dashboard-shell--admin .admin-analytics .bg-surface-secondary,
+.dashboard-shell--admin .admin-analytics .bg-surface-tertiary {
+  background: var(--admin-surface-subtle) !important;
+}
+
+.dashboard-shell--admin .admin-analytics__metric > div:last-child {
+  background: var(--admin-accent-soft) !important;
+  color: var(--admin-accent) !important;
+}
+
+.dashboard-shell--admin .admin-analytics__panel h3 {
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+
+/* ========================================================================== 
+   OWNER / HOTEL PARTNER UI — CONSISTENT OPERATIONS WORKSPACE
+   Scoped to .dashboard-shell--owner so customer/public UI stays unchanged.
+   ========================================================================== */
+.dashboard-shell--owner .page-header,
+.dashboard-shell--owner .owner-module__header,
+.dashboard-shell--owner .owner-entity-header {
+  padding: 18px 20px;
+  border: 1px solid var(--owner-border);
+  border-radius: 12px;
+  background: var(--owner-surface);
+  box-shadow: 0 2px 8px rgb(31 65 98 / 5%);
+}
+
+.dashboard-shell--owner .page-header {
+  margin-bottom: 20px;
+}
+
+.dashboard-shell--owner .page-header h1,
+.dashboard-shell--owner .owner-module__title h1,
+.dashboard-shell--owner .owner-entity-header__identity h1 {
+  color: var(--owner-text);
+  font-weight: 730;
+  letter-spacing: -.022em;
+}
+
+.dashboard-shell--owner .page-header__desc,
+.dashboard-shell--owner .owner-module__title p,
+.dashboard-shell--owner .owner-entity-header__identity p:last-child {
+  color: var(--owner-text-secondary);
+}
+
+.dashboard-shell--owner .owner-module__icon {
+  width: 40px;
+  height: 40px;
+  border-color: #cfe0f0;
+  border-radius: 9px;
+  background: var(--owner-accent-soft);
+  color: var(--owner-accent);
+}
+
+.dashboard-shell--owner .owner-hotel-context {
+  min-height: 58px;
+  padding: 9px 14px;
+  border-color: var(--owner-border);
+  border-radius: 10px;
+  background: var(--owner-surface);
+  color: var(--owner-accent);
+  box-shadow: inset 3px 0 0 var(--owner-accent), 0 1px 4px rgb(31 65 98 / 4%);
+}
+
+.dashboard-shell--owner .owner-hotel-context small {
+  color: var(--owner-muted);
+}
+
+.dashboard-shell--owner .owner-hotel-context strong,
+.dashboard-shell--owner .owner-hotel-context select {
+  color: var(--owner-text);
+}
+
+.dashboard-shell--owner .owner-scope-state {
+  min-height: 82px;
+  border-color: #cbd8e5;
+  border-radius: 10px;
+  background: #f7fafc;
+  color: var(--owner-text-secondary);
+}
+
+.dashboard-shell--owner .owner-module__toolbar,
+.dashboard-shell--owner .owner-module__filters,
+.dashboard-shell--owner .owner-module__form,
+.dashboard-shell--owner .owner-module__data,
+.dashboard-shell--owner .owner-metric-strip,
+.dashboard-shell--owner .owner-revenue-total {
+  border-color: var(--owner-border);
+  border-radius: 10px;
+  background: var(--owner-surface);
+  box-shadow: 0 1px 5px rgb(31 65 98 / 4%);
+}
+
+.dashboard-shell--owner .owner-module__toolbar,
+.dashboard-shell--owner .owner-module__filters {
+  padding: 13px 14px;
+}
+
+.dashboard-shell--owner .owner-module__search {
+  border-color: var(--owner-border);
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.dashboard-shell--owner .owner-module__search:focus-within {
+  border-color: #8fb9e6;
+  box-shadow: 0 0 0 3px rgb(40 120 208 / 10%);
+}
+
+.dashboard-shell--owner .owner-module__form-grid input,
+.dashboard-shell--owner .owner-module__filters input,
+.dashboard-shell--owner .owner-module__filters select {
+  border-color: var(--owner-border);
+  background: #fbfdff;
+}
+
+.dashboard-shell--owner .owner-room-type-list {
+  gap: 10px;
+}
+
+.dashboard-shell--owner .owner-room-type-row {
+  border-color: var(--owner-border);
+  border-radius: 10px;
+  background: var(--owner-surface);
+  box-shadow: 0 1px 4px rgb(31 65 98 / 4%);
+}
+
+.dashboard-shell--owner .owner-room-type-row:hover {
+  border-color: #a9c7e4;
+  background: #f8fbfe;
+  box-shadow: 0 4px 12px rgb(31 65 98 / 6%);
+}
+
+.dashboard-shell--owner .owner-room-type-row__image {
+  border: 1px solid #dbe5ee;
+  background: var(--owner-surface-soft);
+}
+
+.dashboard-shell--owner .owner-room-type-row__action {
+  color: var(--owner-accent);
+}
+
+.dashboard-shell--owner .owner-metric-strip article + article {
+  border-left-color: var(--owner-border);
+}
+
+.dashboard-shell--owner .owner-revenue-total {
+  background:
+    linear-gradient(110deg, rgb(232 242 252 / 82%), rgb(255 255 255 / 96%) 48%),
+    var(--owner-surface);
+}
+
+.dashboard-shell--owner .owner-revenue-total strong {
+  color: #155ea7;
+}
+
+.dashboard-shell--owner .owner-rate-table th {
+  background: #f5f8fb;
+  color: #66778a;
+}
+
+.dashboard-shell--owner .owner-rate-table th,
+.dashboard-shell--owner .owner-rate-table td {
+  border-bottom-color: #e3eaf1;
+}
+
+.dashboard-shell--owner .owner-action-menu summary,
+.dashboard-shell--owner .owner-action-menu nav {
+  border-color: var(--owner-border);
+  background: var(--owner-surface);
+}
+
+.dashboard-shell--owner .owner-action-menu summary:hover {
+  background: var(--owner-surface-soft);
+}
+
+.dashboard-shell--owner .owner-form-heading {
+  padding: 18px 20px;
+  border: 1px solid var(--owner-border);
+  border-radius: 12px;
+  background: var(--owner-surface);
+  box-shadow: 0 2px 8px rgb(31 65 98 / 5%);
+}
+
+.dashboard-shell--owner .owner-editor-section {
+  padding-inline: 18px;
+  border-color: var(--owner-border) !important;
+  background: var(--owner-surface);
+}
+
+.dashboard-shell--owner .owner-editor-section:first-of-type {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.dashboard-shell--owner .owner-form-actions {
+  padding: 13px 16px max(13px, env(safe-area-inset-bottom));
+  border: 1px solid var(--owner-border);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 -4px 16px rgb(31 65 98 / 6%);
+}
+
+.dashboard-shell--owner .owner-dashboard__filters {
+  padding: 13px 14px;
+  border: 1px solid var(--owner-border);
+  border-radius: 10px;
+  background: var(--owner-surface);
+  box-shadow: 0 1px 5px rgb(31 65 98 / 4%);
+}
+
+.dashboard-shell--owner .owner-status-summary > .card,
+.dashboard-shell--owner .owner-dashboard .card,
+.dashboard-shell--owner .surface-card,
+.dashboard-shell--owner .table-wrap {
+  border-color: var(--owner-border);
+  background: var(--owner-surface);
+  box-shadow: 0 1px 5px rgb(31 65 98 / 4%);
+}
+
+.dashboard-shell--owner .owner-status-summary > .card {
+  min-height: 88px;
+  border-radius: 10px;
+}
+
+.dashboard-shell--owner .owner-status-summary > .card:nth-child(1) {
+  border-left: 3px solid #22a861;
+}
+
+.dashboard-shell--owner .owner-status-summary > .card:nth-child(2) {
+  border-left: 3px solid #e9a11b;
+}
+
+.dashboard-shell--owner .owner-status-summary > .card:nth-child(3) {
+  border-left: 3px solid #d9535f;
+}
+
+.dashboard-shell--owner .owner-hotel-list {
+  display: grid;
+  gap: 10px;
+  border-top: 0;
+}
+
+.dashboard-shell--owner .owner-hotel-list__item {
+  padding: 14px;
+  border: 1px solid var(--owner-border);
+  border-radius: 11px;
+  background: var(--owner-surface);
+  box-shadow: 0 1px 5px rgb(31 65 98 / 4%);
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+
+.dashboard-shell--owner .owner-hotel-list__item:hover {
+  border-color: #aec9e2;
+  background: #fbfdff;
+  box-shadow: 0 4px 13px rgb(31 65 98 / 6%);
+}
+
+.dashboard-shell--owner .owner-bookings-results {
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.dashboard-shell--owner .table-wrap {
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.dashboard-shell--owner .data-table thead th {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--owner-border);
+  background: #f4f7fa;
+  color: #66778a;
+  font-size: 10.5px;
+  font-weight: 720;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.dashboard-shell--owner .data-table tbody td {
+  padding: 13px 14px;
+  border-bottom-color: #e7edf3;
+  color: var(--owner-text-secondary);
+  font-size: 13px;
+}
+
+.dashboard-shell--owner .data-table tbody tr:hover {
+  background: #f7fafc;
+}
+
+.dashboard-shell--owner .admin-row-link {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid #cfe0f0;
+  border-radius: 6px;
+  background: #f7fbff;
+  color: var(--owner-accent);
+  text-decoration: none;
+}
+
+.dashboard-shell--owner .admin-row-link:hover {
+  border-color: #aecbe6;
+  background: #eaf4fe;
+  text-decoration: none;
+}
+
+.dashboard-shell--owner .btn-primary {
+  border-color: var(--owner-accent);
+  background: var(--owner-accent);
+}
+
+.dashboard-shell--owner .btn-primary:hover:not(:disabled) {
+  border-color: var(--owner-accent-strong);
+  background: var(--owner-accent-strong);
+}
+
+.dashboard-shell--owner .btn-outline,
+.dashboard-shell--owner .btn-secondary {
+  border-color: #c8d7e5;
+  background: #ffffff;
+  color: #315c88;
+}
+
+.dashboard-shell--owner .btn-outline:hover:not(:disabled),
+.dashboard-shell--owner .btn-secondary:hover:not(:disabled) {
+  border-color: #aec7df;
+  background: #f2f7fc;
+  color: #225588;
+}
+
+.dashboard-shell--owner .input,
+.dashboard-shell--owner .select,
+.dashboard-shell--owner .textarea,
+.dashboard-shell--owner .combobox__control {
+  border-color: var(--owner-border);
+  background: #fbfdff;
+}
+
+.dashboard-shell--owner .input:focus,
+.dashboard-shell--owner .select:focus,
+.dashboard-shell--owner .textarea:focus,
+.dashboard-shell--owner .combobox__control:focus-within {
+  border-color: #8fb9e6;
+  box-shadow: 0 0 0 3px rgb(40 120 208 / 11%);
+}
+
+@media (max-width: 720px) {
+  .dashboard-shell--owner .page-header,
+  .dashboard-shell--owner .owner-module__header,
+  .dashboard-shell--owner .owner-entity-header,
+  .dashboard-shell--owner .owner-form-heading {
+    padding: 15px;
+  }
+
+  .dashboard-shell--owner .owner-editor-section {
+    padding-inline: 14px;
+  }
+}
