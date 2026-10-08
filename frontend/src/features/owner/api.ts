@@ -1,5 +1,8 @@
 import { apiClient } from '../../services/apiClient';
+import type { ApiPaginationMeta, PaginatedApiResponse } from '../../types/api';
 import type {
+  OwnerHotelReview,
+  OwnerReviewsSummary,
   OwnerHotel,
   OwnerRoomType,
   RateRow,
@@ -134,4 +137,19 @@ export const bulkUpsertRates = async (roomTypeId: number, rates: RateItemInput[]
     body: JSON.stringify({ rates }),
   });
   return res.data ?? [];
+};
+
+// ---- Reviews of an owned hotel (read-only) ----
+
+export interface OwnerReviewsPage {
+  items: OwnerHotelReview[];
+  pagination: ApiPaginationMeta;
+  summary: OwnerReviewsSummary;
+}
+
+export const listHotelReviews = async (hotelId: number, page: number, limit: number, rating?: number): Promise<OwnerReviewsPage> => {
+  const q = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (rating) q.set('diemDanhGia', String(rating));
+  const res = await apiClient<OwnerHotelReview[], PaginatedApiResponse<OwnerHotelReview> & { summary: OwnerReviewsSummary }>(`/owner/hotels/${hotelId}/reviews?${q.toString()}`);
+  return { items: res.data ?? [], pagination: res.pagination, summary: res.summary };
 };

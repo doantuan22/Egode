@@ -209,6 +209,11 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
                       Xem chi tiết
                     </Link>
                   )}
+                  {hotel.TrangThai !== 'Chờ duyệt' && (
+                    <Link to={`/owner/hotels/${hotel.MaKhachSan}/reviews`} className="btn btn-outline btn-sm flex justify-center py-2">
+                      <i className="ph ph-star" aria-hidden="true"></i> Xem đánh giá
+                    </Link>
+                  )}
                 </div>
               </article>
             ))}

@@ -1,5 +1,5 @@
 import { Icon } from '../common/Icon';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUiStore } from '../../lib/store';
 import { useSignOut, useMe } from '../../features/auth/hooks';
@@ -50,10 +50,18 @@ const adminGroups = [
 function activePath(pathname: string, to: string) {
   if (to === '/admin') return pathname === to;
   if (to === '/owner/overview') return pathname === to;
-  if (to === '/owner/hotels') return pathname === to || pathname === '/owner/hotels/new' || /^\/owner\/hotels\/\d+$/.test(pathname);
+  if (to === '/owner/hotels') return pathname === to || pathname === '/owner/hotels/new' || /^\/owner\/hotels\/\d+(\/reviews)?$/.test(pathname);
   if (to === '/owner/room-types') return pathname === to || pathname.startsWith('/owner/room-types/');
   if (to === '/owner/bookings') return pathname === to || pathname.startsWith('/owner/bookings/');
   return pathname === to || pathname.startsWith(`${to}/`);
+}
+
+function currentPageLabel(pathname: string, groups: typeof adminGroups) {
+  const match = groups
+    .flatMap((group) => group.items)
+    .sort((a, b) => b.to.length - a.to.length)
+    .find((item) => activePath(pathname, item.to));
+  return match?.label ?? 'Bảng điều khiển';
 }
 
 export function DashboardNavigation({ role }: { role: DashboardRole }) {
@@ -94,7 +102,7 @@ export function DashboardNavigation({ role }: { role: DashboardRole }) {
       >
         <div className="dashboard-sidebar__brand">
           <Link to="/" className="site-header__logo" onClick={closeSidebar}>
-            <span className="site-header__logo-mark">E</span>
+            <img src="/egode_logo.png" alt="" className="site-header__logo-image" />
             <span>Egode</span>
           </Link>
           <span className="badge badge-primary">{label}</span>
@@ -120,9 +128,11 @@ export function DashboardNavigation({ role }: { role: DashboardRole }) {
 }
 
 export function DashboardTopbar({ role }: { role: DashboardRole }) {
+  const { pathname } = useLocation();
   const { toggleSidebar } = useUiStore();
   const meQuery = useMe();
   const name = meQuery.data?.HoTen ?? (role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Đối tác');
   const profilePath = profilePathFor(role);
-  return <header className="dashboard-topbar"><button type="button" className="dashboard-sidebar-toggle btn btn-icon btn-ghost" onClick={toggleSidebar} aria-label="Mở menu"><Icon name="list" size={20} /></button><div className="dashboard-topbar__actions"><Link to={profilePath} className="site-header__user"><span className="site-header__avatar dashboard-user-avatar">{name.charAt(0).toUpperCase()}</span><span className="dashboard-user-meta hidden text-left sm:block"><strong>{name}</strong><small>{role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Chủ khách sạn'}</small></span><Icon name="caret-down" size={16} className="text-ink-muted" /></Link></div></header>;
+  const pageLabel = useMemo(() => (role === ROLE_NAMES.ADMIN ? currentPageLabel(pathname, adminGroups) : null), [role, pathname]);
+  return <header className="dashboard-topbar"><button type="button" className="dashboard-sidebar-toggle btn btn-icon btn-ghost" onClick={toggleSidebar} aria-label="Mở menu"><Icon name="list" size={20} /></button>{pageLabel && <div className="dashboard-topbar__context"><span className="dashboard-topbar__eyebrow">Hệ thống quản trị</span><strong className="dashboard-topbar__title">{pageLabel}</strong></div>}<div className="dashboard-topbar__actions"><Link to={profilePath} className="site-header__user"><span className="site-header__avatar dashboard-user-avatar">{name.charAt(0).toUpperCase()}</span><span className="dashboard-user-meta hidden text-left sm:block"><strong>{name}</strong><small>{role === ROLE_NAMES.ADMIN ? 'Quản trị viên' : 'Chủ khách sạn'}</small></span><Icon name="caret-down" size={16} className="text-ink-muted" /></Link></div></header>;
 }

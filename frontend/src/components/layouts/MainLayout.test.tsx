@@ -38,6 +38,14 @@ describe('MainLayout footer', () => {
     });
   });
 
+  it('carries the real Egode logo, not a placeholder letter', () => {
+    renderPublicPage();
+    const footer = screen.getByRole('contentinfo');
+
+    expect(footer.querySelector('img')).toHaveAttribute('src', '/egode_logo.png');
+    expect(within(footer).queryByText(/^E$/)).not.toBeInTheDocument();
+  });
+
   it('shows the current year in the copyright line', () => {
     renderPublicPage();
     expect(within(screen.getByRole('contentinfo')).getByText(new RegExp(`© ${new Date().getFullYear()} Egode`))).toBeInTheDocument();

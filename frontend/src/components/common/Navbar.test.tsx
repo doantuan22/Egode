@@ -1,3 +1,4 @@
+import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Navbar } from './Navbar';
 import { useMe, useSignOut } from '../../features/auth/hooks';
@@ -31,11 +32,19 @@ describe('Navbar account menu', () => {
     expect(links()).not.toContain('/profile');
   });
 
-  it('gives a customer the customer profile and their bookings', () => {
+  it('gives a customer the customer profile, their bookings and support, all in the avatar menu', () => {
     renderAs(ROLE_NAMES.CUSTOMER);
 
     expect(links()).toContain('/profile');
     expect(links()).toContain('/bookings');
+    // The top bar already links to the help centre as "Hỗ trợ"; "Hỗ trợ / Khiếu nại" is the avatar-menu entry (desktop menu + phone drawer).
+    expect(screen.getAllByRole('link', { name: 'Hỗ trợ / Khiếu nại' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Hỗ trợ / Khiếu nại' }).every((a) => a.getAttribute('href') === '/support')).toBe(true);
+  });
+
+  it.each([ROLE_NAMES.ADMIN, ROLE_NAMES.PARTNER])('does not offer customer support to %s', (role) => {
+    renderAs(role);
+    expect(screen.queryByRole('link', { name: 'Hỗ trợ / Khiếu nại' })).not.toBeInTheDocument();
   });
 
   it.each([ROLE_NAMES.ADMIN, ROLE_NAMES.PARTNER])('does not offer "my bookings" to %s (they cannot book)', (role) => {

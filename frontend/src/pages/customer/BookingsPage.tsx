@@ -18,9 +18,8 @@ export default function BookingsPage() {
   return (
     <div className="page-container booking-history-page">
       <CustomerCenterNavigation />
-      <div className="page-header">
-        <h1>Đặt phòng của tôi</h1>
-      </div>
+      {/* The tab above already names the page, so the heading is for screen readers only. */}
+      <h1 className="sr-only">Đơn đặt phòng của tôi</h1>
 
       <div role="group" aria-label="Lọc đặt phòng theo trạng thái" className="pill-tabs mb-5">
         {BOOKING_TABS.map((tab) => (<FilterChip key={tab.key} pressed={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>{tab.label}</FilterChip>))}

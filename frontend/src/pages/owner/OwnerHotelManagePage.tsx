@@ -122,6 +122,7 @@ export default function OwnerHotelManagePage() {
             <nav aria-label="Thao tác khách sạn">
               <Link to={`/owner/revenue?hotelId=${hotelId}`}>Doanh thu</Link>
               <Link to={`/owner/bookings?hotelId=${hotelId}`}>Quản lý đặt phòng</Link>
+              <Link to={`/owner/hotels/${hotelId}/reviews`}>Đánh giá của khách</Link>
               {hotel.TrangThai === 'Hoạt động' && <button type="button" className="is-danger" disabled={deactivateMutation.isPending} onClick={async () => { if (await confirm({ title: 'Ngừng kinh doanh khách sạn?', description: 'Các đặt phòng lịch sử sẽ được giữ lại.', confirmLabel: 'Ngừng kinh doanh', variant: 'danger' })) deactivateMutation.mutate(); }}>{deactivateMutation.isPending ? 'Đang xử lý...' : 'Ngừng kinh doanh'}</button>}
               {hotel.TrangThai === 'Ngừng hoạt động' && hotel.NgayDuyet && <button type="button" disabled={reactivateMutation.isPending} onClick={async () => { if (await confirm({ title: 'Bật lại hoạt động khách sạn?', description: 'Khách sạn sẽ hiển thị công khai và nhận đặt phòng trở lại.', confirmLabel: 'Bật lại' })) reactivateMutation.mutate(); }}>{reactivateMutation.isPending ? 'Đang xử lý...' : 'Bật lại hoạt động'}</button>}
             </nav>

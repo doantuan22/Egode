@@ -340,16 +340,6 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .owner-hotel-list__item > div:last-child .btn { white-space: nowrap; }
 
 .admin-dashboard__domains { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .85fr); gap: 32px; align-items: start; }
-.admin-link-group h2 { margin-bottom: 10px; }
-.admin-link-group ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-border-default); }
-.admin-link-group li { border-bottom: 1px solid var(--color-border-default); }
-.admin-link-group a { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 70px; padding: 12px 4px; color: var(--color-text-primary); }
-.admin-link-group a:hover strong { color: var(--color-action-primary); }
-.admin-link-group a > span { display: grid; gap: 3px; min-width: 0; }
-.admin-link-group strong { font-size: 14px; font-weight: var(--font-weight-semibold); }
-.admin-link-group small { color: var(--color-text-muted); font-size: 13px; line-height: 1.4; }
-.admin-link-group a > i { flex: none; color: var(--color-text-muted); }
-.admin-dashboard__header { padding-bottom: var(--space-5); border-bottom: 1px solid var(--color-border-default); }
 .admin-partner-review__body { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 24px; align-items: start; }
 .admin-partner-review__body > [role="status"], .admin-partner-review__body > [role="alert"] { grid-column: 1 / -1; }
 .admin-partner-review__evidence { grid-column: 1; min-width: 0; }
@@ -368,7 +358,6 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .admin-support-detail__resolution, .admin-support-detail__action { grid-column: 1 / -1; padding-top: 16px; border-top: 1px solid var(--color-border-default); }
 @media (max-width: 767px) {
   .admin-dashboard__domains { grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  .admin-link-group a { min-height: 64px; }
   .admin-partner-review__body { grid-template-columns: minmax(0, 1fr); padding: 18px; }
   .admin-partner-review__evidence, .admin-partner-review__decision { grid-column: 1; grid-row: auto; }
   .admin-partner-review__decision { position: static; }
@@ -550,7 +539,8 @@ select.ui-field { appearance: none; padding-right: 38px; background-image: url("
 .customer-center-nav { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 0 0 12px; border-bottom: 1px solid var(--color-border); }
 .customer-center-nav a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 12px; border-radius: var(--radius-control); color: var(--color-text-secondary); font-size: 14px; font-weight: 600; white-space: nowrap; }
 .customer-center-nav a:hover { background: var(--color-surface-subtle); color: var(--color-text-primary); }
-.customer-center-nav a.active { background: var(--color-action-primary-subtle); color: var(--color-action-primary); }
+.customer-center-nav a.active { background: color-mix(in srgb, var(--color-action-primary) 10%, white); color: var(--color-action-primary-hover); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-action-primary) 28%, white); }
+.customer-center-nav a.active:hover { background: color-mix(in srgb, var(--color-action-primary) 14%, white); color: var(--color-action-primary-hover); }
 .owner-hotel-form { max-width: 920px; }
 .owner-form-heading { padding-bottom: 16px; border-bottom: 1px solid var(--color-border); }
 .owner-editor-section { background: transparent; }

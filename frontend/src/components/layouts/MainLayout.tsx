@@ -9,12 +9,13 @@ import { ROLE_NAMES } from '../../lib/roles';
 export function MainLayout() {
   const location = useLocation();
   const role = useAuthStore((state) => state.role);
+  const isAdminDashboard = role === ROLE_NAMES.ADMIN && location.pathname.startsWith('/admin');
   const isDashboard =
-    (role === ROLE_NAMES.ADMIN && location.pathname.startsWith('/admin')) ||
+    isAdminDashboard ||
     (role === ROLE_NAMES.PARTNER && (location.pathname.startsWith('/owner') || location.pathname.startsWith('/partner')));
 
   return (
-    <div className={isDashboard ? 'dashboard-shell' : ''}>
+    <div className={isDashboard ? `dashboard-shell${isAdminDashboard ? ' dashboard-shell--admin' : ''}` : ''}>
       <a href="#main-content" className="sr-only z-50 rounded bg-white px-4 py-2 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Chuyển đến nội dung chính</a>
       <NavigationEffects />
       
@@ -39,7 +40,7 @@ export function MainLayout() {
               <div className="site-footer__grid">
                 <div className="site-footer__col">
                   <div className="site-footer__brand mb-4">
-                    <div className="site-header__logo-mark">E</div>Egode
+                    <img src="/egode_logo.png" alt="" />Egode
                   </div>
                   <p className="site-footer__tagline">Tìm nơi lưu trú, theo dõi chuyến đi và quản lý cơ sở trên Egode.</p>
                 </div>

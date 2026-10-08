@@ -14,6 +14,7 @@ const ProfilePage = lazy(() => import('../pages/customer/ProfilePage'));
 const OwnerDashboardPage = lazy(() => import('../pages/owner/OwnerDashboardPage'));
 const OwnerHotelFormPage = lazy(() => import('../pages/owner/OwnerHotelFormPage'));
 const OwnerHotelManagePage = lazy(() => import('../pages/owner/OwnerHotelManagePage'));
+const OwnerHotelReviewsPage = lazy(() => import('../pages/owner/OwnerHotelReviewsPage'));
 const OwnerRoomTypeManagePage = lazy(() => import('../pages/owner/OwnerRoomTypeManagePage'));
 const OwnerBookingsPage = lazy(() => import('../pages/owner/OwnerBookingsPage'));
 const OwnerBookingDetailPage = lazy(() => import('../pages/owner/OwnerBookingDetailPage'));
@@ -30,6 +31,7 @@ export const ownerRoutes = (
     <Route path="/owner/hotels" element={<OwnerDashboardPage mode="hotels" />} />
     <Route path="/owner/hotels/new" element={<OwnerHotelFormPage />} />
     <Route path="/owner/hotels/:hotelId" element={<OwnerHotelManagePage />} />
+    <Route path="/owner/hotels/:hotelId/reviews" element={<OwnerHotelReviewsPage />} />
     <Route path="/owner/room-types" element={<OwnerRoomTypesPage />} />
     <Route path="/owner/room-types/:roomTypeId" element={<OwnerRoomTypeManagePage />} />
     <Route path="/owner/inventory-pricing" element={<OwnerInventoryPricingPage />} />

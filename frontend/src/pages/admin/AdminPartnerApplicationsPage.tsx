@@ -8,14 +8,19 @@ import { useListParams } from '../../hooks/useListParams';
 import { PageHeader } from '../../components/common/PageHeader';
 import { FilterChip } from '../../components/common/FilterChip';
 import { DataTable, type Column } from '../../components/common/DataTable';
+import { Pagination } from '../../components/common/Pagination';
 
 const FILTER_DEFAULTS = { status: 'Chờ duyệt' };
+const PAGE_SIZE = 10;
 
 export default function AdminPartnerApplicationsPage() {
-  const { values, setValue } = useListParams(FILTER_DEFAULTS);
+  const { values, page, setValue, setPage } = useListParams(FILTER_DEFAULTS);
   const status = values.status;
-  const setStatus = (value: string) => setValue('status', value);
-  const query = useAdminPartnerApplications(status === 'ALL' ? undefined : status);
+  const setStatus = (value: string) => {
+    setValue('status', value);
+    setPage(1);
+  };
+  const query = useAdminPartnerApplications(status === 'ALL' ? undefined : status, page, PAGE_SIZE);
 
   const columns: Column<AdminPartnerApplication>[] = [
     { key: 'id', header: 'Mã hồ sơ', cell: (application) => <span className="font-mono font-bold text-primary-600">#{application.MaHoSoDoiTac}</span> },
@@ -52,6 +57,15 @@ export default function AdminPartnerApplicationsPage() {
         emptyTitle="Không có hồ sơ đăng ký nào phù hợp"
         emptyDescription="Chưa có hồ sơ với trạng thái đã chọn."
         emptyIcon="files"
+        footer={query.data && (
+          <Pagination
+            page={page}
+            totalPages={query.data.pagination.totalPages}
+            total={query.data.pagination.total}
+            itemLabel="hồ sơ"
+            onPageChange={setPage}
+          />
+        )}
       />
     </div>
   );

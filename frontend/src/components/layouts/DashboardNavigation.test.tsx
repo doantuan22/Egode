@@ -37,6 +37,29 @@ describe('DashboardTopbar', () => {
   });
 });
 
+describe('DashboardNavigation brand', () => {
+  it.each([ROLE_NAMES.ADMIN, ROLE_NAMES.PARTNER])('shows the real Egode logo next to the name for %s, not a placeholder letter', (role) => {
+    stubViewport(false);
+    renderWithProviders(<DashboardNavigation role={role} />);
+
+    const home = screen.getByRole('link', { name: 'Egode' });
+    expect(home).toHaveAttribute('href', '/');
+    expect(home.querySelector('img')).toHaveAttribute('src', '/egode_logo.png');
+  });
+});
+
+describe('DashboardTopbar page title', () => {
+  it('tells the administrator which area they are in', () => {
+    renderWithProviders(<DashboardTopbar role={ROLE_NAMES.ADMIN} />, { route: '/admin/hotels/7' });
+    expect(screen.getByText('Khách sạn', { selector: '.dashboard-topbar__title' })).toBeInTheDocument();
+  });
+
+  it('is unchanged for the partner dashboard', () => {
+    renderWithProviders(<DashboardTopbar role={ROLE_NAMES.PARTNER} />, { route: '/owner/hotels' });
+    expect(document.querySelector('.dashboard-topbar__title')).toBeNull();
+  });
+});
+
 describe('DashboardNavigation on a small screen (the sidebar is an off-canvas drawer)', () => {
   beforeEach(() => stubViewport(true));
 

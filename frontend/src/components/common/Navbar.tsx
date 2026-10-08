@@ -274,6 +274,23 @@ export function Navbar() {
                     </Link>
                   )}
 
+                  {role ===
+                    ROLE_NAMES.CUSTOMER && (
+                    <Link
+                      to="/support"
+                      className="dropdown-item"
+                      onClick={() =>
+                        setIsDropdownOpen(
+                          false
+                        )
+                      }
+                    >
+                      <i className="ph ph-chat-dots text-lg" />
+
+                      Hỗ trợ / Khiếu nại
+                    </Link>
+                  )}
+
                   <div className="dropdown-divider" />
 
                   <button
@@ -461,6 +478,19 @@ export function Navbar() {
                     className="mobile-drawer__link"
                   >
                     Đơn đặt phòng
+                  </Link>
+                )}
+
+                {role ===
+                  ROLE_NAMES.CUSTOMER && (
+                  <Link
+                    to="/support"
+                    onClick={
+                      toggleSidebar
+                    }
+                    className="mobile-drawer__link"
+                  >
+                    Hỗ trợ / Khiếu nại
                   </Link>
                 )}
               </>

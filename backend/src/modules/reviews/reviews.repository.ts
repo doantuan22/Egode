@@ -50,6 +50,43 @@ export class ReviewsRepository {
     return { items, total };
   }
 
+  /** The owner's view of one hotel's reviews: the same moderated ("Hiển thị") set the public sees, optionally one star level, with the stay dates. */
+  async listVisibleForOwner(maKhachSan: number, page: number, limit: number, diemDanhGia?: number) {
+    const prisma = getPrismaClient();
+    const where = { MaKhachSan: maKhachSan, TrangThai: REVIEW_STATUS.VISIBLE, ...(diemDanhGia ? { DiemDanhGia: diemDanhGia } : {}) };
+    const [items, total] = await Promise.all([
+      prisma.dANH_GIA.findMany({
+        where,
+        orderBy: { MaDanhGia: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          MaDanhGia: true,
+          DiemDanhGia: true,
+          NoiDung: true,
+          HINH_ANH_DANH_GIA: { select: { URL: true }, orderBy: { MaHinhAnhDanhGia: 'asc' } },
+          TAI_KHOAN: { select: { HoTen: true } },
+          DAT_PHONG: { select: { NgayNhanPhong: true, NgayTraPhong: true } },
+        },
+      }),
+      prisma.dANH_GIA.count({ where }),
+    ]);
+    return { items, total };
+  }
+
+  /** How many visible reviews gave each score (1-5) — always for the whole hotel, whatever star filter the list uses. */
+  async scoreDistribution(maKhachSan: number): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {
+    const prisma = getPrismaClient();
+    const rows = await prisma.dANH_GIA.groupBy({
+      by: ['DiemDanhGia'],
+      where: { MaKhachSan: maKhachSan, TrangThai: REVIEW_STATUS.VISIBLE },
+      _count: { _all: true },
+    });
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const row of rows) if (row.DiemDanhGia in distribution) distribution[row.DiemDanhGia as 1 | 2 | 3 | 4 | 5] = row._count._all;
+    return distribution;
+  }
+
   /** Average score and count of the visible reviews, for several hotels in one query. */
   async ratingSummaries(maKhachSanList: number[]): Promise<Map<number, RatingSummary>> {
     const summaries = new Map<number, RatingSummary>();

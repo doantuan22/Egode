@@ -19,7 +19,7 @@ const TYPES = ['Hỗ trợ', 'Khiếu nại'];
 const FILTER_DEFAULTS = { search: '', status: '', type: '' };
 
 export default function AdminSupportPage() {
-  const { values, page, setValue, setPage } = useListParams(FILTER_DEFAULTS);
+  const { values, page, setValue, setPage, reset } = useListParams(FILTER_DEFAULTS);
   const [searchInput, setSearchInput] = useUrlSearchInput(values.search, (value) => setValue('search', value));
   const search = values.search;
   const status = values.status;
@@ -49,11 +49,13 @@ export default function AdminSupportPage() {
     { key: 'actions', header: 'Xử lý', align: 'center', cell: (r) => <Link to={`/admin/support/${r.MaYeuCauHoTro}`} className="admin-row-link">Phản hồi</Link> },
   ];
 
+  const resetFilters = () => reset();
+
   return (
     <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full">
       <PageHeader title="Hỗ trợ & Khiếu nại" description="Tiếp nhận yêu cầu trợ giúp, xử lý mâu thuẫn đặt phòng từ khách hàng và đối tác." />
 
-      <FilterBar>
+      <FilterBar onReset={resetFilters}>
         <div role="group" aria-label="Lọc theo trạng thái yêu cầu" className="flex basis-full gap-2 overflow-x-auto">
           {['ALL', ...STATUSES].map((st) => (
             <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>

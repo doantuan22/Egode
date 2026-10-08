@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ownerApi from './api';
 import type { HotelFormValues, RoomTypeFormValues, RateItemInput, OwnerBookingsFilters } from './types';
 
@@ -146,5 +146,15 @@ export function useBulkUpsertRates(roomTypeId: number) {
   return useMutation({
     mutationFn: (rates: RateItemInput[]) => ownerApi.bulkUpsertRates(roomTypeId, rates),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['owner', 'room-types', roomTypeId, 'rates'] }),
+  });
+}
+
+/** The moderated reviews of one of the owner's hotels, a page at a time, optionally one star level. */
+export function useOwnerHotelReviews(hotelId: number, page: number, limit: number, rating?: number) {
+  return useQuery({
+    queryKey: ['owner', 'hotels', hotelId, 'reviews', page, limit, rating ?? 'all'] as const,
+    queryFn: () => ownerApi.listHotelReviews(hotelId, page, limit, rating),
+    enabled: hotelId > 0,
+    placeholderData: keepPreviousData,
   });
 }

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { OwnerHotelsController } from './owner-hotels.controller';
 import { OwnerRoomTypesController } from './owner-room-types.controller';
 import { OwnerBookingsController } from './owner-bookings.controller';
+import { OwnerReviewsController } from './owner-reviews.controller';
 import { authenticate, requireRole } from '../../middleware/auth.middleware';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { ROLE_NAMES } from '../../common/constants/roles';
@@ -15,11 +16,13 @@ import {
 } from './owner-hotels.schemas';
 import { createRoomTypeSchema, hotelIdParamSchema as roomTypeHotelIdParamSchema } from './owner-room-types.schemas';
 import { ownerBookingsQuerySchema, ownerBookingParamsSchema } from './owner-bookings.schemas';
+import { ownerReviewsQuerySchema } from './owner-reviews.schemas';
 
 const router = Router();
 const controller = new OwnerHotelsController();
 const roomTypesController = new OwnerRoomTypesController();
 const bookingsController = new OwnerBookingsController();
+const reviewsController = new OwnerReviewsController();
 
 router.use(authenticate, requireRole(ROLE_NAMES.PARTNER));
 
@@ -52,6 +55,11 @@ router.get(
   '/:hotelId/bookings/:bookingId',
   validateRequest({ params: ownerBookingParamsSchema }),
   bookingsController.getOne
+);
+router.get(
+  '/:id/reviews',
+  validateRequest({ params: hotelIdParamSchema, query: ownerReviewsQuerySchema }),
+  reviewsController.list
 );
 router.patch(
   '/:id/images/:imageId',

@@ -495,6 +495,22 @@ export const openApiSpec = {
         responses: { '200': { description: 'OwnerAnalytics' }, '403': { description: "Not this owner's hotel" }, '404': { description: 'Hotel not found' } },
       },
     },
+    '/owner/hotels/{id}/reviews': {
+      get: {
+        summary: 'Reviews of one owned hotel, read-only, paginated, newest first',
+        tags: ['Reviews'],
+        security: [{ BearerAuth: [] }],
+        description:
+          "Ownership checked first (404 unknown hotel, 403 someone else's). Only reviews in the \"Hiển thị\" state are returned; Chờ duyệt / Ẩn / Vi phạm stay with the administrator. The guest is shown as an abbreviated name, with the stay dates. \"summary\" covers the whole hotel: DiemTrungBinh, SoLuongDanhGia and PhanBoDiem (count per score 1-5), whatever `diemDanhGia` filters the list to.",
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 50, default: 10 } },
+          { name: 'diemDanhGia', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 5 }, description: 'Only reviews with exactly this score' },
+        ],
+        responses: { '200': { description: 'Page of reviews + summary + pagination' }, '400': { description: 'Invalid query' }, '403': { description: "Not this owner's hotel" }, '404': { description: 'Hotel not found' } },
+      },
+    },
     '/admin/analytics': {
       get: {
         summary: 'System-wide analytics/reports dashboard (M8 §3, admin only)',

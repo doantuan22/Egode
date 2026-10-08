@@ -3,9 +3,7 @@ import { ROLE_NAMES } from '../../lib/roles';
 import { useAuthStore } from '../../lib/authStore';
 
 const destinations = [
-  { to: '/bookings', label: 'Đặt phòng' },
-  { to: '/profile', label: 'Hồ sơ' },
-  { to: '/support', label: 'Hỗ trợ' },
+  { to: '/bookings', label: 'Đơn đặt phòng của tôi' },
 ];
 
 export function CustomerCenterNavigation() {

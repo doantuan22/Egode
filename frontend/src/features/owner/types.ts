@@ -100,3 +100,23 @@ export interface RateItemInput {
 }
 export interface OwnerBooking { MaDatPhong: number; MaXacNhanDatPhong: string; KhachHang: { MaTaiKhoan: number; HoTen: string; SoDienThoai: string }; NgayNhanPhong: string; NgayTraPhong: string; TongTienThanhToan: number; TrangThai: string; NgayTao: string; GhiChu: string | null; GioNhanPhong: string; GioTraPhong: string; ChiTietPhong: Array<{ MaLoaiPhong: number; TenLoaiPhong: string; SoLuong: number }>; ThanhToan: Array<{ MaThanhToan: number; TrangThai: string; PhuongThucThanhToan: string; SoTien: number; ThoiGianGiaoDich: string }>; }
 export interface OwnerBookingsFilters { page?: number; limit?: number; trangThai?: string; search?: string; from?: string; to?: string; }
+
+/** One moderated review of an owned hotel (GET /owner/hotels/:id/reviews): abbreviated guest name, no account data. */
+export interface OwnerHotelReview {
+  MaDanhGia: number;
+  DiemDanhGia: number;
+  NoiDung: string | null;
+  TenNguoiDanhGia: string;
+  HinhAnh: string[];
+  NgayNhanPhong: string;
+  NgayTraPhong: string;
+}
+
+export type ScoreDistribution = Record<1 | 2 | 3 | 4 | 5, number>;
+
+export interface OwnerReviewsSummary {
+  DiemTrungBinh: number | null;
+  SoLuongDanhGia: number;
+  /** Always the whole hotel, whatever star filter the list is showing. */
+  PhanBoDiem: ScoreDistribution;
+}
