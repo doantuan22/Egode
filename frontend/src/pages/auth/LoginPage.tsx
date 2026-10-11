@@ -356,7 +356,7 @@ export default function LoginPage() {
                     drop-shadow-[0_4px_12px_rgba(14,165,233,0.25)]
                   "
                 >
-                  cùng Egode.
+                  cùng Egode
                 </span>
               </h1>
 
