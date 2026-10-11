@@ -421,15 +421,81 @@ export default function HomePage() {
 
       <section className="egode-home-cta">
         <div className="egode-home-container">
-          <div className="egode-home-cta__content">
-            <div className="egode-home-cta__copy">
-              <h2>Sẵn sàng cho chuyến đi tiếp theo?</h2>
-              <p>Chọn điểm đến, ngày lưu trú và bắt đầu tìm khách sạn trên Egode.</p>
+          <div
+            className="relative overflow-hidden rounded-[24px] border border-[#C7DCF5] px-6 py-8 sm:px-8 md:px-10 lg:px-12 lg:py-10"
+            style={{
+              minHeight: '290px',
+              backgroundColor: '#F5F9FF',
+              backgroundImage: `
+                linear-gradient(
+                  90deg,
+                  rgba(248, 251, 255, 0.99) 0%,
+                  rgba(248, 251, 255, 0.97) 36%,
+                  rgba(248, 251, 255, 0.88) 48%,
+                  rgba(248, 251, 255, 0.48) 60%,
+                  rgba(248, 251, 255, 0.10) 72%,
+                  rgba(248, 251, 255, 0) 100%
+                ),
+                url('/egode-travel-cta.png')
+              `,
+              backgroundSize: '100% 100%, auto 100%',
+              backgroundPosition: 'center, right center',
+              backgroundRepeat: 'no-repeat, no-repeat',
+              boxShadow: '0 12px 30px rgba(67, 105, 150, 0.08)',
+            }}
+          >
+            <div className="relative z-10 flex min-h-[210px] max-w-[590px] flex-col justify-center">
+              <h2 className="m-0 text-[26px] font-extrabold leading-[1.2] text-[#173B63] sm:text-[28px] md:text-[30px]">
+                Sẵn sàng cho chuyến đi tiếp theo?
+              </h2>
+
+              <p className="mt-2.5 max-w-[560px] text-[15px] leading-6 text-[#526B84] sm:text-[16px]">
+                Chọn điểm đến, ngày lưu trú và bắt đầu tìm khách sạn phù hợp trên Egode.
+              </p>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-[14px] font-semibold text-[#49627B]">
+                <span className="inline-flex items-center gap-2">
+                  <i className="ph-fill ph-tag text-[16px] text-[#3478F6]" aria-hidden="true" />
+                  Ưu đãi tốt
+                </span>
+
+                <span className="inline-flex items-center gap-2">
+                  <i className="ph-fill ph-lightning text-[16px] text-[#18A957]" aria-hidden="true" />
+                  Đặt nhanh
+                </span>
+
+                <span className="inline-flex items-center gap-2">
+                  <i className="ph-fill ph-map-pin text-[16px] text-[#8B5CF6]" aria-hidden="true" />
+                  Điểm đến đa dạng
+                </span>
+              </div>
+
+              <Link
+                to="/hotels"
+                className="mt-6 inline-flex w-fit items-center gap-2 rounded-[12px] bg-[#2F6FE4] px-6 py-3 text-[15px] font-bold !text-white no-underline shadow-[0_8px_20px_rgba(47,111,228,0.22)] transition hover:bg-[#245FC8] hover:!text-white"
+                style={{
+                  color: '#FFFFFF',
+                  WebkitTextFillColor: '#FFFFFF',
+                }}
+              >
+                <span
+                  style={{
+                    color: '#FFFFFF',
+                    WebkitTextFillColor: '#FFFFFF',
+                  }}
+                >
+                  Khám phá khách sạn
+                </span>
+                <i
+                  className="ph ph-arrow-right text-[17px] !text-white"
+                  aria-hidden="true"
+                  style={{
+                    color: '#FFFFFF',
+                    WebkitTextFillColor: '#FFFFFF',
+                  }}
+                />
+              </Link>
             </div>
-            <Link to="/hotels" className="egode-home-cta__button">
-              Khám phá khách sạn
-              <i className="ph ph-arrow-right" />
-            </Link>
           </div>
         </div>
       </section>
