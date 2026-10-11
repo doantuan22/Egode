@@ -138,10 +138,10 @@ export default function HomePage() {
             </div>
 
             <h1>
-              Đi đâu cũng được,
+              Đi đâu cũng được
 
               <span>
-                Egode lo chỗ nghỉ.
+                Egode lo chỗ nghỉ
               </span>
             </h1>
 
