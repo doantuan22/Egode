@@ -16,7 +16,10 @@ export interface AdminHotel {
   TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN?: AdminHotelOwner;
   /** Cover first. The list carries only that one photo; the detail carries them all. */
   HINH_ANH_KHACH_SAN?: AdminHotelImage[];
+  /** Only on the answer to "suspend": what happened to the hotel's open bookings. */
+  DonDaXuLy?: AdminHotelSuspensionOutcome;
 }
+export interface AdminHotelSuspensionOutcome { DonHoanTat: number; DonDaHuy: number; DonHoanTien: number }
 export interface AdminHotelOwner { MaTaiKhoan: number; HoTen: string; Email: string; SoDienThoai: string | null }
 export interface AdminHotelImage { MaHinhAnh: number; URL: string; AnhDaiDien: boolean }
 export interface AdminHotelListResult { items: AdminHotel[]; pagination: { page: number; limit: number; total: number; totalPages: number }; }

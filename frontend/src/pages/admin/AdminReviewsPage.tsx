@@ -17,7 +17,8 @@ import { Icon } from '../../components/common/Icon';
 import { AdminListPanel } from '../../components/admin/AdminListPanel';
 
 const PAGE_SIZE = 10;
-const STATUSES = ['Chờ duyệt', 'Hiển thị', 'Ẩn', 'Vi phạm'];
+// Reviews are published as soon as they are posted; 'Chờ duyệt' only exists on rows written before that change.
+const STATUSES = ['Hiển thị', 'Ẩn', 'Vi phạm'];
 
 const FILTER_DEFAULTS = { search: '', status: '', star: '' };
 

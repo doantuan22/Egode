@@ -1,6 +1,9 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
-import { HOTEL_STATUS } from '../../common/constants/hotel-status';
+import { BOOKING_STATUS, HOTEL_STATUS } from '../../common/constants/hotel-status';
+
+/** Bookings that still have something to happen: waiting for payment, or paid and the stay is not over. */
+const OPEN_BOOKING_STATUSES = [BOOKING_STATUS.PENDING_PAYMENT, BOOKING_STATUS.CONFIRMED];
 
 export class OwnerHotelsRepository {
   async listByOwner(ownerId: number) {
@@ -53,6 +56,30 @@ export class OwnerHotelsRepository {
     const result = await prisma.kHACH_SAN.updateMany({
       where: { MaKhachSan: maKhachSan, TrangThai: from },
       data: { TrangThai: to, NgayCapNhat: now },
+    });
+    return result.count === 1;
+  }
+
+  /** How many of this hotel's bookings are still open ("Chờ thanh toán" or "Đã xác nhận", stay not finished). */
+  async countOpenBookings(maKhachSan: number): Promise<number> {
+    const prisma = getPrismaClient();
+    return prisma.dAT_PHONG.count({ where: { MaKhachSan: maKhachSan, TrangThai: { in: OPEN_BOOKING_STATUSES } } });
+  }
+
+  /**
+   * Hoạt động → Ngừng hoạt động in ONE statement that also requires no open booking, so a booking that lands
+   * between a separate count and the update cannot be left on a hotel that was switched off. False when the
+   * hotel is no longer active or has an open booking.
+   */
+  async deactivateWhenNoOpenBookings(maKhachSan: number, now: Date): Promise<boolean> {
+    const prisma = getPrismaClient();
+    const result = await prisma.kHACH_SAN.updateMany({
+      where: {
+        MaKhachSan: maKhachSan,
+        TrangThai: HOTEL_STATUS.ACTIVE,
+        DAT_PHONG: { none: { TrangThai: { in: OPEN_BOOKING_STATUSES } } },
+      },
+      data: { TrangThai: HOTEL_STATUS.INACTIVE, NgayCapNhat: now },
     });
     return result.count === 1;
   }

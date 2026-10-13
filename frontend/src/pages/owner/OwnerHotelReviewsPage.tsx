@@ -81,7 +81,7 @@ export default function OwnerHotelReviewsPage() {
         <span>Quay lại {hotel.TenKhachSan}</span>
       </Link>
 
-      <PageHeader title="Đánh giá của khách" description={`Những gì khách đã viết về ${hotel.TenKhachSan}. Chỉ hiển thị các đánh giá đã được kiểm duyệt.`} />
+      <PageHeader title="Đánh giá của khách" description={`Những gì khách đã viết về ${hotel.TenKhachSan}. Đánh giá bị admin ẩn hoặc đánh dấu vi phạm sẽ không hiển thị.`} />
 
       {reviewsQuery.isLoading ? (
         <PageSpinner />
@@ -115,7 +115,7 @@ export default function OwnerHotelReviewsPage() {
             <EmptyState
               icon="chat-text"
               title={rating ? `Chưa có đánh giá ${rating} sao` : 'Chưa có đánh giá nào'}
-              description={rating ? 'Thử chọn mức sao khác hoặc xem tất cả đánh giá.' : 'Đánh giá của khách sẽ xuất hiện ở đây sau khi được kiểm duyệt.'}
+              description={rating ? 'Thử chọn mức sao khác hoặc xem tất cả đánh giá.' : 'Đánh giá của khách sẽ xuất hiện ở đây ngay sau khi khách gửi.'}
             />
           ) : (
             <Card padded={false}>

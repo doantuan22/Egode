@@ -201,46 +201,101 @@ describe('a suspended hotel cannot change inventory or price', () => {
   });
 });
 
-describe('switching a hotel or room type off only stops NEW bookings', () => {
+describe('switching a hotel or room type off only stops NEW bookings (a hotel only while it has no open booking)', () => {
   const book = (roomTypeId: number) =>
     request(app).post(`/api/hotels/${hotelId}/bookings`).set('Authorization', `Bearer ${customerToken}`).send({ checkIn: day(3), checkOut: day(4), rooms: [{ maLoaiPhong: roomTypeId, soLuong: 1 }] });
 
-  it('deactivating the hotel leaves a confirmed booking confirmed, viewable and cancellable; new bookings are refused', async () => {
-    const rt = await roomTypeWithStock(5);
-    const bookingId = await occupy(rt, 1, 2, 4);
-
-    const off = await request(app).post(`/api/owner/hotels/${hotelId}/deactivate`).set('Authorization', `Bearer ${ownerToken}`);
-    expect(off.status).toBe(200);
-    try {
-      expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: bookingId } })).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
-      const detail = await request(app).get(`/api/bookings/${bookingId}`).set('Authorization', `Bearer ${customerToken}`);
-      expect(detail.status).toBe(200);
-      expect(detail.body.data.TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
-      const ownerView = await request(app).get(`/api/owner/hotels/${hotelId}/bookings/${bookingId}`).set('Authorization', `Bearer ${ownerToken}`);
-      expect(ownerView.status).toBe(200);
-
-      expect((await book(rt)).status).toBe(404); // no NEW booking
-
-      const cancel = await request(app).post(`/api/bookings/${bookingId}/cancel`).set('Authorization', `Bearer ${customerToken}`).send({});
-      expect(cancel.status).toBe(200);
-    } finally {
-      await request(app).post(`/api/owner/hotels/${hotelId}/reactivate`).set('Authorization', `Bearer ${ownerToken}`);
+  /**
+   * The hotel shared by the other tests in this file keeps bookings from earlier cases, which would (rightly)
+   * block deactivation — so each case here gets a hotel of its own, removed with its bookings afterwards.
+   */
+  const withOwnHotel = async (run: (h: { id: number; roomTypeId: number; occupy: (rooms: number, from: number, to: number, status: string) => Promise<number> }) => Promise<void>) => {
+    const id = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
+    const roomType = await createTestRoomType(id);
+    for (let d = 1; d <= 5; d++) {
+      await prisma().qUY_PHONG_GIA.create({ data: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: at(d), GiaPhong: 500000, SoLuongPhong: 5, TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE } });
     }
-    expect((await prisma().kHACH_SAN.findUniqueOrThrow({ where: { MaKhachSan: hotelId } })).TrangThai).toBe(HOTEL_STATUS.ACTIVE);
+    const occupyHere = async (rooms: number, from: number, to: number, status: string) => {
+      const booking = await createTestBookingDirect(customerId, id, policyId, at(from), at(to), { trangThai: status });
+      await prisma().cHI_TIET_DAT_PHONG.create({ data: { MaDatPhong: booking.MaDatPhong, MaLoaiPhong: roomType.MaLoaiPhong, SoLuongPhong: rooms } });
+      return booking.MaDatPhong;
+    };
+    try {
+      await run({ id, roomTypeId: roomType.MaLoaiPhong, occupy: occupyHere });
+    } finally {
+      await prisma().hOAN_TIEN.deleteMany({ where: { THANH_TOAN: { DAT_PHONG: { MaKhachSan: id } } } });
+      await prisma().tHANH_TOAN.deleteMany({ where: { DAT_PHONG: { MaKhachSan: id } } });
+      await prisma().cHI_TIET_DAT_PHONG.deleteMany({ where: { DAT_PHONG: { MaKhachSan: id } } });
+      await prisma().dAT_PHONG.deleteMany({ where: { MaKhachSan: id } });
+      await deleteTestHotel(id);
+    }
+  };
+  const call = (path: string, token = ownerToken) => request(app).post(path).set('Authorization', `Bearer ${token}`).send({});
+  const statusOf = async (id: number) => (await prisma().kHACH_SAN.findUniqueOrThrow({ where: { MaKhachSan: id } })).TrangThai;
+
+  it('refuses to deactivate the hotel while it has a confirmed booking, then allows it once that booking is cancelled', async () => {
+    await withOwnHotel(async (h) => {
+      const bookingId = await h.occupy(1, 2, 4, BOOKING_STATUS.CONFIRMED);
+
+      const refused = await call(`/api/owner/hotels/${h.id}/deactivate`);
+      expect(refused.status).toBe(409);
+      expect(refused.body.message).toMatch(/chưa hoàn tất/);
+      expect(await statusOf(h.id)).toBe(HOTEL_STATUS.ACTIVE);
+      expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: bookingId } })).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
+
+      expect((await call(`/api/bookings/${bookingId}/cancel`, customerToken)).status).toBe(200);
+
+      expect((await call(`/api/owner/hotels/${h.id}/deactivate`)).status).toBe(200);
+      expect(await statusOf(h.id)).toBe(HOTEL_STATUS.INACTIVE);
+      const newBooking = await request(app)
+        .post(`/api/hotels/${h.id}/bookings`)
+        .set('Authorization', `Bearer ${customerToken}`)
+        .send({ checkIn: day(3), checkOut: day(4), rooms: [{ maLoaiPhong: h.roomTypeId, soLuong: 1 }] });
+      expect(newBooking.status).toBe(404); // no NEW booking at a hotel that is switched off
+    });
   });
 
-  it('deactivating a room type leaves its confirmed booking untouched; new bookings of that type are refused', async () => {
+  it('a booking still waiting for payment also blocks it, but one whose payment deadline has passed does not', async () => {
+    await withOwnHotel(async (h) => {
+      const waiting = await h.occupy(1, 2, 3, BOOKING_STATUS.PENDING_PAYMENT);
+
+      expect((await call(`/api/owner/hotels/${h.id}/deactivate`)).status).toBe(409);
+      expect(await statusOf(h.id)).toBe(HOTEL_STATUS.ACTIVE);
+
+      await prisma().dAT_PHONG.update({ where: { MaDatPhong: waiting }, data: { NgayTao: new Date(Date.now() - 24 * 60 * 60 * 1000) } });
+
+      expect((await call(`/api/owner/hotels/${h.id}/deactivate`)).status).toBe(200);
+      expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: waiting } })).TrangThai).toBe(BOOKING_STATUS.CANCELLED);
+    });
+  });
+
+  it('cancelled and completed bookings do not block it', async () => {
+    await withOwnHotel(async (h) => {
+      await h.occupy(1, 2, 3, BOOKING_STATUS.CANCELLED);
+      await h.occupy(1, 3, 4, BOOKING_STATUS.COMPLETED);
+
+      expect((await call(`/api/owner/hotels/${h.id}/deactivate`)).status).toBe(200);
+      expect(await statusOf(h.id)).toBe(HOTEL_STATUS.INACTIVE);
+    });
+  });
+
+  it('refuses to stop selling a room type that is in an open booking, then allows it once that booking is cancelled; new bookings are refused afterwards', async () => {
     const rt = await roomTypeWithStock(5);
     const bookingId = await occupy(rt, 2, 2, 4);
+    const status = async () => (await prisma().lOAI_PHONG.findUniqueOrThrow({ where: { MaLoaiPhong: rt } })).TrangThai;
+
+    const refused = await request(app).post(`/api/owner/room-types/${rt}/deactivate`).set('Authorization', `Bearer ${ownerToken}`);
+    expect(refused.status).toBe(409);
+    expect(refused.body.message).toMatch(/chưa hoàn tất/);
+    expect(await status()).toBe(ROOM_TYPE_STATUS.ACTIVE);
+    expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: bookingId } })).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
+
+    const cancel = await request(app).post(`/api/bookings/${bookingId}/cancel`).set('Authorization', `Bearer ${customerToken}`).send({});
+    expect(cancel.status).toBe(200);
 
     const off = await request(app).post(`/api/owner/room-types/${rt}/deactivate`).set('Authorization', `Bearer ${ownerToken}`);
     expect(off.status).toBe(200);
-    expect((await prisma().lOAI_PHONG.findUniqueOrThrow({ where: { MaLoaiPhong: rt } })).TrangThai).toBe(ROOM_TYPE_STATUS.DISCONTINUED);
-
-    expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: bookingId } })).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
-    const detail = await request(app).get(`/api/bookings/${bookingId}`).set('Authorization', `Bearer ${customerToken}`);
-    expect(detail.status).toBe(200);
-    expect(detail.body.data.ChiTietPhong[0].SoLuong).toBe(2);
+    expect(await status()).toBe(ROOM_TYPE_STATUS.DISCONTINUED);
     expect((await book(rt)).status).toBe(400);
   });
 });

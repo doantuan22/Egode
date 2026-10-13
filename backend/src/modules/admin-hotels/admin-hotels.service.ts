@@ -1,6 +1,12 @@
 import { getPrismaClient } from '../../config/prisma';
 import { AppError } from '../../common/errors/app-error';
-import { HOTEL_STATUS } from '../../common/constants/hotel-status';
+import { BOOKING_STATUS, HOTEL_STATUS } from '../../common/constants/hotel-status';
+import { checkInInstant } from '../../common/utils/business-time';
+import { BookingsRepository } from '../bookings/bookings.repository';
+import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
+import { ConfiguredRefundGateway } from '../payments/simulated-refund-gateway';
+import { RefundsRepository, type PendingRefund } from '../payments/refunds.repository';
+import { RefundProcessor } from '../payments/refund-processor';
 import type { CreateAmenityInput, ListHotelsQuery, UpdateAmenityInput, UpdateHotelInput } from './admin-hotels.schemas';
 
 /** What an admin needs to know about who owns a hotel (never the password hash or other profile fields). */
@@ -13,7 +19,25 @@ const OWNER_SUMMARY = { MaTaiKhoan: true, HoTen: true, Email: true, SoDienThoai:
  * Every transition is a single guarded UPDATE (`WHERE TrangThai = <expected>`), so two admins acting on the
  * same hotel cannot both succeed and no endpoint can be used to skip a state (e.g. reactivate ≠ approve).
  */
+/** What suspending a hotel did to the bookings it had open. */
+export interface SuspensionOutcome {
+  /** Stays already under way ("Đã xác nhận", check-in time passed) → "Hoàn tất". */
+  DonHoanTat: number;
+  /** Not yet checked in ("Đã xác nhận" or "Chờ thanh toán") → "Đã hủy". */
+  DonDaHuy: number;
+  /** Cancelled bookings that had been paid: refunded in full. */
+  DonHoanTien: number;
+}
+
+const SUSPENSION_NOTE = 'Khách sạn bị quản trị viên đình chỉ';
+
 export class AdminHotelsService {
+  constructor(
+    private readonly bookings: BookingsRepository = new BookingsRepository(),
+    private readonly refunds: RefundsRepository = new RefundsRepository(),
+    private readonly refundProcessor: RefundProcessor = new RefundProcessor(new ConfiguredRefundGateway(), refunds)
+  ) {}
+
   async list(q: ListHotelsQuery) {
     const prisma = getPrismaClient();
     const where = {
@@ -80,12 +104,63 @@ export class AdminHotelsService {
     });
   }
 
-  async suspend(id: number) {
+  /**
+   * Hoạt động → Đình chỉ, and the hotel's open bookings are settled in the same step so nobody is left holding a
+   * booking at a hotel that has been shut down:
+   *   - a stay already under way ("Đã xác nhận", the hotel's check-in time has passed) → "Hoàn tất";
+   *   - a booking not yet checked in ("Đã xác nhận" or still "Chờ thanh toán") → "Đã hủy". Money already paid is
+   *     refunded IN FULL (the guest did nothing wrong, so the cancellation policy tiers do not apply).
+   * The status change and the booking changes commit together; the refunds are then sent to the gateway with no
+   * transaction open, exactly like a customer cancellation, and a failed one stays retryable.
+   */
+  async suspend(id: number, ipAddr = '127.0.0.1') {
     const hotel = await this.getOne(id);
-    if (hotel.TrangThai === HOTEL_STATUS.SUSPENDED) return hotel;
-    return this.transition(id, HOTEL_STATUS.ACTIVE, HOTEL_STATUS.SUSPENDED, 'Chỉ có thể đình chỉ khách sạn đang hoạt động', {
-      NgayCapNhat: new Date(),
+    if (hotel.TrangThai === HOTEL_STATUS.SUSPENDED) return { ...hotel, DonDaXuLy: { DonHoanTat: 0, DonDaHuy: 0, DonHoanTien: 0 } satisfies SuspensionOutcome };
+    if (hotel.TrangThai !== HOTEL_STATUS.ACTIVE) throw AppError.badRequest('Chỉ có thể đình chỉ khách sạn đang hoạt động');
+
+    // Settle stale holds and finished stays first, so only genuinely open bookings are touched below.
+    await reconcileBookingLifecycle();
+
+    const now = new Date();
+    const pendingRefunds: PendingRefund[] = [];
+    const outcome: SuspensionOutcome = { DonHoanTat: 0, DonDaHuy: 0, DonHoanTien: 0 };
+
+    await this.bookings.runInTransaction(async (tx) => {
+      const changed = await tx.kHACH_SAN.updateMany({
+        where: { MaKhachSan: id, TrangThai: HOTEL_STATUS.ACTIVE },
+        data: { TrangThai: HOTEL_STATUS.SUSPENDED, NgayCapNhat: now },
+      });
+      if (changed.count === 0) throw AppError.conflict('Khách sạn đã đổi trạng thái trước đó — vui lòng tải lại');
+
+      const open = await tx.dAT_PHONG.findMany({
+        where: { MaKhachSan: id, TrangThai: { in: [BOOKING_STATUS.PENDING_PAYMENT, BOOKING_STATUS.CONFIRMED] } },
+        select: { MaDatPhong: true, TrangThai: true, NgayNhanPhong: true },
+      });
+
+      for (const booking of open) {
+        const underway = booking.TrangThai === BOOKING_STATUS.CONFIRMED && checkInInstant(booking.NgayNhanPhong, hotel.GioNhanPhong).getTime() <= now.getTime();
+        if (underway) {
+          if ((await this.bookings.completeBooking(tx, booking.MaDatPhong, `${SUSPENSION_NOTE}: đơn đang lưu trú được chuyển hoàn tất`, now)) === 1) outcome.DonHoanTat += 1;
+          continue;
+        }
+
+        if ((await this.bookings.cancelBooking(tx, booking.MaDatPhong, `${SUSPENSION_NOTE}: đơn chưa nhận phòng bị hủy`, now)) !== 1) continue;
+        outcome.DonDaHuy += 1;
+
+        // Never fabricate a refund for money that was not captured (an unpaid hold, a 0đ booking).
+        const payment = await this.refunds.lockSuccessfulPayment(tx, booking.MaDatPhong);
+        if (!payment) continue;
+        const refund = await this.refunds.openPendingRefund(tx, payment, Number(payment.SoTien), `${SUSPENSION_NOTE} — hoàn 100% tiền đã thanh toán`, now);
+        if (refund) {
+          pendingRefunds.push(refund);
+          outcome.DonHoanTien += 1;
+        }
+      }
     });
+
+    for (const refund of pendingRefunds) await this.refundProcessor.process(refund, ipAddr);
+
+    return { ...(await this.getOne(id)), DonDaXuLy: outcome };
   }
 
   async reactivate(id: number) {

@@ -130,7 +130,7 @@ export default function AdminReviewDetailPage() {
               disabled={moderateMutation.isPending || removeMutation.isPending}
               onClick={() => moderateMutation.mutate({ id: reviewId, trangThai: 'Hiển thị' })} variant="success" className="w-full sm:w-auto"
             >
-              Duyệt (Hiển thị)
+              {r.TrangThai === 'Chờ duyệt' ? 'Cho hiển thị' : 'Hiển thị lại'}
             </Button>
           )}
           

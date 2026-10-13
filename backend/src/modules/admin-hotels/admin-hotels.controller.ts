@@ -58,7 +58,7 @@ export class AdminHotelsController {
 
   suspend = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      sendSuccess(res, await this.service.suspend(this.id(req)), 'Đã đình chỉ khách sạn');
+      sendSuccess(res, await this.service.suspend(this.id(req), req.ip ?? '127.0.0.1'), 'Đã đình chỉ khách sạn');
     } catch (e) {
       next(e);
     }

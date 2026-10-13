@@ -6,6 +6,7 @@ import type { CreateHotelInput, UpdateHotelInput } from './owner-hotels.schemas'
 import type { KHACH_SAN } from '../../generated/prisma/client';
 import { assertImageCountBelowLimit, MAX_HOTEL_IMAGES } from '../../common/utils/image-upload';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
+import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
 
 const HOTEL_IMAGE_FOLDER = 'hotel-booking/hotels';
 
@@ -69,7 +70,12 @@ export class OwnerHotelsService {
     return this.repository.update(maKhachSan, { ...input, NgayCapNhat: new Date() });
   }
 
-  /** Hoạt động → Ngừng hoạt động. Only a hotel that is live can be switched off by its owner. */
+  /**
+   * Hoạt động → Ngừng hoạt động. Only a hotel that is live can be switched off by its owner, and only while it
+   * has no open booking ("Chờ thanh toán", or "Đã xác nhận" with the stay not over): switching it off would
+   * leave guests holding a booking at a hotel that no longer operates. Unpaid holds past their deadline and
+   * finished stays are settled first, so they never block this.
+   */
   async deactivate(ownerId: number, maKhachSan: number) {
     const hotel = await this.getOwnedHotel(ownerId, maKhachSan);
     if (hotel.TrangThai === HOTEL_STATUS.INACTIVE) return hotel;
@@ -77,7 +83,26 @@ export class OwnerHotelsService {
     if (hotel.TrangThai !== HOTEL_STATUS.ACTIVE) {
       throw AppError.badRequest('Chỉ có thể ngừng hoạt động khách sạn đang hoạt động');
     }
-    return this.transition(maKhachSan, HOTEL_STATUS.ACTIVE, HOTEL_STATUS.INACTIVE, 'Chỉ có thể ngừng hoạt động khách sạn đang hoạt động');
+
+    await reconcileBookingLifecycle();
+    const openBookings = await this.repository.countOpenBookings(maKhachSan);
+    if (openBookings > 0) throw this.openBookingsError(openBookings);
+
+    const changed = await this.repository.deactivateWhenNoOpenBookings(maKhachSan, new Date());
+    if (!changed) {
+      // Lost a race: either a booking arrived (still the same answer) or an admin changed the hotel meanwhile.
+      const current = await this.repository.countOpenBookings(maKhachSan);
+      if (current > 0) throw this.openBookingsError(current);
+      throw AppError.conflict('Khách sạn đã đổi trạng thái trước đó — vui lòng tải lại');
+    }
+    return (await this.repository.findById(maKhachSan))!;
+  }
+
+  private openBookingsError(count: number): AppError {
+    return AppError.conflict(
+      `Không thể ngừng hoạt động khi khách sạn còn ${count} đơn đặt phòng chưa hoàn tất (chờ thanh toán hoặc khách chưa trả phòng)`,
+      { SoDonChuaHoanTat: count }
+    );
   }
 
   /**

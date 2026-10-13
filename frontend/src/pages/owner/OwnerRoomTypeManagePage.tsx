@@ -6,6 +6,7 @@ import {
   useRoomType,
   useUpdateRoomType,
   useDeactivateRoomType,
+  useReactivateRoomType,
   useReplaceRoomTypeAmenities,
   useUploadRoomTypeImage,
   useDeleteRoomTypeImage,
@@ -32,6 +33,7 @@ export default function OwnerRoomTypeManagePage() {
   const amenitiesQuery = useAmenities();
   const updateMutation = useUpdateRoomType(roomTypeId);
   const deactivateMutation = useDeactivateRoomType(roomTypeId);
+  const reactivateMutation = useReactivateRoomType(roomTypeId);
   const amenitiesMutation = useReplaceRoomTypeAmenities(roomTypeId);
   const uploadImageMutation = useUploadRoomTypeImage(roomTypeId);
   const deleteImageMutation = useDeleteRoomTypeImage(roomTypeId);
@@ -127,6 +129,14 @@ export default function OwnerRoomTypeManagePage() {
             {updateMutation.error instanceof ApiError ? updateMutation.error.message : 'Cập nhật thất bại'}
           </div>
         )}
+        {(deactivateMutation.isError || reactivateMutation.isError) && (
+          <div role="alert" className="rounded-lg bg-danger-light border border-danger/30 px-4 py-3 text-sm text-danger-ink">
+            {(() => {
+              const error = reactivateMutation.isError ? reactivateMutation.error : deactivateMutation.error;
+              return error instanceof ApiError ? error.message : 'Không thể đổi trạng thái bán của loại phòng';
+            })()}
+          </div>
+        )}
 
         <section className="owner-editor-section border-b border-border py-6 first:border-t">
           <div className="mb-6">
@@ -188,9 +198,18 @@ export default function OwnerRoomTypeManagePage() {
               <Button 
                 type="button" variant="danger-outline" 
                 disabled={deactivateMutation.isPending} 
-                onClick={async () => { if (await confirm({ title: 'Ngừng bán loại phòng?', description: 'Các đặt phòng lịch sử sẽ được giữ lại.', confirmLabel: 'Ngừng bán', variant: 'danger' })) deactivateMutation.mutate(); }}
+                onClick={async () => { if (await confirm({ title: 'Ngừng bán loại phòng?', description: 'Loại phòng sẽ không còn hiển thị và không nhận đặt phòng mới. Chỉ thực hiện được khi không còn đơn đặt phòng chưa hoàn tất; các đặt phòng lịch sử được giữ lại.', confirmLabel: 'Ngừng bán', variant: 'danger' })) deactivateMutation.mutate(); }}
               >
                 {deactivateMutation.isPending ? 'Đang xử lý...' : 'Ngừng bán'}
+              </Button>
+            )}
+            {roomType.TrangThai === 'Ngừng bán' && (
+              <Button
+                type="button" variant="success-outline"
+                disabled={reactivateMutation.isPending}
+                onClick={async () => { if (await confirm({ title: 'Mở bán lại loại phòng?', description: 'Loại phòng sẽ hiển thị lại cho khách và nhận đặt phòng ở những ngày còn quỹ phòng mở bán.', confirmLabel: 'Mở bán lại' })) reactivateMutation.mutate(); }}
+              >
+                {reactivateMutation.isPending ? 'Đang xử lý...' : 'Mở bán lại'}
               </Button>
             )}
           </div>

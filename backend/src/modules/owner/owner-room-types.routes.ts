@@ -25,6 +25,7 @@ router.patch(
   controller.update
 );
 router.post('/:id/deactivate', validateRequest({ params: roomTypeIdParamSchema }), controller.deactivate);
+router.post('/:id/reactivate', validateRequest({ params: roomTypeIdParamSchema }), controller.reactivate);
 router.put(
   '/:id/amenities',
   validateRequest({ params: roomTypeIdParamSchema, body: replaceAmenitiesSchema }),

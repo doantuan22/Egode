@@ -65,7 +65,8 @@ export class ReviewsService {
           maKhachSan: booking.MaKhachSan,
           diemDanhGia: input.diemDanhGia,
           noiDung: input.noiDung ?? null,
-          trangThai: REVIEW_STATUS.PENDING,
+          // No pre-moderation: a review is public as soon as it is posted. The admin can still hide it afterwards.
+          trangThai: REVIEW_STATUS.VISIBLE,
         },
         uploadedImages.map((image) => image.url)
       );

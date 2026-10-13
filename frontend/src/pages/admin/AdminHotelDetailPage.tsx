@@ -56,7 +56,12 @@ export default function AdminHotelDetailPage() {
   };
   
   const suspend = async () => {
-    if (await confirm({ title: 'Đình chỉ khách sạn?', description: 'Cơ sở sẽ không thể tiếp nhận đặt phòng mới.', confirmLabel: 'Đình chỉ', variant: 'danger' })) mutation.mutate({ action: 'suspend' });
+    if (await confirm({
+      title: 'Đình chỉ khách sạn?',
+      description: 'Khách sạn sẽ ngừng nhận đặt phòng mới. Các đơn đang xử lý sẽ được xử lý ngay: đơn khách đang lưu trú chuyển sang "Hoàn tất"; đơn chưa nhận phòng (kể cả đơn chờ thanh toán) bị hủy, và tiền đã thanh toán được hoàn 100%. Thao tác này không thể hoàn tác.',
+      confirmLabel: 'Đình chỉ',
+      variant: 'danger',
+    })) mutation.mutate({ action: 'suspend' });
   };
   const approve = async () => {
     if (await confirm({ title: 'Duyệt khách sạn?', description: `Khách sạn ${query.data?.TenKhachSan ?? ''} sẽ được hiển thị công khai và nhận đặt phòng.`, confirmLabel: 'Duyệt' })) mutation.mutate({ action: 'approve' });
@@ -105,7 +110,9 @@ export default function AdminHotelDetailPage() {
         <div className="p-6 space-y-6">
           {mutation.isSuccess && saved && (
             <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-              Cập nhật khách sạn thành công
+              {mutation.data?.DonDaXuLy
+                ? `Đã đình chỉ khách sạn: ${mutation.data.DonDaXuLy.DonHoanTat} đơn đang lưu trú chuyển hoàn tất, ${mutation.data.DonDaXuLy.DonDaHuy} đơn chưa nhận phòng đã hủy (${mutation.data.DonDaXuLy.DonHoanTien} đơn được hoàn tiền).`
+                : 'Cập nhật khách sạn thành công'}
             </div>
           )}
           {mutation.isError && (

@@ -78,7 +78,13 @@ export function ReviewSection({ bookingId, bookingStatus }: ReviewSectionProps) 
               ))}
             </div>
           )}
-          <p className="text-xs text-ink-muted">Cảm ơn bạn đã đánh giá — đánh giá đang chờ kiểm duyệt trước khi hiển thị công khai.</p>
+          <p className="text-xs text-ink-muted">
+            {reviewQuery.data.TrangThai === 'Hiển thị'
+              ? 'Cảm ơn bạn đã đánh giá — đánh giá của bạn đã được hiển thị công khai.'
+              : reviewQuery.data.TrangThai === 'Chờ duyệt'
+                ? 'Cảm ơn bạn đã đánh giá — đánh giá đang chờ kiểm duyệt trước khi hiển thị công khai.'
+                : 'Cảm ơn bạn đã đánh giá — đánh giá này hiện không được hiển thị công khai.'}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">

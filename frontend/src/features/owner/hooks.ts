@@ -97,6 +97,7 @@ export function useUpdateRoomType(id: number) {
   });
 }
 export function useDeactivateRoomType(id: number) { const queryClient = useQueryClient(); return useMutation({ mutationFn: () => ownerApi.deactivateRoomType(id), onSuccess: (roomType) => { queryClient.setQueryData(roomTypeKey(id), roomType); queryClient.invalidateQueries({ queryKey: roomTypesKey(roomType.MaKhachSan) }); } }); }
+export function useReactivateRoomType(id: number) { const queryClient = useQueryClient(); return useMutation({ mutationFn: () => ownerApi.reactivateRoomType(id), onSuccess: (roomType) => { queryClient.setQueryData(roomTypeKey(id), roomType); queryClient.invalidateQueries({ queryKey: roomTypesKey(roomType.MaKhachSan) }); } }); }
 
 export function useOwnerBookings(hotelId: number, filters: OwnerBookingsFilters) { return useQuery({ queryKey: ['owner', 'hotels', hotelId, 'bookings', filters], queryFn: () => ownerApi.listOwnerBookings(hotelId, filters), enabled: hotelId > 0 }); }
 export function useOwnerBooking(hotelId: number, bookingId: number) { return useQuery({ queryKey: ['owner', 'hotels', hotelId, 'bookings', bookingId], queryFn: () => ownerApi.getOwnerBooking(hotelId, bookingId), enabled: hotelId > 0 && bookingId > 0 }); }

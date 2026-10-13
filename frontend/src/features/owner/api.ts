@@ -94,6 +94,7 @@ export const updateRoomType = async (
   return res.data as OwnerRoomType;
 };
 export const deactivateRoomType = async (id: number): Promise<OwnerRoomType> => { const res = await apiClient<OwnerRoomType>(`/owner/room-types/${id}/deactivate`, { method: 'POST' }); return res.data as OwnerRoomType; };
+export const reactivateRoomType = async (id: number): Promise<OwnerRoomType> => { const res = await apiClient<OwnerRoomType>(`/owner/room-types/${id}/reactivate`, { method: 'POST' }); return res.data as OwnerRoomType; };
 
 export const listOwnerBookings = async (hotelId: number, filters: OwnerBookingsFilters) => { const query = new URLSearchParams(); Object.entries(filters).forEach(([key, value]) => { if (value) query.set(key, String(value)); }); const res = await apiClient<OwnerBooking[]>(`/owner/hotels/${hotelId}/bookings?${query.toString()}`); const paginated = res as typeof res & { pagination: { page: number; limit: number; total: number; totalPages: number } }; return { items: res.data ?? [], pagination: paginated.pagination }; };
 export const getOwnerBooking = async (hotelId: number, bookingId: number): Promise<OwnerBooking> => { const res = await apiClient<OwnerBooking>(`/owner/hotels/${hotelId}/bookings/${bookingId}`); return res.data as OwnerBooking; };

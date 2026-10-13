@@ -1,6 +1,9 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
-import { ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
+import { BOOKING_STATUS, ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
+
+/** Bookings that still have something to happen: waiting for payment, or paid and the stay is not over. */
+const OPEN_BOOKING_STATUSES = [BOOKING_STATUS.PENDING_PAYMENT, BOOKING_STATUS.CONFIRMED];
 
 export class OwnerRoomTypesRepository {
   async listForHotel(maKhachSan: number) {
@@ -35,6 +38,31 @@ export class OwnerRoomTypesRepository {
   async update(maLoaiPhong: number, data: Prisma.LOAI_PHONGUpdateInput) {
     const prisma = getPrismaClient();
     return prisma.lOAI_PHONG.update({ where: { MaLoaiPhong: maLoaiPhong }, data });
+  }
+
+  /** How many open bookings ("Chờ thanh toán", or "Đã xác nhận" with the stay not over) include this room type. */
+  async countOpenBookings(maLoaiPhong: number): Promise<number> {
+    const prisma = getPrismaClient();
+    return prisma.dAT_PHONG.count({
+      where: { TrangThai: { in: OPEN_BOOKING_STATUSES }, CHI_TIET_DAT_PHONG: { some: { MaLoaiPhong: maLoaiPhong } } },
+    });
+  }
+
+  /**
+   * "Hoạt động" → "Ngừng bán" in ONE statement that also requires no open booking of this room type, so a booking
+   * that lands between a separate count and the update cannot be left on a room type that was switched off.
+   */
+  async discontinueWhenNoOpenBookings(maLoaiPhong: number): Promise<boolean> {
+    const prisma = getPrismaClient();
+    const result = await prisma.lOAI_PHONG.updateMany({
+      where: {
+        MaLoaiPhong: maLoaiPhong,
+        TrangThai: ROOM_TYPE_STATUS.ACTIVE,
+        CHI_TIET_DAT_PHONG: { none: { DAT_PHONG: { TrangThai: { in: OPEN_BOOKING_STATUSES } } } },
+      },
+      data: { TrangThai: ROOM_TYPE_STATUS.DISCONTINUED },
+    });
+    return result.count === 1;
   }
 
   async replaceAmenities(maLoaiPhong: number, amenityIds: number[]) {

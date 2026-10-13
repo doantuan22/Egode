@@ -171,7 +171,7 @@ describe('POST /bookings/:id/review', () => {
     expect(tooHigh.status).toBe(400);
   });
 
-  it('201 creates a review for a completed own booking, defaulting to "Chờ duyệt"', async () => {
+  it('201 creates a review for a completed own booking, published at once ("Hiển thị", no pre-moderation)', async () => {
     const booking = await makeBooking(BOOKING_STATUS.COMPLETED, addDays(-10), addDays(-8));
     const res = await request(app)
       .post(`/api/bookings/${booking.MaDatPhong}/review`)
@@ -179,13 +179,28 @@ describe('POST /bookings/:id/review', () => {
       .send({ diemDanhGia: 4, noiDung: 'Phòng sạch, nhân viên thân thiện.' });
 
     expect(res.status).toBe(201);
-    expect(res.body.data.TrangThai).toBe(REVIEW_STATUS.PENDING);
+    expect(res.body.data.TrangThai).toBe(REVIEW_STATUS.VISIBLE);
     expect(res.body.data.DiemDanhGia).toBe(4);
 
     const prisma = getPrismaClient();
     const row = await prisma.dANH_GIA.findUnique({ where: { MaDatPhong: booking.MaDatPhong } });
     expect(row?.MaKhachHang).toBe(customerId);
     expect(row?.MaKhachSan).toBe(hotelId); // derived server-side from the booking, not from the client
+  });
+
+  it('a new review shows on the public hotel page and in its average straight away, without any admin action', async () => {
+    const booking = await makeBooking(BOOKING_STATUS.COMPLETED, addDays(-10), addDays(-8));
+    const created = await request(app)
+      .post(`/api/bookings/${booking.MaDatPhong}/review`)
+      .set('Authorization', `Bearer ${customerToken}`)
+      .send({ diemDanhGia: 5, noiDung: 'Hiển thị ngay sau khi gửi.' });
+    expect(created.status).toBe(201);
+
+    const publicList = await request(app).get(`/api/hotels/${hotelId}/reviews`).query({ limit: 50 });
+
+    expect(publicList.status).toBe(200);
+    expect(publicList.body.data.map((r: { MaDanhGia: number }) => r.MaDanhGia)).toContain(created.body.data.MaDanhGia);
+    expect(publicList.body.summary.SoLuongDanhGia).toBeGreaterThanOrEqual(1);
   });
 
   it('uploads images via the (mocked) Cloudinary integration and stores their URLs', async () => {
@@ -278,7 +293,7 @@ describe('Admin review moderation', () => {
 
     const list = await request(app)
       .get('/api/admin/reviews')
-      .query({ trangThai: REVIEW_STATUS.PENDING })
+      .query({ trangThai: REVIEW_STATUS.VISIBLE })
       .set('Authorization', `Bearer ${adminToken}`);
     expect(list.status).toBe(200);
     expect(list.body.data.map((r: { MaDanhGia: number }) => r.MaDanhGia)).toContain(reviewId);

@@ -12,6 +12,7 @@ import {
   createTestAmenity,
   deleteTestAmenity,
 } from '../../test/factories';
+import { getPrismaClient } from '../../config/prisma';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
 
@@ -113,6 +114,60 @@ describe('GET/PATCH /api/owner/room-types/:id', () => {
       .get('/api/owner/room-types/999999999')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(404);
+  });
+});
+
+describe('POST /api/owner/room-types/:id/deactivate and /reactivate', () => {
+  it('stops selling a room type (hidden from guests) and puts it back on sale again', async () => {
+    const { token, hotel } = await makeOwnerWithHotel();
+    const roomType = await createTestRoomType(hotel.MaKhachSan);
+    const call = (action: 'deactivate' | 'reactivate') =>
+      request(app).post(`/api/owner/room-types/${roomType.MaLoaiPhong}/${action}`).set('Authorization', `Bearer ${token}`);
+    const status = async () => (await getPrismaClient().lOAI_PHONG.findUniqueOrThrow({ where: { MaLoaiPhong: roomType.MaLoaiPhong } })).TrangThai;
+
+    const day = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+    const listedForGuests = async () => {
+      const res = await request(app).get(`/api/hotels/${hotel.MaKhachSan}/rooms`).query({ checkIn: day(3), checkOut: day(4), guests: 1 });
+      expect(res.status).toBe(200);
+      return (res.body.data as Array<{ MaLoaiPhong: number }>).some((room) => room.MaLoaiPhong === roomType.MaLoaiPhong);
+    };
+
+    expect(await listedForGuests()).toBe(true);
+
+    const off = await call('deactivate');
+    expect(off.status).toBe(200);
+    expect(await status()).toBe(ROOM_TYPE_STATUS.DISCONTINUED);
+    expect(await listedForGuests()).toBe(false);
+
+    const on = await call('reactivate');
+    expect(on.status).toBe(200);
+    expect(on.body.data.TrangThai).toBe(ROOM_TYPE_STATUS.ACTIVE);
+    expect(await status()).toBe(ROOM_TYPE_STATUS.ACTIVE);
+    expect(await listedForGuests()).toBe(true);
+  });
+
+  it('reactivating twice is harmless', async () => {
+    const { token, hotel } = await makeOwnerWithHotel();
+    const roomType = await createTestRoomType(hotel.MaKhachSan);
+
+    const first = await request(app).post(`/api/owner/room-types/${roomType.MaLoaiPhong}/reactivate`).set('Authorization', `Bearer ${token}`);
+    const second = await request(app).post(`/api/owner/room-types/${roomType.MaLoaiPhong}/reactivate`).set('Authorization', `Bearer ${token}`);
+
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    expect(second.body.data.TrangThai).toBe(ROOM_TYPE_STATUS.ACTIVE);
+  });
+
+  it('only the owner of the hotel can reactivate (403), and an unknown id is 404', async () => {
+    const ownerA = await makeOwnerWithHotel();
+    const ownerB = await makeOwnerWithHotel();
+    const roomType = await createTestRoomType(ownerA.hotel.MaKhachSan);
+
+    const stranger = await request(app).post(`/api/owner/room-types/${roomType.MaLoaiPhong}/reactivate`).set('Authorization', `Bearer ${ownerB.token}`);
+    const missing = await request(app).post('/api/owner/room-types/999999999/reactivate').set('Authorization', `Bearer ${ownerA.token}`);
+
+    expect(stranger.status).toBe(403);
+    expect(missing.status).toBe(404);
   });
 });
 

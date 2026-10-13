@@ -246,7 +246,7 @@ export const openApiSpec = {
         tags: ['Review'],
         security: [{ BearerAuth: [] }],
         description:
-          'MaKhachHang/MaKhachSan are derived server-side from the booking, never from the client. Only allowed once DAT_PHONG.TrangThai is actually "Hoàn tất" (lazily swept from "Đã xác nhận" once NgayTraPhong has passed — see bookings/booking-completion.ts). At most one review per booking (UQ_DANH_GIA_MaDatPhong). New reviews always start "Chờ duyệt" — a customer cannot set TrangThai.',
+          'MaKhachHang/MaKhachSan are derived server-side from the booking, never from the client. Only allowed once DAT_PHONG.TrangThai is actually "Hoàn tất" (lazily swept from "Đã xác nhận" once NgayTraPhong has passed — see bookings/booking-completion.ts). At most one review per booking (UQ_DANH_GIA_MaDatPhong). New reviews are published at once ("Hiển thị", no pre-moderation); the admin can hide them afterwards. A customer cannot set TrangThai.',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         requestBody: {
           required: true,
@@ -639,6 +639,15 @@ export const openApiSpec = {
         security: [{ BearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: { '200': { description: 'Deactivated (idempotent)' }, '403': { description: 'Forbidden' }, '404': { description: 'Not found' } },
+      },
+    },
+    '/owner/room-types/{id}/reactivate': {
+      post: {
+        summary: 'Put a discontinued room type back on sale ("Ngừng bán" → "Hoạt động"; rates and bookings untouched)',
+        tags: ['Owner'],
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Reactivated (idempotent)' }, '403': { description: 'Forbidden' }, '404': { description: 'Not found' } },
       },
     },
     '/owner/room-types/{id}/amenities': {

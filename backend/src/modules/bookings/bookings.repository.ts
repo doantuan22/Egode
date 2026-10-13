@@ -259,6 +259,19 @@ export class BookingsRepository {
     });
   }
 
+  /** Guarded "Đã xác nhận" → "Hoàn tất" with a note; 0 rows when the booking is no longer confirmed. */
+  async completeBooking(tx: Prisma.TransactionClient, maDatPhong: number, note: string, now: Date): Promise<number> {
+    const result = await tx.$executeRaw(Prisma.sql`
+      UPDATE DAT_PHONG
+      SET TrangThai = ${BOOKING_STATUS.COMPLETED},
+          NgayCapNhat = ${now},
+          GhiChu = CASE WHEN GhiChu IS NULL THEN ${note} ELSE GhiChu + N' | ' + ${note} END
+      WHERE MaDatPhong = ${maDatPhong}
+        AND TrangThai = ${BOOKING_STATUS.CONFIRMED}
+    `);
+    return Number(result);
+  }
+
   /** Guarded transition — only succeeds if the booking is still in a cancellable state; races (double-cancel, expiry) resolve to 0 rows affected instead of corrupting state. */
   async cancelBooking(tx: Prisma.TransactionClient, maDatPhong: number, note: string, now: Date): Promise<number> {
     const result = await tx.$executeRaw(Prisma.sql`
