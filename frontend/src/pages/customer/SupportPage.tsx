@@ -64,7 +64,7 @@ export default function SupportPage() {
         </>
       ),
     },
-    { key: 'date', header: 'Ngày gửi', cell: (r) => <span className="text-[13px] text-muted">{formatDateVi(r.NgayTao)}</span> },
+    { key: 'date', header: 'Ngày gửi', cell: (r) => <span className="text-[0.8125rem] text-muted">{formatDateVi(r.NgayTao)}</span> },
     { key: 'status', header: 'Trạng thái', cell: (r) => <StatusBadge domain="support" status={r.TrangThai} /> },
     { key: 'actions', header: 'Thao tác', align: 'right', cell: (r) => <Link to={`/support/${r.MaYeuCauHoTro}`} className="btn btn-outline btn-sm">Xem trao đổi</Link> },
   ];
@@ -84,8 +84,8 @@ export default function SupportPage() {
       {showForm && (
         <div className="card card-body animate-in slide-in-from-top-4 fade-in duration-300" ref={formRef}>
           <div className="flex justify-between items-center mb-5 pb-3.5 border-b border-border flex-wrap gap-2">
-            <h2 className="text-[17px] font-bold text-heading">Gửi yêu cầu hoặc phản ánh dịch vụ</h2>
-            <span className="text-[13px] text-muted">Trạng thái xử lý được cập nhật ngay trong danh sách yêu cầu</span>
+            <h2 className="text-[1.0625rem] font-bold text-heading">Gửi yêu cầu hoặc phản ánh dịch vụ</h2>
+            <span className="text-[0.8125rem] text-muted">Trạng thái xử lý được cập nhật ngay trong danh sách yêu cầu</span>
           </div>
 
           <form onSubmit={submit} className="flex flex-col gap-5">
@@ -150,8 +150,8 @@ export default function SupportPage() {
 
       <div className="card card-body">
         <div className="mb-5 pb-3.5 border-b border-border">
-          <h2 className="text-[17px] font-bold text-heading">Lịch sử yêu cầu đã gửi</h2>
-          <span className="text-[13px] text-muted block mt-1">Theo dõi tiến độ xử lý các phiếu yêu cầu của bạn</span>
+          <h2 className="text-[1.0625rem] font-bold text-heading">Lịch sử yêu cầu đã gửi</h2>
+          <span className="text-[0.8125rem] text-muted block mt-1">Theo dõi tiến độ xử lý các phiếu yêu cầu của bạn</span>
         </div>
 
         <DataTable

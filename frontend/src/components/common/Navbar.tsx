@@ -153,9 +153,9 @@ export function Navbar() {
               src="/egode_logo.png"
               alt="Egode"
               className="
-                h-[42px]
+                h-[2.625rem]
                 w-auto
-                max-w-[180px]
+                max-w-[11.25rem]
                 object-contain
               "
             />

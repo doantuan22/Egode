@@ -33,8 +33,8 @@ export default function SupportDetailPage() {
       <div className="card card-body max-w-3xl">
         <div className="flex justify-between items-start gap-3 mb-5 pb-4 border-b border-border flex-wrap">
           <div>
-            <h1 className="text-[20px] font-bold text-heading">{r.TieuDe}</h1>
-            <p className="mt-1 text-[13px] text-muted">
+            <h1 className="text-[1.25rem] font-bold text-heading">{r.TieuDe}</h1>
+            <p className="mt-1 text-[0.8125rem] text-muted">
               {r.LoaiYeuCau} · Gửi lúc {formatDateTimeVi(r.NgayTao)}
             </p>
           </div>

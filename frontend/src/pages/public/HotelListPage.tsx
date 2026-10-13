@@ -208,7 +208,7 @@ export default function HotelListPage() {
       <section
         className="
           relative
-          min-h-[450px]
+          min-h-[28.125rem]
           overflow-visible
         "
       >
@@ -272,7 +272,7 @@ export default function HotelListPage() {
           "
         >
 
-          <div className="max-w-[650px]">
+          <div className="max-w-[40.625rem]">
 
             {/* BADGE */}
 
@@ -288,7 +288,7 @@ export default function HotelListPage() {
                 bg-white/10
                 px-4
                 py-2
-                text-[11px]
+                text-[0.6875rem]
                 font-extrabold
                 tracking-[0.08em]
                 text-white
@@ -312,11 +312,11 @@ export default function HotelListPage() {
             <h1
               className="
                 m-0
-                text-[40px]
+                text-[2.5rem]
                 font-extrabold
                 leading-[1.08]
                 tracking-[-0.045em]
-                md:text-[52px]
+                md:text-[3.25rem]
               "
               style={{
                 color: '#ffffff',
@@ -342,8 +342,8 @@ export default function HotelListPage() {
             <p
               className="
                 mt-4
-                max-w-[560px]
-                text-[15px]
+                max-w-[35rem]
+                text-[0.9375rem]
                 font-medium
                 leading-7
                 md:text-base
@@ -398,7 +398,7 @@ export default function HotelListPage() {
           className="
             page-container
             absolute
-            bottom-[-66px]
+            bottom-[-4.125rem]
             left-1/2
             z-20
             w-full
@@ -408,7 +408,7 @@ export default function HotelListPage() {
 
           <div
             className="
-              rounded-[24px]
+              rounded-[1.5rem]
               border
               border-white/80
               bg-white/95
@@ -436,7 +436,7 @@ export default function HotelListPage() {
                 <span
                   className="
                     block
-                    text-[10px]
+                    text-[0.625rem]
                     font-extrabold
                     uppercase
                     tracking-[0.12em]
@@ -450,7 +450,7 @@ export default function HotelListPage() {
                   className="
                     m-0
                     mt-1
-                    text-[18px]
+                    text-[1.125rem]
                     font-extrabold
                     text-slate-900
                   "
@@ -539,7 +539,7 @@ export default function HotelListPage() {
         className="
           page-container
           pb-14
-          pt-[105px]
+          pt-[6.5625rem]
         "
       >
 
@@ -550,7 +550,7 @@ export default function HotelListPage() {
         <section
           className="
             overflow-hidden
-            rounded-[22px]
+            rounded-[1.375rem]
             border
             border-slate-200
             bg-white
@@ -590,7 +590,7 @@ export default function HotelListPage() {
                   w-11
                   shrink-0
                   place-items-center
-                  rounded-[14px]
+                  rounded-[0.875rem]
                   bg-[#edf7ff]
                   text-[#1687d9]
                 "
@@ -609,7 +609,7 @@ export default function HotelListPage() {
                 <h2
                   className="
                     m-0
-                    text-[15px]
+                    text-[0.9375rem]
                     font-extrabold
                     text-slate-900
                   "
@@ -714,7 +714,7 @@ export default function HotelListPage() {
               flex
               flex-col
               gap-5
-              rounded-[22px]
+              rounded-[1.375rem]
               border
               border-slate-200
               bg-white
@@ -743,7 +743,7 @@ export default function HotelListPage() {
                 <h2
                   className="
                     m-0
-                    text-[21px]
+                    text-[1.3125rem]
                     font-extrabold
                     tracking-[-0.02em]
                     text-slate-900
@@ -771,7 +771,7 @@ export default function HotelListPage() {
                         bg-blue-50
                         px-2.5
                         py-1
-                        text-[11px]
+                        text-[0.6875rem]
                         font-semibold
                         text-primary
                       "
@@ -829,7 +829,7 @@ export default function HotelListPage() {
               className="
                 w-full
                 shrink-0
-                md:w-[245px]
+                md:w-[15.3125rem]
               "
             >
 
@@ -888,7 +888,7 @@ export default function HotelListPage() {
             <div
               role="alert"
               className="
-                rounded-[22px]
+                rounded-[1.375rem]
                 border
                 border-danger/30
                 bg-danger-light
@@ -941,7 +941,7 @@ export default function HotelListPage() {
             <div
               className="
                 overflow-hidden
-                rounded-[22px]
+                rounded-[1.375rem]
                 border
                 border-slate-200
                 bg-white
@@ -1187,7 +1187,7 @@ function HeroChip({
         bg-[#061a2d]/35
         px-3
         py-2
-        text-[11px]
+        text-[0.6875rem]
         font-semibold
         text-white/90
         backdrop-blur-md
@@ -1280,7 +1280,7 @@ function HotelCardSkeletons() {
             className="
               h-44
               w-full
-              rounded-[22px]
+              rounded-[1.375rem]
             "
           />
         )

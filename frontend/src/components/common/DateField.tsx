@@ -5,10 +5,16 @@ import { vi } from 'react-day-picker/locale';
 import 'react-day-picker/style.css';
 import { cn, fromDateInputValue, toDateInputValue } from '../../lib/utils';
 import { useAnchoredPosition } from './useAnchoredPosition';
-import { useDashboardUi } from './DashboardUiContext';
 
 // `type` is accepted (and ignored) so a `<input type="date">` can be swapped for `<DateField>` without touching its props.
-type DateFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & { type?: string };
+type DateFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
+  type?: string;
+  /**
+   * `dropdown` adds month and year selectors to the calendar header, for dates far from today such as a birth date.
+   * The year list runs from `min` (default 1900) to `max` (default: this year).
+   */
+  captionLayout?: 'label' | 'dropdown';
+};
 
 const POPOVER_WIDTH = 330;
 
@@ -19,18 +25,16 @@ const setNativeValue = (input: HTMLInputElement, value: string) => {
 };
 
 /**
- * `<input type="date">`. In the dashboards it keeps the native field (typing, validation, react-hook-form) and adds a
- * button that opens the same calendar the customer-facing search uses; everywhere else it is the plain native input.
- * Works on `YYYY-MM-DD` strings like the rest of the app.
+ * `<input type="date">` with the app's own calendar: the native field stays in the DOM (typing, validation,
+ * react-hook-form) and a button opens the same calendar the customer-facing search uses, because the browser's
+ * native calendar cannot be styled. Works on `YYYY-MM-DD` strings like the rest of the app.
  */
-export const DateField = forwardRef<HTMLInputElement, DateFieldProps>(function DateField({ className, ...props }, forwardedRef) {
-  const enhanced = useDashboardUi();
-  if (!enhanced) return <input ref={forwardedRef} type="date" className={className} {...props} />;
-  return <EnhancedDateField ref={forwardedRef} className={className} {...props} />;
+export const DateField = forwardRef<HTMLInputElement, DateFieldProps>(function DateField(props, forwardedRef) {
+  return <EnhancedDateField ref={forwardedRef} {...props} />;
 });
 
 const EnhancedDateField = forwardRef<HTMLInputElement, DateFieldProps>(function EnhancedDateField(
-  { className, onChange, value, defaultValue, min, max, disabled, ...rest },
+  { className, onChange, value, defaultValue, min, max, disabled, captionLayout = 'label', ...rest },
   forwardedRef
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -96,6 +100,9 @@ const EnhancedDateField = forwardRef<HTMLInputElement, DateFieldProps>(function 
   if (minDate) disabledDays.push({ before: minDate });
   if (maxDate) disabledDays.push({ after: maxDate });
   const selected = fromDateInputValue(current);
+  const hasDropdowns = captionLayout === 'dropdown';
+  const startMonth = hasDropdowns ? (minDate ?? new Date(1900, 0, 1)) : undefined;
+  const endMonth = hasDropdowns ? (maxDate ?? new Date(new Date().getFullYear(), 11, 31)) : undefined;
   const today = toDateInputValue(new Date());
   const todayAllowed = (!min || today >= String(min)) && (!max || today <= String(max));
 
@@ -145,6 +152,9 @@ const EnhancedDateField = forwardRef<HTMLInputElement, DateFieldProps>(function 
                 mode="single"
                 locale={vi}
                 weekStartsOn={1}
+                captionLayout={captionLayout}
+                startMonth={startMonth}
+                endMonth={endMonth}
                 defaultMonth={selected ?? minDate ?? undefined}
                 selected={selected}
                 disabled={disabledDays.length > 0 ? disabledDays : undefined}

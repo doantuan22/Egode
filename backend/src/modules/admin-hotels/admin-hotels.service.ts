@@ -1,7 +1,7 @@
 import { getPrismaClient } from '../../config/prisma';
 import { AppError } from '../../common/errors/app-error';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
-import type { ListHotelsQuery, UpdateHotelInput } from './admin-hotels.schemas';
+import type { CreateAmenityInput, ListHotelsQuery, UpdateAmenityInput, UpdateHotelInput } from './admin-hotels.schemas';
 
 /** What an admin needs to know about who owns a hotel (never the password hash or other profile fields). */
 const OWNER_SUMMARY = { MaTaiKhoan: true, HoTen: true, Email: true, SoDienThoai: true } as const;
@@ -108,5 +108,74 @@ export class AdminHotelsService {
       throw AppError.badRequest(invalidStateMessage);
     }
     return this.getOne(id);
+  }
+
+  /** The amenity catalogue, with how many hotels and room types use each entry (so the admin sees what a delete would hit). */
+  async listAmenities() {
+    const rows = await getPrismaClient().tIEN_NGHI.findMany({
+      orderBy: { TenTienNghi: 'asc' },
+      include: { _count: { select: { KHACH_SAN_TIEN_NGHI: true, LOAI_PHONG_TIEN_NGHI: true } } },
+    });
+    return rows.map(({ _count, ...amenity }) => ({
+      ...amenity,
+      SoKhachSan: _count.KHACH_SAN_TIEN_NGHI,
+      SoLoaiPhong: _count.LOAI_PHONG_TIEN_NGHI,
+    }));
+  }
+
+  async createAmenity(input: CreateAmenityInput) {
+    await this.assertAmenityNameFree(input.TenTienNghi);
+    return this.mapDuplicateName(() =>
+      getPrismaClient().tIEN_NGHI.create({ data: { TenTienNghi: input.TenTienNghi, BieuTuong: input.BieuTuong ?? null } })
+    );
+  }
+
+  async updateAmenity(id: number, input: UpdateAmenityInput) {
+    await this.getAmenity(id);
+    if (input.TenTienNghi !== undefined) await this.assertAmenityNameFree(input.TenTienNghi, id);
+    return this.mapDuplicateName(() => getPrismaClient().tIEN_NGHI.update({ where: { MaTienNghi: id }, data: input }));
+  }
+
+  /** Refuses while a hotel or room type still lists the amenity: removing it would silently strip it from live listings. */
+  async deleteAmenity(id: number) {
+    await this.getAmenity(id);
+    const prisma = getPrismaClient();
+    const [hotels, roomTypes] = await Promise.all([
+      prisma.kHACH_SAN_TIEN_NGHI.count({ where: { MaTienNghi: id } }),
+      prisma.lOAI_PHONG_TIEN_NGHI.count({ where: { MaTienNghi: id } }),
+    ]);
+    if (hotels + roomTypes > 0) {
+      throw AppError.conflict(
+        `Không thể xóa tiện nghi đang được sử dụng (${hotels} khách sạn, ${roomTypes} loại phòng). Hãy gỡ tiện nghi khỏi các cơ sở trước.`,
+        { SoKhachSan: hotels, SoLoaiPhong: roomTypes }
+      );
+    }
+    await prisma.tIEN_NGHI.delete({ where: { MaTienNghi: id } });
+  }
+
+  private async getAmenity(id: number) {
+    const amenity = await getPrismaClient().tIEN_NGHI.findUnique({ where: { MaTienNghi: id } });
+    if (!amenity) throw AppError.notFound('Không tìm thấy tiện nghi');
+    return amenity;
+  }
+
+  private async assertAmenityNameFree(name: string, exceptId?: number) {
+    const clash = await getPrismaClient().tIEN_NGHI.findFirst({
+      where: { TenTienNghi: name, ...(exceptId ? { NOT: { MaTienNghi: exceptId } } : {}) },
+      select: { MaTienNghi: true },
+    });
+    if (clash) throw AppError.conflict('Tên tiện nghi đã tồn tại');
+  }
+
+  /** The pre-check above can race a concurrent insert; the unique index is the real guard. */
+  private async mapDuplicateName<T>(write: () => Promise<T>): Promise<T> {
+    try {
+      return await write();
+    } catch (error) {
+      if (typeof error === 'object' && error !== null && (error as { code?: string }).code === 'P2002') {
+        throw AppError.conflict('Tên tiện nghi đã tồn tại');
+      }
+      throw error;
+    }
   }
 }

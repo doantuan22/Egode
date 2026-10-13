@@ -1,6 +1,12 @@
 /* Egode Design System — Base / Reset */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+/* Fluid UI scale for the public / customer site. Text, buttons, spacing and the content width are all in rem,
+   so the whole interface grows with the viewport: 1rem = 16px up to ~1280px wide, ~17px on a 1536px laptop,
+   18px at 1920px and capped at 20px (2560px). The preference of the browser's own font size is kept (rem inside
+   clamp), and dashboards keep a fixed 16px root: their layout is tuned in dense, table-first px-based rules. */
+html:not(:has(.dashboard-shell)) { font-size: clamp(1rem, 0.75rem + 0.3125vw, 1.25rem); }
 body {
   margin: 0;
   font-family: var(--font-family);
@@ -22,7 +28,7 @@ img { max-width: 100%; display: block; }
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar { width: 0.5rem; height: 0.5rem; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: var(--radius-pill); }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
@@ -64,7 +70,7 @@ input, select, textarea { font-family: inherit; }
   top: 0;
   background: var(--color-primary);
   color: #fff;
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   border-radius: 0 0 var(--radius-md) 0;
   z-index: 1000;
 }

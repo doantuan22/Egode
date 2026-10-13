@@ -4,6 +4,7 @@ import {
   createPromotion,
   deactivatePromotion,
   getPromotion,
+  listAvailablePromotions,
   listPromotions,
   updatePromotion,
 } from './api';
@@ -52,5 +53,15 @@ export function useSetPromotionStatus() {
       queryClient.setQueryData(['admin', 'promotions', 'detail', promo.MaKhuyenMai], (prev: unknown) => ({ ...(prev as object), ...promo }));
       queryClient.invalidateQueries({ queryKey: ['admin', 'promotions'] });
     },
+  });
+}
+
+/** Codes the guest can pick in the booking panel. Short-lived: a code can run out or expire while the page is open. */
+export function useAvailablePromotions(enabled = true) {
+  return useQuery({
+    queryKey: ['promotions', 'available'],
+    queryFn: listAvailablePromotions,
+    enabled,
+    staleTime: 60_000,
   });
 }

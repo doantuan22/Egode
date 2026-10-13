@@ -475,6 +475,15 @@ export default function HotelDetailPage() {
     );
   };
 
+  /** A code picked from the list of available codes: it is typed in and applied in one step. */
+  const selectPromo = (code: string) => {
+    bookingMutation.reset();
+    setPromoNotice(null);
+    setPromoInput(code);
+    if (code === appliedPromo) void quoteQuery.refetch();
+    setAppliedPromo(code);
+  };
+
   /* =========================================================
      QUOTE MATCH
   ========================================================= */
@@ -636,7 +645,7 @@ export default function HotelDetailPage() {
           className="
             mx-auto
             max-w-md
-            rounded-[22px]
+            rounded-[1.375rem]
             border
             border-danger/30
             bg-danger-light
@@ -1018,7 +1027,7 @@ export default function HotelDetailPage() {
             <div
               className="
                 overflow-hidden
-                rounded-[24px]
+                rounded-[1.5rem]
                 border
                 border-border
                 bg-white
@@ -1053,7 +1062,7 @@ export default function HotelDetailPage() {
             <div
               className="
                 overflow-hidden
-                rounded-[24px]
+                rounded-[1.5rem]
                 border
                 border-border
                 bg-white
@@ -1074,7 +1083,7 @@ export default function HotelDetailPage() {
             <div
               className="
                 overflow-hidden
-                rounded-[24px]
+                rounded-[1.5rem]
                 border
                 border-border
                 bg-white
@@ -1114,7 +1123,7 @@ export default function HotelDetailPage() {
             <div
               className="
                 overflow-hidden
-                rounded-[24px]
+                rounded-[1.5rem]
                 border
                 border-border
                 bg-white
@@ -1158,7 +1167,7 @@ export default function HotelDetailPage() {
                     <span
                       className="
                         block
-                        text-[10px]
+                        text-[0.625rem]
                         font-extrabold
                         uppercase
                         tracking-[0.12em]
@@ -1220,6 +1229,12 @@ export default function HotelDetailPage() {
                   }
                   onApplyPromo={
                     applyPromo
+                  }
+                  onSelectPromo={
+                    selectPromo
+                  }
+                  appliedPromo={
+                    appliedPromo
                   }
                   note={
                     ghiChu

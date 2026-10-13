@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
     <div className="bg-surface-secondary font-sans text-ink min-h-[80vh] flex flex-col antialiased">
       
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="bg-white w-full max-w-[580px] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
+        <div className="bg-white w-full max-w-[36.25rem] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
           
           {/* Stepper */}
           <div className="flex items-center justify-between mb-8 relative">

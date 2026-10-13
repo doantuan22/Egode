@@ -25,7 +25,7 @@
   --border-strong: #D1D5DB;
   --color-border-interactive: var(--color-action-primary);
   --color-border-focus: var(--color-action-primary);
-  --focus-ring: 0 0 0 3px rgb(37 99 235 / 18%);
+  --focus-ring: 0 0 0 0.1875rem rgb(37 99 235 / 18%);
 
   /* Semantic states */
   --state-success: #16A34A;
@@ -63,29 +63,29 @@
   --line-height-body: 1.5;
   --line-height-heading: 1.2;
 
-  /* 4px spacing grid */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
+  /* 0.25rem spacing grid */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
 
   /* Four intentional radius levels */
-  --radius-control-sm: 4px;
-  --radius-control: 8px;
-  --radius-surface: 12px;
+  --radius-control-sm: 0.25rem;
+  --radius-control: 0.5rem;
+  --radius-surface: 0.75rem;
   --radius-pill: 999px;
 
   /* Elevation is reserved for interactive floating surfaces */
   --elevation-0: none;
   --elevation-1: 0 1px 2px rgb(15 23 42 / 4%);
-  --elevation-2: 0 4px 12px rgb(15 23 42 / 10%);
-  --elevation-3: 0 12px 28px rgb(15 23 42 / 14%);
+  --elevation-2: 0 0.25rem 0.75rem rgb(15 23 42 / 10%);
+  --elevation-3: 0 0.75rem 1.75rem rgb(15 23 42 / 14%);
 
   /* Compatibility aliases for gradual migration */
   --color-primary: var(--color-action-primary);
@@ -124,11 +124,11 @@
   --shadow-lg: var(--elevation-3);
 
   /* Layout */
-  --header-height: 68px;
-  --sidebar-width: 264px;
-  --sidebar-width-collapsed: 76px;
-  --container-max: 1280px; /* the one content width of the site: header, pages, footer */
-  --gutter: 16px; /* space between the viewport edge and the content; grows with the viewport, see layout.css */
+  --header-height: 4.25rem;
+  --sidebar-width: 16.5rem;
+  --sidebar-width-collapsed: 4.75rem;
+  --container-max: 84rem; /* the one content width of the site: header, pages, footer. In rem so it grows with the fluid root size, see base.css */
+  --gutter: 1rem; /* space between the viewport edge and the content; grows with the viewport, see layout.css */
 
   /* Motion */
   --transition-fast: 140ms ease;

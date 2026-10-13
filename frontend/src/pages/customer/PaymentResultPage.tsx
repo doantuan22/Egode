@@ -161,8 +161,8 @@ export default function PaymentResultPage() {
 
   return (
     <div className="bg-surface-secondary text-ink min-h-screen flex flex-col font-sans antialiased">
-      <div className="page-container max-w-[800px] pt-8"><CustomerCenterNavigation /></div>
-      <div className="page-container max-w-[800px] py-12 md:py-16 flex-grow flex flex-col items-center justify-center">
+      <div className="page-container max-w-[50rem] pt-8"><CustomerCenterNavigation /></div>
+      <div className="page-container max-w-[50rem] py-12 md:py-16 flex-grow flex flex-col items-center justify-center">
         {outcome}
       </div>
       {paymentFlow.dialog}

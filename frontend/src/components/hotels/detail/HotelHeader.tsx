@@ -16,7 +16,7 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
             <Icon name="caret-right" className="text-sm text-border-strong" />
             <Link to="/hotels" className="hover:text-primary font-medium transition-colors">Khách sạn</Link>
             <Icon name="caret-right" className="text-sm text-border-strong" />
-            <span className="font-semibold text-ink truncate max-w-[200px] sm:max-w-none">{hotel.TenKhachSan}</span>
+            <span className="font-semibold text-ink truncate max-w-[12.5rem] sm:max-w-none">{hotel.TenKhachSan}</span>
           </nav>
         </div>
       </section>
@@ -30,7 +30,7 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
                   <Icon key={i} name="star" weight={i < hotel.HangSao ? 'fill' : 'regular'} className={cn('text-base', i >= hotel.HangSao && 'text-border-strong')} />
                 ))}
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary-50 text-primary border border-primary-200">{hotel.HangSao} Sao</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[0.6875rem] font-semibold bg-primary-50 text-primary border border-primary-200">{hotel.HangSao} Sao</span>
               {(hotel.DanhGia?.SoLuongDanhGia ?? 0) > 0 && (
                 <a href="#danh-gia-khach" className="text-xs font-semibold text-ink hover:text-primary">
                   {formatRating(hotel.DanhGia?.DiemTrungBinh ?? null)}/5 · {hotel.DanhGia?.SoLuongDanhGia} đánh giá

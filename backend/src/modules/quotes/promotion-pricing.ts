@@ -23,6 +23,26 @@ export interface PromotionEvalResult {
 /** A promotion runs on calendar days (DATE columns); "today" is the Vietnam day, compared as `YYYY-MM-DD` strings. */
 
 /**
+ * Why a promotion cannot be used by a booking made right now, or `null` when it can: status, the date window
+ * (read on the Vietnam calendar day the guest is booking, not on the stay dates) and the usage cap. The one
+ * source for both pricing a code the guest typed and listing the codes the guest may pick.
+ */
+export function promotionUnavailableReason(
+  promo: Pick<PromotionRecord, 'TrangThai' | 'NgayBatDau' | 'NgayKetThuc' | 'SoLuongGioiHan'>,
+  now: Date,
+  usedCount: number
+): string | null {
+  if (promo.TrangThai !== PROMOTION_STATUS.ACTIVE) return 'Mã khuyến mãi hiện không hoạt động';
+
+  const today = businessToday(now);
+  if (today < dateKeyOf(promo.NgayBatDau)) return 'Mã khuyến mãi chưa bắt đầu áp dụng';
+  if (today > dateKeyOf(promo.NgayKetThuc)) return 'Mã khuyến mãi đã hết hạn';
+
+  if (promo.SoLuongGioiHan > 0 && usedCount >= promo.SoLuongGioiHan) return 'Mã khuyến mãi đã hết lượt sử dụng';
+  return null;
+}
+
+/**
  * Pure evaluation of a single promotion against a quote subtotal — no DB
  * access here (usedCount is looked up by the caller) so every business rule
  * (window, status, minimum order, usage cap, discount type + max cap) is
@@ -34,21 +54,8 @@ export function evaluatePromotion(
   now: Date,
   usedCount: number
 ): PromotionEvalResult {
-  if (promo.TrangThai !== PROMOTION_STATUS.ACTIVE) {
-    return { valid: false, reason: 'Mã khuyến mãi hiện không hoạt động', discount: 0 };
-  }
-
-  const today = businessToday(now);
-  if (today < dateKeyOf(promo.NgayBatDau)) {
-    return { valid: false, reason: 'Mã khuyến mãi chưa bắt đầu áp dụng', discount: 0 };
-  }
-  if (today > dateKeyOf(promo.NgayKetThuc)) {
-    return { valid: false, reason: 'Mã khuyến mãi đã hết hạn', discount: 0 };
-  }
-
-  if (promo.SoLuongGioiHan > 0 && usedCount >= promo.SoLuongGioiHan) {
-    return { valid: false, reason: 'Mã khuyến mãi đã hết lượt sử dụng', discount: 0 };
-  }
+  const unavailable = promotionUnavailableReason(promo, now, usedCount);
+  if (unavailable) return { valid: false, reason: unavailable, discount: 0 };
 
   if (tongTienPhong < promo.GiaTriDonToiThieu) {
     return {

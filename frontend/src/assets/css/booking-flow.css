@@ -65,7 +65,7 @@
 .egode-home-hero {
   position: relative;
 
-  min-height: 570px;
+  min-height: 35.625rem;
 
   background-position: center;
   background-size: cover;
@@ -81,7 +81,7 @@
       var(--container-max)
     );
 
-  min-height: 570px;
+  min-height: 35.625rem;
 
   margin: 0 auto;
 
@@ -89,12 +89,12 @@
   flex-direction: column;
   justify-content: center;
 
-  padding: 64px 0 56px;
+  padding: 4rem 0 3.5rem;
 }
 
 .egode-home-hero__copy {
   width: min(
-    690px,
+    43.125rem,
     100%
   );
 
@@ -108,13 +108,13 @@
   display: inline-flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 0.5rem;
 
-  margin-bottom: 18px;
+  margin-bottom: 1.125rem;
 
   padding:
-    8px
-    13px;
+    0.5rem
+    0.8125rem;
 
   border:
     1px solid
@@ -130,14 +130,14 @@
     );
 
   backdrop-filter:
-    blur(10px);
+    blur(0.625rem);
 
   color:
     rgb(
       255 255 255 / 92%
     );
 
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 
   letter-spacing: .03em;
@@ -146,11 +146,11 @@
 .egode-home-hero__badge i {
   color: #67d8ff;
 
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .egode-home-hero__copy h1 {
-  max-width: 690px;
+  max-width: 43.125rem;
 
   margin: 0;
 
@@ -158,9 +158,9 @@
 
   font-size:
     clamp(
-      40px,
+      2.5rem,
       5vw,
-      66px
+      4.125rem
     );
 
   font-weight: 800;
@@ -170,7 +170,7 @@
   letter-spacing: -.045em;
 
   text-shadow:
-    0 5px 18px
+    0 0.3125rem 1.125rem
     rgb(
       0 0 0 / 32%
     );
@@ -179,28 +179,28 @@
 .egode-home-hero__copy h1 span {
   display: block;
 
-  margin-top: 4px;
+  margin-top: 0.25rem;
 
   color: #65d8ff;
 }
 
 .egode-home-hero__description {
-  max-width: 610px;
+  max-width: 38.125rem;
 
-  margin-top: 20px;
+  margin-top: 1.25rem;
 
   color:
     rgb(
       255 255 255 / 92%
     );
 
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
 
   line-height: 1.7;
 
   text-shadow:
-    0 2px 7px
+    0 2px 0.4375rem
     rgb(
       0 0 0 / 36%
     );
@@ -214,22 +214,22 @@
   display: flex;
   flex-wrap: wrap;
 
-  gap: 12px;
+  gap: 0.75rem;
 
-  margin-top: 24px;
+  margin-top: 1.5rem;
 }
 
 .egode-home-hero__stats > div {
   display: inline-flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 0.5rem;
 
-  min-height: 38px;
+  min-height: 2.375rem;
 
   padding:
-    7px
-    12px;
+    0.4375rem
+    0.75rem;
 
   border:
     1px solid
@@ -245,20 +245,20 @@
     );
 
   backdrop-filter:
-    blur(8px);
+    blur(0.5rem);
 
   color:
     rgb(
       255 255 255 / 90%
     );
 
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .egode-home-hero__stats i {
   color: #65d8ff;
 
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 
 .egode-home-hero__stats strong {
@@ -276,13 +276,13 @@
 
   width:
     min(
-      1120px,
+      73.5rem,
       100%
     );
 
-  margin-top: 38px;
+  margin-top: 2.375rem;
 
-  padding: 18px;
+  padding: 1.125rem;
 
   border:
     1px solid
@@ -290,7 +290,7 @@
       255 255 255 / 62%
     );
 
-  border-radius: 24px;
+  border-radius: 1.5rem;
 
   background:
     rgb(
@@ -298,13 +298,13 @@
     );
 
   box-shadow:
-    0 24px 65px
+    0 1.5rem 4.0625rem
     rgb(
       15 23 42 / 24%
     );
 
   backdrop-filter:
-    blur(16px);
+    blur(1rem);
 }
 
 .egode-home-search__heading {
@@ -312,22 +312,22 @@
   align-items: flex-end;
   justify-content: space-between;
 
-  gap: 20px;
+  gap: 1.25rem;
 
-  margin-bottom: 13px;
+  margin-bottom: 0.8125rem;
 
   padding:
-    0 3px;
+    0 0.1875rem;
 }
 
 .egode-home-search__heading span {
   display: block;
 
-  margin-bottom: 3px;
+  margin-bottom: 0.1875rem;
 
   color: var(--color-primary);
 
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
 
   letter-spacing: .12em;
@@ -339,7 +339,7 @@
   color:
     var(--color-text-primary);
 
-  font-size: 19px;
+  font-size: 1.1875rem;
   font-weight: 750;
 }
 
@@ -347,12 +347,12 @@
   display: flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 0.375rem;
 
   color:
     var(--color-text-muted);
 
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
@@ -360,7 +360,7 @@
   color:
     var(--color-success-text);
 
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 
 /* ==========================================================
@@ -369,47 +369,47 @@
 
 .egode-home-search
 .travel-search {
-  padding: 5px;
+  padding: 0.3125rem;
 
   border:
     1px solid
     var(--color-border-default);
 
-  border-radius: 16px;
+  border-radius: 1rem;
 
   box-shadow: none;
 }
 
 .egode-home-search
 .travel-search__segment {
-  min-height: 58px;
+  min-height: 3.625rem;
 }
 
 .egode-home-search
 .travel-search__segment-label {
   margin-bottom: 2px;
 
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 
 .egode-home-search
 .travel-search__segment-value {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
 .egode-home-search
 .travel-search__submit {
-  min-width: 145px;
-  min-height: 58px;
+  min-width: 9.0625rem;
+  min-height: 3.625rem;
 
-  border-radius: 12px;
+  border-radius: 0.75rem;
 
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 
   box-shadow:
-    0 7px 20px
+    0 0.4375rem 1.25rem
     color-mix(
       in srgb,
       var(--color-primary) 22%,
@@ -438,7 +438,7 @@
 ========================================================== */
 
 .egode-benefits {
-  padding: 34px 0;
+  padding: 2.125rem 0;
 
   background: white;
 
@@ -456,18 +456,18 @@
       minmax(0, 1fr)
     );
 
-  gap: 16px;
+  gap: 1rem;
 }
 
 .egode-benefit-card {
   display: flex;
   align-items: flex-start;
 
-  gap: 13px;
+  gap: 0.8125rem;
 
-  padding: 16px;
+  padding: 1rem;
 
-  border-radius: 16px;
+  border-radius: 1rem;
 
   transition:
     background .2s ease,
@@ -482,8 +482,8 @@
 }
 
 .egode-benefit-card__icon {
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
 
   flex: none;
 
@@ -491,25 +491,25 @@
 
   place-items: center;
 
-  border-radius: 14px;
+  border-radius: 0.875rem;
 
   background: #eaf7ff;
 
   color: #0284c7;
 
-  font-size: 21px;
+  font-size: 1.3125rem;
 }
 
 .egode-benefit-card h3 {
   margin:
     1px
     0
-    5px;
+    0.3125rem;
 
   color:
     var(--color-text-primary);
 
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 750;
 }
 
@@ -519,7 +519,7 @@
   color:
     var(--color-text-muted);
 
-  font-size: 12px;
+  font-size: 0.75rem;
 
   line-height: 1.55;
 }
@@ -529,7 +529,7 @@
 ========================================================== */
 
 .egode-home-section {
-  padding: 70px 0;
+  padding: 4.375rem 0;
 
   background: white;
 }
@@ -543,7 +543,7 @@
 ========================================================== */
 
 .egode-section-heading {
-  margin-bottom: 28px;
+  margin-bottom: 1.75rem;
 }
 
 .egode-section-heading--row {
@@ -553,18 +553,18 @@
   justify-content:
     space-between;
 
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 .egode-section-heading__eyebrow {
   display: block;
 
-  margin-bottom: 6px;
+  margin-bottom: 0.375rem;
 
   color:
     var(--color-primary);
 
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 800;
 
   letter-spacing: .11em;
@@ -578,9 +578,9 @@
 
   font-size:
     clamp(
-      26px,
+      1.625rem,
       3vw,
-      34px
+      2.125rem
     );
 
   font-weight: 800;
@@ -589,17 +589,17 @@
 }
 
 .egode-section-heading p {
-  max-width: 650px;
+  max-width: 40.625rem;
 
   margin:
-    7px
+    0.4375rem
     0
     0;
 
   color:
     var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: 0.875rem;
 
   line-height: 1.6;
 }
@@ -610,12 +610,12 @@
   display: inline-flex;
   align-items: center;
 
-  gap: 7px;
+  gap: 0.4375rem;
 
   color:
     var(--color-primary);
 
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -636,17 +636,17 @@
       minmax(0, 1fr)
     );
 
-  gap: 18px;
+  gap: 1.125rem;
 }
 
 .egode-destination-card {
   position: relative;
 
-  min-height: 315px;
+  min-height: 19.6875rem;
 
   overflow: hidden;
 
-  border-radius: 22px;
+  border-radius: 1.375rem;
 
   background:
     linear-gradient(
@@ -656,7 +656,7 @@
     );
 
   box-shadow:
-    0 10px 28px
+    0 0.625rem 1.75rem
     rgb(
       15 23 42 / 9%
     );
@@ -668,10 +668,10 @@
 
 .egode-destination-card:hover {
   transform:
-    translateY(-5px);
+    translateY(-0.3125rem);
 
   box-shadow:
-    0 18px 38px
+    0 1.125rem 2.375rem
     rgb(
       15 23 42 / 16%
     );
@@ -709,7 +709,7 @@
       255 255 255 / 58%
     );
 
-  font-size: 44px;
+  font-size: 2.75rem;
 }
 
 .egode-destination-card__overlay {
@@ -741,7 +741,7 @@
 
   z-index: 2;
 
-  padding: 22px;
+  padding: 1.375rem;
 
   color: white;
 }
@@ -750,11 +750,11 @@
 > span {
   display: block;
 
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 
   color: #a9e8ff;
 
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
 
   letter-spacing: .12em;
@@ -765,13 +765,13 @@
 
   color: white;
 
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 800;
 }
 
 .egode-destination-card__content p {
   margin:
-    5px
+    0.3125rem
     0
     0;
 
@@ -780,17 +780,17 @@
       255 255 255 / 78%
     );
 
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .egode-destination-card__arrow {
   position: absolute;
 
-  right: 18px;
-  bottom: 19px;
+  right: 1.125rem;
+  bottom: 1.1875rem;
 
-  width: 38px;
-  height: 38px;
+  width: 2.375rem;
+  height: 2.375rem;
 
   display: grid;
 
@@ -810,9 +810,9 @@
     );
 
   backdrop-filter:
-    blur(8px);
+    blur(0.5rem);
 
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 /* ==========================================================
@@ -828,7 +828,7 @@
       minmax(0, 1fr)
     );
 
-  gap: 18px;
+  gap: 1.125rem;
 }
 
 .egode-stay-card {
@@ -838,12 +838,12 @@
     1px solid
     var(--color-border-default);
 
-  border-radius: 20px;
+  border-radius: 1.25rem;
 
   background: white;
 
   box-shadow:
-    0 7px 24px
+    0 0.4375rem 1.5rem
     rgb(
       15 23 42 / 6%
     );
@@ -856,7 +856,7 @@
 
 .egode-stay-card:hover {
   transform:
-    translateY(-4px);
+    translateY(-0.25rem);
 
   border-color:
     color-mix(
@@ -866,7 +866,7 @@
     );
 
   box-shadow:
-    0 17px 38px
+    0 1.0625rem 2.375rem
     rgb(
       15 23 42 / 12%
     );
@@ -877,7 +877,7 @@
 
   display: block;
 
-  height: 190px;
+  height: 11.875rem;
 
   overflow: hidden;
 
@@ -911,23 +911,23 @@
   color:
     var(--color-text-muted);
 
-  font-size: 35px;
+  font-size: 2.1875rem;
 }
 
 .egode-stay-card__rating {
   position: absolute;
 
-  left: 12px;
-  bottom: 12px;
+  left: 0.75rem;
+  bottom: 0.75rem;
 
   display: inline-flex;
   align-items: center;
 
-  gap: 5px;
+  gap: 0.3125rem;
 
   padding:
-    6px
-    9px;
+    0.375rem
+    0.5625rem;
 
   border-radius: 999px;
 
@@ -937,11 +937,11 @@
     );
 
   backdrop-filter:
-    blur(8px);
+    blur(0.5rem);
 
   color: white;
 
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 
@@ -950,34 +950,34 @@
 }
 
 .egode-stay-card__body {
-  padding: 17px;
+  padding: 1.0625rem;
 }
 
 .egode-stay-card__location {
   display: flex;
   align-items: center;
 
-  gap: 5px;
+  gap: 0.3125rem;
 
   color:
     var(--color-primary);
 
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 650;
 }
 
 .egode-stay-card__body h3 {
-  min-height: 48px;
+  min-height: 3rem;
 
   margin:
-    8px
+    0.5rem
     0
-    14px;
+    0.875rem;
 
   color:
     var(--color-text-primary);
 
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 750;
 
   line-height: 1.4;
@@ -995,9 +995,9 @@
   justify-content:
     space-between;
 
-  gap: 10px;
+  gap: 0.625rem;
 
-  padding-top: 13px;
+  padding-top: 0.8125rem;
 
   border-top:
     1px solid
@@ -1014,19 +1014,19 @@
   color:
     var(--color-text-muted);
 
-  font-size: 10px;
+  font-size: 0.625rem;
 }
 
 .egode-stay-card__footer strong {
   color:
     var(--color-text-primary);
 
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .egode-stay-card__action {
-  width: 38px;
-  height: 38px;
+  width: 2.375rem;
+  height: 2.375rem;
 
   flex: none;
 
@@ -1034,14 +1034,14 @@
 
   place-items: center;
 
-  border-radius: 12px;
+  border-radius: 0.75rem;
 
   background:
     var(--color-primary);
 
   color: white;
 
-  font-size: 17px;
+  font-size: 1.0625rem;
 }
 
 .egode-stay-card__action:hover {
@@ -1053,17 +1053,17 @@
   display: flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 0.375rem;
 
-  margin-top: 11px;
+  margin-top: 0.6875rem;
 
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 650;
 }
 
 .egode-stay-card__availability span {
-  width: 7px;
-  height: 7px;
+  width: 0.4375rem;
+  height: 0.4375rem;
 
   border-radius: 50%;
 }
@@ -1095,7 +1095,7 @@ span {
 ========================================================== */
 
 .egode-home-cta {
-  padding: 0 0 64px;
+  padding: 0 0 4rem;
   background: #f6f8fb;
 }
 
@@ -1104,8 +1104,8 @@ span {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 24px 28px;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
   border: 1px solid color-mix(in srgb, var(--color-action-primary) 18%, white);
   border-radius: var(--radius-surface);
   background: var(--color-action-primary-subtle);
@@ -1116,9 +1116,9 @@ span {
 }
 
 .egode-home-cta h2 {
-  margin: 0 0 4px;
+  margin: 0 0 0.25rem;
   color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -1126,7 +1126,7 @@ span {
 .egode-home-cta p {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
@@ -1135,13 +1135,13 @@ span {
   flex: none;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 20px;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
   border-radius: var(--radius-control);
   background: var(--color-action-primary);
   color: var(--color-text-on-action);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 650;
   white-space: nowrap;
   transition: background 0.15s ease;
@@ -1156,7 +1156,7 @@ span {
 ========================================================== */
 
 .egode-home-message {
-  padding: 30px;
+  padding: 1.875rem;
 
   color:
     var(--color-text-muted);
@@ -1199,30 +1199,30 @@ span {
 
   .egode-home-hero__inner {
     padding:
-      48px
+      3rem
       0
-      38px;
+      2.375rem;
   }
 
   .egode-home-hero__copy h1 {
     font-size:
       clamp(
-        36px,
+        2.25rem,
         11vw,
-        52px
+        3.25rem
       );
   }
 
   .egode-home-hero__description {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
 
   .egode-home-search {
-    margin-top: 28px;
+    margin-top: 1.75rem;
 
-    padding: 13px;
+    padding: 0.8125rem;
 
-    border-radius: 19px;
+    border-radius: 1.1875rem;
   }
 
   .egode-home-search__heading {
@@ -1236,7 +1236,7 @@ span {
 
   .egode-home-section {
     padding:
-      52px
+      3.25rem
       0;
   }
 
@@ -1251,7 +1251,7 @@ span {
   .egode-home-cta__content {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
+    gap: 1rem;
   }
 
   .egode-home-cta__button {
@@ -1269,35 +1269,35 @@ span {
 
   .egode-benefits {
     padding:
-      22px
+      1.375rem
       0;
   }
 
   .egode-benefit-card {
     padding:
-      12px
-      5px;
+      0.75rem
+      0.3125rem;
   }
 
   .egode-destination-card {
-    min-height: 270px;
+    min-height: 16.875rem;
   }
 
   .egode-stay-card__media {
-    height: 220px;
+    height: 13.75rem;
   }
 
   .egode-home-cta {
     padding-bottom:
-      48px;
+      3rem;
   }
 
   .egode-home-cta__content {
-    padding: 20px;
+    padding: 1.25rem;
   }
 
   .egode-home-cta h2 {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 }
 
@@ -1315,6 +1315,6 @@ span {
 
   .booking-flow
   .site-header__user {
-    padding: 4px;
+    padding: 0.25rem;
   }
 }

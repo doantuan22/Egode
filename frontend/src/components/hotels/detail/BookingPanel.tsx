@@ -5,8 +5,8 @@ import { cn, formatCurrencyVND } from '../../../lib/utils';
 import { Button } from '../../common/Button';
 import { Card } from '../../common/Card';
 import { Icon } from '../../common/Icon';
-import { Input } from '../../common/Input';
 import { PageSpinner } from '../../common/PageSpinner';
+import { PromoPicker } from './PromoPicker';
 import { Textarea } from '../../common/Textarea';
 
 export interface BookingPanelProps {
@@ -25,6 +25,10 @@ export interface BookingPanelProps {
   /** Why a previously applied code was removed (the backend said it is not valid). */
   promoNotice: string | null;
   onPromoInputChange: (value: string) => void;
+  /** A code was picked from the list of available codes: apply it right away. */
+  onSelectPromo: (code: string) => void;
+  /** The code the page has applied ('' when none). */
+  appliedPromo: string;
   onApplyPromo: () => void;
   note: string;
   onNoteChange: (value: string) => void;
@@ -88,7 +92,7 @@ export function BookingPanel(props: BookingPanelProps) {
   );
 }
 
-function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoNotice, onPromoInputChange, onApplyPromo, note, onNoteChange, bookingError, isBooking, isSignedIn, isCustomer, onSignIn, onBook, guests, selectedCapacity }: BookingPanelProps & { quote: Quote }) {
+function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoNotice, onPromoInputChange, onSelectPromo, appliedPromo, onApplyPromo, note, onNoteChange, bookingError, isBooking, isSignedIn, isCustomer, onSignIn, onBook, guests, selectedCapacity }: BookingPanelProps & { quote: Quote }) {
   return (
     <>
       {!quote.KhaDung && (
@@ -121,20 +125,15 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoN
       </div>
 
       <div className="space-y-2">
-        <div className="flex gap-2 items-end">
-          <div className="flex-1">
-            <Input
-              id="hotel-detail-ml-1"
-              label="Mã khuyến mãi"
-              type="text"
-              value={promoInput}
-              onChange={(e) => onPromoInputChange(e.target.value)}
-              placeholder="Nhập mã (nếu có)"
-              className="uppercase"
-            />
-          </div>
-          <Button type="button" variant="secondary" onClick={onApplyPromo} disabled={!promoInput.trim() || quoteQuery.isFetching}>Áp dụng</Button>
-        </div>
+        <PromoPicker
+          value={promoInput}
+          onChange={onPromoInputChange}
+          onApply={onApplyPromo}
+          applyDisabled={!promoInput.trim() || quoteQuery.isFetching}
+          onSelect={onSelectPromo}
+          appliedCode={quoteMatchesPromo && quote.PromoHopLe ? appliedPromo : ''}
+          subtotal={quote.TongTienPhong}
+        />
         {!quoteMatchesPromo && <p className="text-xs text-warning-ink">Áp dụng mã để cập nhật báo giá trước khi tiếp tục.</p>}
         {promoNotice && (
           <p role="alert" className="text-xs font-medium text-danger-ink">{promoNotice}</p>
@@ -156,7 +155,7 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoN
           <span className="font-bold text-ink">Tổng thanh toán</span>
           <div className="text-right">
             <span className="text-2xl font-black text-primary leading-none block">{formatCurrencyVND(quote.TongTienThanhToan)}</span>
-            <span className="text-[10px] text-primary/70 font-semibold uppercase">Đã bao gồm thuế phí</span>
+            <span className="text-[0.625rem] text-primary/70 font-semibold uppercase">Đã bao gồm thuế phí</span>
           </div>
         </div>
       </div>
@@ -175,7 +174,7 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoN
         ) : !isCustomer ? (
           <div className="text-center">
             <Button type="button" size="lg" className="w-full" disabled>Xác nhận đặt phòng</Button>
-            <p className="text-[11px] text-ink-muted mt-2">Dành cho tài khoản khách hàng</p>
+            <p className="text-[0.6875rem] text-ink-muted mt-2">Dành cho tài khoản khách hàng</p>
           </div>
         ) : (
           <Button
@@ -190,7 +189,7 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoN
           </Button>
         )}
         {isSignedIn && isCustomer && quote.TongTienThanhToan === 0 && (
-          <p className="mt-2 text-center text-[11px] text-ink-muted">Tổng thanh toán 0 đ — đặt phòng được xác nhận ngay, không cần thanh toán.</p>
+          <p className="mt-2 text-center text-[0.6875rem] text-ink-muted">Tổng thanh toán 0 đ — đặt phòng được xác nhận ngay, không cần thanh toán.</p>
         )}
       </div>
 
@@ -200,7 +199,7 @@ function QuoteDetails({ quote, quoteQuery, quoteMatchesPromo, promoInput, promoN
             <Icon name="shield-check" weight="fill" />
             {quote.ChinhSachHuy.TenChinhSach}
           </div>
-          <ul className="text-[11px] text-success-ink pl-6 list-disc">
+          <ul className="text-[0.6875rem] text-success-ink pl-6 list-disc">
             {quote.ChinhSachHuy.ChiTiet.map((tier, i) => (
               <li key={i}>Hủy trước {tier.SoGioTruocNhanPhong}h hoàn {tier.TyLeHoanTien}%</li>
             ))}

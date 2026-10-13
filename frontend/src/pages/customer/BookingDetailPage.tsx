@@ -94,10 +94,10 @@ export default function BookingDetailPage() {
 
       <div className="card p-6 flex justify-between items-center flex-wrap gap-3">
         <div>
-          <h1 className="text-[22px] font-bold text-ink flex items-center gap-3 flex-wrap">
+          <h1 className="text-[1.375rem] font-bold text-ink flex items-center gap-3 flex-wrap">
             Chi tiết đặt phòng <span className="text-primary">#{booking.MaXacNhanDatPhong}</span>
           </h1>
-          <p className="text-[13px] text-muted mt-1">Trạng thái hiện tại: {booking.TrangThai}</p>
+          <p className="text-[0.8125rem] text-muted mt-1">Trạng thái hiện tại: {booking.TrangThai}</p>
         </div>
         <StatusBadge domain="booking" status={booking.TrangThai} />
       </div>
@@ -119,18 +119,18 @@ export default function BookingDetailPage() {
               )}
               <div>
                 <h2 className="text-lg font-bold text-ink mb-1">{booking.TenKhachSan}</h2>
-                <p className="text-[13px] text-muted flex items-center gap-1.5 mb-2">
+                <p className="text-[0.8125rem] text-muted flex items-center gap-1.5 mb-2">
                   <i className="ph ph-map-pin" aria-hidden="true"></i>
                   {booking.DiaChiChiTiet}
                 </p>
-                {booking.GhiChu && <p className="text-[13px] text-muted mb-2">Ghi chú: {booking.GhiChu}</p>}
+                {booking.GhiChu && <p className="text-[0.8125rem] text-muted mb-2">Ghi chú: {booking.GhiChu}</p>}
                 <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-2">
-                  <Link to={`/hotels/${booking.MaKhachSan}`} className="inline-flex items-center gap-1 text-[13px] text-primary hover:underline">Xem thông tin khách sạn <i className="ph ph-arrow-right" aria-hidden="true"></i></Link>
+                  <Link to={`/hotels/${booking.MaKhachSan}`} className="inline-flex items-center gap-1 text-[0.8125rem] text-primary hover:underline">Xem thông tin khách sạn <i className="ph ph-arrow-right" aria-hidden="true"></i></Link>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${booking.TenKhachSan}, ${booking.DiaChiChiTiet}`)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[13px] text-primary hover:underline"
+                    className="inline-flex items-center gap-1 text-[0.8125rem] text-primary hover:underline"
                   >
                     Xem trên bản đồ <i className="ph ph-map-trifold" aria-hidden="true"></i>
                   </a>
@@ -140,14 +140,14 @@ export default function BookingDetailPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 bg-surface-secondary border border-border rounded-lg p-4 gap-4">
               <div>
-                <p className="block text-[12px] text-muted mb-1">Nhận phòng</p>
-                <span className="text-[15px] font-semibold text-heading">{formatDateVi(booking.NgayNhanPhong)}</span>
-                <span className="block text-[12px] text-muted">Từ {booking.GioNhanPhong}</span>
+                <p className="block text-[0.75rem] text-muted mb-1">Nhận phòng</p>
+                <span className="text-[0.9375rem] font-semibold text-heading">{formatDateVi(booking.NgayNhanPhong)}</span>
+                <span className="block text-[0.75rem] text-muted">Từ {booking.GioNhanPhong}</span>
               </div>
               <div>
-                <p className="block text-[12px] text-muted mb-1">Trả phòng</p>
-                <span className="text-[15px] font-semibold text-heading">{formatDateVi(booking.NgayTraPhong)}</span>
-                <span className="block text-[12px] text-muted">Trước {booking.GioTraPhong}</span>
+                <p className="block text-[0.75rem] text-muted mb-1">Trả phòng</p>
+                <span className="text-[0.9375rem] font-semibold text-heading">{formatDateVi(booking.NgayTraPhong)}</span>
+                <span className="block text-[0.75rem] text-muted">Trước {booking.GioTraPhong}</span>
               </div>
             </div>
           </div>
@@ -160,8 +160,8 @@ export default function BookingDetailPage() {
             {booking.ChiTietPhong.map((line, i) => (
               <div key={line.MaLoaiPhong} className={cn("flex justify-between items-center pb-4", i !== booking.ChiTietPhong.length - 1 && "border-b border-dashed border-border mb-4")}>
                 <div>
-                  <div className="text-[15px] font-semibold text-heading mb-1">{line.TenLoaiPhong}</div>
-                  <div className="text-[13px] text-muted">Số lượng: {line.SoLuong} phòng</div>
+                  <div className="text-[0.9375rem] font-semibold text-heading mb-1">{line.TenLoaiPhong}</div>
+                  <div className="text-[0.8125rem] text-muted">Số lượng: {line.SoLuong} phòng</div>
                 </div>
               </div>
             ))}
@@ -176,12 +176,12 @@ export default function BookingDetailPage() {
             <div className="flex flex-col gap-3.5 relative">
               {booking.ChinhSachHuy.ChiTiet.map((tier, i) => (
                 <div key={i} className="flex gap-3.5 relative">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 z-10 bg-primary-50 text-primary border border-primary-100">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[0.6875rem] font-bold flex-shrink-0 z-10 bg-primary-50 text-primary border border-primary-100">
                     {i + 1}
                   </div>
                   <div>
-                    <h5 className="text-[14px] font-semibold text-heading">Trước {tier.SoGioTruocNhanPhong} giờ</h5>
-                    <p className="text-[13px] text-muted mt-0.5">Hoàn tiền {tier.TyLeHoanTien}%</p>
+                    <h5 className="text-[0.875rem] font-semibold text-heading">Trước {tier.SoGioTruocNhanPhong} giờ</h5>
+                    <p className="text-[0.8125rem] text-muted mt-0.5">Hoàn tiền {tier.TyLeHoanTien}%</p>
                   </div>
                 </div>
               ))}

@@ -55,7 +55,7 @@ export function HotelGalleryDialog({ hotelName, images, startIndex, onClose }: {
       aria-label={`Ảnh ${hotelName}`}
       onClose={onClose}
       onClick={(event) => { if (event.target === event.currentTarget) requestClose(); }}
-      className="m-auto max-h-[92vh] w-[min(96vw,1040px)] overflow-hidden rounded-2xl border border-border bg-white p-0 shadow-xl backdrop:bg-black/70"
+      className="m-auto max-h-[92vh] w-[min(96vw,65rem)] overflow-hidden rounded-2xl border border-border bg-white p-0 shadow-xl backdrop:bg-black/70"
     >
       {isOpen && (
         <div className="flex max-h-[92vh] flex-col">

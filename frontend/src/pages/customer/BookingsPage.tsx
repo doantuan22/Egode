@@ -59,18 +59,18 @@ export default function BookingsPage() {
               )}
               <div className="flex-1 flex flex-col gap-1.5 min-w-0">
                 <div className="flex justify-between items-center flex-wrap gap-2">
-                  <span className="text-[13px] font-semibold text-primary">Mã đơn: {b.MaXacNhanDatPhong}</span>
+                  <span className="text-[0.8125rem] font-semibold text-primary">Mã đơn: {b.MaXacNhanDatPhong}</span>
                   <StatusBadge domain="booking" status={b.TrangThai} />
                 </div>
                 <h3 className="text-base font-semibold text-heading truncate">{b.TenKhachSan}</h3>
-                <p className="text-[13px] text-muted truncate">{b.DiaChiChiTiet}</p>
-                <div className="text-[13px] text-muted flex gap-x-4 gap-y-1 flex-wrap mt-1">
+                <p className="text-[0.8125rem] text-muted truncate">{b.DiaChiChiTiet}</p>
+                <div className="text-[0.8125rem] text-muted flex gap-x-4 gap-y-1 flex-wrap mt-1">
                   <span>Nhận: <strong className="text-heading">{formatDateVi(b.NgayNhanPhong)}</strong></span>
                   <span className="hidden sm:inline">•</span>
                   <span>Trả: <strong className="text-heading">{formatDateVi(b.NgayTraPhong)}</strong></span>
                 </div>
               </div>
-              <div className="flex flex-col items-start sm:items-end gap-3 min-w-[140px]">
+              <div className="flex flex-col items-start sm:items-end gap-3 min-w-[8.75rem]">
                 <div className="text-lg font-bold text-primary">{formatCurrencyVND(b.TongTienThanhToan)}</div>
                 <div className="flex gap-2">
                   <Link to={`/bookings/${b.MaDatPhong}`} className="btn btn-outline btn-sm">Chi tiết</Link>

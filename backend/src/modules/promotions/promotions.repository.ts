@@ -52,6 +52,28 @@ export class PromotionsRepository {
     return prisma.dAT_PHONG.count({ where: { MaKhuyenMai: maKhuyenMai, TrangThai: { not: BOOKING_STATUS.CANCELLED } } });
   }
 
+  /** Non-cancelled bookings per promotion, for several promotions in one query. */
+  async countUsageByIds(maKhuyenMais: number[]): Promise<Map<number, number>> {
+    if (maKhuyenMais.length === 0) return new Map();
+    const prisma = getPrismaClient();
+    const rows = await prisma.dAT_PHONG.groupBy({
+      by: ['MaKhuyenMai'],
+      where: { MaKhuyenMai: { in: maKhuyenMais }, TrangThai: { not: BOOKING_STATUS.CANCELLED } },
+      _count: { _all: true },
+    });
+    return new Map(rows.flatMap((row) => (row.MaKhuyenMai === null ? [] : [[row.MaKhuyenMai, row._count._all] as const])));
+  }
+
+  /** Active promotions whose date window contains the given calendar day (a `YYYY-MM-DD` key, read as a DATE). */
+  async findActiveOnDay(dayKey: string, activeStatus: string) {
+    const prisma = getPrismaClient();
+    const day = new Date(`${dayKey}T00:00:00.000Z`);
+    return prisma.kHUYEN_MAI.findMany({
+      where: { TrangThai: activeStatus, NgayBatDau: { lte: day }, NgayKetThuc: { gte: day } },
+      orderBy: [{ NgayKetThuc: 'asc' }, { MaKhuyenMai: 'asc' }],
+    });
+  }
+
   async create(data: PromotionWriteData & { PhamViApDung: string; TrangThai: string }) {
     const prisma = getPrismaClient();
     return prisma.kHUYEN_MAI.create({ data });

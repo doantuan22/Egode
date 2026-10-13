@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="bg-surface-secondary min-h-[80vh] flex items-center justify-center font-sans">
-        <div className="bg-white w-full max-w-[580px] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10 text-center">
+        <div className="bg-white w-full max-w-[36.25rem] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10 text-center">
           <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-danger-light text-danger mb-4 text-3xl">
             <i className="ph-fill ph-warning-circle"></i>
           </div>
@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="bg-surface-secondary font-sans text-ink min-h-[80vh] flex flex-col antialiased">
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="bg-white w-full max-w-[580px] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
+        <div className="bg-white w-full max-w-[36.25rem] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
           
           {/* Stepper */}
           <div className="flex items-center justify-between mb-8 relative">

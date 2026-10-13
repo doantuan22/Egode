@@ -9,6 +9,7 @@ import { useQuote } from '../../features/quotes/hooks';
 import { useCreateBooking } from '../../features/bookings/hooks';
 import { useLocations } from '../../features/locations/hooks';
 import { useHotelReviews } from '../../features/reviews/hooks';
+import { useAvailablePromotions } from '../../features/promotions/hooks';
 import { shareUrl } from '../../lib/share';
 import { useAuthStore } from '../../lib/authStore';
 import { ApiError } from '../../services/apiClient';
@@ -20,6 +21,7 @@ vi.mock('../../features/quotes/hooks');
 vi.mock('../../features/bookings/hooks');
 vi.mock('../../features/locations/hooks');
 vi.mock('../../features/reviews/hooks');
+vi.mock('../../features/promotions/hooks');
 vi.mock('../../lib/share');
 
 const image = (id: number) => ({ MaHinhAnh: id, URL: `https://img.test/${id}.jpg`, AnhDaiDien: id === 1 });
@@ -44,6 +46,7 @@ beforeEach(() => {
   vi.mocked(useCreateBooking).mockReturnValue(idle as unknown as ReturnType<typeof useCreateBooking>);
   vi.mocked(useLocations).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useLocations>);
   vi.mocked(useHotelReviews).mockReturnValue({ isLoading: false, isError: false, data: { items: [], summary: { DiemTrungBinh: null, SoLuongDanhGia: 0 }, pagination: { page: 1, limit: 5, total: 0, totalPages: 1 } } } as unknown as ReturnType<typeof useHotelReviews>);
+  vi.mocked(useAvailablePromotions).mockReturnValue({ isLoading: false, isError: false, data: [] } as unknown as ReturnType<typeof useAvailablePromotions>);
   vi.mocked(shareUrl).mockReset();
   Element.prototype.scrollIntoView = vi.fn();
 });
@@ -199,12 +202,79 @@ describe('HotelDetailPage price quote', () => {
   const request = (extra: object = {}) => ({ checkIn: '2030-01-01', checkOut: '2030-01-02', guests: 2, rooms: [{ maLoaiPhong: 11, soLuong: 1 }], ...extra });
   const lastRequest = () => vi.mocked(useQuote).mock.calls.at(-1)?.[1];
   const addRoom = (user: ReturnType<typeof userEvent.setup>) => user.click(screen.getByRole('button', { name: 'Tăng phòng Phòng Superior' }));
-  const promoInput = () => screen.getByPlaceholderText('Nhập mã (nếu có)');
+  const promoInput = () => screen.getByPlaceholderText('Nhập hoặc chọn mã');
 
   beforeEach(() => {
     vi.mocked(useHotelRooms).mockReturnValue({ isLoading: false, isError: false, isFetching: false, data: [room] } as unknown as ReturnType<typeof useHotelRooms>);
     mockQuote({ data: quote });
     useAuthStore.setState({ accessToken: 'token', role: 'Khách hàng' });
+  });
+
+  describe('promo picker', () => {
+    const available = [
+      { MaCode: 'GIAM10', LoaiGiamGia: 'Phần trăm', GiaTriGiam: 10, GiaTriDonToiThieu: 0, MucGiamToiDa: 100000, NgayBatDau: '2030-01-01', NgayKetThuc: '2030-12-31' },
+      { MaCode: 'VIP500', LoaiGiamGia: 'Số tiền cố định', GiaTriGiam: 500000, GiaTriDonToiThieu: 2000000, MucGiamToiDa: 0, NgayBatDau: '2030-01-01', NgayKetThuc: '2030-06-30' },
+    ];
+    beforeEach(() => {
+      vi.mocked(useAvailablePromotions).mockReturnValue({ isLoading: false, isError: false, data: available } as unknown as ReturnType<typeof useAvailablePromotions>);
+    });
+
+    it('opens a list of the codes that can be used when the promo box is clicked', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      expect(screen.queryByRole('group', { name: 'Mã khuyến mãi có thể dùng' })).not.toBeInTheDocument();
+
+      await user.click(promoInput());
+
+      const list = screen.getByRole('group', { name: 'Mã khuyến mãi có thể dùng' });
+      expect(within(list).getByText('GIAM10')).toBeInTheDocument();
+      expect(within(list).getByText(/Giảm 10% \(tối đa/)).toBeInTheDocument();
+      expect(within(list).getByText(/Dùng đến 31\/12\/2030/)).toBeInTheDocument();
+    });
+
+    it('picking a code types it in and quotes with it at once, without pressing "Áp dụng"', async () => {
+      mockQuote({ data: { ...quote, PromoHopLe: true, SoTienGiam: 70000, TongTienThanhToan: 630000, PromoThongBao: 'Áp dụng thành công' } });
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.click(promoInput());
+
+      await user.click(screen.getByRole('button', { name: /GIAM10/ }));
+
+      expect(promoInput()).toHaveValue('GIAM10');
+      expect(lastRequest()).toEqual(request({ promoCode: 'GIAM10' }));
+      expect(screen.queryByRole('group', { name: 'Mã khuyến mãi có thể dùng' })).not.toBeInTheDocument();
+    });
+
+    it('shows a code whose minimum order is not reached, but does not let it be picked', async () => {
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+      await user.click(promoInput());
+
+      const locked = screen.getByRole('button', { name: /VIP500/ });
+
+      expect(locked).toBeDisabled();
+      expect(locked).toHaveTextContent(`Cần thêm ${formatCurrencyVND(1300000)}`);
+      await user.click(locked);
+      expect(lastRequest()).toEqual(request());
+    });
+
+    it('says so when no code can be used right now, and typing a code by hand still works', async () => {
+      vi.mocked(useAvailablePromotions).mockReturnValue({ isLoading: false, isError: false, data: [] } as unknown as ReturnType<typeof useAvailablePromotions>);
+      mockQuote({ data: { ...quote, PromoHopLe: true, SoTienGiam: 70000, TongTienThanhToan: 630000, PromoThongBao: 'Áp dụng thành công' } });
+      open();
+      const user = userEvent.setup();
+      await addRoom(user);
+
+      await user.click(promoInput());
+      expect(screen.getByText('Hiện chưa có mã khuyến mãi nào có thể áp dụng.')).toBeInTheDocument();
+
+      await user.type(promoInput(), 'SUMMER');
+      await user.click(screen.getByRole('button', { name: 'Áp dụng' }));
+      expect(lastRequest()).toEqual(request({ promoCode: 'SUMMER' }));
+    });
   });
 
   it('asks for no quote until a room is chosen', () => {

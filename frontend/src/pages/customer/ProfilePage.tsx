@@ -9,9 +9,10 @@ import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
 
-import { cn } from '../../lib/utils';
+import { cn, toDateInputValue } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
+import { DateField } from '../../components/common/DateField';
 
 /** Both sections of the customer's profile live in a frame of this height (the personal-details card sets it), so switching sections never resizes it. */
 const CARD_MIN_HEIGHT = 'lg:min-h-[28rem]';
@@ -120,7 +121,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <h3 className="font-bold text-lg text-ink mb-1 text-center">{meQuery.data?.HoTen}</h3>
-                <p className="text-[13px] text-ink-muted mb-3 text-center">{meQuery.data?.TenDangNhap}</p>
+                <p className="text-[0.8125rem] text-ink-muted mb-3 text-center">{meQuery.data?.TenDangNhap}</p>
               </div>
 
               <div className="flex-1">
@@ -170,8 +171,10 @@ export default function ProfilePage() {
 
                   <div>
                     <label htmlFor="profile-field-4" className="block text-xs font-semibold text-ink mb-1.5">Ngày sinh</label>
-                    <input id="profile-field-4" 
+                    <DateField id="profile-field-4" 
                       type="date" 
+                      captionLayout="dropdown"
+                      max={toDateInputValue(new Date())}
                       className={cn("w-full px-3.5 py-2.5 rounded-xl border bg-white text-ink text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all", errors.NgaySinh ? "border-danger bg-danger-light/20" : "border-border")}
                       {...register('NgaySinh')} 
                     />
@@ -213,7 +216,7 @@ export default function ProfilePage() {
             <i className="ph-fill ph-lock-key text-5xl" aria-hidden="true"></i>
           </div>
           <h3 className="font-bold text-lg text-ink mb-1">Đổi mật khẩu</h3>
-          <p className="text-[13px] leading-relaxed text-ink-muted">Sau khi đổi, các thiết bị khác sẽ phải đăng nhập lại.</p>
+          <p className="text-[0.8125rem] leading-relaxed text-ink-muted">Sau khi đổi, các thiết bị khác sẽ phải đăng nhập lại.</p>
         </div>
 
         <div className="flex-1 min-w-0">
@@ -264,7 +267,7 @@ export default function ProfilePage() {
               );
             })}
 
-            <ul className="sm:col-span-2 grid gap-2 rounded-xl bg-surface-secondary px-4 py-4 text-[13px]" aria-label="Yêu cầu mật khẩu">
+            <ul className="sm:col-span-2 grid gap-2 rounded-xl bg-surface-secondary px-4 py-4 text-[0.8125rem]" aria-label="Yêu cầu mật khẩu">
               {passwordChecks.map((check) => (
                 <li key={check.label} className={cn('flex items-center gap-2', check.met ? 'text-success-ink' : 'text-ink-muted')}>
                   <i className={cn('text-base', check.met ? 'ph-fill ph-check-circle' : 'ph ph-circle')} aria-hidden="true"></i>
@@ -290,7 +293,7 @@ export default function ProfilePage() {
     return (
       <div className="bg-surface-secondary text-ink min-h-[80vh]">
         <div className="page-container py-8">
-          <div className="mx-auto flex w-full max-w-[900px] min-w-0 flex-col gap-6">
+          <div className="mx-auto flex w-full max-w-[56.25rem] min-w-0 flex-col gap-6">
             <h1 className="text-2xl font-bold text-ink">HỒ SƠ CÁ NHÂN</h1>
             {profileCard}
             {passwordCard}
@@ -310,7 +313,7 @@ export default function ProfilePage() {
     <div className="bg-surface-secondary text-ink min-h-[80vh]">
       {/* On a wide screen the frame starts 15% of the window height down, so a short card does not hug the top of an empty page. */}
       <div className="page-container flex flex-col gap-6 pb-8 pt-8 md:flex-row md:pt-[15vh]">
-        <aside className="w-full shrink-0 rounded-2xl border border-border bg-white p-4 shadow-sm md:w-[250px]">
+        <aside className="w-full shrink-0 rounded-2xl border border-border bg-white p-4 shadow-sm md:w-[15.625rem]">
           <h2 className="px-3 pb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">Hồ sơ tài khoản</h2>
           <nav aria-label="Hồ sơ tài khoản" className="flex flex-col gap-2">
             <Link to="/profile" aria-current={section === 'profile' ? 'page' : undefined} className={menuItem(section === 'profile')}>

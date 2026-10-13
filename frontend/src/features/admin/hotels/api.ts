@@ -30,3 +30,11 @@ export const approveAdminHotel = async (id: number): Promise<AdminHotel> => (awa
 export const rejectAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reject`, { method: 'POST' })).data as AdminHotel;
 export const suspendAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/suspend`, { method: 'POST' })).data as AdminHotel;
 export const reactivateAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reactivate`, { method: 'POST' })).data as AdminHotel;
+
+/** An amenity of the shared catalogue, with how many hotels / room types currently list it. */
+export interface AdminAmenity { MaTienNghi: number; TenTienNghi: string; BieuTuong: string | null; SoKhachSan: number; SoLoaiPhong: number }
+export interface AdminAmenityPayload { TenTienNghi: string; BieuTuong: string | null }
+export const listAdminAmenities = async (): Promise<AdminAmenity[]> => (await apiClient<AdminAmenity[]>('/admin/hotels/amenities')).data ?? [];
+export const createAdminAmenity = async (payload: AdminAmenityPayload) => (await apiClient<AdminAmenity>('/admin/hotels/amenities', { method: 'POST', body: JSON.stringify(payload) })).data as AdminAmenity;
+export const updateAdminAmenity = async (id: number, payload: Partial<AdminAmenityPayload>) => (await apiClient<AdminAmenity>(`/admin/hotels/amenities/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })).data as AdminAmenity;
+export const deleteAdminAmenity = async (id: number): Promise<void> => { await apiClient<void>(`/admin/hotels/amenities/${id}`, { method: 'DELETE' }); };

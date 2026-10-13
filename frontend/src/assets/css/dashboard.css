@@ -4194,6 +4194,38 @@
   text-transform: capitalize;
 }
 
+/* Month / year selectors (captionLayout="dropdown", e.g. a birth date). The real <select>s sit invisibly over the labels. */
+.ui-date__popover .rdp-dropdowns {
+  gap: 4px;
+}
+
+.ui-date__popover .rdp-dropdown_root {
+  padding: 2px 4px 2px 8px;
+  border-radius: 8px;
+  color: var(--color-heading);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.ui-date__popover .rdp-dropdown_root:hover {
+  background: var(--color-surface-selected);
+  color: var(--color-action-primary);
+}
+
+.ui-date__popover .rdp-dropdown_root:has(.rdp-dropdown:focus-visible) {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+.ui-date__popover .rdp-dropdown:focus-visible ~ .rdp-caption_label {
+  outline: none;
+}
+
+.ui-date__popover .rdp-dropdowns .rdp-caption_label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .ui-date__popover .rdp-button_previous,
 .ui-date__popover .rdp-button_next {
   border-radius: 8px;
@@ -4753,4 +4785,338 @@
   .dashboard-shell--admin .admin-booking-filters__date-inputs > span {
     display: none;
   }
+}
+
+/* Owner workspace sizing
+   Match the admin workspace: list pages use the full desktop canvas while
+   detail and editor pages stay intentionally narrower for readability. */
+.dashboard-shell--owner .dashboard-content__canvas {
+  max-width: 1680px;
+}
+
+.dashboard-shell--owner .owner-module,
+.dashboard-shell--owner [class~="max-w-[1200px]"] {
+  max-width: none;
+}
+
+.dashboard-shell--owner [class~="max-w-[1080px]"],
+.dashboard-shell--owner [class~="max-w-[1040px]"] {
+  max-width: 1440px;
+}
+
+.dashboard-shell--owner [class~="max-w-[1000px]"] {
+  max-width: 1400px;
+}
+
+.dashboard-shell--owner [class~="max-w-[800px]"] {
+  max-width: 1200px;
+}
+
+.dashboard-shell--owner .owner-hotel-manage #owner-hotel-editor,
+.dashboard-shell--owner .owner-hotel-manage > .owner-editor-section {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.dashboard-shell--owner .owner-hotel-manage {
+  max-width: 1200px;
+}
+
+/* Owner typography scale
+   Apply the same 15% readability increase used by the admin workspace. */
+.dashboard-shell--owner {
+  --owner-font-9: 10.35px;
+  --owner-font-10: 11.5px;
+  --owner-font-10-5: 12.075px;
+  --owner-font-11: 12.65px;
+  --owner-font-12: 13.8px;
+  --owner-font-13: 14.95px;
+  --owner-font-14: 16.1px;
+  --owner-font-15: 17.25px;
+  --owner-font-16: 18.4px;
+  --owner-font-17: 19.55px;
+  --owner-font-18: 20.7px;
+  --owner-font-20: 23px;
+  --owner-font-22: 25.3px;
+  --owner-font-24: 27.6px;
+  --owner-font-28: 32.2px;
+  --font-size-caption: 0.8625rem;
+  --font-size-supporting: 0.934375rem;
+  --font-size-label: 1.00625rem;
+  --font-size-body: 1.15rem;
+  --font-size-subsection: 1.15rem;
+  --font-size-section: 1.4375rem;
+  --font-size-page: 2.0125rem;
+  --font-size-price: 1.725rem;
+  --font-size-kpi: 1.725rem;
+  --text-xs: 0.8625rem;
+  --text-sm: 1.00625rem;
+  --text-base: 1.15rem;
+  --text-lg: 1.29375rem;
+  --text-xl: 1.4375rem;
+  --text-2xl: 1.725rem;
+  --text-3xl: 2.15625rem;
+  font-size: 1.15rem;
+}
+
+/* Content surfaces receive the same second readability step as admin cards. */
+.dashboard-shell--owner :is(
+  .page-header,
+  .owner-module__header,
+  .owner-entity-header,
+  .owner-form-heading,
+  .owner-editor-section,
+  .owner-hotel-context,
+  .owner-scope-state,
+  .owner-module__toolbar,
+  .owner-module__filters,
+  .owner-module__form,
+  .owner-module__data,
+  .owner-metric-strip,
+  .owner-revenue-total,
+  .owner-room-type-row,
+  .owner-dashboard__filters,
+  .owner-status-summary > .card,
+  .owner-dashboard .card,
+  .surface-card,
+  .table-wrap,
+  .owner-hotel-list__item,
+  .owner-bookings-results
+) {
+  --owner-font-9: 11.9025px;
+  --owner-font-10: 13.225px;
+  --owner-font-10-5: 13.88625px;
+  --owner-font-11: 14.5475px;
+  --owner-font-12: 15.87px;
+  --owner-font-13: 17.1925px;
+  --owner-font-14: 18.515px;
+  --owner-font-15: 19.8375px;
+  --owner-font-16: 21.16px;
+  --owner-font-17: 22.4825px;
+  --owner-font-18: 23.805px;
+  --owner-font-20: 26.45px;
+  --owner-font-22: 29.095px;
+  --owner-font-24: 31.74px;
+  --owner-font-28: 37.03px;
+  --font-size-caption: 0.991875rem;
+  --font-size-supporting: 1.07453125rem;
+  --font-size-label: 1.1571875rem;
+  --font-size-body: 1.3225rem;
+  --font-size-subsection: 1.3225rem;
+  --font-size-section: 1.653125rem;
+  --font-size-page: 2.314375rem;
+  --font-size-price: 1.98375rem;
+  --font-size-kpi: 1.98375rem;
+  --text-xs: 0.991875rem;
+  --text-sm: 1.1571875rem;
+  --text-base: 1.3225rem;
+  --text-lg: 1.4878125rem;
+  --text-xl: 1.653125rem;
+  --text-2xl: 1.98375rem;
+  --text-3xl: 2.4796875rem;
+  font-size: 1.3225rem;
+}
+
+/* Owner dashboard chrome */
+.dashboard-shell--owner .dashboard-brand__copy strong {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .dashboard-brand__copy small,
+.dashboard-shell--owner .dashboard-role-pill {
+  font-size: var(--owner-font-9);
+}
+
+.dashboard-shell--owner .dashboard-sidebar__group-title,
+.dashboard-shell--owner .dashboard-topbar__eyebrow {
+  font-size: var(--owner-font-10);
+}
+
+.dashboard-shell--owner .dashboard-sidebar__item,
+.dashboard-shell--owner .dashboard-user-meta strong {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .dashboard-user-meta small {
+  font-size: var(--owner-font-10);
+}
+
+.dashboard-shell--owner .dashboard-topbar__title {
+  font-size: var(--owner-font-17);
+}
+
+/* Owner page headings and common controls */
+.dashboard-shell--owner .page-header h1,
+.dashboard-shell--owner .owner-module__header h1,
+.dashboard-shell--owner .owner-module__title h1,
+.dashboard-shell--owner .owner-entity-header__identity h1,
+.dashboard-shell--owner .owner-form-heading h1 {
+  font-size: clamp(var(--owner-font-22), 2vw, var(--owner-font-28));
+}
+
+.dashboard-shell--owner .page-header__desc,
+.dashboard-shell--owner .owner-module__header p,
+.dashboard-shell--owner .owner-module__title p,
+.dashboard-shell--owner .owner-entity-header__identity p:last-child,
+.dashboard-shell--owner .owner-form-heading p {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .owner-entity-header__eyebrow {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner .btn {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .btn-sm {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .btn-lg {
+  font-size: var(--owner-font-15);
+}
+
+.dashboard-shell--owner .badge,
+.dashboard-shell--owner .status-badge,
+.dashboard-shell--owner .ui-status {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner .form-label,
+.dashboard-shell--owner .breadcrumb,
+.dashboard-shell--owner .pagination button,
+.dashboard-shell--owner .admin-row-link {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .form-hint,
+.dashboard-shell--owner .form-error,
+.dashboard-shell--owner .ui-field-message {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner .input,
+.dashboard-shell--owner .select,
+.dashboard-shell--owner .textarea,
+.dashboard-shell--owner .ui-field,
+.dashboard-shell--owner .ui-field-label,
+.dashboard-shell--owner .ui-select__face,
+.dashboard-shell--owner .combobox__control {
+  font-size: var(--owner-font-14);
+}
+
+/* Owner module content */
+.dashboard-shell--owner .owner-hotel-context small {
+  font-size: var(--owner-font-11);
+}
+
+.dashboard-shell--owner .owner-hotel-context strong,
+.dashboard-shell--owner .owner-hotel-context select,
+.dashboard-shell--owner .owner-module__search input {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .owner-module__toolbar > span,
+.dashboard-shell--owner .owner-room-type-row__action,
+.dashboard-shell--owner .owner-module__form p,
+.dashboard-shell--owner .owner-module__note {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .owner-room-type-row__main strong {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .owner-room-type-row__main small,
+.dashboard-shell--owner .owner-module__form-grid label,
+.dashboard-shell--owner .owner-module__filters label,
+.dashboard-shell--owner .owner-module__weekdays legend {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner .owner-module__weekdays label,
+.dashboard-shell--owner .owner-rate-table td {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .owner-module__form h2,
+.dashboard-shell--owner .owner-module__data h2 {
+  font-size: var(--owner-font-16);
+}
+
+.dashboard-shell--owner .owner-module__form-grid input,
+.dashboard-shell--owner .owner-module__form-grid select,
+.dashboard-shell--owner .owner-module__filters input,
+.dashboard-shell--owner .owner-module__filters select {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .owner-rate-table th,
+.dashboard-shell--owner .data-table thead th {
+  font-size: var(--owner-font-10-5);
+}
+
+.dashboard-shell--owner .data-table tbody td {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner .owner-metric-strip small,
+.dashboard-shell--owner .owner-metric-strip span {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner .owner-metric-strip strong {
+  font-size: var(--owner-font-24);
+}
+
+.dashboard-shell--owner .owner-revenue-total span {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner .owner-revenue-total small {
+  font-size: var(--owner-font-13);
+}
+
+/* Arbitrary Tailwind sizes used across owner dashboards and editors. */
+.dashboard-shell--owner [class~="text-[10px]"] {
+  font-size: var(--owner-font-10);
+}
+
+.dashboard-shell--owner [class~="text-[11px]"] {
+  font-size: var(--owner-font-11);
+}
+
+.dashboard-shell--owner [class~="text-[12px]"] {
+  font-size: var(--owner-font-12);
+}
+
+.dashboard-shell--owner [class~="text-[13px]"] {
+  font-size: var(--owner-font-13);
+}
+
+.dashboard-shell--owner [class~="text-[14px]"] {
+  font-size: var(--owner-font-14);
+}
+
+.dashboard-shell--owner [class~="text-[17px]"] {
+  font-size: var(--owner-font-17);
+}
+
+.dashboard-shell--owner [class~="text-[18px]"] {
+  font-size: var(--owner-font-18);
+}
+
+.dashboard-shell--owner [class~="text-[20px]"] {
+  font-size: var(--owner-font-20);
+}
+
+.dashboard-shell--owner [class~="text-[22px]"] {
+  font-size: var(--owner-font-22);
+}
+
+.dashboard-shell--owner [class~="text-[24px]"] {
+  font-size: var(--owner-font-24);
 }

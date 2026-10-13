@@ -106,13 +106,13 @@ export default function LoginPage() {
   ) =>
     cn(
       `
-        h-[54px]
+        h-[3.375rem]
         w-full
-        rounded-[14px]
+        rounded-[0.875rem]
         border
         bg-white
         py-0
-        text-[14px]
+        text-[0.875rem]
         font-medium
         leading-none
         text-slate-800
@@ -203,14 +203,14 @@ export default function LoginPage() {
           top-[22%]
           -z-10
 
-          h-[500px]
-          w-[500px]
+          h-[31.25rem]
+          w-[31.25rem]
 
           rounded-full
 
           bg-cyan-400/10
 
-          blur-[130px]
+          blur-[8.125rem]
         "
       />
 
@@ -227,7 +227,7 @@ export default function LoginPage() {
           min-h-[calc(100vh-var(--header-height))]
 
           w-full
-          max-w-[1500px]
+          max-w-[93.75rem]
 
           items-center
 
@@ -247,7 +247,7 @@ export default function LoginPage() {
 
             gap-10
 
-            lg:grid-cols-[minmax(0,1.15fr)_minmax(430px,520px)]
+            lg:grid-cols-[minmax(0,1.15fr)_minmax(26.875rem,32.5rem)]
 
             xl:gap-20
           "
@@ -263,7 +263,7 @@ export default function LoginPage() {
               lg:block
             "
           >
-            <div className="max-w-[760px]">
+            <div className="max-w-[47.5rem]">
 
               {/* Mini badge */}
 
@@ -285,7 +285,7 @@ export default function LoginPage() {
                   px-5
                   py-2.5
 
-                  text-[14px]
+                  text-[0.875rem]
                   font-semibold
 
                   text-slate-100
@@ -300,7 +300,7 @@ export default function LoginPage() {
                     ph
                     ph-map-pin
 
-                    text-[19px]
+                    text-[1.1875rem]
                     text-cyan-300
                   "
                   aria-hidden="true"
@@ -313,7 +313,7 @@ export default function LoginPage() {
 
               <h1
                 className="
-                  max-w-[720px]
+                  max-w-[45rem]
 
                   text-[clamp(3rem,4.3vw,4.65rem)]
 
@@ -368,8 +368,8 @@ export default function LoginPage() {
 
                   mt-6
 
-                  h-[4px]
-                  w-[150px]
+                  h-[0.25rem]
+                  w-[9.375rem]
 
                   overflow-hidden
 
@@ -403,9 +403,9 @@ export default function LoginPage() {
                 className="
                   mt-6
 
-                  max-w-[670px]
+                  max-w-[41.875rem]
 
-                  text-[16px]
+                  text-[1rem]
 
                   font-medium
 
@@ -434,7 +434,7 @@ export default function LoginPage() {
 
                   grid
 
-                  max-w-[720px]
+                  max-w-[45rem]
 
                   grid-cols-3
 
@@ -480,9 +480,9 @@ export default function LoginPage() {
             <section
               className="
                 w-full
-                max-w-[510px]
+                max-w-[31.875rem]
 
-                rounded-[30px]
+                rounded-[1.875rem]
 
                 border
                 border-white/70
@@ -524,7 +524,7 @@ export default function LoginPage() {
                     mb-6
 
                     flex
-                    h-[66px]
+                    h-[4.125rem]
 
                     items-center
                     justify-center
@@ -535,7 +535,7 @@ export default function LoginPage() {
                     alt="Egode"
 
                     className="
-                      h-[60px]
+                      h-[3.75rem]
                       w-auto
 
                       object-contain
@@ -558,7 +558,7 @@ export default function LoginPage() {
 
                     bg-clip-text
 
-                    text-[31px]
+                    text-[1.9375rem]
 
                     font-extrabold
 
@@ -579,9 +579,9 @@ export default function LoginPage() {
                     mx-auto
                     mt-3
 
-                    max-w-[365px]
+                    max-w-[22.8125rem]
 
-                    text-[14px]
+                    text-[0.875rem]
 
                     font-normal
 
@@ -733,7 +733,7 @@ export default function LoginPage() {
 
                       block
 
-                      text-[13px]
+                      text-[0.8125rem]
 
                       font-bold
 
@@ -765,7 +765,7 @@ export default function LoginPage() {
 
                         -translate-y-1/2
 
-                        text-[20px]
+                        text-[1.25rem]
 
                         text-slate-400
                       "
@@ -825,7 +825,7 @@ export default function LoginPage() {
 
                       block
 
-                      text-[13px]
+                      text-[0.8125rem]
 
                       font-bold
 
@@ -857,7 +857,7 @@ export default function LoginPage() {
 
                         -translate-y-1/2
 
-                        text-[19px]
+                        text-[1.1875rem]
 
                         text-slate-400
                       "
@@ -975,7 +975,7 @@ export default function LoginPage() {
                     to="/forgot-password"
 
                     className="
-                      text-[13px]
+                      text-[0.8125rem]
 
                       font-semibold
 
@@ -1000,19 +1000,19 @@ export default function LoginPage() {
                   disabled={busy}
 
                   className="
-                    min-h-[54px]
+                    min-h-[3.375rem]
 
                     w-full
 
                     justify-center
 
-                    rounded-[12px]
+                    rounded-[0.75rem]
 
                     bg-gradient-to-r
                     from-blue-600
                     to-blue-500
 
-                    text-[15px]
+                    text-[0.9375rem]
 
                     font-bold
 
@@ -1114,7 +1114,7 @@ export default function LoginPage() {
                 className="
                   text-center
 
-                  text-[14px]
+                  text-[0.875rem]
 
                   !text-slate-500
                 "
@@ -1167,9 +1167,9 @@ function LoginFeatureCard({
       className="
         group
 
-        min-h-[168px]
+        min-h-[10.5rem]
 
-        rounded-[22px]
+        rounded-[1.375rem]
 
         border
         border-white/20
@@ -1209,7 +1209,7 @@ function LoginFeatureCard({
           items-center
           justify-center
 
-          rounded-[14px]
+          rounded-[0.875rem]
 
           border
           border-cyan-200/20
@@ -1232,7 +1232,7 @@ function LoginFeatureCard({
         "
       >
         <i
-          className={`ph ${icon} text-[25px]`}
+          className={`ph ${icon} text-[1.5625rem]`}
           aria-hidden="true"
         />
       </div>
@@ -1241,7 +1241,7 @@ function LoginFeatureCard({
 
       <h3
         className="
-          !text-[16px]
+          !text-[1rem]
 
           !font-bold
 
@@ -1263,7 +1263,7 @@ function LoginFeatureCard({
         className="
           mt-1.5
 
-          text-[13px]
+          text-[0.8125rem]
 
           font-normal
 

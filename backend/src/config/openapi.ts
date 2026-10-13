@@ -409,6 +409,14 @@ export const openApiSpec = {
         responses: { '200': { description: 'Updated' }, '400': { description: '"Đã xử lý" requires ketQuaXuLy, or the request is already resolved' }, '403': { description: 'Not an admin' }, '404': { description: 'Not found' } },
       },
     },
+    '/promotions/available': {
+      get: {
+        summary: 'Promotion codes a guest can pick right now (public)',
+        description: 'Only active promotions whose date window contains today (Vietnam day) and that still have uses left. The same rules a typed code goes through when a quote is priced; the minimum order value is shown but checked by the quote.',
+        tags: ['Promotions'],
+        responses: { '200': { description: 'List of MaCode, LoaiGiamGia, GiaTriGiam, GiaTriDonToiThieu, MucGiamToiDa, NgayBatDau, NgayKetThuc' } },
+      },
+    },
     '/admin/promotions': {
       get: {
         summary: 'List promotions, filter by TrangThai/LoaiGiamGia, search by MaCode (M8 §1, admin only)',
@@ -909,6 +917,30 @@ export const openApiSpec = {
           { name: 'TrangThai', in: 'query', schema: { type: 'string' } },
         ],
         responses: { '200': { description: 'Paginated hotel administration list' }, '401': { description: 'Not authenticated' }, '403': { description: 'Admin role required' } },
+      },
+    },
+    '/admin/hotels/amenities': {
+      get: {
+        summary: 'List the amenity catalogue with hotel / room-type usage counts (admin only)', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        responses: { '200': { description: 'Amenities with SoKhachSan and SoLoaiPhong' }, '401': { description: 'Not authenticated' }, '403': { description: 'Admin role required' } },
+      },
+      post: {
+        summary: 'Add an amenity to the catalogue (admin only)', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['TenTienNghi'], properties: { TenTienNghi: { type: 'string', minLength: 2, maxLength: 150 }, BieuTuong: { type: 'string', maxLength: 255, nullable: true } } } } } },
+        responses: { '201': { description: 'Created' }, '400': { description: 'Validation error' }, '403': { description: 'Admin role required' }, '409': { description: 'Name already exists' } },
+      },
+    },
+    '/admin/hotels/amenities/{id}': {
+      patch: {
+        summary: 'Rename or re-icon an amenity (admin only)', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { TenTienNghi: { type: 'string', minLength: 2, maxLength: 150 }, BieuTuong: { type: 'string', maxLength: 255, nullable: true } } } } } },
+        responses: { '200': { description: 'Updated' }, '400': { description: 'Validation error' }, '403': { description: 'Admin role required' }, '404': { description: 'Amenity not found' }, '409': { description: 'Name already exists' } },
+      },
+      delete: {
+        summary: 'Delete an amenity that no hotel or room type uses (admin only)', tags: ['Admin Hotels'], security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
+        responses: { '200': { description: 'Deleted' }, '403': { description: 'Admin role required' }, '404': { description: 'Amenity not found' }, '409': { description: 'Amenity still in use' } },
       },
     },
     '/admin/hotels/{id}': {

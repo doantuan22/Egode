@@ -16,6 +16,7 @@ import { paymentsBookingRoutes, paymentsGatewayRoutes } from '../modules/payment
 import { reviewsBookingRoutes, adminReviewsRoutes, hotelReviewsRoutes } from '../modules/reviews/reviews.routes';
 import { supportRoutes, adminSupportRoutes } from '../modules/support/support.routes';
 import promotionsRoutes from '../modules/promotions/promotions.routes';
+import publicPromotionsRoutes from '../modules/promotions/public-promotions.routes';
 import ownerAnalyticsRoutes from '../modules/owner/owner-analytics.routes';
 import adminAnalyticsRoutes from '../modules/analytics/admin-analytics.routes';
 import adminHotelsRoutes from '../modules/admin-hotels/admin-hotels.routes';
@@ -41,6 +42,7 @@ router.use('/hotels', quotesRoutes);
 router.use('/amenities', amenitiesRoutes);
 router.use('/locations', locationsRoutes);
 router.use('/cancellation-policies', cancellationPoliciesRoutes);
+router.use('/promotions', publicPromotionsRoutes);
 
 // Booking (M5)
 router.use('/hotels', bookingsRoutes);

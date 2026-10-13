@@ -11,8 +11,9 @@ import {
 
 import { ApiError } from '../../services/apiClient';
 import { applyServerFieldErrors } from '../../lib/apiErrors';
-import { cn } from '../../lib/utils';
+import { cn, toDateInputValue } from '../../lib/utils';
 import { Button } from '../../components/common/Button';
+import { DateField } from '../../components/common/DateField';
 
 type RegisterIntent = 'customer' | 'partner' | null;
 
@@ -143,7 +144,7 @@ export default function RegisterPage() {
           mx-auto
           flex
           w-full
-          max-w-[1500px]
+          max-w-[93.75rem]
           items-center
           px-7
           py-6
@@ -169,7 +170,7 @@ export default function RegisterPage() {
           ================================================= */}
 
           <section className="hidden lg:block">
-            <div className="max-w-[760px]">
+            <div className="max-w-[47.5rem]">
               <div className="relative inline-block">
                 {/* DÒNG 1 */}
 
@@ -236,10 +237,10 @@ export default function RegisterPage() {
                   viewBox="0 0 80 80"
                   className="
                     absolute
-                    right-[-58px]
-                    top-[16px]
-                    h-[48px]
-                    w-[48px]
+                    right-[-3.625rem]
+                    top-[1rem]
+                    h-[3rem]
+                    w-[3rem]
                   "
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -292,13 +293,13 @@ export default function RegisterPage() {
                     BRUSH WAVE
                 ================================================= */}
 
-                <div className="mt-[3px] ml-[78px]">
+                <div className="mt-[0.1875rem] ml-[4.875rem]">
                   <svg
                     viewBox="0 0 560 48"
                     fill="none"
                     className="
-                      h-[32px]
-                      w-[470px]
+                      h-[2rem]
+                      w-[29.375rem]
                       overflow-visible
                     "
                     xmlns="http://www.w3.org/2000/svg"
@@ -403,8 +404,8 @@ export default function RegisterPage() {
               <p
                 className="
                   mt-2
-                  max-w-[650px]
-                  text-[16px]
+                  max-w-[40.625rem]
+                  text-[1rem]
                   font-semibold
                   leading-7
                 "
@@ -428,7 +429,7 @@ export default function RegisterPage() {
               className="
                 mt-8
                 grid
-                max-w-[680px]
+                max-w-[42.5rem]
                 grid-cols-3
                 gap-4
               "
@@ -466,8 +467,8 @@ export default function RegisterPage() {
               <section
                 className="
                   w-full
-                  max-w-[540px]
-                  rounded-[30px]
+                  max-w-[33.75rem]
+                  rounded-[1.875rem]
                   border
                   border-white/80
                   bg-white/95
@@ -489,9 +490,9 @@ export default function RegisterPage() {
                     src={LOGO_SRC}
                     alt="Egode"
                     className="
-                      h-[62px]
+                      h-[3.875rem]
                       w-auto
-                      max-w-[210px]
+                      max-w-[13.125rem]
                       object-contain
                     "
                   />
@@ -500,7 +501,7 @@ export default function RegisterPage() {
                 <div className="mb-6 text-center">
                   <h1
                     className="
-                      text-[29px]
+                      text-[1.8125rem]
                       font-extrabold
                       tracking-[-0.025em]
                       text-slate-900
@@ -587,9 +588,9 @@ export default function RegisterPage() {
               <section
                 className="
                   w-full
-                  max-w-[700px]
+                  max-w-[43.75rem]
                   overflow-hidden
-                  rounded-[28px]
+                  rounded-[1.75rem]
                   border
                   border-white/75
                   bg-white/96
@@ -644,7 +645,7 @@ export default function RegisterPage() {
                       className="
                         h-12
                         w-auto
-                        max-w-[155px]
+                        max-w-[9.6875rem]
                         object-contain
                       "
                     />
@@ -652,7 +653,7 @@ export default function RegisterPage() {
                     <div>
                       <h1
                         className="
-                          text-[23px]
+                          text-[1.4375rem]
                           font-extrabold
                           tracking-[-0.02em]
                           text-slate-900
@@ -741,9 +742,11 @@ export default function RegisterPage() {
                       label="Ngày sinh"
                       error={errors.NgaySinh?.message}
                     >
-                      <input
+                      <DateField
                         id="register-NgaySinh"
                         type="date"
+                        captionLayout="dropdown"
+                        max={toDateInputValue(new Date())}
                         className={inputClass(
                           !!errors.NgaySinh
                         )}
@@ -779,7 +782,7 @@ export default function RegisterPage() {
                         Giới tính
                       </p>
 
-                      <div className="flex min-h-[42px] items-center gap-2">
+                      <div className="flex min-h-[2.625rem] items-center gap-2">
                         {['Nam', 'Nữ', 'Khác'].map(
                           (gender) => (
                             <label
@@ -1094,7 +1097,7 @@ function FeatureCard({
   return (
     <div
       className="
-        rounded-[22px]
+        rounded-[1.375rem]
         border
         border-white/25
         bg-[#102033]/84
@@ -1122,14 +1125,14 @@ function FeatureCard({
           text-sky-300
         "
       >
-        <i className={`ph ${icon} text-[26px]`} />
+        <i className={`ph ${icon} text-[1.625rem]`} />
       </div>
 
-      <p className="text-[17px] font-extrabold text-white">
+      <p className="text-[1.0625rem] font-extrabold text-white">
         {title}
       </p>
 
-      <p className="mt-2 text-[13px] font-medium leading-6 text-slate-200">
+      <p className="mt-2 text-[0.8125rem] font-medium leading-6 text-slate-200">
         {description}
       </p>
     </div>
@@ -1213,7 +1216,7 @@ function IntentOption({
             items-center
             justify-center
             rounded-2xl
-            text-[22px]
+            text-[1.375rem]
             transition-all
           `,
           iconClasses
@@ -1224,7 +1227,7 @@ function IntentOption({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
-          <strong className="text-[17px] font-extrabold text-slate-900">
+          <strong className="text-[1.0625rem] font-extrabold text-slate-900">
             {title}
           </strong>
 
@@ -1240,7 +1243,7 @@ function IntentOption({
           )}
         </div>
 
-        <p className="mt-1 text-[13px] font-medium leading-5 text-slate-500">
+        <p className="mt-1 text-[0.8125rem] font-medium leading-5 text-slate-500">
           {description}
         </p>
       </div>

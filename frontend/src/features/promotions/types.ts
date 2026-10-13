@@ -34,3 +34,15 @@ export interface PromotionFormValues {
   NgayBatDau: string;
   NgayKetThuc: string;
 }
+
+/** A code a guest may pick while booking (public list: only what is needed to choose and understand it). */
+export interface AvailablePromotion {
+  MaCode: string;
+  LoaiGiamGia: string;
+  GiaTriGiam: number;
+  GiaTriDonToiThieu: number;
+  /** 0 = no cap. */
+  MucGiamToiDa: number;
+  NgayBatDau: string;
+  NgayKetThuc: string;
+}

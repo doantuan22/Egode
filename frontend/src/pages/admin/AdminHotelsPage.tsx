@@ -84,7 +84,16 @@ export default function AdminHotelsPage() {
 
   return (
     <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
-      <PageHeader title="Quản lý khách sạn" description="Giám sát toàn bộ cơ sở lưu trú đối tác, trạng thái mở bán và xử lý rủi ro." />
+      <PageHeader
+        title="Quản lý khách sạn"
+        description="Giám sát toàn bộ cơ sở lưu trú đối tác, trạng thái mở bán và xử lý rủi ro."
+        actions={
+          <Link to="/admin/hotels/amenities" className="btn btn-outline">
+            <Icon name="list-checks" />
+            <span>Quản lý tiện nghi</span>
+          </Link>
+        }
+      />
 
       <AdminListPanel
         itemLabel="khách sạn"

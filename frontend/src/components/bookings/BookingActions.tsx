@@ -51,12 +51,12 @@ export function BookingActions({ canPay, canCancel, onPay, isPaying, payError, o
       ) : (
         <div className="bg-danger-light border border-danger/30 rounded-xl p-4">
           <h3 className="text-sm font-bold text-danger-ink mb-2">Xác nhận hủy đặt phòng?</h3>
-          <div className="bg-surface border border-danger/20 rounded-lg p-3 mb-3 text-[13px] text-danger-ink">
+          <div className="bg-surface border border-danger/20 rounded-lg p-3 mb-3 text-[0.8125rem] text-danger-ink">
             {refundPreview.paid > 0 ? (
               <>
                 <div className="flex justify-between mb-1"><span>Đã thanh toán:</span> <span>{formatCurrencyVND(refundPreview.paid)}</span></div>
                 <div className="flex justify-between mb-1"><span>Dự kiến hoàn ({refundPreview.percent}%):</span> <strong className="text-base">{formatCurrencyVND(refundPreview.amount)}</strong></div>
-                <div className="text-[11px] mt-2 opacity-80">Hệ thống sẽ tính lại chính xác khi bạn xác nhận.</div>
+                <div className="text-[0.6875rem] mt-2 opacity-80">Hệ thống sẽ tính lại chính xác khi bạn xác nhận.</div>
               </>
             ) : (
               <div>Đơn này chưa thanh toán nên sẽ không có hoàn tiền.</div>

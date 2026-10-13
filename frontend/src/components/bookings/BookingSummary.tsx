@@ -19,23 +19,23 @@ export function BookingSummary({ booking, onRetryRefund, isRetryingRefund = fals
     <Card padded={false} className="card-body">
       <h2 className="text-base font-bold text-heading mb-5 pb-3 border-b border-border">Chi tiết thanh toán</h2>
 
-      <div className="flex justify-between text-[14px] text-muted mb-3">
+      <div className="flex justify-between text-[0.875rem] text-muted mb-3">
         <span>Tổng tiền phòng</span>
         <span>{formatCurrencyVND(booking.TongTienPhong)}</span>
       </div>
       {booking.SoTienGiam > 0 && (
-        <div className="flex justify-between text-[14px] text-success-ink mb-3">
+        <div className="flex justify-between text-[0.875rem] text-success-ink mb-3">
           <span>Khuyến mãi {booking.KhuyenMai?.MaCode}</span>
           <span>− {formatCurrencyVND(booking.SoTienGiam)}</span>
         </div>
       )}
 
       <div className="flex justify-between items-center pt-3.5 mt-3.5 border-t border-border">
-        <span className="text-[15px] font-semibold text-heading">Tổng thanh toán</span>
-        <span className="text-[20px] font-bold text-primary">{formatCurrencyVND(booking.TongTienThanhToan)}</span>
+        <span className="text-[0.9375rem] font-semibold text-heading">Tổng thanh toán</span>
+        <span className="text-[1.25rem] font-bold text-primary">{formatCurrencyVND(booking.TongTienThanhToan)}</span>
       </div>
 
-      <div className="mt-4 pt-3.5 border-t border-dashed border-border text-[13px] text-muted flex flex-col gap-1.5">
+      <div className="mt-4 pt-3.5 border-t border-dashed border-border text-[0.8125rem] text-muted flex flex-col gap-1.5">
         {booking.ThanhToan.length === 0 ? (
           <div>{booking.TongTienThanhToan === 0 ? 'Đơn 0 đ — không phát sinh giao dịch thanh toán.' : 'Chưa có giao dịch thanh toán.'}</div>
         ) : (
@@ -44,7 +44,7 @@ export function BookingSummary({ booking, onRetryRefund, isRetryingRefund = fals
               <div>Phương thức: <strong>{payment.PhuongThucThanhToan}</strong></div>
               <div>Trạng thái: <strong className={cn(payment.TrangThai === 'Thành công' && 'text-success-ink')}>{payment.TrangThai}</strong></div>
               <div>Số tiền: <strong>{formatCurrencyVND(payment.SoTien)}</strong></div>
-              <div className="text-[11px] mt-1">{formatDateTimeVi(payment.ThoiGianGiaoDich)}</div>
+              <div className="text-[0.6875rem] mt-1">{formatDateTimeVi(payment.ThoiGianGiaoDich)}</div>
 
               {payment.HoanTien.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-border">

@@ -71,4 +71,37 @@ export class AdminHotelsController {
       next(e);
     }
   };
+
+  listAmenities = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      sendSuccess(res, await this.service.listAmenities());
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  createAmenity = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      sendSuccess(res, await this.service.createAmenity(req.body), 'Đã thêm tiện nghi', 201);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  updateAmenity = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      sendSuccess(res, await this.service.updateAmenity(this.id(req), req.body), 'Đã cập nhật tiện nghi');
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  deleteAmenity = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this.service.deleteAmenity(this.id(req));
+      sendSuccess(res, undefined, 'Đã xóa tiện nghi');
+    } catch (e) {
+      next(e);
+    }
+  };
 }

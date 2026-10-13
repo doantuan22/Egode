@@ -17,7 +17,7 @@ export function HotelGallery({ images, hotelName, onOpen }: HotelGalleryProps) {
       <div className="page-container">
         {images.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 rounded-2xl overflow-hidden relative">
-            <button type="button" aria-label="Xem ảnh lớn 1" onClick={() => onOpen(0)} className="md:col-span-2 relative group overflow-hidden cursor-pointer h-[320px] md:h-[440px]">
+            <button type="button" aria-label="Xem ảnh lớn 1" onClick={() => onOpen(0)} className="md:col-span-2 relative group overflow-hidden cursor-pointer h-[20rem] md:h-[27.5rem]">
               <img
                 src={images[0].URL}
                 alt={hotelName}
@@ -27,7 +27,7 @@ export function HotelGallery({ images, hotelName, onOpen }: HotelGalleryProps) {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
             </button>
-            <div className="hidden md:grid md:col-span-2 grid-cols-2 gap-3 h-[440px]">
+            <div className="hidden md:grid md:col-span-2 grid-cols-2 gap-3 h-[27.5rem]">
               {images.slice(1, 5).map((img, index) => {
                 const showAll = index === 3 && images.length > 5;
                 return (

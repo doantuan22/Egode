@@ -19,9 +19,9 @@ function Controlled({ min }: { min?: string }) {
 }
 
 describe('DateField', () => {
-  it('is the plain native date input outside the dashboards', () => {
+  it('draws the calendar button outside the dashboards too (register and profile forms)', () => {
     render(<Controlled />);
-    expect(screen.queryByRole('button', { name: 'Mở lịch chọn ngày' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Mở lịch chọn ngày' })).toBeInTheDocument();
     expect(screen.getByLabelText('Từ ngày')).toHaveAttribute('type', 'date');
   });
 
@@ -66,6 +66,22 @@ describe('DateField', () => {
     await screen.findByRole('dialog');
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('offers month and year selectors for far-away dates such as a birth date', async () => {
+    render(<DateField aria-label="Ngày sinh" captionLayout="dropdown" max="2026-10-13" defaultValue="1995-06-20" />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Mở lịch chọn ngày' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Chọn ngày' });
+    const year = within(dialog).getByRole('combobox', { name: /năm/i });
+    expect(year).toHaveValue('1995');
+    expect(within(dialog).getByRole('option', { name: '1900' })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('option', { name: '2027' })).not.toBeInTheDocument();
+
+    await user.selectOptions(year, '1990');
+    await user.click(within(dialog).getByRole('button', { name: /ngày 15 tháng 06 năm 1990/ }));
+    expect(screen.getByLabelText('Ngày sinh')).toHaveValue('1990-06-15');
   });
 
   it('is used by Input type="date" too', () => {

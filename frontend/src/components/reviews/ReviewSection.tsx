@@ -47,7 +47,7 @@ export function ReviewSection({ bookingId, bookingStatus }: ReviewSectionProps) 
   return (
     <div id="danh-gia" className="scroll-mt-24 space-y-3 rounded-2xl border border-border bg-white p-6 shadow-xs">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
-        <i className="ph ph-chat-text text-[20px] text-ink-muted" aria-hidden="true" /> Đánh giá
+        <i className="ph ph-chat-text text-[1.25rem] text-ink-muted" aria-hidden="true" /> Đánh giá
       </h2>
 
       {reviewQuery.isLoading ? (

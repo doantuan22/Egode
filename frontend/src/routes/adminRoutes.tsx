@@ -13,6 +13,7 @@ const AdminAccountDetailPage = lazy(() => import('../pages/admin/AdminAccountDet
 const AdminCreateAccountPage = lazy(() => import('../pages/admin/AdminCreateAccountPage'));
 const AdminHotelsPage = lazy(() => import('../pages/admin/AdminHotelsPage'));
 const AdminHotelDetailPage = lazy(() => import('../pages/admin/AdminHotelDetailPage'));
+const AdminAmenitiesPage = lazy(() => import('../pages/admin/AdminAmenitiesPage'));
 const AdminBookingsPage = lazy(() => import('../pages/admin/AdminBookingsPage'));
 const AdminBookingDetailPage = lazy(() => import('../pages/admin/AdminBookingDetailPage'));
 const AdminPaymentsPage = lazy(() => import('../pages/admin/AdminPaymentsPage'));
@@ -33,6 +34,7 @@ export const adminRoutes = (
     <Route path="/admin/accounts/new" element={<AdminCreateAccountPage />} />
     <Route path="/admin/accounts/:id" element={<AdminAccountDetailPage />} />
     <Route path="/admin/hotels" element={<AdminHotelsPage />} />
+    <Route path="/admin/hotels/amenities" element={<AdminAmenitiesPage />} />
     <Route path="/admin/hotels/:id" element={<AdminHotelDetailPage />} />
     <Route path="/admin/bookings" element={<AdminBookingsPage />} />
     <Route path="/admin/bookings/:id" element={<AdminBookingDetailPage />} />

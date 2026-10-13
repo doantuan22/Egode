@@ -50,7 +50,7 @@ export default function PartnerApplyPage() {
 
   return (
     <div className="bg-surface-secondary text-ink font-sans antialiased min-h-[80vh] flex flex-col">
-      <div className="flex-grow page-container max-w-[800px] py-8 md:py-12 flex flex-col gap-10">
+      <div className="flex-grow page-container max-w-[50rem] py-8 md:py-12 flex flex-col gap-10">
         
         <section className="space-y-6">
           <div className="space-y-2 border-b border-border pb-6">

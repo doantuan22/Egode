@@ -1,6 +1,6 @@
 import { apiClient } from '../../services/apiClient';
 import type { ApiPaginationMeta, PaginatedApiResponse } from '../../types/api';
-import type { Promotion, PromotionDetail, PromotionFormValues, PromotionListQuery } from './types';
+import type { AvailablePromotion, Promotion, PromotionDetail, PromotionFormValues, PromotionListQuery } from './types';
 
 const buildQuery = (query: PromotionListQuery): string => {
   const params = new URLSearchParams();
@@ -42,4 +42,10 @@ export const activatePromotion = async (id: number): Promise<Promotion> => {
 export const deactivatePromotion = async (id: number): Promise<Promotion> => {
   const res = await apiClient<Promotion>(`/admin/promotions/${id}/deactivate`, { method: 'POST' });
   return res.data as Promotion;
+};
+
+/** Public: the codes that can be used right now (active, today inside their window, uses left). */
+export const listAvailablePromotions = async (): Promise<AvailablePromotion[]> => {
+  const res = await apiClient<AvailablePromotion[]>('/promotions/available');
+  return res.data ?? [];
 };

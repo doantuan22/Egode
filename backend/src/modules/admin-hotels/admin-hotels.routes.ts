@@ -2,10 +2,15 @@ import { Router } from 'express';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { AdminHotelsController } from './admin-hotels.controller';
-import { hotelIdSchema, listHotelsSchema, updateHotelSchema } from './admin-hotels.schemas';
+import { amenityIdSchema, createAmenitySchema, hotelIdSchema, listHotelsSchema, updateAmenitySchema, updateHotelSchema } from './admin-hotels.schemas';
 const router = Router(); const controller = new AdminHotelsController();
 router.use(authenticate, requireAdmin);
 router.get('/', validateRequest({ query: listHotelsSchema }), controller.list);
+// Amenity catalogue — declared before '/:id' so "amenities" is never parsed as a hotel id.
+router.get('/amenities', controller.listAmenities);
+router.post('/amenities', validateRequest({ body: createAmenitySchema }), controller.createAmenity);
+router.patch('/amenities/:id', validateRequest({ params: amenityIdSchema, body: updateAmenitySchema }), controller.updateAmenity);
+router.delete('/amenities/:id', validateRequest({ params: amenityIdSchema }), controller.deleteAmenity);
 router.get('/:id', validateRequest({ params: hotelIdSchema }), controller.getOne);
 router.patch('/:id', validateRequest({ params: hotelIdSchema, body: updateHotelSchema }), controller.update);
 router.post('/:id/approve', validateRequest({ params: hotelIdSchema }), controller.approve);
