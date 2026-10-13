@@ -16,7 +16,7 @@ import { AdminListPanel } from '../../components/admin/AdminListPanel';
 const FILTER_DEFAULTS = { search: '', status: '' };
 
 export default function AdminHotelsPage() {
-  const { values, page, setValue, setPage, reset } = useListParams(FILTER_DEFAULTS);
+  const { values, page, setValue, setPage } = useListParams(FILTER_DEFAULTS);
   const [search, setSearch] = useUrlSearchInput(values.search, (value) => setValue('search', value));
   const debouncedSearch = values.search;
   const status = values.status;
@@ -27,8 +27,6 @@ export default function AdminHotelsPage() {
     queryFn: () => listAdminHotels({ page, limit: 20, search: debouncedSearch || undefined, TrangThai: status || undefined }) 
   });
   
-  const resetFilters = () => reset();
-
   const activeFilterCount = Number(Boolean(debouncedSearch)) + Number(Boolean(status));
 
   const columns: Column<AdminHotel>[] = [
@@ -95,7 +93,7 @@ export default function AdminHotelsPage() {
         onRefresh={() => void query.refetch()}
         refreshing={query.isFetching}
         filters={
-          <FilterBar onReset={activeFilterCount > 0 ? resetFilters : undefined}>
+          <FilterBar>
             <div className="min-w-[240px] flex-[2]">
               <Input label="Tìm kiếm khách sạn" type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Nhập tên khách sạn..." />
             </div>

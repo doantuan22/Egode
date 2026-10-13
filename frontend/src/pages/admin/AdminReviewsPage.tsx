@@ -7,7 +7,6 @@ import { useListParams, useUrlSearchInput } from '../../hooks/useListParams';
 import { Pagination } from '../../components/common/Pagination';
 import { PageHeader } from '../../components/common/PageHeader';
 import { FilterBar } from '../../components/common/FilterBar';
-import { FilterChip } from '../../components/common/FilterChip';
 import { DataTable, type Column } from '../../components/common/DataTable';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -30,13 +29,16 @@ export default function AdminReviewsPage() {
   const setStatus = (value: string) => setValue('status', value);
   const star = values.star;
   const setStar = (value: string) => setValue('star', value);
+  // Older shared URLs used ALL explicitly; normalize them to the current empty/default value.
+  const selectedStatus = status === 'ALL' ? '' : status;
+  const selectedStar = star === 'ALL' ? '' : star;
 
   const query = useAdminReviewList({
     page,
     limit: PAGE_SIZE,
     search: search || undefined,
-    trangThai: status === 'ALL' ? undefined : status || undefined,
-    diemDanhGia: star && star !== 'ALL' ? Number(star) : undefined,
+    trangThai: selectedStatus || undefined,
+    diemDanhGia: selectedStar ? Number(selectedStar) : undefined,
   });
   const removeMutation = useRemoveViolationReview();
   const confirm = useConfirm();
@@ -48,9 +50,9 @@ export default function AdminReviewsPage() {
 
   const visibleReviews = query.data?.items
     // The star filter is also applied locally so a stale cached page never shows the wrong score.
-    .filter((r) => star === 'ALL' || star === '' || r.DiemDanhGia.toString() === star);
+    .filter((r) => !selectedStar || r.DiemDanhGia.toString() === selectedStar);
 
-  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(status && status !== 'ALL')) + Number(Boolean(star && star !== 'ALL'));
+  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(selectedStatus)) + Number(Boolean(selectedStar));
 
   const columns: Column<AdminReviewListItem>[] = [
     {
@@ -92,7 +94,10 @@ export default function AdminReviewsPage() {
     },
   ];
 
-  const resetFilters = () => reset();
+  const resetFilters = () => {
+    setSearchInput('');
+    reset();
+  };
 
   return (
     <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
@@ -112,34 +117,56 @@ export default function AdminReviewsPage() {
         onRefresh={() => void query.refetch()}
         refreshing={query.isFetching}
         filters={
-          <FilterBar onReset={activeFilterCount > 0 ? resetFilters : undefined}>
-            <div role="group" aria-label="Lọc theo trạng thái đánh giá" className="admin-quick-filters basis-full">
-              <span>Trạng thái</span>
-              {['ALL', ...STATUSES].map((st) => (
-                <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
-                  {st === 'ALL' ? 'Tất cả đánh giá' : st}
-                </FilterChip>
-              ))}
+          <FilterBar>
+            <div className="admin-review-filters__fields basis-full">
+              <div className="admin-review-filters__search">
+                <Input
+                  label="Tìm kiếm"
+                  type="search"
+                  value={searchInput}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Tên khách sạn, khách hàng hoặc nội dung đánh giá..."
+                />
+              </div>
+              <div className="admin-review-filters__status-select">
+                <Select label="Trạng thái kiểm duyệt" value={selectedStatus} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
+                  <option value="">Tất cả trạng thái</option>
+                  {STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </Select>
+              </div>
+              <div className="admin-review-filters__rating">
+                <Select label="Điểm đánh giá" value={selectedStar} onChange={(e) => { setStar(e.target.value); setPage(1); }}>
+                  <option value="">Tất cả mức điểm</option>
+                  <option value="1">1 sao (Kém)</option>
+                  <option value="2">2 sao</option>
+                  <option value="3">3 sao</option>
+                  <option value="4">4 sao</option>
+                  <option value="5">5 sao (Tốt)</option>
+                </Select>
+              </div>
             </div>
-            <div className="min-w-[240px] flex-[2]">
-              <Input
-                label="Tìm kiếm đánh giá"
-                type="text"
-                value={searchInput}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder="Tìm kiếm đánh giá theo tên khách sạn, tên người dùng..."
-              />
-            </div>
-            <div className="min-w-[180px] flex-1">
-              <Select label="Hạng sao" value={star} onChange={(e) => { setStar(e.target.value); setPage(1); }}>
-                <option value="ALL">Tất cả điểm sao</option>
-                <option value="1">1 sao (Kém)</option>
-                <option value="2">2 sao</option>
-                <option value="3">3 sao</option>
-                <option value="4">4 sao</option>
-                <option value="5">5 sao (Tốt)</option>
-              </Select>
-            </div>
+
+            {activeFilterCount > 0 && (
+              <div className="admin-active-filters admin-review-filters__active basis-full" aria-label="Bộ lọc đang dùng">
+                <span className="admin-review-filters__active-label">Đang lọc:</span>
+                {search && (
+                  <button type="button" aria-label={`Bỏ từ khóa ${search}`} onClick={() => { setSearchInput(''); setPage(1); }} title={`Bỏ từ khóa ${search}`}>
+                    Từ khóa: <span className="admin-review-filters__active-value">{search}</span> <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                {selectedStar && (
+                  <button type="button" aria-label={`Bỏ bộ lọc ${selectedStar} sao`} onClick={() => { setStar(''); setPage(1); }}>
+                    Điểm: {selectedStar} sao <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                {selectedStatus && (
+                  <button type="button" aria-label={`Bỏ bộ lọc trạng thái ${selectedStatus}`} onClick={() => { setStatus(''); setPage(1); }}>
+                    Trạng thái: {selectedStatus} <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                <button type="button" className="admin-active-filters__clear" onClick={resetFilters}>Xóa tất cả</button>
+              </div>
+            )}
           </FilterBar>
         }
       >

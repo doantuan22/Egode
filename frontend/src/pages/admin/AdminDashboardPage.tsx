@@ -19,6 +19,7 @@ const reviewLinks: ManagementLink[] = [
   { to: '/admin/hotels', title: 'Khách sạn', detail: 'Quản lý cơ sở lưu trú và trạng thái hoạt động', icon: 'buildings' },
   { to: '/admin/reviews', title: 'Đánh giá', detail: 'Kiểm duyệt nội dung và phản hồi vi phạm', icon: 'star' },
   { to: '/admin/support', title: 'Hỗ trợ & khiếu nại', detail: 'Theo dõi yêu cầu từ khách hàng và đối tác', icon: 'chat-text' },
+  { to: '/admin/bookings', title: 'Đặt phòng', detail: 'Tra cứu booking trên toàn hệ thống', icon: 'calendar-check' },
   { to: '/admin/payments', title: 'Thanh toán', detail: 'Tra cứu giao dịch và tình trạng hoàn tiền', icon: 'credit-card' },
 ];
 

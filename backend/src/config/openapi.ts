@@ -970,6 +970,43 @@ export const openApiSpec = {
         responses: { '200': { description: 'Hotel reactivated' }, '400': { description: 'Hotel is not suspended' }, '403': { description: 'Admin role required' }, '404': { description: 'Hotel not found' } },
       },
     },
+    '/admin/bookings': {
+      get: {
+        summary: 'List bookings across the platform (admin only, read-only)',
+        description: 'Searches booking confirmation, customer name and hotel name. Date filters apply to the check-in date.',
+        tags: ['Admin Bookings'],
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 } },
+          { name: 'search', in: 'query', schema: { type: 'string', maxLength: 100 } },
+          { name: 'trangThai', in: 'query', schema: { type: 'string', enum: ['Chờ thanh toán', 'Đã xác nhận', 'Đã hủy', 'Hoàn tất'] } },
+          { name: 'hotelId', in: 'query', schema: { type: 'integer', minimum: 1 } },
+          { name: 'from', in: 'query', schema: { type: 'string', format: 'date' } },
+          { name: 'to', in: 'query', schema: { type: 'string', format: 'date' } },
+        ],
+        responses: {
+          '200': { description: 'Paginated booking list' },
+          '400': { description: 'Invalid filter or date range' },
+          '401': { description: 'Not authenticated' },
+          '403': { description: 'Admin role required' },
+        },
+      },
+    },
+    '/admin/bookings/{id}': {
+      get: {
+        summary: 'Get booking operations detail (admin only, read-only)',
+        description: 'Includes room lines, promotion, cancellation policy, payments and refunds; excludes account credentials and provider callback data.',
+        tags: ['Admin Bookings'],
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 } }],
+        responses: {
+          '200': { description: 'Booking detail' },
+          '403': { description: 'Admin role required' },
+          '404': { description: 'Booking not found' },
+        },
+      },
+    },
     '/admin/payments': {
       get: {
         summary: 'List payment and refund operations data (UC35, admin only, read-only)',

@@ -6,7 +6,6 @@ import { useListParams, useUrlSearchInput } from '../../hooks/useListParams';
 import { Pagination } from '../../components/common/Pagination';
 import { PageHeader } from '../../components/common/PageHeader';
 import { FilterBar } from '../../components/common/FilterBar';
-import { FilterChip } from '../../components/common/FilterChip';
 import { DataTable, type Column } from '../../components/common/DataTable';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
@@ -28,12 +27,14 @@ export default function AdminSupportPage() {
   const setStatus = (value: string) => setValue('status', value);
   const type = values.type;
   const setType = (value: string) => setValue('type', value);
+  // Older shared URLs used ALL explicitly; normalize it to the current empty/default value.
+  const selectedStatus = status === 'ALL' ? '' : status;
 
   const query = useAdminSupportList({
     page,
     limit: PAGE_SIZE,
     search: search || undefined,
-    trangThai: status === 'ALL' ? undefined : status || undefined,
+    trangThai: selectedStatus || undefined,
     loaiYeuCau: type || undefined,
   });
 
@@ -42,7 +43,7 @@ export default function AdminSupportPage() {
     setPage(1);
   };
 
-  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(status && status !== 'ALL')) + Number(Boolean(type));
+  const activeFilterCount = Number(Boolean(search)) + Number(Boolean(selectedStatus)) + Number(Boolean(type));
 
   const columns: Column<AdminSupportListItem>[] = [
     { key: 'id', header: 'Mã Ticket', cell: (r) => <span className="font-mono text-sm font-bold text-primary-600">#TCK-{r.MaYeuCauHoTro}</span> },
@@ -53,7 +54,10 @@ export default function AdminSupportPage() {
     { key: 'actions', header: 'Xử lý', align: 'center', cell: (r) => <Link to={`/admin/support/${r.MaYeuCauHoTro}`} className="admin-row-link"><span>Phản hồi</span><Icon name="caret-right" size={14} /></Link> },
   ];
 
-  const resetFilters = () => reset();
+  const resetFilters = () => {
+    setSearchInput('');
+    reset();
+  };
 
   return (
     <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
@@ -66,24 +70,46 @@ export default function AdminSupportPage() {
         onRefresh={() => void query.refetch()}
         refreshing={query.isFetching}
         filters={
-          <FilterBar onReset={activeFilterCount > 0 ? resetFilters : undefined}>
-            <div role="group" aria-label="Lọc theo trạng thái yêu cầu" className="admin-quick-filters basis-full">
-              <span>Trạng thái</span>
-              {['ALL', ...STATUSES].map((st) => (
-                <FilterChip key={st} pressed={status === st || (st === 'ALL' && !status)} onClick={() => { setStatus(st); setPage(1); }}>
-                  {st === 'ALL' ? 'Tất cả ticket' : st}
-                </FilterChip>
-              ))}
+          <FilterBar>
+            <div className="admin-support-filters__fields basis-full">
+              <div className="admin-support-filters__search">
+                <Input label="Tìm kiếm" type="search" value={searchInput} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Mã ticket, tiêu đề hoặc tên khách hàng..." />
+              </div>
+              <div className="admin-support-filters__status-select">
+                <Select label="Trạng thái xử lý" value={selectedStatus} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
+                  <option value="">Tất cả trạng thái</option>
+                  {STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </Select>
+              </div>
+              <div className="admin-support-filters__type">
+                <Select label="Phân loại" value={type} onChange={(e) => { setType(e.target.value); setPage(1); }}>
+                  <option value="">Tất cả phân loại</option>
+                  {TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </Select>
+              </div>
             </div>
-            <div className="min-w-[240px] flex-[2]">
-              <Input label="Tìm yêu cầu" type="text" value={searchInput} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Tìm mã ticket, tiêu đề hoặc khách hàng..." />
-            </div>
-            <div className="min-w-[180px] flex-1">
-              <Select label="Phân loại" value={type} onChange={(e) => { setType(e.target.value); setPage(1); }}>
-                <option value="">Tất cả phân loại</option>
-                {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </Select>
-            </div>
+
+            {activeFilterCount > 0 && (
+              <div className="admin-active-filters admin-support-filters__active basis-full" aria-label="Bộ lọc đang dùng">
+                <span className="admin-support-filters__active-label">Đang lọc:</span>
+                {search && (
+                  <button type="button" aria-label={`Bỏ từ khóa ${search}`} onClick={() => { setSearchInput(''); setPage(1); }} title={`Bỏ từ khóa ${search}`}>
+                    Từ khóa: <span className="admin-support-filters__active-value">{search}</span> <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                {selectedStatus && (
+                  <button type="button" aria-label={`Bỏ bộ lọc trạng thái ${selectedStatus}`} onClick={() => { setStatus(''); setPage(1); }}>
+                    Trạng thái: {selectedStatus} <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                {type && (
+                  <button type="button" aria-label={`Bỏ bộ lọc phân loại ${type}`} onClick={() => { setType(''); setPage(1); }}>
+                    Phân loại: {type} <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                <button type="button" className="admin-active-filters__clear" onClick={resetFilters}>Xóa tất cả</button>
+              </div>
+            )}
           </FilterBar>
         }
       >

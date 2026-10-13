@@ -31,7 +31,7 @@ describe('route table', () => {
     expect(pathsOf(routesOf(publicRoutes))).toEqual(expect.arrayContaining(['/', '/login', '/register', '/forgot-password', '/reset-password', '/hotels', '/hotels/:id']));
     expect(pathsOf(routesOf(customerRoutes))).toEqual(expect.arrayContaining(['/profile', '/bookings', '/bookings/:id', '/payment/result', '/support', '/partner/apply']));
     expect(pathsOf(routesOf(ownerRoutes))).toEqual(expect.arrayContaining(['/owner/overview', '/owner/hotels', '/owner/room-types', '/owner/inventory-pricing', '/owner/bookings', '/owner/revenue', '/owner/reports', '/owner/profile']));
-    expect(pathsOf(routesOf(adminRoutes))).toEqual(expect.arrayContaining(['/admin', '/admin/profile', '/admin/accounts', '/admin/hotels', '/admin/payments', '/admin/promotions', '/admin/analytics']));
+    expect(pathsOf(routesOf(adminRoutes))).toEqual(expect.arrayContaining(['/admin', '/admin/profile', '/admin/accounts', '/admin/hotels', '/admin/bookings', '/admin/bookings/:id', '/admin/payments', '/admin/promotions', '/admin/analytics']));
   });
 
   it('puts every customer route behind a sign-in, with no role restriction', () => {

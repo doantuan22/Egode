@@ -38,6 +38,7 @@ const adminGroups = [
     { to: '/admin/accounts', label: 'Tài khoản', icon: 'users' },
   ]},
   { title: 'Giao dịch', items: [
+    { to: '/admin/bookings', label: 'Đặt phòng', icon: 'calendar-check' },
     { to: '/admin/payments', label: 'Thanh toán & giao dịch', icon: 'credit-card' },
     { to: '/admin/promotions', label: 'Khuyến mãi', icon: 'percent' },
   ]},

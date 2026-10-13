@@ -4295,3 +4295,462 @@
     animation: none;
   }
 }
+
+/* Admin workspace width
+   Use the available desktop canvas instead of leaving wide gutters around
+   1200px list pages. Detail and form pages are widened in smaller steps so
+   fields remain readable rather than becoming excessively long. */
+.dashboard-shell--admin .dashboard-content__canvas {
+  max-width: 1680px;
+}
+
+.dashboard-shell--admin [class~="max-w-[1200px]"] {
+  max-width: none;
+}
+
+.dashboard-shell--admin [class~="max-w-[1160px]"] {
+  max-width: 1440px;
+}
+
+.dashboard-shell--admin [class~="max-w-[1000px]"],
+.dashboard-shell--admin [class~="max-w-[980px]"] {
+  max-width: 1400px;
+}
+
+.dashboard-shell--admin [class~="max-w-[800px]"] {
+  max-width: 1200px;
+}
+
+.dashboard-shell--admin [class~="max-w-[600px]"] {
+  max-width: 1000px;
+}
+
+/* Admin typography scale
+   Keep the dashboard geometry unchanged while making every text tier easier to
+   read. Tailwind text tokens and the legacy admin component sizes both receive
+   the same 15% increase, scoped so owner/customer/public screens are untouched. */
+.dashboard-shell--admin {
+  --admin-font-9: 10.35px;
+  --admin-font-10: 11.5px;
+  --admin-font-10-5: 12.075px;
+  --admin-font-11: 12.65px;
+  --admin-font-12: 13.8px;
+  --admin-font-13: 14.95px;
+  --admin-font-14: 16.1px;
+  --admin-font-15: 17.25px;
+  --admin-font-16: 18.4px;
+  --admin-font-17: 19.55px;
+  --admin-font-20: 23px;
+  --admin-font-22: 25.3px;
+  --admin-font-24: 27.6px;
+  --admin-font-28: 32.2px;
+  --font-size-caption: 0.8625rem;
+  --font-size-supporting: 0.934375rem;
+  --font-size-label: 1.00625rem;
+  --font-size-body: 1.15rem;
+  --font-size-subsection: 1.15rem;
+  --font-size-section: 1.4375rem;
+  --font-size-page: 2.0125rem;
+  --font-size-price: 1.725rem;
+  --font-size-kpi: 1.725rem;
+  --text-xs: 0.8625rem;
+  --text-sm: 1.00625rem;
+  --text-base: 1.15rem;
+  --text-lg: 1.29375rem;
+  --text-xl: 1.4375rem;
+  --text-2xl: 1.725rem;
+  --text-3xl: 2.15625rem;
+  font-size: 1.15rem;
+}
+
+/* Content frames need one more readability step than the surrounding shell.
+   Re-declaring the same tokens keeps every admin page consistent without
+   changing card dimensions, spacing, grids or responsive breakpoints. */
+.dashboard-shell--admin :is(
+  .admin-dashboard__hero,
+  .admin-hero-panel,
+  .admin-queue-card,
+  .admin-kpi-card,
+  .admin-stat-card,
+  .admin-section-card,
+  .admin-management-panel,
+  .admin-dashboard__note,
+  .admin-empty-state,
+  .admin-list-panel,
+  .admin-partner-review__body,
+  .admin-partner-review__decision,
+  .admin-payment-detail__body,
+  .admin-payment-detail__timeline,
+  .admin-support-detail__body,
+  .admin-analytics__filters,
+  .admin-analytics__metric,
+  .admin-analytics__panel,
+  .surface-card,
+  .card,
+  .table-wrap,
+  .bg-white
+) {
+  --admin-font-9: 11.9025px;
+  --admin-font-10: 13.225px;
+  --admin-font-10-5: 13.88625px;
+  --admin-font-11: 14.5475px;
+  --admin-font-12: 15.87px;
+  --admin-font-13: 17.1925px;
+  --admin-font-14: 18.515px;
+  --admin-font-15: 19.8375px;
+  --admin-font-16: 21.16px;
+  --admin-font-17: 22.4825px;
+  --admin-font-20: 26.45px;
+  --admin-font-22: 29.095px;
+  --admin-font-24: 31.74px;
+  --admin-font-28: 37.03px;
+  --font-size-caption: 0.991875rem;
+  --font-size-supporting: 1.07453125rem;
+  --font-size-label: 1.1571875rem;
+  --font-size-body: 1.3225rem;
+  --font-size-subsection: 1.3225rem;
+  --font-size-section: 1.653125rem;
+  --font-size-page: 2.314375rem;
+  --font-size-price: 1.98375rem;
+  --font-size-kpi: 1.98375rem;
+  --text-xs: 0.991875rem;
+  --text-sm: 1.1571875rem;
+  --text-base: 1.3225rem;
+  --text-lg: 1.4878125rem;
+  --text-xl: 1.653125rem;
+  --text-2xl: 1.98375rem;
+  --text-3xl: 2.4796875rem;
+  font-size: 1.3225rem;
+}
+
+/* Dashboard chrome */
+.dashboard-shell--admin .dashboard-brand__copy strong {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .dashboard-brand__copy small,
+.dashboard-shell--admin .dashboard-role-pill {
+  font-size: var(--admin-font-9);
+}
+.dashboard-shell--admin .dashboard-sidebar__group-title,
+.dashboard-shell--admin .dashboard-topbar__eyebrow {
+  font-size: var(--admin-font-10);
+}
+.dashboard-shell--admin .dashboard-sidebar__item,
+.dashboard-shell--admin .dashboard-user-meta strong {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .dashboard-user-meta small {
+  font-size: var(--admin-font-10);
+}
+.dashboard-shell--admin .dashboard-topbar__title {
+  font-size: var(--admin-font-17);
+}
+.dashboard-shell--admin .page-header h1 {
+  font-size: clamp(
+    var(--admin-font-22),
+    2vw,
+    var(--admin-font-28)
+  );
+}
+.dashboard-shell--admin .page-header__desc {
+  font-size: var(--admin-font-13);
+}
+
+/* Shared controls used inside admin cards */
+.dashboard-shell--admin .btn {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .btn-sm {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .btn-lg {
+  font-size: var(--admin-font-15);
+}
+.dashboard-shell--admin .badge,
+.dashboard-shell--admin .status-badge,
+.dashboard-shell--admin .ui-status {
+  font-size: var(--admin-font-12);
+}
+.dashboard-shell--admin .form-label {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .form-hint,
+.dashboard-shell--admin .form-error,
+.dashboard-shell--admin .ui-field-message {
+  font-size: var(--admin-font-12);
+}
+.dashboard-shell--admin .form-section__title {
+  font-size: var(--admin-font-16);
+}
+.dashboard-shell--admin .form-section__desc {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .input,
+.dashboard-shell--admin .select,
+.dashboard-shell--admin .textarea,
+.dashboard-shell--admin .ui-field,
+.dashboard-shell--admin .ui-field-label,
+.dashboard-shell--admin .ui-select__face {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .ui-alert {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .admin-active-filters button,
+.dashboard-shell--admin .admin-row-link {
+  font-size: var(--admin-font-12);
+}
+.dashboard-shell--admin .pagination button,
+.dashboard-shell--admin .breadcrumb {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .tab-item {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .empty-state__title {
+  font-size: var(--admin-font-15);
+}
+.dashboard-shell--admin .empty-state__desc {
+  font-size: var(--admin-font-13);
+}
+
+/* Admin dashboard cards and list surfaces */
+.dashboard-shell--admin .admin-dashboard__eyebrow {
+  font-size: var(--admin-font-10);
+}
+.dashboard-shell--admin .admin-dashboard__hero h1,
+.dashboard-shell--admin .admin-hero-panel h1,
+.dashboard-shell--admin .admin-hero-panel h2 {
+  font-size: var(--admin-font-24);
+}
+.dashboard-shell--admin .admin-dashboard__hero p,
+.dashboard-shell--admin .admin-hero-panel p,
+.dashboard-shell--admin .admin-empty-state p {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .admin-dashboard__report-link,
+.dashboard-shell--admin .admin-section-heading p,
+.dashboard-shell--admin .admin-management-panel__heading p,
+.dashboard-shell--admin .admin-section-card__head p,
+.dashboard-shell--admin .admin-dashboard__note p {
+  font-size: var(--admin-font-12);
+}
+.dashboard-shell--admin .admin-section-heading h2,
+.dashboard-shell--admin .admin-management-panel__heading h2,
+.dashboard-shell--admin .admin-section-card__head h2,
+.dashboard-shell--admin .admin-section-card__head h3 {
+  font-size: var(--admin-font-16);
+}
+.dashboard-shell--admin .admin-queue-card__value {
+  font-size: var(--admin-font-28);
+}
+.dashboard-shell--admin .admin-queue-card__label,
+.dashboard-shell--admin .admin-management-list__copy strong,
+.dashboard-shell--admin .admin-dashboard__note h2 {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .admin-queue-card small,
+.dashboard-shell--admin .admin-kpi-card small,
+.dashboard-shell--admin .admin-management-list__copy small {
+  font-size: var(--admin-font-11);
+}
+.dashboard-shell--admin .admin-kpi-card p,
+.dashboard-shell--admin .data-table thead th {
+  font-size: var(--admin-font-10-5);
+}
+.dashboard-shell--admin .admin-kpi-card strong {
+  font-size: var(--admin-font-22);
+}
+.dashboard-shell--admin .data-table tbody td {
+  font-size: var(--admin-font-13);
+}
+.dashboard-shell--admin .admin-empty-state h3 {
+  font-size: var(--admin-font-17);
+}
+.dashboard-shell--admin .admin-list-panel__summary {
+  font-size: var(--admin-font-12);
+}
+.dashboard-shell--admin .admin-list-panel__summary strong {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .admin-filter-chips__label,
+.dashboard-shell--admin .admin-quick-filters > span:first-child,
+.dashboard-shell--admin .admin-neutral-tag {
+  font-size: var(--admin-font-11);
+}
+.dashboard-shell--admin .admin-link-group strong {
+  font-size: var(--admin-font-14);
+}
+.dashboard-shell--admin .admin-link-group small {
+  font-size: var(--admin-font-13);
+}
+
+/* Arbitrary Tailwind sizes used by admin-only page details and analytics. */
+.dashboard-shell--admin [class~="text-[10px]"] {
+  font-size: var(--admin-font-10);
+}
+.dashboard-shell--admin [class~="text-[11px]"] {
+  font-size: var(--admin-font-11);
+}
+.dashboard-shell--admin [class~="text-[16px]"] {
+  font-size: var(--admin-font-16);
+}
+.dashboard-shell--admin [class~="text-[20px]"] {
+  font-size: var(--admin-font-20);
+}
+.dashboard-shell--admin [class~="text-[22px]"] {
+  font-size: var(--admin-font-22);
+}
+.dashboard-shell--admin [class~="text-[24px]"] {
+  font-size: var(--admin-font-24);
+}
+
+/* Admin list filters: keep the primary search and both select filters on one row. */
+.dashboard-shell--admin .admin-review-filters__fields,
+.dashboard-shell--admin .admin-support-filters__fields {
+  display: grid;
+  grid-template-columns: minmax(360px, 2fr) minmax(210px, 0.7fr) minmax(210px, 0.7fr);
+  align-items: end;
+  gap: 14px;
+}
+
+.dashboard-shell--admin .admin-review-filters__search,
+.dashboard-shell--admin .admin-review-filters__status-select,
+.dashboard-shell--admin .admin-review-filters__rating,
+.dashboard-shell--admin .admin-support-filters__search,
+.dashboard-shell--admin .admin-support-filters__status-select,
+.dashboard-shell--admin .admin-support-filters__type {
+  min-width: 0;
+}
+
+.dashboard-shell--admin .admin-review-filters__active-label,
+.dashboard-shell--admin .admin-support-filters__active-label {
+  color: var(--admin-text-primary);
+  font-size: var(--admin-font-13);
+  font-weight: 700;
+}
+
+.dashboard-shell--admin .admin-review-filters__active,
+.dashboard-shell--admin .admin-support-filters__active {
+  width: 100%;
+  margin-top: 0;
+}
+
+.dashboard-shell--admin .admin-review-filters__active-label,
+.dashboard-shell--admin .admin-support-filters__active-label {
+  margin-right: 2px;
+}
+
+.dashboard-shell--admin .admin-review-filters__active button:not(.admin-active-filters__clear),
+.dashboard-shell--admin .admin-support-filters__active button:not(.admin-active-filters__clear) {
+  max-width: min(100%, 420px);
+}
+
+.dashboard-shell--admin .admin-review-filters__active-value,
+.dashboard-shell--admin .admin-support-filters__active-value {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .dashboard-shell--admin .admin-review-filters__fields,
+  .dashboard-shell--admin .admin-support-filters__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-shell--admin .admin-review-filters__search,
+  .dashboard-shell--admin .admin-support-filters__search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-shell--admin .admin-review-filters__fields,
+  .dashboard-shell--admin .admin-support-filters__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-shell--admin .admin-review-filters__search,
+  .dashboard-shell--admin .admin-support-filters__search {
+    grid-column: auto;
+  }
+}
+
+/* Admin bookings: search + status + check-in range, with a wider date control. */
+.dashboard-shell--admin .admin-booking-filters__fields {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.5fr) minmax(210px, 0.65fr) minmax(380px, 1.15fr);
+  align-items: end;
+  gap: 14px;
+}
+
+.dashboard-shell--admin .admin-booking-filters__search,
+.dashboard-shell--admin .admin-booking-filters__status-select,
+.dashboard-shell--admin .admin-booking-filters__date-range {
+  min-width: 0;
+}
+
+.dashboard-shell--admin .admin-booking-filters__date-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-shell--admin .admin-booking-filters__date-inputs > span {
+  color: var(--admin-muted);
+  font-weight: 700;
+}
+
+.dashboard-shell--admin .admin-booking-filters__active {
+  width: 100%;
+  margin-top: 0;
+}
+
+.dashboard-shell--admin .admin-booking-filters__active-label {
+  margin-right: 2px;
+  color: var(--admin-text-primary);
+  font-size: var(--admin-font-13);
+  font-weight: 700;
+}
+
+.dashboard-shell--admin .admin-booking-filters__active button:not(.admin-active-filters__clear) {
+  max-width: min(100%, 460px);
+}
+
+.dashboard-shell--admin .admin-booking-filters__active-value {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1120px) {
+  .dashboard-shell--admin .admin-booking-filters__fields {
+    grid-template-columns: minmax(210px, 0.7fr) minmax(380px, 1.3fr);
+  }
+
+  .dashboard-shell--admin .admin-booking-filters__search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .dashboard-shell--admin .admin-booking-filters__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-shell--admin .admin-booking-filters__search {
+    grid-column: auto;
+  }
+
+  .dashboard-shell--admin .admin-booking-filters__date-inputs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-shell--admin .admin-booking-filters__date-inputs > span {
+    display: none;
+  }
+}
