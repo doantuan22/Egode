@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAdminSupportDetail, useAdminUpdateSupportRequest } from '../../features/support/hooks';
 import { ApiError } from '../../services/apiClient';
 import { Alert } from '../../components/common/Alert';
+import { useToast } from '../../components/common/FeedbackProvider';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { formatDateTimeVi } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
@@ -13,7 +14,8 @@ export default function AdminSupportDetailPage() {
   const requestId = Number(id);
   const requestQuery = useAdminSupportDetail(requestId);
   const updateMutation = useAdminUpdateSupportRequest();
-  const [ketQuaXuLy, setKetQuaXuLy] = useState('');
+  const notify = useToast();
+const [ketQuaXuLy, setKetQuaXuLy] = useState('');
   const [resolutionError, setResolutionError] = useState('');
 
   if (requestQuery.isLoading) {
@@ -27,16 +29,26 @@ export default function AdminSupportDetailPage() {
   const r = requestQuery.data;
   const isResolved = r.TrangThai === 'Đã xử lý';
 
-  const claim = () => updateMutation.mutate({ id: requestId, payload: { trangThai: 'Đang xử lý' } });
-  const resolve = () => {
+  const failed = (error: unknown) =>
+    notify({ title: 'Không cập nhật được yêu cầu', description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' });
+
+  const claim = () =>
+    updateMutation.mutate(
+      { id: requestId, payload: { trangThai: 'Đang xử lý' } },
+      { onSuccess: () => notify({ title: 'Đã nhận xử lý yêu cầu', description: 'Yêu cầu chuyển sang trạng thái "Đang xử lý".', tone: 'info' }), onError: failed }
+    );
+const resolve = () => {
     if (!ketQuaXuLy.trim()) {
       setResolutionError('Nhập kết quả xử lý trước khi hoàn tất yêu cầu.');
       document.getElementById('admin-support-detail-field-1')?.focus();
       return;
     }
     setResolutionError('');
-    updateMutation.mutate({ id: requestId, payload: { trangThai: 'Đã xử lý', ketQuaXuLy: ketQuaXuLy.trim() } });
-  };
+    updateMutation.mutate(
+      { id: requestId, payload: { trangThai: 'Đã xử lý', ketQuaXuLy: ketQuaXuLy.trim() } },
+      { onSuccess: () => notify({ title: 'Đã hoàn tất yêu cầu', description: 'Kết quả xử lý đã được lưu và gửi tới khách hàng.', tone: 'success' }), onError: failed }
+    );
+};
 
   return (
     <div className="admin-support-detail flex flex-col gap-5 max-w-[980px] mx-auto w-full">
@@ -65,18 +77,7 @@ export default function AdminSupportDetailPage() {
         </div>
 
         <div className="admin-support-detail__body p-6 text-xs">
-          {updateMutation.isError && (
-             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-               {updateMutation.error instanceof ApiError ? updateMutation.error.message : 'Không thể cập nhật yêu cầu'}
-             </div>
-          )}
-          {updateMutation.isSuccess && (
-             <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-               Cập nhật ticket thành công.
-             </div>
-          )}
-
-          <section className="admin-support-detail__context space-y-2">
+<section className="admin-support-detail__context space-y-2">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px]">Thông tin khách hàng & Yêu cầu</h4>
             <div className="grid grid-cols-2 gap-2 text-ink-sub pt-1">
               <div>Họ tên: <strong className="text-heading">{r.TAI_KHOAN_YEU_CAU_HO_TRO_MaTaiKhoanKhachHangToTAI_KHOAN.HoTen}</strong></div>

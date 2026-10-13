@@ -148,3 +148,43 @@ describe('AdminHotelDetailPage shows who owns the hotel and its photos', () => {
     expect(screen.queryByRole('img', { name: /Ảnh của/ })).not.toBeInTheDocument();
   });
 });
+
+describe('AdminHotelDetailPage announces the result of a status action in a notice', () => {
+  const notice = async (title: string) => (await screen.findByText(title)).closest('.toast') as HTMLElement;
+
+  it('suspending names the hotel and how its bookings were settled', async () => {
+    vi.mocked(hotelsApi.suspendAdminHotel).mockResolvedValue({ ...hotel('Đình chỉ'), DonDaXuLy: { DonHoanTat: 1, DonDaHuy: 2, DonHoanTien: 1 } });
+    await open('Hoạt động');
+
+    await userEvent.click(button(/Tạm đình chỉ/)!);
+    await userEvent.click(await screen.findByRole('button', { name: 'Đình chỉ' }));
+
+    const toast = await notice('Đã đình chỉ khách sạn');
+    expect(toast).toHaveTextContent('Khách sạn thử ngừng nhận đặt phòng');
+    expect(toast).toHaveTextContent('1 đơn đang lưu trú chuyển hoàn tất, 2 đơn chưa nhận phòng đã hủy (1 đơn được hoàn tiền)');
+  });
+
+  it('reactivating says the hotel is taking bookings again', async () => {
+    vi.mocked(hotelsApi.reactivateAdminHotel).mockResolvedValue(hotel('Hoạt động'));
+    await open('Đình chỉ');
+
+    await userEvent.click(button(/Kích hoạt lại/)!);
+    await userEvent.click(await screen.findByRole('button', { name: 'Kích hoạt lại' }));
+
+    const toast = await notice('Đã kích hoạt lại khách sạn');
+    expect(toast).toHaveTextContent('đã hoạt động trở lại');
+  });
+
+  it('a refused action is an error notice with the server reason', async () => {
+    const { ApiError } = await import('../../services/apiClient');
+    vi.mocked(hotelsApi.approveAdminHotel).mockRejectedValue(new ApiError('Khách sạn đã được xử lý trước đó', 409, undefined, 'CONFLICT'));
+    await open('Chờ duyệt');
+
+    await userEvent.click(button(/Duyệt khách sạn/)!);
+    await userEvent.click(await screen.findByRole('button', { name: 'Duyệt' }));
+
+    const toast = await notice('Không duyệt được khách sạn');
+    expect(toast).toHaveAttribute('role', 'alert');
+    expect(toast).toHaveTextContent('Khách sạn đã được xử lý trước đó');
+  });
+});

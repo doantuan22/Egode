@@ -3,6 +3,7 @@ import { HOTEL_STATUS, ROOM_TYPE_STATUS, ROOM_RATE_STATUS, BOOKING_STATUS } from
 
 export interface CandidateHotelParams {
   location?: string;
+  keyword?: string;
   starRating?: number;
   amenityIds?: number[];
   checkIn: Date;
@@ -52,13 +53,23 @@ export class HotelsRepository {
               },
             }
           : {}),
-        ...(params.amenityIds && params.amenityIds.length > 0
-          ? {
-              AND: params.amenityIds.map((maTienNghi) => ({
-                KHACH_SAN_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } },
-              })),
-            }
-          : {}),
+        AND: [
+          ...(params.keyword
+            ? [
+                {
+                  OR: [
+                    { TenKhachSan: { contains: params.keyword } },
+                    { DiaChiChiTiet: { contains: params.keyword } },
+                    { DIA_PHUONG: { TenThanhPho: { contains: params.keyword } } },
+                    { DIA_PHUONG: { TenTinh: { contains: params.keyword } } },
+                  ],
+                },
+              ]
+            : []),
+          ...(params.amenityIds ?? []).map((maTienNghi) => ({
+            KHACH_SAN_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } },
+          })),
+        ],
         LOAI_PHONG: { some: { TrangThai: ROOM_TYPE_STATUS.ACTIVE } },
       },
       include: {

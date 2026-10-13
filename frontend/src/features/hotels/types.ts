@@ -66,6 +66,7 @@ export type SortOption = 'price_asc' | 'price_desc' | 'star_desc' | 'newest';
 
 export interface HotelSearchParams {
   location?: string;
+  keyword?: string;
   checkIn: string;
   checkOut: string;
   guests: number;

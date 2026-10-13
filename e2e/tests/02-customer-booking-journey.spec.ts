@@ -65,8 +65,9 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
   await expect(page.getByRole('link', { name: star4.name }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: star3.name }).first()).toBeVisible();
 
-  // ---- filter "Từ 4 sao trở lên": the 3-star hotel disappears, the 4-star stays
+  // ---- filter "Từ 4 sao trở lên" + "Áp dụng bộ lọc": the 3-star hotel disappears, the 4-star stays
   await page.getByRole('button', { name: 'Từ 4 sao trở lên' }).click();
+  await page.getByRole('button', { name: 'Áp dụng bộ lọc' }).click();
   await expect(page.getByRole('link', { name: star3.name })).toHaveCount(0);
   await expect(page.getByRole('link', { name: star4.name }).first()).toBeVisible();
   expect(new URL(page.url()).searchParams.get('starRating')).toBe('4');

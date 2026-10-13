@@ -74,6 +74,7 @@ export class HotelsService {
     await releaseExpiredHolds();
     const hotels = await this.hotelsRepository.findCandidateHotels({
       location: query.location,
+      keyword: query.keyword || undefined,
       starRating: query.starRating,
       amenityIds: query.amenities,
       checkIn: query.checkIn,

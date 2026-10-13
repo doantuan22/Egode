@@ -9,17 +9,20 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   /** Field-level validation error. Wires `aria-invalid`/`aria-describedby` automatically. */
   error?: string;
   hint?: string;
+  /** Draws the dropdown list itself (like in the dashboards) instead of the browser's native one; the real `<select>` stays underneath. */
+  menu?: boolean;
 }
 
 /** Canonical select — same base style and touch-target height as {@link Input}. */
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, hint, id, children, ...props }, ref) => {
+  ({ className, label, error, hint, menu = false, id, children, ...props }, ref) => {
     const generatedId = React.useId();
     const selectId = id ?? generatedId;
     const errorId = `${selectId}-error`;
     const hintId = `${selectId}-hint`;
-    // In the dashboards the dropdown list is drawn by SelectMenu; the native <select> stays underneath as the real control.
-    const Control = useDashboardUi() ? SelectMenu : 'select';
+    // In the dashboards (or with `menu`) the dropdown list is drawn by SelectMenu; the native <select> stays underneath as the real control.
+    const dashboardUi = useDashboardUi();
+    const Control = menu || dashboardUi ? SelectMenu : 'select';
 
     const field = (
       <Control

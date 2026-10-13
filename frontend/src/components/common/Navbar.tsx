@@ -151,7 +151,7 @@ export function Navbar() {
           >
             <img
               src="/egode_logo.png"
-              alt="Egode"
+              alt=""
               className="
                 h-[2.625rem]
                 w-auto
@@ -159,6 +159,7 @@ export function Navbar() {
                 object-contain
               "
             />
+            <span className="site-header__brand-name">Egode</span>
           </Link>
 
           {/* =========================================

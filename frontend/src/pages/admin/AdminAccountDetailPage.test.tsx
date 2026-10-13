@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AdminAccountDetailPage from './AdminAccountDetailPage';
@@ -17,14 +18,23 @@ const account = (MaTaiKhoan: number, TrangThai = 'Hoạt động') => ({
 });
 const idle = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, isError: false, error: null, isSuccess: false, data: undefined };
 
-const open = (viewing: number, signedInAs: number, status = 'Hoạt động', mutationError?: Error) => {
+/** A mutation whose `mutate` finishes at once with `outcome`, the way react-query calls the per-call callbacks. */
+const finishing = (outcome: { error: Error } | { data: unknown }) => ({
+  ...idle,
+  mutate: vi.fn((_vars: unknown, options?: { onSuccess?: (data: unknown) => void; onError?: (error: Error) => void }) => {
+    if ('error' in outcome) options?.onError?.(outcome.error);
+    else options?.onSuccess?.(outcome.data);
+  }),
+});
+
+const open = (viewing: number, signedInAs: number, status = 'Hoạt động', mutations: { lock?: unknown; unlock?: unknown } = {}) => {
   vi.mocked(useAccountDetail).mockReturnValue({ isLoading: false, isError: false, data: account(viewing, status) } as unknown as ReturnType<typeof useAccountDetail>);
   vi.mocked(useMe).mockReturnValue({ data: { MaTaiKhoan: signedInAs } } as unknown as ReturnType<typeof useMe>);
   vi.mocked(useUpdateAccount).mockReturnValue(idle as unknown as ReturnType<typeof useUpdateAccount>);
-  vi.mocked(useUnlockAccount).mockReturnValue(idle as unknown as ReturnType<typeof useUnlockAccount>);
-  vi.mocked(useDeleteAccount).mockReturnValue(idle as unknown as ReturnType<typeof useDeleteAccount>);
-  vi.mocked(useLockAccount).mockReturnValue((mutationError ? { ...idle, isError: true, error: mutationError } : idle) as unknown as ReturnType<typeof useLockAccount>);
-  renderWithProviders(
+  vi.mocked(useUnlockAccount).mockReturnValue((mutations.unlock ?? idle) as unknown as ReturnType<typeof useUnlockAccount>);
+vi.mocked(useDeleteAccount).mockReturnValue(idle as unknown as ReturnType<typeof useDeleteAccount>);
+  vi.mocked(useLockAccount).mockReturnValue((mutations.lock ?? idle) as unknown as ReturnType<typeof useLockAccount>);
+renderWithProviders(
     <FeedbackProvider>
       <Routes><Route path="/admin/accounts/:id" element={<AdminAccountDetailPage />} /></Routes>
     </FeedbackProvider>,
@@ -48,8 +58,51 @@ describe('AdminAccountDetailPage — administrators are not offered actions agai
     expect(screen.getByText(/không thể tự khóa hoặc xóa chính mình/)).toBeInTheDocument();
   });
 
-  it("shows the server's reason when the last administrator is protected", () => {
-    open(5, 9, 'Hoạt động', new ApiError('Không thể khóa quản trị viên cuối cùng — hệ thống phải còn ít nhất một quản trị viên đang hoạt động', 409, undefined, 'CONFLICT'));
-    expect(screen.getByRole('alert')).toHaveTextContent('Không thể khóa quản trị viên cuối cùng');
+  it("shows the server's reason in a notice when the last administrator is protected", async () => {
+    open(5, 9, 'Hoạt động', {
+      lock: finishing({ error: new ApiError('Không thể khóa quản trị viên cuối cùng — hệ thống phải còn ít nhất một quản trị viên đang hoạt động', 409, undefined, 'CONFLICT') }),
+    });
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: /Khóa tài khoản/ }));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Khóa tài khoản' }));
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent('Không khóa được tài khoản');
+    expect(notice).toHaveTextContent('Không thể khóa quản trị viên cuối cùng');
+  });
+});
+
+describe('AdminAccountDetailPage — the result of lock and unlock is announced', () => {
+  it('locking says who can no longer sign in', async () => {
+    open(5, 9, 'Hoạt động', { lock: finishing({ data: account(5, 'Khóa') }) });
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: /Khóa tài khoản/ }));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Khóa tài khoản' }));
+
+    const notice = await screen.findByRole('status');
+    expect(notice).toHaveTextContent('Đã khóa tài khoản');
+    expect(notice).toHaveTextContent('Quản trị không thể đăng nhập');
+  });
+
+  it('unlocking says the account can sign in again', async () => {
+    open(5, 9, 'Khóa', { unlock: finishing({ data: account(5, 'Hoạt động') }) });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /Mở khóa tài khoản/ }));
+
+    const notice = await screen.findByRole('status');
+    expect(notice).toHaveTextContent('Đã mở khóa tài khoản');
+    expect(notice).toHaveTextContent('có thể đăng nhập trở lại');
+  });
+
+  it('a refused unlock is reported as an error notice', async () => {
+    open(5, 9, 'Khóa', { unlock: finishing({ error: new ApiError('Tài khoản không ở trạng thái khóa', 409, undefined, 'CONFLICT') }) });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /Mở khóa tài khoản/ }));
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent('Không mở khóa được tài khoản');
+    expect(notice).toHaveTextContent('Tài khoản không ở trạng thái khóa');
   });
 });

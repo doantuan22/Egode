@@ -10,7 +10,7 @@ import {
 } from '../../features/admin/accounts/hooks';
 import type { UpdateAccountPayload } from '../../types/auth';
 import { ApiError } from '../../services/apiClient';
-import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { useMe } from '../../features/auth/hooks';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
@@ -22,8 +22,9 @@ export default function AdminAccountDetailPage() {
   const navigate = useNavigate();
   const accountId = Number(id);
   const confirm = useConfirm();
+  const notify = useToast();
 
-  const detailQuery = useAccountDetail(Number.isFinite(accountId) ? accountId : null);
+  const detailQuery= useAccountDetail(Number.isFinite(accountId) ? accountId : null);
   const updateMutation = useUpdateAccount();
   const lockMutation = useLockAccount();
   const unlockMutation = useUnlockAccount();
@@ -61,21 +62,54 @@ export default function AdminAccountDetailPage() {
   const account = detailQuery.data;
   const isLocked = account.TrangThai === 'Khóa';
 
+  const failed = (title: string) => (error: unknown) =>
+    notify({ title, description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' });
+
   const onSubmit = (data: UpdateAccountPayload) =>
-    updateMutation.mutate({
-      id: accountId,
-      payload: {
-        ...data,
-        NgaySinh: data.NgaySinh || undefined,
-        GioiTinh: data.GioiTinh ? data.GioiTinh : undefined,
+    updateMutation.mutate(
+      {
+        id: accountId,
+        payload: {
+          ...data,
+          NgaySinh: data.NgaySinh || undefined,
+          GioiTinh: data.GioiTinh ? data.GioiTinh : undefined,
+        },
       },
+      {
+        onSuccess: () => notify({ title: 'Đã lưu thay đổi', description: `Thông tin tài khoản ${account.HoTen} đã được cập nhật.`, tone: 'success' }),
+        onError: failed('Không lưu được thay đổi'),
+      }
+    );
+
+  const onLock = async () => {
+    const accepted = await confirm({ title: 'Khóa tài khoản?', description: 'Người dùng sẽ không thể đăng nhập cho đến khi được mở khóa.', confirmLabel: 'Khóa tài khoản', variant: 'danger' });
+    if (!accepted) return;
+    lockMutation.mutate(accountId, {
+      onSuccess: () => notify({ title: 'Đã khóa tài khoản', description: `${account.HoTen} không thể đăng nhập cho đến khi được mở khóa.`, tone: 'warning' }),
+      onError: failed('Không khóa được tài khoản'),
+    });
+  };
+
+  const onUnlock = () =>
+    unlockMutation.mutate(accountId, {
+      onSuccess: () => notify({ title: 'Đã mở khóa tài khoản', description: `${account.HoTen} có thể đăng nhập trở lại.`, tone: 'success' }),
+      onError: failed('Không mở khóa được tài khoản'),
     });
 
   const onDelete = async () => {
     const accepted = await confirm({ title: 'Xóa tài khoản?', description: `Tài khoản ${account.HoTen} sẽ bị xóa nếu không có dữ liệu lịch sử cần giữ lại.`, confirmLabel: 'Xóa tài khoản', variant: 'danger' });
     if (!accepted) return;
-    const result = await deleteMutation.mutateAsync(accountId);
-    if (result.hardDeleted) navigate('/admin/accounts', { replace: true });
+    try {
+      const result = await deleteMutation.mutateAsync(accountId);
+      if (result.hardDeleted) {
+        notify({ title: 'Đã xóa tài khoản', description: `Tài khoản ${account.HoTen} đã được xóa.`, tone: 'success' });
+        navigate('/admin/accounts', { replace: true });
+      } else {
+        notify({ title: 'Tài khoản đã được khóa', description: 'Tài khoản có dữ liệu lịch sử liên quan nên được khóa thay vì xóa hoàn toàn.', tone: 'warning', duration: 8000 });
+      }
+    } catch (error) {
+      failed('Không xóa được tài khoản')(error);
+    }
   };
 
   return (
@@ -106,23 +140,7 @@ export default function AdminAccountDetailPage() {
         </div>
 
         <div className="p-6 space-y-6">
-          {updateMutation.isSuccess && (
-            <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-              Cập nhật tài khoản thành công
-            </div>
-          )}
-          {(updateMutation.isError || lockMutation.isError || unlockMutation.isError || deleteMutation.isError) && (
-            <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-              {[updateMutation, lockMutation, unlockMutation, deleteMutation].map((m) => m.error).find((e) => e instanceof ApiError)?.message ?? 'Thao tác thất bại, vui lòng thử lại'}
-            </div>
-          )}
-          {deleteMutation.isSuccess && !deleteMutation.data?.hardDeleted && (
-             <div role="status" className="p-3 bg-warning-light border border-warning/30 rounded-xl text-warning-ink text-sm font-medium">
-               Tài khoản có dữ liệu lịch sử liên quan nên đã được khóa thay vì xóa hoàn toàn.
-             </div>
-          )}
-
-          <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
+<div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-identification-card text-primary"></i> Thông tin định danh & Cấu hình
             </h4>
@@ -178,18 +196,16 @@ export default function AdminAccountDetailPage() {
               {isSelf ? null : isLocked ? (
                 <Button
                   type="button"
-                  onClick={() => unlockMutation.mutate(accountId)}
-                  disabled={unlockMutation.isPending} variant="success-outline" className="flex-1"
+                  onClick={onUnlock}
+disabled={unlockMutation.isPending} variant="success-outline" className="flex-1"
                 >
                   <i className="ph ph-lock-key-open"></i> {unlockMutation.isPending ? 'Đang mở khóa...' : 'Mở khóa tài khoản'}
                 </Button>
               ) : (
                 <Button
                   type="button"
-                  onClick={() => {
-                    void confirm({ title: 'Khóa tài khoản?', description: 'Người dùng sẽ không thể đăng nhập cho đến khi được mở khóa.', confirmLabel: 'Khóa tài khoản', variant: 'danger' }).then((accepted) => { if (accepted) lockMutation.mutate(accountId); });
-                  }}
-                  disabled={lockMutation.isPending} variant="warning-outline" className="flex-1"
+                  onClick={() => void onLock()}
+disabled={lockMutation.isPending} variant="warning-outline" className="flex-1"
                 >
                   <i className="ph ph-lock-key"></i> {lockMutation.isPending ? 'Đang khóa...' : 'Khóa tài khoản'}
                 </Button>

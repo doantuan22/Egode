@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useAdminReviewDetail, useModerateReview, useRemoveViolationReview } from '../../features/reviews/hooks';
 import { ApiError } from '../../services/apiClient';
-import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { formatDateRangeVi } from '../../lib/utils';
 import { PageSpinner } from '../../components/common/PageSpinner';
@@ -14,8 +14,9 @@ export default function AdminReviewDetailPage() {
   const moderateMutation = useModerateReview();
   const removeMutation = useRemoveViolationReview();
   const confirm = useConfirm();
+  const notify = useToast();
 
-  if (reviewQuery.isLoading) {
+  if (reviewQuery.isLoading){
     return <PageSpinner />;
   }
 
@@ -24,6 +25,28 @@ export default function AdminReviewDetailPage() {
   }
 
   const r = reviewQuery.data;
+
+  const failed = (title: string) => (error: unknown) =>
+    notify({ title, description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' });
+
+  const setStatus = (trangThai: 'Hiển thị' | 'Ẩn' | 'Vi phạm') =>
+    moderateMutation.mutate(
+      { id: reviewId, trangThai },
+      {
+        onSuccess: () => {
+          if (trangThai === 'Hiển thị') notify({ title: 'Đánh giá đang hiển thị', description: 'Đánh giá này hiển thị công khai trên trang khách sạn.', tone: 'success' });
+          else if (trangThai === 'Ẩn') notify({ title: 'Đã ẩn đánh giá', description: 'Đánh giá không còn hiển thị công khai.', tone: 'warning' });
+          else notify({ title: 'Đã đánh dấu vi phạm', description: 'Đánh giá được đánh dấu vi phạm và không hiển thị công khai.', tone: 'warning' });
+        },
+        onError: failed('Không cập nhật được trạng thái đánh giá'),
+      }
+    );
+
+  const removeReview = () =>
+    removeMutation.mutate(reviewId, {
+      onSuccess: () => notify({ title: 'Đã gỡ đánh giá', description: 'Đánh giá đã được gỡ khỏi phần hiển thị công khai; dữ liệu và ảnh vẫn được lưu để kiểm tra.', tone: 'success', duration: 7000 }),
+      onError: failed('Không gỡ được đánh giá'),
+    });
 
   const renderStars = (score: number) => {
     const starsHTML = [];
@@ -64,23 +87,7 @@ export default function AdminReviewDetailPage() {
         </div>
 
         <div className="p-6 space-y-5 text-xs">
-          {moderateMutation.isError && (
-             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-               {moderateMutation.error instanceof ApiError ? moderateMutation.error.message : 'Không thể cập nhật trạng thái'}
-             </div>
-          )}
-          {removeMutation.isError && (
-             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-               {removeMutation.error instanceof ApiError ? removeMutation.error.message : 'Không thể gỡ đánh giá'}
-             </div>
-          )}
-          {removeMutation.isSuccess && (
-             <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-               Đánh giá đã được gỡ khỏi phần hiển thị công khai; dữ liệu và ảnh vẫn được lưu để kiểm tra.
-             </div>
-          )}
-
-          <div className="flex items-center justify-between p-3.5 bg-surface-secondary rounded-xl border border-border/60">
+<div className="flex items-center justify-between p-3.5 bg-surface-secondary rounded-xl border border-border/60">
             <div>
               <div className="font-bold text-heading text-sm">{r.TAI_KHOAN.HoTen} <span className="font-normal text-ink-muted text-xs">({r.TAI_KHOAN.Email})</span></div>
               <div className="text-[11px] text-ink-muted mt-1">Khách sạn: <strong className="text-ink-sub">{r.KHACH_SAN.TenKhachSan}</strong></div>
@@ -128,7 +135,7 @@ export default function AdminReviewDetailPage() {
           {r.TrangThai !== 'Hiển thị' && (
             <Button
               disabled={moderateMutation.isPending || removeMutation.isPending}
-              onClick={() => moderateMutation.mutate({ id: reviewId, trangThai: 'Hiển thị' })} variant="success" className="w-full sm:w-auto"
+              onClick={() => setStatus('Hiển thị')}variant="success" className="w-full sm:w-auto"
             >
               {r.TrangThai === 'Chờ duyệt' ? 'Cho hiển thị' : 'Hiển thị lại'}
             </Button>
@@ -137,7 +144,7 @@ export default function AdminReviewDetailPage() {
           {r.TrangThai !== 'Ẩn' && (
             <Button
               disabled={moderateMutation.isPending || removeMutation.isPending}
-              onClick={() => moderateMutation.mutate({ id: reviewId, trangThai: 'Ẩn' })} variant="outline" className="w-full sm:w-auto"
+              onClick={() => setStatus('Ẩn')}variant="outline" className="w-full sm:w-auto"
             >
               Ẩn đánh giá
             </Button>
@@ -146,7 +153,7 @@ export default function AdminReviewDetailPage() {
           {r.TrangThai !== 'Vi phạm' && (
             <Button
               disabled={moderateMutation.isPending || removeMutation.isPending}
-              onClick={() => moderateMutation.mutate({ id: reviewId, trangThai: 'Vi phạm' })} variant="danger-outline" className="w-full sm:w-auto"
+              onClick={() => setStatus('Vi phạm')}variant="danger-outline" className="w-full sm:w-auto"
             >
               Đánh dấu vi phạm
             </Button>
@@ -155,7 +162,7 @@ export default function AdminReviewDetailPage() {
           {(r.TrangThai === 'Vi phạm' || r.TrangThai === 'Ẩn') && (
             <Button
               disabled={r.TrangThai === 'Ẩn' || removeMutation.isPending}
-              onClick={() => { void confirm({ title: 'Gỡ đánh giá khỏi phần công khai?', description: 'Dữ liệu và ảnh vẫn được lưu để phục vụ kiểm tra.', confirmLabel: 'Gỡ đánh giá', variant: 'danger' }).then((accepted) => { if (accepted) removeMutation.mutate(reviewId); }); }} variant="danger" className="w-full sm:w-auto"
+              onClick={() => { void confirm({ title: 'Gỡ đánh giá khỏi phần công khai?', description: 'Dữ liệu và ảnh vẫn được lưu để phục vụ kiểm tra.', confirmLabel: 'Gỡ đánh giá', variant: 'danger' }).then((accepted) => { if (accepted) removeReview(); }); }}variant="danger" className="w-full sm:w-auto"
             >
               {removeMutation.isPending ? 'Đang gỡ...' : r.TrangThai === 'Ẩn' ? 'Đã gỡ' : 'Xóa / gỡ khỏi công khai'}
             </Button>

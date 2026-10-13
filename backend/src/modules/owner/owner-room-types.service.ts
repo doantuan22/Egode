@@ -93,7 +93,9 @@ export class OwnerRoomTypesService {
   async reactivate(ownerId: number, maLoaiPhong: number) {
     const roomType = await this.getOwnedRoomType(ownerId, maLoaiPhong);
     if (roomType.TrangThai === ROOM_TYPE_STATUS.ACTIVE) return roomType;
-    return this.repository.update(maLoaiPhong, { TrangThai: ROOM_TYPE_STATUS.ACTIVE });
+    await this.repository.update(maLoaiPhong, { TrangThai: ROOM_TYPE_STATUS.ACTIVE });
+    // Same shape as GET / deactivate: the page keeps this response as the room type it shows (amenities, images, hotel).
+    return (await this.repository.findByIdWithHotel(maLoaiPhong))!;
   }
 
   async replaceAmenities(ownerId: number, maLoaiPhong: number, amenityIds: number[]) {

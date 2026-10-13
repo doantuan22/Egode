@@ -11,6 +11,7 @@ import type {
 const buildSearchQuery = (params: HotelSearchParams): string => {
   const q = new URLSearchParams();
   if (params.location) q.set('location', params.location);
+  if (params.keyword) q.set('keyword', params.keyword);
   q.set('checkIn', params.checkIn);
   q.set('checkOut', params.checkOut);
   q.set('guests', String(params.guests));

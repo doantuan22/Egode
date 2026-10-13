@@ -18,6 +18,7 @@ export const openApiSpec = {
         tags: ['Discovery'],
         parameters: [
           { name: 'location', in: 'query', schema: { type: 'string' }, description: 'Matches city or province (contains)' },
+          { name: 'keyword', in: 'query', schema: { type: 'string', maxLength: 100 }, description: 'Free text: matches hotel name, address, city or province (contains)' },
           { name: 'checkIn', in: 'query', required: true, schema: { type: 'string', format: 'date' } },
           { name: 'checkOut', in: 'query', required: true, schema: { type: 'string', format: 'date' }, description: 'Exclusive — checkout night is not counted' },
           { name: 'guests', in: 'query', schema: { type: 'integer', default: 1 } },

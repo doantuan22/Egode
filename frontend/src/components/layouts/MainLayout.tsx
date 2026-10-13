@@ -1,7 +1,10 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { Navbar } from '../common/Navbar';
 import { NavigationEffects } from '../common/NavigationEffects';
+import { NavigationProgress } from '../common/NavigationProgress';
 import { AppErrorBoundary } from '../common/AppErrorBoundary';
+import { RouteFallback } from '../common/RouteFallback';
 import { DashboardNavigation, DashboardTopbar } from './DashboardNavigation';
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_NAMES } from '../../lib/roles';
@@ -25,6 +28,7 @@ export function MainLayout() {
     <div className={dashboardShellClass}>
       <a href="#main-content" className="sr-only z-50 rounded bg-white px-4 py-2 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Chuyển đến nội dung chính</a>
       <NavigationEffects />
+      <NavigationProgress />
       
       {isDashboard && role ? (
         <>
@@ -33,7 +37,7 @@ export function MainLayout() {
             <DashboardTopbar role={role} />
             <main id="main-content" tabIndex={-1} className="dashboard-content focus:outline-none">
               <div className="dashboard-content__canvas">
-                <AppErrorBoundary inline resetKey={location.pathname}><Outlet /></AppErrorBoundary>
+                <AppErrorBoundary inline resetKey={location.pathname}><Suspense fallback={<RouteFallback />}><Outlet /></Suspense></AppErrorBoundary>
               </div>
             </main>
           </div>
@@ -42,7 +46,7 @@ export function MainLayout() {
         <>
           <Navbar />
           <main id="main-content" tabIndex={-1} className="focus:outline-none min-h-[60vh]">
-            <AppErrorBoundary inline resetKey={location.pathname}><Outlet /></AppErrorBoundary>
+            <AppErrorBoundary inline resetKey={location.pathname}><Suspense fallback={<RouteFallback />}><Outlet /></Suspense></AppErrorBoundary>
           </main>
           <footer className="site-footer">
             <div className="site-footer__inner">

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import type { HotelDetail } from '../../../features/hotels/types';
-import { Button } from '../../common/Button';
 import { Icon } from '../../common/Icon';
 import { cn } from '../../../lib/utils';
 import { formatRating } from '../../../features/reviews/rating';
@@ -44,10 +43,10 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
             </p>
           </div>
 
-          <Button type="button" variant="outline" aria-label="Chia sẻ" onClick={onShare} className="self-start lg:self-end">
-            <Icon name="share-network" />
+          <button type="button" aria-label="Chia sẻ" onClick={onShare} className="hotel-share self-start lg:self-end">
+            <span className="hotel-share__icon"><Icon name="share-network" weight="bold" /></span>
             <span className="hidden sm:inline">Chia sẻ</span>
-          </Button>
+          </button>
         </div>
       </section>
     </>

@@ -19,6 +19,11 @@ export interface ToastOptions {
   duration?: number;
 }
 
+/** The icon (Phosphor name) that carries each tone, so the kind of message is readable before a word is. */
+const TOAST_ICONS = { success: 'check-circle', error: 'warning-octagon', warning: 'warning', info: 'info' } as const;
+/** A refusal or failure is worth more time on screen than a confirmation. */
+const toastDuration = (options: ToastOptions) => options.duration ?? (options.tone === 'error' ? 8000 : 5000);
+
 interface FeedbackContextValue {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
   notify: (options: ToastOptions) => void;
@@ -69,7 +74,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       setToasts((current) => current.filter((toast) => toast.id !== id));
       toastTimers.current.delete(id);
       toastOrder.current = toastOrder.current.filter((toastId) => toastId !== id);
-    }, options.duration ?? 5000));
+    }, toastDuration(options)));
   }, []);
 
   const dismissToast = useCallback((id: number) => {
@@ -120,6 +125,9 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
           <div className="toast-stack" aria-label="Thông báo" aria-live="polite" aria-relevant="additions text">
             {toasts.map((toast) => (
               <div key={toast.id} className={`toast toast-${toast.tone ?? 'info'}`} role={toast.tone === 'error' ? 'alert' : 'status'}>
+                <span className="toast__icon" aria-hidden="true">
+                  <i className={`ph-fill ph-${TOAST_ICONS[toast.tone ?? 'info']}`} />
+                </span>
                 <span className="toast__content">
                   <strong>{toast.title}</strong>
                   {toast.description && <span>{toast.description}</span>}
@@ -127,6 +135,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
                 <button type="button" className="toast__close" aria-label="Đóng thông báo" onClick={() => dismissToast(toast.id)}>
                   <i className="ph ph-x" aria-hidden="true" />
                 </button>
+                <span className="toast__timer" style={{ animationDuration: `${toastDuration(toast)}ms` }} aria-hidden="true" />
               </div>
             ))}
           </div>

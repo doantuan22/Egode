@@ -41,6 +41,9 @@ function parseParams(
     location:
       searchParams.get('location') ||
       undefined,
+    keyword:
+      searchParams.get('keyword') ||
+      undefined,
 
     checkIn:
       searchParams.get('checkIn') ||
@@ -152,33 +155,9 @@ export default function HotelListPage() {
     setSearchParams(next);
   };
 
-  const toggleAmenity = (
-    id: number
-  ) => {
-    const current =
-      params.amenities ?? [];
-
-    const next =
-      current.includes(id)
-        ? current.filter(
-            (item) =>
-              item !== id
-          )
-        : [
-            ...current,
-            id,
-          ];
-
-    updateParams({
-      amenities:
-        next.length > 0
-          ? next.join(',')
-          : undefined,
-    });
-  };
-
   const resetFilters = () => {
     updateParams({
+      keyword: undefined,
       minPrice: undefined,
       maxPrice: undefined,
       starRating: undefined,
@@ -547,154 +526,21 @@ export default function HotelListPage() {
             FILTER
         ================================================= */}
 
-        <section
-          className="
-            overflow-hidden
-            rounded-[1.375rem]
-            border
-            border-slate-200
-            bg-white
-            shadow-[0_7px_25px_rgba(15,23,42,0.05)]
-          "
-        >
-
-          {/* FILTER HEADER */}
-
-          <div
-            className="
-              flex
-              flex-col
-              gap-4
-              border-b
-              border-slate-100
-              px-6
-              py-5
-              sm:flex-row
-              sm:items-center
-              sm:justify-between
-            "
-          >
-
-            <div
-              className="
-                flex
-                items-center
-                gap-3
-              "
-            >
-
-              <div
-                className="
-                  grid
-                  h-11
-                  w-11
-                  shrink-0
-                  place-items-center
-                  rounded-[0.875rem]
-                  bg-[#edf7ff]
-                  text-[#1687d9]
-                "
-              >
-                <i
-                  className="
-                    ph
-                    ph-sliders-horizontal
-                    text-xl
-                  "
-                />
-              </div>
-
-              <div>
-
-                <h2
-                  className="
-                    m-0
-                    text-[0.9375rem]
-                    font-extrabold
-                    text-slate-900
-                  "
-                >
-                  Bộ lọc tìm kiếm
-                </h2>
-
-                <p
-                  className="
-                    m-0
-                    mt-1
-                    text-xs
-                    text-slate-500
-                  "
-                >
-                  Chọn mức giá, hạng sao và tiện nghi phù hợp.
-                </p>
-
-              </div>
-
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={
-                resetFilters
-              }
-            >
-              Xóa bộ lọc
-            </Button>
-
-          </div>
-
-          {/* FILTER BODY */}
-
-          <div
-            className="
-              bg-white
-              px-5
-              py-5
-              md:px-6
-            "
-          >
-
-            <HotelFilterBar
-              values={
-                params
-              }
-              amenities={
-                amenitiesQuery.data
-              }
-              onPriceChange={(
-                key,
-                value
-              ) =>
-                updateParams({
-                  [key]:
-                    value,
-                })
-              }
-              onStarChange={(
-                star
-              ) =>
-                updateParams({
-                  starRating:
-                    star ===
-                    undefined
-                      ? undefined
-                      : String(
-                          star
-                        ),
-                })
-              }
-              onAmenityToggle={
-                toggleAmenity
-              }
-              onReset={
-                resetFilters
-              }
-            />
-
-          </div>
-
-        </section>
+        <HotelFilterBar
+          values={params}
+          amenities={amenitiesQuery.data}
+          totalHotels={query.isSuccess ? totalHotels : undefined}
+          onApply={(next) =>
+            updateParams({
+              keyword: next.keyword,
+              minPrice: next.minPrice === undefined ? undefined : String(next.minPrice),
+              maxPrice: next.maxPrice === undefined ? undefined : String(next.maxPrice),
+              starRating: next.starRating === undefined ? undefined : String(next.starRating),
+              amenities: next.amenities && next.amenities.length > 0 ? next.amenities.join(',') : undefined,
+            })
+          }
+          onReset={resetFilters}
+        />
 
         {/* =================================================
             RESULTS AREA
@@ -827,6 +673,7 @@ export default function HotelListPage() {
 
             <div
               className="
+                hotel-sort
                 w-full
                 shrink-0
                 md:w-[15.3125rem]
@@ -834,6 +681,7 @@ export default function HotelListPage() {
             >
 
               <Select
+                menu
                 label="Sắp xếp theo"
                 value={
                   params.sort
@@ -974,7 +822,7 @@ export default function HotelListPage() {
                 HOTEL LIST
             =============================================== */
 
-            <div className="space-y-4">
+            <div className="space-y-4 motion-stagger">
 
               {query.data?.items.map(
                 (hotel) => (

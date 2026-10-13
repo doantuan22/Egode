@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAdminReviewList, useRemoveViolationReview } from '../../features/reviews/hooks';
 import { ApiError } from '../../services/apiClient';
-import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { StatusBadge } from '../../components/domain/StatusBadge';
 import { useListParams, useUrlSearchInput } from '../../hooks/useListParams';
 import { Pagination } from '../../components/common/Pagination';
@@ -11,7 +11,6 @@ import { DataTable, type Column } from '../../components/common/DataTable';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
-import { Alert } from '../../components/common/Alert';
 import type { AdminReviewListItem } from '../../features/reviews/types';
 import { Icon } from '../../components/common/Icon';
 import { AdminListPanel } from '../../components/admin/AdminListPanel';
@@ -43,6 +42,12 @@ export default function AdminReviewsPage() {
   });
   const removeMutation = useRemoveViolationReview();
   const confirm = useConfirm();
+  const notify = useToast();
+  const removeReview = (id: number) =>
+    removeMutation.mutate(id, {
+      onSuccess: () => notify({ title: 'Đã gỡ đánh giá', description: 'Đánh giá đã được gỡ khỏi phần hiển thị công khai; dữ liệu lịch sử vẫn được lưu.', tone: 'success', duration: 7000 }),
+      onError: (error) => notify({ title: 'Không gỡ được đánh giá', description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' }),
+    });
 
   const handleSearchChange = (val: string) => {
     setSearchInput(val);
@@ -84,7 +89,7 @@ export default function AdminReviewsPage() {
               variant="danger"
               size="sm"
               disabled={removeMutation.isPending}
-              onClick={() => { void confirm({ title: 'Gỡ đánh giá khỏi phần công khai?', description: 'Dữ liệu và ảnh vẫn được lưu để phục vụ kiểm tra.', confirmLabel: 'Gỡ đánh giá', variant: 'danger' }).then((accepted) => { if (accepted) removeMutation.mutate(r.MaDanhGia); }); }}
+              onClick={() => { void confirm({ title: 'Gỡ đánh giá khỏi phần công khai?', description: 'Dữ liệu và ảnh vẫn được lưu để phục vụ kiểm tra.', confirmLabel: 'Gỡ đánh giá', variant: 'danger' }).then((accepted) => { if (accepted) removeReview(r.MaDanhGia); }); }}
             >
               Xóa/gỡ
             </Button>
@@ -104,14 +109,7 @@ export default function AdminReviewsPage() {
     <div className="admin-page-shell max-w-[1200px] mx-auto w-full">
       <PageHeader title="Kiểm duyệt đánh giá" description="Rà soát phản hồi từ du khách, xử lý báo cáo vi phạm nội dung không chuẩn mực." />
 
-      {removeMutation.isError && (
-        <Alert tone="error">{removeMutation.error instanceof ApiError ? removeMutation.error.message : 'Không thể gỡ đánh giá'}</Alert>
-      )}
-      {removeMutation.isSuccess && (
-        <Alert tone="success">Đánh giá đã được gỡ khỏi phần hiển thị công khai; dữ liệu lịch sử vẫn được lưu.</Alert>
-      )}
-
-      <AdminListPanel
+<AdminListPanel
         itemLabel="đánh giá"
         total={query.data?.pagination.total}
         activeFilterCount={activeFilterCount}

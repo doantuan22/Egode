@@ -44,6 +44,9 @@ export interface BookingPanelProps {
 export function BookingPanel(props: BookingPanelProps) {
   const { roomTypeCount, roomCount, quoteQuery, quoteMatchesSelection } = props;
   const quote = quoteQuery.data;
+  // The rooms chosen cannot hold the party: that one notice says it all, so the server's quote answer (it would be the
+  // same sentence again) and the quote itself are not shown until the selection is big enough.
+  const capacityShort = props.selectedCapacity < props.guests;
 
   return (
     <div id="dat-phong" className="hotel-selection-summary scroll-mt-36 lg:sticky lg:top-40 space-y-4">
@@ -59,22 +62,22 @@ export function BookingPanel(props: BookingPanelProps) {
             <p className="text-sm font-medium text-primary-800">Chọn số lượng cho một hoặc nhiều loại phòng để xem tổng giá.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between border-b border-border pb-3 text-sm">
               <span className="font-semibold text-ink">{roomTypeCount} loại phòng</span>
               <span className="text-ink-muted">{roomCount} phòng</span>
             </div>
 
             <p
-              role={props.selectedCapacity < props.guests ? 'alert' : 'status'}
-              className={cn('rounded-lg px-3 py-2 text-xs', props.selectedCapacity < props.guests ? 'bg-warning-light text-warning-ink' : 'bg-surface-secondary text-ink-muted')}
+              role={capacityShort ? 'alert' : 'status'}
+              className={cn('rounded-lg px-3 py-2 text-xs leading-relaxed', capacityShort ? 'bg-warning-light text-warning-ink' : 'bg-surface-secondary text-ink-muted')}
             >
-              {props.selectedCapacity < props.guests
+              {capacityShort
                 ? `Các phòng đã chọn chỉ chứa tối đa ${props.selectedCapacity} khách, chưa đủ cho ${props.guests} khách. Hãy chọn thêm phòng.`
                 : `Sức chứa các phòng đã chọn: ${props.selectedCapacity} khách (cho ${props.guests} khách).`}
             </p>
 
-            {quoteQuery.isLoading ? (
+            {capacityShort ? null : quoteQuery.isLoading ? (
               <PageSpinner className="py-6" />
             ) : quoteQuery.isError ? (
               <div role="alert" className="rounded-lg bg-danger-light px-3 py-2 text-xs text-danger-ink">

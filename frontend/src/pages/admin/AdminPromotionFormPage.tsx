@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCreatePromotion, usePromotionDetail, useSetPromotionStatus, useUpdatePromotion } from '../../features/promotions/hooks';
 import { ApiError } from '../../services/apiClient';
 import type { PromotionFormValues } from '../../features/promotions/types';
-import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
 import { Select } from '../../components/common/Select';
@@ -33,8 +33,9 @@ export default function AdminPromotionFormPage() {
   const updateMutation = useUpdatePromotion();
   const statusMutation = useSetPromotionStatus();
   const confirm = useConfirm();
+  const notify = useToast();
 
-  const [form, setForm] = useState<PromotionFormValues>(emptyForm);
+  const [form, setForm]= useState<PromotionFormValues>(emptyForm);
 
   useEffect(() => {
     if (detailQuery.data) {
@@ -51,12 +52,27 @@ export default function AdminPromotionFormPage() {
     }
   }, [detailQuery.data]);
 
+  const failed = (title: string) => (error: unknown) =>
+    notify({ title, description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' });
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEdit) {
-      updateMutation.mutate({ id: promotionId, payload: form });
+      updateMutation.mutate(
+        { id: promotionId, payload: form },
+        {
+          onSuccess: () => notify({ title: 'Đã lưu thay đổi', description: `Mã khuyến mãi ${form.MaCode} đã được cập nhật.`, tone: 'success' }),
+          onError: failed('Không lưu được mã khuyến mãi'),
+        }
+      );
     } else {
-      createMutation.mutate(form, { onSuccess: (promo) => navigate(`/admin/promotions/${promo.MaKhuyenMai}`, { replace: true }) });
+      createMutation.mutate(form, {
+        onSuccess: (promo) => {
+          notify({ title: 'Đã tạo mã khuyến mãi', description: `Mã ${promo.MaCode} đã được tạo.`, tone: 'success' });
+          navigate(`/admin/promotions/${promo.MaKhuyenMai}`, { replace: true });
+        },
+        onError: failed('Không tạo được mã khuyến mãi'),
+      });
     }
   };
 
@@ -101,18 +117,7 @@ export default function AdminPromotionFormPage() {
         </div>
 
         <div className="p-6 space-y-6">
-          {mutation.isError && (
-             <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-               {mutation.error instanceof ApiError ? mutation.error.message : 'Không thể lưu mã khuyến mãi'}
-             </div>
-          )}
-          {mutation.isSuccess && isEdit && (
-             <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-               Lưu thay đổi thành công!
-             </div>
-          )}
-
-          <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-4">
+<div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-4">
              <form onSubmit={submit} className="space-y-4 pt-1">
                 <div className="space-y-1.5">
                   <label htmlFor="admin-promotion-form-field-1" className="text-xs font-semibold text-ink-sub block">Mã code <span className="text-danger">*</span></label>
@@ -229,8 +234,16 @@ export default function AdminPromotionFormPage() {
                       onClick={async () => {
                         const activating = detailQuery.data!.TrangThai !== 'Hoạt động';
                         if (!activating && !await confirm({ title: 'Ngừng mã khuyến mãi?', description: 'Khách hàng sẽ không thể dùng mã này cho đặt phòng mới.', confirmLabel: 'Ngừng mã', variant: 'danger' })) return;
-                        statusMutation.mutate({ id: promotionId, active: activating });
-                      }}
+                        statusMutation.mutate(
+                          { id: promotionId, active: activating },
+                          {
+                            onSuccess: () => activating
+                              ? notify({ title: 'Đã bật mã khuyến mãi', description: `Khách hàng có thể dùng mã ${form.MaCode} cho đặt phòng mới.`, tone: 'success' })
+                              : notify({ title: 'Đã ngừng mã khuyến mãi', description: `Mã ${form.MaCode} không còn áp dụng cho đặt phòng mới.`, tone: 'warning' }),
+                            onError: failed(activating ? 'Không bật được mã khuyến mãi' : 'Không ngừng được mã khuyến mãi'),
+                          }
+                        );
+}}
                     >
                       {detailQuery.data.TrangThai === 'Hoạt động' ? 'Tắt mã' : 'Bật mã'}
                     </Button>

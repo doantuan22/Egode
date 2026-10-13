@@ -1,0 +1,134 @@
+/* ==========================================================================
+   MOTION
+   One place for the site's movement. Rules:
+   - only `opacity` and `transform` are animated (no layout work, stays smooth);
+   - everything that moves sits under `prefers-reduced-motion: no-preference`, so reduced-motion users get none of it;
+   - enter animations only: a leaving element is removed at once (that keeps focus and tests simple);
+   - gentle: long, soft easing and small distances, never a full blank-to-visible flash. A page change keeps the old
+     page on screen until the next is ready, then the new one settles in from ~60% opacity.
+   Easing: --ease-out for things arriving, --ease-spring for small pops.
+   ========================================================================== */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 0.7, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+/* ---------- Navigation progress: a thin bar that only appears when a page takes a moment (NavigationProgress) ---------- */
+.nav-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 400; height: 2px; pointer-events: none; opacity: 0; }
+.nav-progress span { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: linear-gradient(90deg, var(--color-action-primary), #38bdf8); box-shadow: 0 0 8px rgb(56 189 248 / 55%); }
+.nav-progress[data-phase='loading'] { opacity: 1; }
+.nav-progress[data-phase='loading'] span { width: 82%; transition: width 9s cubic-bezier(0.1, 0.6, 0.2, 1); }
+.nav-progress[data-phase='done'] { opacity: 0; transition: opacity 0.4s ease 0.12s; }
+.nav-progress[data-phase='done'] span { width: 100%; transition: width 0.25s ease-out; }
+
+/* ---------- Page placeholder for a first visit (RouteFallback) ---------- */
+.route-fallback { position: relative; min-height: 60vh; }
+.route-fallback__body { width: min(100% - 2 * var(--gutter), var(--container-max)); margin: 0 auto; padding: 2.5rem 0; display: grid; gap: 0.875rem; }
+.route-fallback__title, .route-fallback__line, .route-fallback__grid > div { border-radius: 0.5rem; background: var(--color-surface-subtle); }
+.route-fallback__title { width: min(22rem, 70%); height: 2rem; }
+.route-fallback__line { width: min(40rem, 100%); height: 0.875rem; }
+.route-fallback__line--short { width: min(26rem, 70%); }
+.route-fallback__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.route-fallback__grid > div { height: 11rem; border-radius: 1rem; }
+@media (max-width: 640px) { .route-fallback__grid { grid-template-columns: 1fr; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes motion-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes page-dissolve-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes page-dissolve-in {
+    from { opacity: 0; transform: translate3d(0, 0.5rem, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes motion-rise {
+    from { opacity: 0; transform: translate3d(0, 0.75rem, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes motion-pop {
+    from { opacity: 0; transform: scale(0.96) translate3d(0, 0.5rem, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes motion-slide-left {
+    from { transform: translate3d(100%, 0, 0); }
+    to { transform: none; }
+  }
+  @keyframes motion-toast {
+    from { opacity: 0; transform: translate3d(1.5rem, 0, 0) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .route-fallback__title, .route-fallback__line, .route-fallback__grid > div { animation: ui-skeleton-pulse 1.8s ease-in-out infinite; }
+  @keyframes ui-skeleton-pulse { 50% { opacity: 0.7; } }
+
+  /* ---------- Page to page (usePageTransitionLocation) ----------
+     The browser holds a picture of the old page and a picture of the new one and dissolves one into the other. The two
+     fades share one duration and easing and are blended additively, so the brightness never dips or jumps; that is
+     what separates this from fading the page in on its own, which reads as a flash. The new picture also rises a few
+     pixels. The pictures are images, so the lift cannot disturb `position: fixed` elements inside the page. */
+  ::view-transition-group(root) { animation-duration: 0.42s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  ::view-transition-old(root) { animation: page-dissolve-out 0.42s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  ::view-transition-new(root) { animation: page-dissolve-in 0.42s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+  /* ---------- Content that lands after a skeleton: lists and grids arrive one by one ---------- */
+  .motion-stagger > * { animation: motion-rise 0.42s var(--ease-out) backwards; }
+  .motion-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .motion-stagger > *:nth-child(2) { animation-delay: 45ms; }
+  .motion-stagger > *:nth-child(3) { animation-delay: 90ms; }
+  .motion-stagger > *:nth-child(4) { animation-delay: 135ms; }
+  .motion-stagger > *:nth-child(5) { animation-delay: 180ms; }
+  .motion-stagger > *:nth-child(6) { animation-delay: 225ms; }
+  .motion-stagger > *:nth-child(7) { animation-delay: 270ms; }
+  .motion-stagger > *:nth-child(n + 8) { animation-delay: 300ms; }
+
+  /* ---------- Scroll reveal (Reveal component): sections fade up the first time they are seen ---------- */
+  [data-reveal='pending'] { opacity: 0; transform: translate3d(0, 1rem, 0); }
+  [data-reveal='in'] { opacity: 1; transform: none; transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out); }
+  /* A block that was already on screen when the page appeared has no entrance of its own. */
+  [data-reveal-instant] { transition: none !important; }
+  [data-reveal-instant] .egode-benefits__grid > *,
+  [data-reveal-instant] .egode-destination-grid > *,
+  [data-reveal-instant] .egode-featured-grid > * { animation: none !important; }
+  /* Cards of a revealed section follow one after another. */
+  [data-reveal='in'] .egode-benefits__grid > *,
+  [data-reveal='in'] .egode-destination-grid > *,
+  [data-reveal='in'] .egode-featured-grid > * { animation: motion-rise 0.65s var(--ease-out) backwards; }
+  [data-reveal='in'] .egode-benefits__grid > *:nth-child(2),
+  [data-reveal='in'] .egode-destination-grid > *:nth-child(2),
+  [data-reveal='in'] .egode-featured-grid > *:nth-child(2) { animation-delay: 70ms; }
+  [data-reveal='in'] .egode-benefits__grid > *:nth-child(3),
+  [data-reveal='in'] .egode-destination-grid > *:nth-child(3),
+  [data-reveal='in'] .egode-featured-grid > *:nth-child(3) { animation-delay: 140ms; }
+  [data-reveal='in'] .egode-benefits__grid > *:nth-child(n + 4),
+  [data-reveal='in'] .egode-destination-grid > *:nth-child(n + 4),
+  [data-reveal='in'] .egode-featured-grid > *:nth-child(n + 4) { animation-delay: 210ms; }
+
+  /* ---------- Overlays ---------- */
+  .toast { animation: motion-toast 0.4s var(--ease-spring) backwards; }
+  .toast__timer { animation: toast-timer linear forwards; }
+  @keyframes toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+  .toast__icon { animation: motion-pop 0.5s var(--ease-spring) 0.1s backwards; }
+
+  .confirm-dialog[open] { animation: motion-pop 0.22s var(--ease-out); }
+  .confirm-dialog[open]::backdrop { animation: motion-fade 0.22s ease-out; }
+
+  .mobile-drawer.open .mobile-drawer__backdrop { animation: motion-fade 0.22s ease-out; }
+  .mobile-drawer.open .mobile-drawer__panel { animation: motion-slide-left 0.28s var(--ease-out); }
+
+  .dropdown-menu.open { animation: motion-pop 0.16s var(--ease-out); }
+
+  /* ---------- Press and lift ---------- */
+  .btn { transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform 120ms var(--ease-out); }
+  .btn:active:not(:disabled):not([aria-disabled='true']) { transform: translateY(1px) scale(0.985); }
+
+  .hotel-card-v2 { transition: border-color var(--transition-base), box-shadow 0.25s ease, transform 0.25s var(--ease-out); }
+  .hotel-card-v2:hover { transform: translateY(-2px); box-shadow: 0 0.75rem 1.75rem rgb(15 23 42 / 10%); }
+  .hotel-card-v2__media img { transition: transform 0.5s var(--ease-out); }
+  .hotel-card-v2:hover .hotel-card-v2__media img { transform: scale(1.04); }
+  .hotel-card-v2__media { overflow: hidden; }
+}

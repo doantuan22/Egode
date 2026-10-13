@@ -572,7 +572,17 @@ describe('HotelDetailPage guests (party size) flow', () => {
     await addRoom(user); // 1 × 2 guests
 
     expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 2 khách, chưa đủ cho 5 khách');
-    expect(bookButton()).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /Tạo đặt phòng/ })).not.toBeInTheDocument();
+  });
+
+  it('says it once: even when the server refuses the quote with the same sentence, only the one capacity notice shows', async () => {
+    mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 2 khách, không đủ cho 5 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
+    openFor(5);
+    await addRoom(userEvent.setup()); // 1 × 2 guests
+
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(screen.getByRole('alert')).toHaveTextContent('chưa đủ cho 5 khách');
+    expect(screen.queryByText(/không đủ cho 5 khách/)).not.toBeInTheDocument();
   });
 
   it('choosing more rooms until the capacity is enough turns the warning into a plain note and enables booking', async () => {
@@ -589,11 +599,12 @@ describe('HotelDetailPage guests (party size) flow', () => {
     expect(bookButton()).toBeEnabled();
   });
 
-  it("shows the server's own capacity message when the quote is refused", async () => {
-    mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 2 khách, không đủ cho 3 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
-    openFor(3);
-    await addRoom(userEvent.setup());
-    expect(screen.getAllByText(/không đủ cho 3 khách/).length).toBeGreaterThan(0);
+  it("shows the server's own capacity message when it refuses a quote the page thought was fine", async () => {
+    mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 1 khách, không đủ cho 2 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
+    openFor(2);
+    await addRoom(userEvent.setup()); // 1 × 2 guests: enough as far as the page knows
+
+    expect(screen.getAllByText(/không đủ cho 2 khách/)).toHaveLength(1);
   });
 });
 

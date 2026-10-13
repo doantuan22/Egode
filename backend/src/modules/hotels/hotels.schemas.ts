@@ -6,6 +6,8 @@ const dateOnly = z.coerce.date();
 export const searchHotelsQuerySchema = z
   .object({
     location: z.string().trim().max(255).optional(),
+    // Free text matched against hotel name, address, city and province (the "Từ khóa" box of the filter bar).
+    keyword: z.string().trim().max(100).optional(),
     checkIn: dateOnly,
     checkOut: dateOnly,
     guests: z.coerce.number().int().min(1).max(50).default(1),

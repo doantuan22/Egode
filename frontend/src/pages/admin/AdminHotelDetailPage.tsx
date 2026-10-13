@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import { ApiError } from '../../services/apiClient';
-import { useConfirm } from '../../components/common/FeedbackProvider';
+import { useConfirm, useToast } from '../../components/common/FeedbackProvider';
 import { approveAdminHotel, getAdminHotel, reactivateAdminHotel, rejectAdminHotel, suspendAdminHotel, updateAdminHotel, type UpdateAdminHotelPayload } from '../../features/admin/hotels/api';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
@@ -10,13 +10,22 @@ import { Select } from '../../components/common/Select';
 
 type HotelAction = 'update' | 'approve' | 'reject' | 'suspend' | 'reactivate';
 
+/** What each action is called in a failure notice. */
+const FAILED_TITLE: Record<HotelAction, string> = {
+  update: 'Không lưu được thay đổi',
+  approve: 'Không duyệt được khách sạn',
+  reject: 'Không từ chối được khách sạn',
+  suspend: 'Không đình chỉ được khách sạn',
+  reactivate: 'Không kích hoạt lại được khách sạn',
+};
+
 export default function AdminHotelDetailPage() {
   const id = Number(useParams().id); 
   const queryClient = useQueryClient();
   
   const query = useQuery({ queryKey: ['admin', 'hotels', id], queryFn: () => getAdminHotel(id) });
   
-  const [saved, setSaved] = useState(false);
+  const notify = useToast();
   const mutation = useMutation({ 
     mutationFn: ({ action, payload }: { action: HotelAction; payload?: Partial<UpdateAdminHotelPayload> }) => {
       switch (action) {
@@ -27,11 +36,33 @@ export default function AdminHotelDetailPage() {
         case 'reactivate': return reactivateAdminHotel(id);
       }
     },
-    onSuccess: () => { setSaved(true); queryClient.invalidateQueries({ queryKey: ['admin', 'hotels'] }); } 
+    onSuccess: (data, { action }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'hotels'] });
+      const name = query.data?.TenKhachSan ?? 'Khách sạn';
+      switch (action) {
+        case 'update': notify({ title: 'Đã lưu thay đổi', description: `Thông tin của ${name} đã được cập nhật.`, tone: 'success' }); break;
+        case 'approve': notify({ title: 'Đã duyệt khách sạn', description: `${name} đã được hiển thị công khai và nhận đặt phòng.`, tone: 'success' }); break;
+        case 'reject': notify({ title: 'Đã từ chối khách sạn', description: `${name} sẽ không được hiển thị công khai.`, tone: 'warning' }); break;
+        case 'reactivate': notify({ title: 'Đã kích hoạt lại khách sạn', description: `${name} đã hoạt động trở lại và nhận đặt phòng.`, tone: 'success' }); break;
+        case 'suspend': {
+          const done = data?.DonDaXuLy;
+          notify({
+            title: 'Đã đình chỉ khách sạn',
+            description: done
+              ? `${name} ngừng nhận đặt phòng. ${done.DonHoanTat} đơn đang lưu trú chuyển hoàn tất, ${done.DonDaHuy} đơn chưa nhận phòng đã hủy (${done.DonHoanTien} đơn được hoàn tiền).`
+              : `${name} ngừng nhận đặt phòng.`,
+            tone: 'warning',
+            duration: 9000,
+          });
+          break;
+        }
+      }
+    },
+    onError: (error, { action }) => {
+      notify({ title: FAILED_TITLE[action], description: error instanceof ApiError ? error.message : 'Thao tác thất bại, vui lòng thử lại.', tone: 'error' });
+    },
   });
   const confirm = useConfirm();
-  
-  useEffect(() => { if (mutation.isError) setSaved(false); }, [mutation.isError]);
   
   if (query.isLoading) return <PageSpinner />;
   if (query.isError || !query.data) return <div role="alert" className="mx-auto max-w-md rounded-lg bg-danger-light px-4 py-3 text-center text-sm text-danger-ink border border-danger/30">{query.error instanceof ApiError ? query.error.message : 'Không tìm thấy khách sạn'}</div>;
@@ -39,9 +70,8 @@ export default function AdminHotelDetailPage() {
   const hotel = query.data;
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => { 
-    event.preventDefault(); 
-    setSaved(false); 
-    const form = new FormData(event.currentTarget); 
+    event.preventDefault();
+const form = new FormData(event.currentTarget); 
     mutation.mutate({ 
       action: 'update', 
       payload: { 
@@ -108,20 +138,7 @@ export default function AdminHotelDetailPage() {
         </div>
 
         <div className="p-6 space-y-6">
-          {mutation.isSuccess && saved && (
-            <div role="status" className="p-3 bg-success-light border border-success/30 rounded-xl text-success-ink text-sm font-medium">
-              {mutation.data?.DonDaXuLy
-                ? `Đã đình chỉ khách sạn: ${mutation.data.DonDaXuLy.DonHoanTat} đơn đang lưu trú chuyển hoàn tất, ${mutation.data.DonDaXuLy.DonDaHuy} đơn chưa nhận phòng đã hủy (${mutation.data.DonDaXuLy.DonHoanTien} đơn được hoàn tiền).`
-                : 'Cập nhật khách sạn thành công'}
-            </div>
-          )}
-          {mutation.isError && (
-            <div role="alert" className="p-3 bg-danger-light border border-danger/30 rounded-xl text-danger-ink text-sm font-medium">
-              {mutation.error instanceof ApiError ? mutation.error.message : 'Thao tác thất bại, vui lòng thử lại'}
-            </div>
-          )}
-
-          {/* Chủ khách sạn */}
+{/* Chủ khách sạn */}
           <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-user-circle text-primary"></i> Chủ khách sạn

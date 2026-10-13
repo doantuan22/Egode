@@ -129,6 +129,26 @@ describe('stopping sales of a room type', () => {
     expect(on.body.data.TrangThai).toBe(ROOM_TYPE_STATUS.ACTIVE);
   });
 
+  it('answers deactivate and reactivate with the full room type (amenities, images, hotel), like GET does', async () => {
+    const rt = await newRoomType();
+    const reactivate = (id: number) => request(app).post(`/api/owner/room-types/${id}/reactivate`).set('Authorization', `Bearer ${ownerToken}`);
+    const shape = expect.objectContaining({ LOAI_PHONG_TIEN_NGHI: expect.any(Array), HINH_ANH_LOAI_PHONG: expect.any(Array), KHACH_SAN: expect.objectContaining({ MaKhachSan: hotelId }) });
+
+    const off = await deactivate(rt);
+    expect(off.status).toBe(200);
+    expect(off.body.data).toEqual(shape);
+    expect(off.body.data.TrangThai).toBe(ROOM_TYPE_STATUS.DISCONTINUED);
+
+    const on = await reactivate(rt);
+    expect(on.status).toBe(200);
+    expect(on.body.data).toEqual(shape);
+    expect(on.body.data.TrangThai).toBe(ROOM_TYPE_STATUS.ACTIVE);
+
+    const again = await reactivate(rt);
+    expect(again.status).toBe(200);
+    expect(again.body.data).toEqual(shape);
+  });
+
   it('is idempotent for a room type that is already stopped', async () => {
     const rt = await newRoomType();
     expect((await deactivate(rt)).status).toBe(200);
