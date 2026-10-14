@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../common/errors/app-error';
-import { sendPaginated } from '../../common/utils/response';
 import { OwnerReviewsService } from './owner-reviews.service';
 import type { OwnerReviewsQuery } from './owner-reviews.schemas';
 

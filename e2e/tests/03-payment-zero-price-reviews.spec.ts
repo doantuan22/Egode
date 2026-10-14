@@ -37,7 +37,7 @@ test.describe('Zero-price booking', () => {
     await page.goto(stayUrl());
     await page.getByRole('button', { name: `Tăng phòng ${roomTypeName}` }).click();
     const panel = page.locator('#dat-phong');
-    await panel.getByPlaceholder('Nhập mã (nếu có)').fill(free.code);
+    await panel.getByPlaceholder('Nhập hoặc chọn mã').fill(free.code);
     await panel.getByRole('button', { name: 'Áp dụng' }).click();
     await expect(panel).toContainText('Khuyến mãi giảm');
     await panel.getByRole('button', { name: /Xác nhận đặt phòng/ }).click();
@@ -102,7 +102,7 @@ test.describe('Payment (simulated)', () => {
 });
 
 test.describe('Reviews after a finished stay, moderation, and what the public sees', () => {
-  test('only reviews an admin made visible appear publicly; average and count follow moderation', async ({ page, browser }) => {
+  test('new reviews are public immediately; hiding and restoring one changes the public average and count', async ({ page, browser }) => {
     const alice = await newAccount(ROLES.customer);
     const bob = await newAccount(ROLES.customer);
     const aliceStay = await fx('/completed-booking', { customerId: alice.id, hotelId: hotel.id });
@@ -127,30 +127,30 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
 
     let reviews = await fx('/db/reviews', { hotelId: hotel.id });
     expect(reviews).toHaveLength(2);
-    expect(reviews.map((r: { TrangThai: string }) => r.TrangThai)).toEqual(['Chờ duyệt', 'Chờ duyệt']);
+    const [aliceReview, bobReview] = reviews as Array<{ MaDanhGia: number; DiemDanhGia: number; TrangThai: string }>;
+    expect(aliceReview).toMatchObject({ DiemDanhGia: 5, TrangThai: 'Hiển thị' });
+    expect(bobReview).toMatchObject({ DiemDanhGia: 1, TrangThai: 'Hiển thị' });
 
-    // --- the public sees nothing yet: no reviews, no average
+    // --- new reviews are public as soon as they are posted
     const guest = await (await browser.newContext()).newPage();
     await guest.goto(stayUrl());
-    await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toHaveCount(0);
-    await expect(guest.getByText('Không như mong đợi.')).toHaveCount(0);
+    await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toBeVisible();
+    await expect(guest.getByText('Không như mong đợi.')).toBeVisible();
+    const initialHotel = await guest.request.get(`http://localhost:5100/api/hotels/${hotel.id}`);
+    expect((await initialHotel.json()).data.DanhGia).toEqual({ DiemTrungBinh: 3, SoLuongDanhGia: 2 });
 
-    // --- the admin shows Alice's review and hides Bob's
+    // --- an admin can hide Bob's review after publication
     const adminPage = await (await browser.newContext()).newPage();
     await login(adminPage, admin);
-    const [aliceReview, bobReview] = reviews as Array<{ MaDanhGia: number; DiemDanhGia: number }>;
-    expect([aliceReview.DiemDanhGia, bobReview.DiemDanhGia]).toEqual([5, 1]);
-    await adminPage.goto(`/admin/reviews/${aliceReview.MaDanhGia}`);
-    const moderated = () => adminPage.waitForResponse((r) => r.url().includes('/admin/reviews/') && r.request().method() !== 'GET' && r.ok());
-    await Promise.all([moderated(), adminPage.getByRole('button', { name: 'Duyệt (Hiển thị)' }).click()]);
     await adminPage.goto(`/admin/reviews/${bobReview.MaDanhGia}`);
-    await Promise.all([moderated(), adminPage.getByRole('button', { name: 'Ẩn đánh giá' }).click()]);
+    const states = async () => {
+      const rows = await fx<Array<{ MaDanhGia: number; TrangThai: string }>>('/db/reviews', { hotelId: hotel.id });
+      return Object.fromEntries(rows.map((row) => [row.MaDanhGia, row.TrangThai]));
+    };
+    await adminPage.getByRole('button', { name: 'Ẩn đánh giá' }).click();
+    await expect.poll(states).toEqual({ [aliceReview.MaDanhGia]: 'Hiển thị', [bobReview.MaDanhGia]: 'Ẩn' });
 
-    await expect.poll(async () => (await fx('/db/reviews', { hotelId: hotel.id })).map((r: { TrangThai: string }) => r.TrangThai)).toEqual(['Hiển thị', 'Ẩn']);
-    reviews = await fx('/db/reviews', { hotelId: hotel.id });
-    expect(reviews.map((r: { TrangThai: string }) => r.TrangThai)).toEqual(['Hiển thị', 'Ẩn']);
-
-    // --- the public now sees only Alice's review, and the average/count count only visible reviews
+    // --- only Alice is public now, so the average/count include only her review
     await guest.goto(stayUrl());
     await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toBeVisible();
     await expect(guest.getByText('Không như mong đợi.')).toHaveCount(0);
@@ -159,5 +159,15 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     const list = await guest.request.get(`http://localhost:5100/api/hotels?location=${encodeURIComponent(city.name)}&checkIn=${checkIn}&checkOut=${checkOut}&guests=2`);
     const found = (await list.json()).data.find((h: { MaKhachSan: number }) => h.MaKhachSan === hotel.id);
     expect(found).toMatchObject({ DiemTrungBinh: 5, SoLuongDanhGia: 1 });
+
+    // --- restoring the review makes it public and restores the aggregate
+    await adminPage.goto(`/admin/reviews/${bobReview.MaDanhGia}`);
+    await adminPage.getByRole('button', { name: 'Hiển thị lại' }).click();
+    await expect.poll(states).toEqual({ [aliceReview.MaDanhGia]: 'Hiển thị', [bobReview.MaDanhGia]: 'Hiển thị' });
+    await guest.goto(stayUrl());
+    await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toBeVisible();
+    await expect(guest.getByText('Không như mong đợi.')).toBeVisible();
+    const restoredHotel = await guest.request.get(`http://localhost:5100/api/hotels/${hotel.id}`);
+    expect((await restoredHotel.json()).data.DanhGia).toEqual({ DiemTrungBinh: 3, SoLuongDanhGia: 2 });
   });
 });

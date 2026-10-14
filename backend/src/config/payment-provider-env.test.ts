@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
  */
 const base: Record<string, string> = {
   NODE_ENV: 'production',
-  DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true',
+  DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true;trustServerCertificate=false;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10',
   JWT_ACCESS_SECRET: 'a'.repeat(40),
   JWT_REFRESH_SECRET: 'b'.repeat(40),
   CLOUDINARY_CLOUD_NAME: 'cloud',
@@ -19,6 +19,7 @@ const base: Record<string, string> = {
   FRONTEND_URL: 'https://app.test.invalid',
   CORS_ORIGIN: 'https://app.test.invalid',
   REFRESH_COOKIE_SAMESITE: 'lax',
+  TRUST_PROXY: 'true',
 };
 const vnpayComplete: Record<string, string> = {
   VNPAY_TMN_CODE: 'TMN',
@@ -81,6 +82,25 @@ describe('PAYMENT_PROVIDER', () => {
 
   it('an unknown value is rejected', async () => {
     await expect(loadEnv({ PAYMENT_PROVIDER: 'paypal' })).rejects.toThrow('Environment configuration validation failed');
+  });
+
+  it('production SQL connections require certificate validation and bounded pool/timeouts', async () => {
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', DATABASE_URL: base.DATABASE_URL.replace('trustServerCertificate=false', 'trustServerCertificate=true') }))
+      .rejects.toThrow('Environment configuration validation failed');
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', DATABASE_URL: base.DATABASE_URL.replace(';socketTimeout=30000', '') }))
+      .rejects.toThrow('Environment configuration validation failed');
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', DATABASE_URL: base.DATABASE_URL.replace(';connectionLimit=10', ';connectionLimit=0') }))
+      .rejects.toThrow('Environment configuration validation failed');
+  });
+
+  it('production requires trusted proxy handling and exact HTTPS origins', async () => {
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', TRUST_PROXY: 'false' })).rejects.toThrow('Environment configuration validation failed');
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', CORS_ORIGIN: 'https://app.test.invalid/path' })).rejects.toThrow('Environment configuration validation failed');
+  });
+
+  it('production refuses a shared access and refresh signing secret', async () => {
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', JWT_REFRESH_SECRET: base.JWT_ACCESS_SECRET }))
+      .rejects.toThrow('Environment configuration validation failed');
   });
 
   it('development needs nothing: the provider is unset and resolves to the simulation', async () => {

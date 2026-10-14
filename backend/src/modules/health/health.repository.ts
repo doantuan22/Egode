@@ -16,10 +16,11 @@ export class HealthRepository {
       await prisma.$queryRaw`SELECT 1 as ping`;
       return { connected: true, message: 'Database connected successfully' };
     } catch (error) {
-      return {
-        connected: false,
-        message: error instanceof Error ? error.message : 'Database connection not initialized',
-      };
+      // Error messages from SQL drivers may include host/login details; retain only a safe category in server logs.
+      console.error('Database health probe failed', {
+        errorType: error instanceof Error ? error.name : 'UnknownError',
+      });
+      return { connected: false, message: 'Database unavailable' };
     }
   }
 }

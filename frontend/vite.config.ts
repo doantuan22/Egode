@@ -2,13 +2,17 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
+import { validateProductionApiBaseUrl } from './build/production-api-url.ts';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Without VITE_API_BASE_URL the SPA calls the relative /api, which only works when something in front of the SPA
-  // forwards /api to the API (reverse proxy) — on a static host it would get the HTML fallback. Say so at build time.
-  if (mode === 'production' && !loadEnv(mode, process.cwd(), 'VITE_').VITE_API_BASE_URL) {
-    console.warn('\n[vite] VITE_API_BASE_URL is not set: this build calls the relative "/api". Set it to the API origin unless a reverse proxy serves both.\n');
+  const fileEnv = loadEnv(mode, process.cwd(), 'VITE_');
+  const apiBaseUrl = process.env.VITE_API_BASE_URL ?? fileEnv.VITE_API_BASE_URL;
+
+  // Cloudflare Pages is a static host in this architecture, so a relative /api silently resolves to its HTML fallback.
+  // Require an explicit API URL at build time to prevent shipping an unusable artifact.
+  if (mode === 'production') {
+    validateProductionApiBaseUrl(apiBaseUrl);
   }
 
   return {

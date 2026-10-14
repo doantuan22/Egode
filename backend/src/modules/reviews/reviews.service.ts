@@ -83,8 +83,8 @@ export class ReviewsService {
   /**
    * Best-effort rollback of this request's Cloudinary uploads. Never throws, so
    * it cannot mask the error that triggered it, and one failed delete never
-   * stops the others. Failures log only the publicId and the error message —
-   * no image data, URL or credentials.
+   * stops the others. Failures log only the publicId and error type — no raw
+   * provider message, image data, URL, or credentials.
    */
   private async deleteUploadedImages(images: UploadImageResult[]): Promise<void> {
     if (images.length === 0) return;
@@ -92,8 +92,8 @@ export class ReviewsService {
     results.forEach((result, index) => {
       const publicId = images[index].publicId;
       if (result.status === 'rejected') {
-        const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
-        console.error('Review image cleanup failed', { publicId, reason });
+        const errorType = result.reason instanceof Error ? result.reason.name : 'UnknownError';
+        console.error('Review image cleanup failed', { publicId, errorType });
       } else if (!result.value) {
         console.error('Review image cleanup failed', { publicId, reason: 'Cloudinary did not confirm deletion' });
       }

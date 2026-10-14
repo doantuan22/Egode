@@ -233,7 +233,7 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
     expect(outcome).toBe(dbError); // the DB error wins; the cleanup failure never replaces it
     expect(deletedPublicIds()).toEqual(tags.map(publicIdOf).sort()); // all three attempted despite the middle one rejecting
     expect(errorLog).toHaveBeenCalledTimes(1);
-    expect(errorLog).toHaveBeenCalledWith('Review image cleanup failed', { publicId: publicIdOf(tags[1]), reason: 'Cloudinary 503' });
+    expect(errorLog).toHaveBeenCalledWith('Review image cleanup failed', { publicId: publicIdOf(tags[1]), errorType: 'Error' });
     // Nothing sensitive in the log: no image data, no URL.
     const logged = JSON.stringify(errorLog.mock.calls);
     expect(logged).not.toContain('base64');

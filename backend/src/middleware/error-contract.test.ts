@@ -152,7 +152,7 @@ describe('error handler (unit)', () => {
 
   it('codeForStatus covers the statuses the API uses', () => {
     expect([400, 401, 403, 404, 409, 413, 429, 500, 503].map(codeForStatus)).toEqual([
-      'BAD_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'NOT_FOUND', 'CONFLICT', 'PAYLOAD_TOO_LARGE', 'TOO_MANY_REQUESTS', 'INTERNAL_ERROR', 'INTERNAL_ERROR',
+      'BAD_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'NOT_FOUND', 'CONFLICT', 'PAYLOAD_TOO_LARGE', 'TOO_MANY_REQUESTS', 'INTERNAL_ERROR', 'SERVICE_UNAVAILABLE',
     ]);
   });
 });

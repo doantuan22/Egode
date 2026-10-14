@@ -85,7 +85,7 @@ test.describe('promotion boundaries are Vietnamese calendar days (inclusive)', (
     await page.getByRole('button', { name: `Tăng phòng ${roomTypeName}` }).click();
     const panel = page.locator('#dat-phong');
     const apply = async (code: string) => {
-      await panel.getByPlaceholder('Nhập mã (nếu có)').fill(code);
+      await panel.getByPlaceholder('Nhập hoặc chọn mã').fill(code);
       await panel.getByRole('button', { name: 'Áp dụng' }).click();
     };
 

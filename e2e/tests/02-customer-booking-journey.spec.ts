@@ -92,7 +92,7 @@ test('search -> filter -> hotel -> guests -> rooms -> promo -> booking -> paymen
   await expect(panel.getByRole('button', { name: /Tạo đặt phòng/ })).toBeEnabled();
 
   // ---- a typed promo code is NOT applied by changing the quantity (#15); only "Áp dụng" applies it
-  await panel.getByPlaceholder('Nhập mã (nếu có)').fill(promo.code);
+  await panel.getByPlaceholder('Nhập hoặc chọn mã').fill(promo.code);
   await page.getByRole('button', { name: `Giảm phòng ${roomTypeName}` }).click();
   await addRoom.click();
   await expect(panel).not.toContainText('Khuyến mãi giảm');

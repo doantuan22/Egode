@@ -14,44 +14,50 @@ SET NOCOUNT ON;
 SET XACT_ABORT OFF; -- a constraint violation must only fail its own statement
 DECLARE @FailCount INT = 0;
 
+BEGIN TRY
 BEGIN TRANSACTION;
 
 -- -----------------------------------------------------------------
 -- Seed minimal valid parent rows needed by the tests below
 -- -----------------------------------------------------------------
-INSERT INTO VAI_TRO (TenVaiTro, MoTa) VALUES (N'TestRole', N'Test role for constraint checks');
+DECLARE @RunToken VARCHAR(10) = RIGHT(REPLACE(CONVERT(VARCHAR(36), NEWID()), '-', ''), 10);
+DECLARE @TestUserName NVARCHAR(50) = N'test_user_' + @RunToken;
+DECLARE @TestEmail NVARCHAR(255) = N'test_user_' + @RunToken + N'@example.com';
+DECLARE @BookingCode VARCHAR(20) = 'CT' + @RunToken;
+
+INSERT INTO VAI_TRO (TenVaiTro, MoTa) VALUES (N'TestRole_' + @RunToken, N'Test role for constraint checks');
 DECLARE @MaVaiTro INT = SCOPE_IDENTITY();
 
 INSERT INTO TAI_KHOAN (MaVaiTro, TenDangNhap, Email, MatKhau, HoTen, SoDienThoai, NgaySinh, GioiTinh, AnhDaiDien, TrangThai, NgayTao, NgayCapNhat)
-VALUES (@MaVaiTro, N'test_user', N'test_user@example.com', N'hashed', N'Test User', '0900000000', '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+VALUES (@MaVaiTro, @TestUserName, @TestEmail, N'hashed', N'Test User', '0900000000', '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
 DECLARE @MaTaiKhoan INT = SCOPE_IDENTITY();
 
-INSERT INTO DIA_PHUONG (TenThanhPho, TenTinh, QuocGia) VALUES (N'Test City', N'Test Province', N'Vietnam');
+INSERT INTO DIA_PHUONG (TenThanhPho, TenTinh, QuocGia) VALUES (N'Test City ' + @RunToken, N'Test Province ' + @RunToken, N'Vietnam');
 DECLARE @MaDiaPhuong INT = SCOPE_IDENTITY();
 
 INSERT INTO KHACH_SAN (MaTaiKhoanSoHuu, MaDiaPhuong, TenKhachSan, DiaChiChiTiet, HangSao, MoTa, GioNhanPhong, GioTraPhong, TrangThai, NgayDangKy, NgayCapNhat)
-VALUES (@MaTaiKhoan, @MaDiaPhuong, N'Test Hotel', N'123 Test St', 3, N'A test hotel', '14:00', '12:00', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+VALUES (@MaTaiKhoan, @MaDiaPhuong, N'Test Hotel ' + @RunToken, N'123 Test St', 3, N'A test hotel', '14:00', '12:00', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
 DECLARE @MaKhachSan INT = SCOPE_IDENTITY();
 
 INSERT INTO LOAI_PHONG (MaKhachSan, TenLoaiPhong, SoGiuong, SucChua, DienTich, LoaiGiuong, MoTa, TrangThai)
-VALUES (@MaKhachSan, N'Standard', 1, 2, 20.0, N'Double', N'Standard room', N'Hoat dong');
+VALUES (@MaKhachSan, N'Standard ' + @RunToken, 1, 2, 20.0, N'Double', N'Standard room', N'Hoat dong');
 DECLARE @MaLoaiPhong INT = SCOPE_IDENTITY();
 
 -- Second room type, used only by the DDI-02 "different MaLoaiPhong" test.
 INSERT INTO LOAI_PHONG (MaKhachSan, TenLoaiPhong, SoGiuong, SucChua, DienTich, LoaiGiuong, MoTa, TrangThai)
-VALUES (@MaKhachSan, N'Deluxe', 1, 2, 25.0, N'Double', N'Deluxe room', N'Hoat dong');
+VALUES (@MaKhachSan, N'Deluxe ' + @RunToken, 1, 2, 25.0, N'Double', N'Deluxe room', N'Hoat dong');
 DECLARE @MaLoaiPhong2 INT = SCOPE_IDENTITY();
 
 INSERT INTO CHINH_SACH_HUY (TenChinhSach, MoTa, TrangThai, NgayTao)
-VALUES (N'Flexible', N'Flexible cancellation', N'Hoat dong', SYSDATETIME());
+VALUES (N'Flexible ' + @RunToken, N'Flexible cancellation', N'Hoat dong', SYSDATETIME());
 DECLARE @MaChinhSachHuy INT = SCOPE_IDENTITY();
 
 INSERT INTO DAT_PHONG (MaXacNhanDatPhong, MaTaiKhoanKhachHang, MaKhachSan, MaChinhSachHuy, NgayNhanPhong, NgayTraPhong, TongTienPhong, SoTienGiam, TongTienThanhToan, TrangThai, NgayTao, NgayCapNhat)
-VALUES (N'CONF-TEST-001', @MaTaiKhoan, @MaKhachSan, @MaChinhSachHuy, '2026-01-01', '2026-01-03', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
+VALUES (@BookingCode, @MaTaiKhoan, @MaKhachSan, @MaChinhSachHuy, '2026-01-01', '2026-01-03', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
 DECLARE @MaDatPhong INT = SCOPE_IDENTITY();
 
 INSERT INTO THANH_TOAN (MaDatPhong, SoTien, PhuongThucThanhToan, MaGiaoDichDoiTac, TrangThai, ThoiGianGiaoDich)
-VALUES (@MaDatPhong, 1000000, N'The', N'TXN-TEST-001', N'Thanh cong', SYSDATETIME());
+VALUES (@MaDatPhong, 1000000, N'The', N'TXN-TEST-' + @RunToken, N'Thanh cong', SYSDATETIME());
 DECLARE @MaThanhToan INT = SCOPE_IDENTITY();
 
 PRINT '--- Seed rows created inside transaction (will be rolled back) ---';
@@ -61,7 +67,7 @@ PRINT '--- Seed rows created inside transaction (will be rolled back) ---';
 -- -----------------------------------------------------------------
 BEGIN TRY
     INSERT INTO TAI_KHOAN (MaVaiTro, TenDangNhap, Email, MatKhau, HoTen, SoDienThoai, NgaySinh, GioiTinh, AnhDaiDien, TrangThai, NgayTao, NgayCapNhat)
-    VALUES (@MaVaiTro, N'test_user', N'other@example.com', N'hashed', N'Dup User', '0900000001', '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+    VALUES (@MaVaiTro, @TestUserName, N'other_' + @RunToken + N'@example.com', N'hashed', N'Dup User', '0900000001', '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
     PRINT 'FAIL: TEST 1 duplicate TenDangNhap was allowed';
     SET @FailCount += 1;
 END TRY
@@ -74,7 +80,7 @@ END CATCH
 -- -----------------------------------------------------------------
 BEGIN TRY
     INSERT INTO DAT_PHONG (MaXacNhanDatPhong, MaTaiKhoanKhachHang, MaKhachSan, MaChinhSachHuy, NgayNhanPhong, NgayTraPhong, TongTienPhong, SoTienGiam, TongTienThanhToan, TrangThai, NgayTao, NgayCapNhat)
-    VALUES (N'CONF-TEST-BADFK', @MaTaiKhoan, -999999, @MaChinhSachHuy, '2026-01-01', '2026-01-03', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
+    VALUES ('FK' + @RunToken, @MaTaiKhoan, -999999, @MaChinhSachHuy, '2026-01-01', '2026-01-03', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
     PRINT 'FAIL: TEST 2 invalid MaKhachSan FK was allowed';
     SET @FailCount += 1;
 END TRY
@@ -87,7 +93,7 @@ END CATCH
 -- -----------------------------------------------------------------
 BEGIN TRY
     INSERT INTO THANH_TOAN (MaDatPhong, SoTien, PhuongThucThanhToan, MaGiaoDichDoiTac, TrangThai, ThoiGianGiaoDich)
-    VALUES (@MaDatPhong, -100, N'The', N'TXN-TEST-BAD', N'Thanh cong', SYSDATETIME());
+    VALUES (@MaDatPhong, -100, N'The', N'TXN-BAD-' + @RunToken, N'Thanh cong', SYSDATETIME());
     PRINT 'FAIL: TEST 3 negative SoTien was allowed';
     SET @FailCount += 1;
 END TRY
@@ -113,7 +119,7 @@ END CATCH
 -- -----------------------------------------------------------------
 BEGIN TRY
     INSERT INTO DAT_PHONG (MaXacNhanDatPhong, MaTaiKhoanKhachHang, MaKhachSan, MaChinhSachHuy, NgayNhanPhong, NgayTraPhong, TongTienPhong, SoTienGiam, TongTienThanhToan, TrangThai, NgayTao, NgayCapNhat)
-    VALUES (N'CONF-TEST-BADDATE', @MaTaiKhoan, @MaKhachSan, @MaChinhSachHuy, '2026-01-05', '2026-01-05', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
+    VALUES ('DT' + @RunToken, @MaTaiKhoan, @MaKhachSan, @MaChinhSachHuy, '2026-01-05', '2026-01-05', 1000000, 0, 1000000, N'Cho thanh toan', SYSDATETIME(), SYSDATETIME());
     PRINT 'FAIL: TEST 5 NgayTraPhong = NgayNhanPhong was allowed';
     SET @FailCount += 1;
 END TRY
@@ -247,7 +253,7 @@ END CATCH
 -- TEST 14: TAI_KHOAN with NgaySinh/GioiTinh/AnhDaiDien = NULL -> must succeed
 BEGIN TRY
     INSERT INTO TAI_KHOAN (MaVaiTro, TenDangNhap, Email, MatKhau, HoTen, SoDienThoai, NgaySinh, GioiTinh, AnhDaiDien, TrangThai, NgayTao, NgayCapNhat)
-    VALUES (@MaVaiTro, N'test_user_nulls', N'test_user_nulls@example.com', N'hashed', N'Nullable Fields User', '0900000002', NULL, NULL, NULL, N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+    VALUES (@MaVaiTro, N'test_nulls_' + @RunToken, N'test_nulls_' + @RunToken + N'@example.com', N'hashed', N'Nullable Fields User', '0900000002', NULL, NULL, NULL, N'Hoat dong', SYSDATETIME(), SYSDATETIME());
     PRINT 'PASS: TEST 14 TAI_KHOAN with NgaySinh/GioiTinh/AnhDaiDien = NULL accepted';
 END TRY
 BEGIN CATCH
@@ -258,7 +264,7 @@ END CATCH
 -- TEST 15: TAI_KHOAN with SoDienThoai = NULL -> must still fail (stays NOT NULL)
 BEGIN TRY
     INSERT INTO TAI_KHOAN (MaVaiTro, TenDangNhap, Email, MatKhau, HoTen, SoDienThoai, NgaySinh, GioiTinh, AnhDaiDien, TrangThai, NgayTao, NgayCapNhat)
-    VALUES (@MaVaiTro, N'test_user_badphone', N'test_user_badphone@example.com', N'hashed', N'Bad Phone User', NULL, '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+    VALUES (@MaVaiTro, N'test_badphone_' + @RunToken, N'test_badphone_' + @RunToken + N'@example.com', N'hashed', N'Bad Phone User', NULL, '1990-01-01', N'Khac', N'/avatar.png', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
     PRINT 'FAIL: TEST 15 SoDienThoai = NULL was allowed';
     SET @FailCount += 1;
 END TRY
@@ -269,7 +275,7 @@ END CATCH
 -- TEST 16: KHACH_SAN.MoTa = NULL -> must succeed
 BEGIN TRY
     INSERT INTO KHACH_SAN (MaTaiKhoanSoHuu, MaDiaPhuong, TenKhachSan, DiaChiChiTiet, HangSao, MoTa, GioNhanPhong, GioTraPhong, TrangThai, NgayDangKy, NgayCapNhat)
-    VALUES (@MaTaiKhoan, @MaDiaPhuong, N'No-Description Hotel', N'789 Test St', 3, NULL, '14:00', '12:00', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
+    VALUES (@MaTaiKhoan, @MaDiaPhuong, N'No-Description ' + @RunToken, N'789 Test St', 3, NULL, '14:00', '12:00', N'Hoat dong', SYSDATETIME(), SYSDATETIME());
     PRINT 'PASS: TEST 16 KHACH_SAN.MoTa = NULL accepted';
 END TRY
 BEGIN CATCH
@@ -280,7 +286,7 @@ END CATCH
 -- TEST 17: LOAI_PHONG.MoTa = NULL -> must succeed
 BEGIN TRY
     INSERT INTO LOAI_PHONG (MaKhachSan, TenLoaiPhong, SoGiuong, SucChua, DienTich, LoaiGiuong, MoTa, TrangThai)
-    VALUES (@MaKhachSan, N'No-Description Room', 1, 2, 18.0, N'Single', NULL, N'Hoat dong');
+    VALUES (@MaKhachSan, N'No-Description ' + @RunToken, 1, 2, 18.0, N'Single', NULL, N'Hoat dong');
     PRINT 'PASS: TEST 17 LOAI_PHONG.MoTa = NULL accepted';
 END TRY
 BEGIN CATCH
@@ -290,7 +296,7 @@ END CATCH
 
 -- TEST 18: TIEN_NGHI.BieuTuong = NULL -> must succeed
 BEGIN TRY
-    INSERT INTO TIEN_NGHI (TenTienNghi, BieuTuong) VALUES (N'No-Icon Amenity', NULL);
+    INSERT INTO TIEN_NGHI (TenTienNghi, BieuTuong) VALUES (N'No-Icon ' + @RunToken, NULL);
     PRINT 'PASS: TEST 18 TIEN_NGHI.BieuTuong = NULL accepted';
 END TRY
 BEGIN CATCH
@@ -319,4 +325,11 @@ ELSE
 
 ROLLBACK TRANSACTION;
 PRINT 'Transaction rolled back — database left unmodified.';
+IF @FailCount > 0
+    RAISERROR('test-constraints.sql failed with %d failing check(s)', 16, 1, @FailCount);
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH
 GO

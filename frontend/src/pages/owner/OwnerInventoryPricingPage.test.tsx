@@ -45,7 +45,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     const user = userEvent.setup();
     await fillRange(user);
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
 
     expect(await screen.findByText('Ghi đè giá và quỹ phòng?')).toBeInTheDocument();
     const dialog = screen.getByRole('dialog');
@@ -62,7 +62,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     open();
     const user = userEvent.setup();
     await fillRange(user);
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
 
     await user.click(await screen.findByRole('button', { name: 'Ghi đè' }));
 
@@ -79,7 +79,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     // Everything is ticked by default: leave only Monday.
     for (const day of ['T3', 'T4', 'T5', 'T6', 'T7', 'CN']) await user.click(screen.getByRole('checkbox', { name: day }));
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
     expect(await screen.findByText(/2 ngày/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Ghi đè' }));
 
@@ -93,7 +93,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     await fillRange(user);
     for (const day of ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']) await user.click(screen.getByRole('checkbox', { name: day }));
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Chọn ít nhất một thứ trong tuần');
     expect(mutateAsync).not.toHaveBeenCalled();
@@ -124,7 +124,7 @@ describe('OwnerInventoryPricingPage status-only change', () => {
     await pickRange(user);
     await user.selectOptions(screen.getByLabelText('Trạng thái'), 'Đóng bán');
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
 
     expect(await screen.findByText('Đổi trạng thái bán?')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Xác nhận' }));
@@ -142,7 +142,7 @@ describe('OwnerInventoryPricingPage status-only change', () => {
     await pickRange(user);
     await user.selectOptions(screen.getByLabelText('Trạng thái'), 'Đóng bán');
 
-    await user.click(screen.getByRole('button', { name: 'Cập nhật thông tin' }));
+    await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('chưa có giá/quỹ phòng');
     expect(mutateAsync).not.toHaveBeenCalled();

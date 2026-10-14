@@ -45,6 +45,26 @@ describe('HTTP hardening middleware', () => {
     consoleSpy.mockRestore();
   });
 
+  it('production logs error metadata without the raw message or stack', async () => {
+    const originalEnvironment = env.NODE_ENV;
+    env.NODE_ENV = 'production';
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const localApp = express();
+      localApp.get('/fail', (_req, _res, next) => next(new Error('password=do-not-log;server=internal')));
+      localApp.use(errorHandler);
+
+      const response = await request(localApp).get('/fail');
+      expect(response.status).toBe(500);
+      expect(consoleSpy).toHaveBeenCalledWith('Unhandled server error:', { name: 'Error' });
+      expect(JSON.stringify(consoleSpy.mock.calls)).not.toContain('do-not-log');
+      expect(JSON.stringify(consoleSpy.mock.calls)).not.toContain('internal');
+    } finally {
+      env.NODE_ENV = originalEnvironment;
+      consoleSpy.mockRestore();
+    }
+  });
+
   it('rate limits repeated requests and returns Retry-After', async () => {
     const localApp = express();
     localApp.get('/limited', createRateLimiter({ windowMs: 60_000, max: 2, keyPrefix: 'test' }), (_req, res) => res.json({ ok: true }));

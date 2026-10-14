@@ -33,14 +33,38 @@ jobs:
       - name: Generate Prisma Client
         run: npm run prisma:generate
 
+      - name: Validate Prisma schema
+        run: npm run prisma:validate
+
       - name: Typecheck
         run: npm run typecheck
 
       - name: Build
         run: npm run build
 
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
       - name: Run tests
         run: npm run test
+
+  e2e-dependency-audit:
+    name: E2E Dependency Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
   frontend-ci:
     name: Frontend Lint, Typecheck, Build & Test
@@ -68,8 +92,21 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Build
+      - name: Build production bundle with a test-only API URL
+        env:
+          VITE_API_BASE_URL: https://api.example.invalid/api
         run: npm run build
+
+      - name: Verify production API URL and reject local API origins
+        run: |
+          if rg -n -F 'http://localhost:5000/api' dist || rg -n -F 'https://localhost:5000/api' dist || rg -n -F 'http://127.0.0.1:5000/api' dist; then
+            echo 'Local API origin found in production bundle.'
+            exit 1
+          fi
+          rg -q -F 'https://api.example.invalid/api' dist/assets
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
       - name: Run tests
         run: npm run test

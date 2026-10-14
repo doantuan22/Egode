@@ -21,6 +21,7 @@ export const ERROR_CODES = {
   /** The rooms chosen cannot hold the number of guests (quote / booking). */
   CAPACITY_EXCEEDED: 'CAPACITY_EXCEEDED',
   TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
 
@@ -48,6 +49,7 @@ export const codeForStatus = (statusCode: number): ErrorCode => {
     case 409: return ERROR_CODES.CONFLICT;
     case 413: return ERROR_CODES.PAYLOAD_TOO_LARGE;
     case 429: return ERROR_CODES.TOO_MANY_REQUESTS;
+    case 503: return ERROR_CODES.SERVICE_UNAVAILABLE;
     default: return statusCode >= 500 ? ERROR_CODES.INTERNAL_ERROR : ERROR_CODES.BAD_REQUEST;
   }
 };

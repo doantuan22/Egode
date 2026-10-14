@@ -291,7 +291,7 @@ export default function OwnerInventoryPricingPage() {
                   ))}
                 </fieldset>
                 <Button disabled={update.isPending || !roomType}>
-                  {update.isPending ? 'Đang lưu…' : 'Cập nhật thông tin'}
+                  {update.isPending ? 'Đang lưu…' : 'Cập nhật khoảng ngày'}
                 </Button>
               </form>
             </>

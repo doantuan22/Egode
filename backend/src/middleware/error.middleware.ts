@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
 import { AppError } from '../common/errors/app-error';
 import { ERROR_CODES, type ErrorBody, type ErrorDetail } from '../common/errors/error-codes';
+import { env } from '../config/env';
 
 const send = (res: Response, status: number, body: Omit<ErrorBody, 'success'>): void => {
   res.status(status).json({ success: false, ...body } satisfies ErrorBody);
@@ -10,6 +11,14 @@ const send = (res: Response, status: number, body: Omit<ErrorBody, 'success'>): 
 /** Zod issues → [{ field, message }], one entry per issue, `field` being the dotted request path. */
 const toValidationDetails = (error: ZodError): ErrorDetail[] =>
   error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message }));
+
+const logServerError = (label: string, error: Error, code?: string): void => {
+  if (env.NODE_ENV === 'production') {
+    console.error(label, { name: error.name, ...(code ? { code } : {}) });
+    return;
+  }
+  console.error(label, error);
+};
 
 export const errorHandler: ErrorRequestHandler = (
   err: Error | AppError | ZodError,
@@ -33,7 +42,7 @@ export const errorHandler: ErrorRequestHandler = (
 
   // Known, operational errors: their own message and details (never for server errors).
   if (err instanceof AppError) {
-    if (err.statusCode >= 500) console.error('Operational server error:', err);
+    if (err.statusCode >= 500) logServerError('Operational server error:', err, err.code);
     send(res, err.statusCode, {
       message: err.statusCode >= 500 ? 'Internal server error' : err.message,
       code: err.code,
@@ -43,6 +52,6 @@ export const errorHandler: ErrorRequestHandler = (
   }
 
   // Anything else is a bug: logged here, and only a generic message leaves the server (no stack, no internals).
-  console.error('Unhandled server error:', err);
+  logServerError('Unhandled server error:', err);
   send(res, 500, { message: 'Internal server error', code: ERROR_CODES.INTERNAL_ERROR });
 };

@@ -102,7 +102,7 @@ describe('production environment validation (env.ts)', () => {
   const productionEnv: Record<string, string> = {
     NODE_ENV: 'production',
     PAYMENT_PROVIDER: 'vnpay',
-    DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true',
+    DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true;trustServerCertificate=false;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10',
     JWT_ACCESS_SECRET: 'a'.repeat(40),
     JWT_REFRESH_SECRET: 'b'.repeat(40),
     CLOUDINARY_CLOUD_NAME: 'cloud',
@@ -120,6 +120,7 @@ describe('production environment validation (env.ts)', () => {
     SMTP_FROM: 'noreply@test.invalid',
     FRONTEND_URL: 'https://app.test.invalid',
     CORS_ORIGIN: 'https://app.test.invalid',
+    TRUST_PROXY: 'true',
   };
   const originalEnv = { ...process.env };
 

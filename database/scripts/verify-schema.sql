@@ -279,6 +279,94 @@ BEGIN
 END
 
 -- -----------------------------------------------------------------
+-- Check 14: Migration 007 indexes are present and enabled.
+-- -----------------------------------------------------------------
+DECLARE @ExpectedIndexes TABLE (TableName SYSNAME, IndexName SYSNAME);
+INSERT INTO @ExpectedIndexes (TableName, IndexName) VALUES
+    ('DAT_PHONG', 'IX_DAT_PHONG_TrangThai_NgayTao'),
+    ('DAT_PHONG', 'IX_DAT_PHONG_TrangThai_NgayTraPhong'),
+    ('DAT_PHONG', 'IX_DAT_PHONG_MaTaiKhoanKhachHang_NgayTao'),
+    ('DAT_PHONG', 'IX_DAT_PHONG_MaKhachSan_NgayTao'),
+    ('DAT_PHONG', 'IX_DAT_PHONG_MaKhuyenMai'),
+    ('CHI_TIET_DAT_PHONG', 'IX_CHI_TIET_DAT_PHONG_MaLoaiPhong'),
+    ('LOAI_PHONG', 'IX_LOAI_PHONG_MaKhachSan_TrangThai'),
+    ('KHACH_SAN', 'IX_KHACH_SAN_TrangThai'),
+    ('KHACH_SAN', 'IX_KHACH_SAN_MaTaiKhoanSoHuu_NgayDangKy'),
+    ('THANH_TOAN', 'IX_THANH_TOAN_MaDatPhong'),
+    ('THANH_TOAN', 'IX_THANH_TOAN_MaGiaoDichDoiTac'),
+    ('THANH_TOAN', 'IX_THANH_TOAN_TrangThai_ThoiGianGiaoDich'),
+    ('HOAN_TIEN', 'IX_HOAN_TIEN_MaThanhToan'),
+    ('HOAN_TIEN', 'IX_HOAN_TIEN_TrangThai_NgayHoanTien'),
+    ('YEU_CAU_HO_TRO', 'IX_YEU_CAU_HO_TRO_MaTaiKhoanKhachHang_NgayTao');
+
+DECLARE @MissingIndexCount INT;
+SELECT @MissingIndexCount = COUNT(*)
+FROM @ExpectedIndexes e
+LEFT JOIN sys.tables t ON t.name = e.TableName
+LEFT JOIN sys.indexes i ON i.object_id = t.object_id AND i.name = e.IndexName AND i.is_disabled = 0
+WHERE i.index_id IS NULL;
+
+IF @MissingIndexCount = 0
+    PRINT 'PASS: all 15 Migration 007 indexes exist and are enabled';
+ELSE
+BEGIN
+    PRINT 'FAIL: one or more Migration 007 indexes are missing or disabled:';
+    SELECT e.TableName, e.IndexName
+    FROM @ExpectedIndexes e
+    LEFT JOIN sys.tables t ON t.name = e.TableName
+    LEFT JOIN sys.indexes i ON i.object_id = t.object_id AND i.name = e.IndexName AND i.is_disabled = 0
+    WHERE i.index_id IS NULL;
+    SET @FailCount += 1;
+END
+
+-- -----------------------------------------------------------------
+-- Check 15: Migration 008 procedure is present; there are no unreviewed
+-- user functions or triggers that could change the application's data.
+-- -----------------------------------------------------------------
+IF OBJECT_ID('dbo.usp_KhoaKhuyenMaiChoDatPhong', 'P') IS NOT NULL
+    PRINT 'PASS: Migration 008 booking-promotion lock procedure exists';
+ELSE
+BEGIN
+    PRINT 'FAIL: dbo.usp_KhoaKhuyenMaiChoDatPhong is missing';
+    SET @FailCount += 1;
+END
+
+DECLARE @PromotionLockDefinition NVARCHAR(MAX) = OBJECT_DEFINITION(OBJECT_ID('dbo.usp_KhoaKhuyenMaiChoDatPhong', 'P'));
+IF @PromotionLockDefinition IS NOT NULL
+   AND LOWER(@PromotionLockDefinition) LIKE '%updlock%'
+   AND LOWER(@PromotionLockDefinition) LIKE '%holdlock%'
+   AND LOWER(@PromotionLockDefinition) LIKE '%rowlock%'
+   AND LOWER(@PromotionLockDefinition) LIKE '%@@trancount%'
+    PRINT 'PASS: Migration 008 procedure retains its transaction guard and serialization lock hints';
+ELSE
+BEGIN
+    PRINT 'FAIL: Migration 008 procedure definition is unavailable or lacks its required transaction/lock guards';
+    SET @FailCount += 1;
+END
+
+DECLARE @UnexpectedSqlObjectCount INT;
+SELECT @UnexpectedSqlObjectCount =
+    (SELECT COUNT(*) FROM sys.procedures WHERE is_ms_shipped = 0 AND schema_id = SCHEMA_ID('dbo') AND name <> 'usp_KhoaKhuyenMaiChoDatPhong') +
+    (SELECT COUNT(*) FROM sys.objects WHERE is_ms_shipped = 0 AND schema_id = SCHEMA_ID('dbo') AND type IN ('FN', 'IF', 'TF', 'FS', 'FT')) +
+    (SELECT COUNT(*) FROM sys.triggers tr JOIN sys.objects o ON o.object_id = tr.object_id WHERE tr.is_ms_shipped = 0 AND o.schema_id = SCHEMA_ID('dbo'));
+
+IF @UnexpectedSqlObjectCount = 0
+    PRINT 'PASS: no unreviewed dbo procedures, functions, or triggers found';
+ELSE
+BEGIN
+    PRINT 'FAIL: unreviewed dbo procedures, functions, or triggers found:';
+    SELECT 'PROCEDURE' AS ObjectType, name AS ObjectName FROM sys.procedures
+    WHERE is_ms_shipped = 0 AND schema_id = SCHEMA_ID('dbo') AND name <> 'usp_KhoaKhuyenMaiChoDatPhong'
+    UNION ALL
+    SELECT type_desc, name FROM sys.objects
+    WHERE is_ms_shipped = 0 AND schema_id = SCHEMA_ID('dbo') AND type IN ('FN', 'IF', 'TF', 'FS', 'FT')
+    UNION ALL
+    SELECT 'TRIGGER', o.name FROM sys.triggers tr JOIN sys.objects o ON o.object_id = tr.object_id
+    WHERE tr.is_ms_shipped = 0 AND o.schema_id = SCHEMA_ID('dbo');
+    SET @FailCount += 1;
+END
+
+-- -----------------------------------------------------------------
 -- Summary
 -- -----------------------------------------------------------------
 IF @FailCount = 0

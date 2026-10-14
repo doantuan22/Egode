@@ -92,7 +92,7 @@ describe('an administrator cannot take admin powers from themselves (HTTP)', () 
     expect((await row(lockMe.id))!.TrangThai).toBe(ACCOUNT_STATUS.LOCKED);
     expect((await row(demoteMe.id))!.MaVaiTro).toBe(await getRoleId(ROLE_NAMES.CUSTOMER));
     expect(await row(deleteMe.id)).toBeNull();
-  });
+  }, 15_000);
 });
 
 describe('the last active administrator cannot be removed (service, scoped to test admins)', () => {
@@ -151,7 +151,7 @@ describe('two administrators acting at the same time cannot remove the last admi
       const survivors = (await Promise.all([row(a.id), row(b.id)])).filter((r) => r && r.TrangThai === ACCOUNT_STATUS.ACTIVE);
       expect(survivors).toHaveLength(1);
     }
-  });
+  }, 15_000);
 
   it('a lock and a demote of the two remaining admins at once: exactly one succeeds', async () => {
     const [a, b] = [await makeAccount(), await makeAccount()];

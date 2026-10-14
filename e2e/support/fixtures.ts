@@ -44,6 +44,12 @@ export async function login(page: Page, account: Pick<Account, 'email' | 'passwo
 export const test = base;
 export { expect };
 
+// Tests that create secondary browser contexts must not leak them into later E2E cases.
+test.afterEach(async ({ browser, page }) => {
+  const primaryContext = page.context();
+  await Promise.all(browser.contexts().filter((context) => context !== primaryContext).map((context) => context.close()));
+});
+
 /** Opens the navbar account menu and signs out. */
 export async function logout(page: Page) {
   await page.locator('button.site-header__user').click();

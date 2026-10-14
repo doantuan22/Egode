@@ -1132,11 +1132,12 @@ export const openApiSpec = {
     },
     '/health': {
       get: {
-        summary: 'Check API and system health status',
+        summary: 'Liveness probe; add ?db=true for backward-compatible readiness semantics',
         tags: ['Health'],
+        parameters: [{ name: 'db', in: 'query', required: false, schema: { type: 'boolean' }, description: 'When true, checks database readiness and may return 503.' }],
         responses: {
           '200': {
-            description: 'API is running and healthy',
+            description: 'API process is alive (or ready when db=true)',
             content: {
               'application/json': {
                 schema: {
@@ -1150,6 +1151,8 @@ export const openApiSpec = {
                         timestamp: { type: 'string', format: 'date-time' },
                         uptime: { type: 'number' },
                         environment: { type: 'string', example: 'development' },
+                        status: { type: 'string', enum: ['ok', 'degraded'] },
+                        database: { type: 'object', properties: { status: { type: 'string', enum: ['connected', 'disconnected', 'not_checked'] }, details: { type: 'string' } } },
                       },
                     },
                   },
@@ -1157,6 +1160,24 @@ export const openApiSpec = {
               },
             },
           },
+          '503': { description: 'Database is unavailable when db=true' },
+        },
+      },
+    },
+    '/health/live': {
+      get: {
+        summary: 'Liveness probe; does not connect to the database',
+        tags: ['Health'],
+        responses: { '200': { description: 'API process is alive' } },
+      },
+    },
+    '/health/ready': {
+      get: {
+        summary: 'Readiness probe; requires database connectivity',
+        tags: ['Health'],
+        responses: {
+          '200': { description: 'API can accept application traffic' },
+          '503': { description: 'Database is unavailable or the probe timed out' },
         },
       },
     },

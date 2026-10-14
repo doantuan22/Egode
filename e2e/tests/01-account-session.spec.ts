@@ -72,15 +72,17 @@ test.describe('Customer account and session (register, sign in, session refresh,
   test('change password through the profile form: the session survives, old password stops working, new one works', async ({ page }) => {
     const user = await newAccount(ROLES.customer);
     await login(page, user);
-    await page.goto('/profile');
+    await page.goto('/profile?muc=mat-khau');
 
-    await page.getByLabel('Mật khẩu hiện tại').fill(user.password);
-    await page.getByLabel('Mật khẩu mới', { exact: true }).fill('Brand-New-Passw0rd!');
-    await page.getByLabel('Xác nhận mật khẩu mới').fill('Brand-New-Passw0rd!');
+    await page.locator('#profile-MatKhauCu').fill(user.password);
+    await page.locator('#profile-MatKhauMoi').fill('Brand-New-Passw0rd!');
+    await page.locator('#profile-confirmMatKhauMoi').fill('Brand-New-Passw0rd!');
     await page.getByRole('button', { name: 'Đổi mật khẩu' }).click();
     await expect(page.getByText('Đổi mật khẩu thành công.')).toBeVisible();
 
-    await page.reload(); // the replaced cookie still restores the session
+    await page.reload(); // the replaced cookie still restores the password section
+    await expect(page.locator('button.site-header__user')).toBeVisible();
+    await page.goto('/profile');
     await expect(page.getByLabel('Email')).toHaveValue(user.email);
 
     await logout(page);
@@ -97,10 +99,10 @@ test.describe('Customer account and session (register, sign in, session refresh,
   test('change password: a wrong current password lands under that field', async ({ page }) => {
     const user = await newAccount(ROLES.customer);
     await login(page, user);
-    await page.goto('/profile');
-    await page.getByLabel('Mật khẩu hiện tại').fill('Wrong-Current-1');
-    await page.getByLabel('Mật khẩu mới', { exact: true }).fill('Brand-New-Passw0rd!');
-    await page.getByLabel('Xác nhận mật khẩu mới').fill('Brand-New-Passw0rd!');
+    await page.goto('/profile?muc=mat-khau');
+    await page.locator('#profile-MatKhauCu').fill('Wrong-Current-1');
+    await page.locator('#profile-MatKhauMoi').fill('Brand-New-Passw0rd!');
+    await page.locator('#profile-confirmMatKhauMoi').fill('Brand-New-Passw0rd!');
     await page.getByRole('button', { name: 'Đổi mật khẩu' }).click();
     await expect(page.locator('#profile-MatKhauCu-error')).toHaveText('Mật khẩu hiện tại không đúng');
   });

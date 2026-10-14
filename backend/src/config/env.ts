@@ -100,6 +100,12 @@ const envSchema = z.object({
     });
   }
 
+  // Northflank public HTTP ports terminate at its ingress/load balancer and provide X-Forwarded-For.
+  // Express must trust that managed ingress for per-client rate-limit keys; public access must go only through it.
+  if (!value.TRUST_PROXY) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TRUST_PROXY'], message: 'TRUST_PROXY=true is required behind the Northflank public ingress so rate limits use client addresses' });
+  }
+
   if (!value.PAYMENT_PROVIDER) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['PAYMENT_PROVIDER'], message: 'PAYMENT_PROVIDER must be set explicitly in production: vnpay (real gateway) or simulated (no money moves)' });
   }
@@ -124,16 +130,48 @@ const envSchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${label} must be configured for production` });
     }
   }
+  if (value.JWT_ACCESS_SECRET === value.JWT_REFRESH_SECRET) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['JWT_REFRESH_SECRET'], message: 'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different values in production' });
+  }
   if (!value.FRONTEND_URL.startsWith('https://')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['FRONTEND_URL'], message: 'FRONTEND_URL must use HTTPS in production' });
   }
-  const publicUrls = [
+  const exactOrigins = [
+    ['FRONTEND_URL', value.FRONTEND_URL],
     ['CORS_ORIGIN', value.CORS_ORIGIN],
-    ...(usesVnpay ? ([['VNPAY_RETURN_URL', value.VNPAY_RETURN_URL], ['VNPAY_IPN_URL', value.VNPAY_IPN_URL]] as const) : []),
   ] as const;
-  for (const [key, raw] of publicUrls) {
-    if (raw.split(',').some((url) => !url.trim().startsWith('https://'))) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must use HTTPS in production` });
+  for (const [key, raw] of exactOrigins) {
+    const entries = raw.split(',').map((url) => url.trim());
+    const validOrigins = entries.every((entry) => {
+      try {
+        const parsed = new URL(entry);
+        return parsed.protocol === 'https:' && parsed.origin === entry.replace(/\/$/, '');
+      } catch {
+        return false;
+      }
+    });
+    if (!validOrigins) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must contain exact HTTPS origins without paths, query, or fragment in production` });
+    }
+  }
+  const httpsUrls = usesVnpay
+    ? [
+        ['VNPAY_PAYMENT_URL', value.VNPAY_PAYMENT_URL],
+        ['VNPAY_REFUND_URL', value.VNPAY_REFUND_URL],
+        ['VNPAY_RETURN_URL', value.VNPAY_RETURN_URL],
+        ['VNPAY_IPN_URL', value.VNPAY_IPN_URL],
+      ] as const
+    : [];
+  for (const [key, raw] of httpsUrls) {
+    let secureUrl = false;
+    try {
+      const parsed = new URL(raw);
+      secureUrl = parsed.protocol === 'https:' && !parsed.username && !parsed.password;
+    } catch {
+      secureUrl = false;
+    }
+    if (!secureUrl) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must be a valid HTTPS URL in production` });
     }
   }
   if (usesVnpay && (value.VNPAY_PAYMENT_URL.includes('sandbox') || value.VNPAY_REFUND_URL.includes('sandbox'))) {
@@ -142,6 +180,29 @@ const envSchema = z.object({
   if (!/(^|;)\s*encrypt\s*=\s*true\s*(;|$)/i.test(value.DATABASE_URL)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['DATABASE_URL'], message: 'DATABASE_URL must set encrypt=true in production' });
   }
+  if (!/(^|;)\s*trustServerCertificate\s*=\s*false\s*(;|$)/i.test(value.DATABASE_URL)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['DATABASE_URL'], message: 'DATABASE_URL must set trustServerCertificate=false in production' });
+  }
+
+  const sqlOption = (name: string): string | undefined =>
+    value.DATABASE_URL.match(new RegExp(`(?:^|;)\\s*${name}\\s*=\\s*([^;]+)`, 'i'))?.[1]?.trim();
+  const boundedIntegerOption = (name: string, min: number, max: number, unit: string) => {
+    const raw = sqlOption(name);
+    const parsed = raw === undefined ? NaN : Number(raw);
+    if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['DATABASE_URL'],
+        message: `DATABASE_URL must set ${name} to an integer from ${min} to ${max}${unit}`,
+      });
+    }
+  };
+  // The MSSQL adapter reads socketTimeout as the query/request timeout and poolTimeout in seconds.
+  // Keep these bounded so readiness and normal requests cannot wait indefinitely.
+  boundedIntegerOption('connectionTimeout', 1_000, 60_000, ' milliseconds');
+  boundedIntegerOption('socketTimeout', 1_000, 60_000, ' milliseconds');
+  boundedIntegerOption('poolTimeout', 1, 60, ' seconds');
+  boundedIntegerOption('connectionLimit', 1, 50, ' connections');
 });
 
 const parseEnv = () => {
