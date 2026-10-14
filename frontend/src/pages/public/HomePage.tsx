@@ -107,8 +107,10 @@ export default function HomePage() {
 
       <section className="egode-home-hero">
 
-        {/* Photo + shading layers live behind the content (see .egode-home-hero in booking-flow.css). */}
-        <div className="egode-home-hero__bg" aria-hidden="true" />
+        {/* Photo + shading layers live behind the content inside a clipped backdrop */}
+        <div className="egode-home-hero__backdrop" aria-hidden="true">
+          <div className="egode-home-hero__bg" />
+        </div>
 
         <div className="egode-home-hero__inner">
 
