@@ -1,0 +1,57 @@
+[
+  {
+    "city": "Hồ Chí Minh",
+    "province": "Hồ Chí Minh",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Hà Nội",
+    "province": "Hà Nội",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Đà Nẵng",
+    "province": "Đà Nẵng",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Nha Trang",
+    "province": "Khánh Hòa",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Đà Lạt",
+    "province": "Lâm Đồng",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Hội An",
+    "province": "Quảng Nam",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Phú Quốc",
+    "province": "Kiên Giang",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Hạ Long",
+    "province": "Quảng Ninh",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Sa Pa",
+    "province": "Lào Cai",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Huế",
+    "province": "Thừa Thiên Huế",
+    "country": "Việt Nam"
+  },
+  {
+    "city": "Vũng Tàu",
+    "province": "Bà Rịa - Vũng Tàu",
+    "country": "Việt Nam"
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "cancellationPolicy": {
+    "name": "Chính sách hủy linh hoạt tiêu chuẩn",
+    "description": "Hủy trước 48 giờ hoàn 100%, từ 24 đến dưới 48 giờ hoàn 50%, dưới 24 giờ không hoàn tiền.",
+    "status": "Hoạt động",
+    "tiers": [
+      {
+        "hours": 48,
+        "rate": 100
+      },
+      {
+        "hours": 24,
+        "rate": 50
+      },
+      {
+        "hours": 0,
+        "rate": 0
+      }
+    ]
+  },
+  "promotions": [
+    {
+      "code": "CHAOMUNG2026",
+      "type": "Phần trăm",
+      "value": 10,
+      "minOrder": 500000,
+      "maxDiscount": 300000,
+      "limit": 500,
+      "startDays": -30,
+      "endDays": 180,
+      "scope": "Toàn hệ thống",
+      "status": "Hoạt động"
+    },
+    {
+      "code": "GIAM200K",
+      "type": "Số tiền cố định",
+      "value": 200000,
+      "minOrder": 1500000,
+      "maxDiscount": 200000,
+      "limit": 300,
+      "startDays": -15,
+      "endDays": 120,
+      "scope": "Toàn hệ thống",
+      "status": "Hoạt động"
+    },
+    {
+      "code": "CUOITUAN15",
+      "type": "Phần trăm",
+      "value": 15,
+      "minOrder": 2000000,
+      "maxDiscount": 600000,
+      "limit": 200,
+      "startDays": -10,
+      "endDays": 90,
+      "scope": "Toàn hệ thống",
+      "status": "Hoạt động"
+    },
+    {
+      "code": "VIPHOTEL25",
+      "type": "Phần trăm",
+      "value": 25,
+      "minOrder": 4000000,
+      "maxDiscount": 1500000,
+      "limit": 100,
+      "startDays": -5,
+      "endDays": 150,
+      "scope": "Toàn hệ thống",
+      "status": "Hoạt động"
+    }
+  ]
+}

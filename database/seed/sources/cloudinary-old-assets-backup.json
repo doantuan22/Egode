@@ -1,0 +1,1522 @@
+[
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511816/hotel-booking/hotels/demo-exterior-01.jpg",
+    "format": "jpg",
+    "bytes": 285299,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:36Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511816/hotel-booking/hotels/demo-exterior-02.jpg",
+    "format": "jpg",
+    "bytes": 166941,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:23:36Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511816/hotel-booking/hotels/demo-exterior-03.jpg",
+    "format": "jpg",
+    "bytes": 211102,
+    "width": 1600,
+    "height": 1071,
+    "created_at": "2026-09-27T12:23:36Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511816/hotel-booking/hotels/demo-exterior-04.jpg",
+    "format": "jpg",
+    "bytes": 245774,
+    "width": 1600,
+    "height": 1199,
+    "created_at": "2026-09-27T12:23:36Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511818/hotel-booking/hotels/demo-exterior-05.jpg",
+    "format": "jpg",
+    "bytes": 412917,
+    "width": 1600,
+    "height": 1195,
+    "created_at": "2026-09-27T12:23:38Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511818/hotel-booking/hotels/demo-exterior-06.jpg",
+    "format": "jpg",
+    "bytes": 338023,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:38Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511818/hotel-booking/hotels/demo-exterior-07.jpg",
+    "format": "jpg",
+    "bytes": 471143,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:38Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511818/hotel-booking/hotels/demo-exterior-08.jpg",
+    "format": "jpg",
+    "bytes": 271521,
+    "width": 1600,
+    "height": 1054,
+    "created_at": "2026-09-27T12:23:38Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511819/hotel-booking/hotels/demo-exterior-09.jpg",
+    "format": "jpg",
+    "bytes": 314623,
+    "width": 1600,
+    "height": 1157,
+    "created_at": "2026-09-27T12:23:39Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511819/hotel-booking/hotels/demo-exterior-10.jpg",
+    "format": "jpg",
+    "bytes": 268347,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:39Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-11",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511819/hotel-booking/hotels/demo-exterior-11.jpg",
+    "format": "jpg",
+    "bytes": 273355,
+    "width": 1600,
+    "height": 901,
+    "created_at": "2026-09-27T12:23:39Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-12",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511819/hotel-booking/hotels/demo-exterior-12.jpg",
+    "format": "jpg",
+    "bytes": 372292,
+    "width": 1600,
+    "height": 901,
+    "created_at": "2026-09-27T12:23:39Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-13",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511820/hotel-booking/hotels/demo-exterior-13.jpg",
+    "format": "jpg",
+    "bytes": 266512,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:40Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-14",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511820/hotel-booking/hotels/demo-exterior-14.jpg",
+    "format": "jpg",
+    "bytes": 176274,
+    "width": 1600,
+    "height": 1044,
+    "created_at": "2026-09-27T12:23:40Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-15",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511820/hotel-booking/hotels/demo-exterior-15.jpg",
+    "format": "jpg",
+    "bytes": 224068,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:40Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-16",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511821/hotel-booking/hotels/demo-exterior-16.jpg",
+    "format": "jpg",
+    "bytes": 343953,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:41Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-17",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511822/hotel-booking/hotels/demo-exterior-17.jpg",
+    "format": "jpg",
+    "bytes": 434067,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:42Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-18",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511822/hotel-booking/hotels/demo-exterior-18.jpg",
+    "format": "jpg",
+    "bytes": 250140,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:42Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-19",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511823/hotel-booking/hotels/demo-exterior-19.jpg",
+    "format": "jpg",
+    "bytes": 398036,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:43Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-20",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511823/hotel-booking/hotels/demo-exterior-20.jpg",
+    "format": "jpg",
+    "bytes": 308985,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:43Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-21",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511823/hotel-booking/hotels/demo-exterior-21.jpg",
+    "format": "jpg",
+    "bytes": 296903,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:43Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-22",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511824/hotel-booking/hotels/demo-exterior-22.jpg",
+    "format": "jpg",
+    "bytes": 667429,
+    "width": 1600,
+    "height": 1107,
+    "created_at": "2026-09-27T12:23:44Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-23",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511824/hotel-booking/hotels/demo-exterior-23.jpg",
+    "format": "jpg",
+    "bytes": 462255,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:44Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-24",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511824/hotel-booking/hotels/demo-exterior-24.jpg",
+    "format": "jpg",
+    "bytes": 381238,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:44Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-25",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511824/hotel-booking/hotels/demo-exterior-25.jpg",
+    "format": "jpg",
+    "bytes": 248023,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:44Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-26",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511825/hotel-booking/hotels/demo-exterior-26.jpg",
+    "format": "jpg",
+    "bytes": 298952,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:45Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-27",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511826/hotel-booking/hotels/demo-exterior-27.jpg",
+    "format": "jpg",
+    "bytes": 390121,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:46Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-28",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511826/hotel-booking/hotels/demo-exterior-28.jpg",
+    "format": "jpg",
+    "bytes": 457850,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:46Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-29",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511826/hotel-booking/hotels/demo-exterior-29.jpg",
+    "format": "jpg",
+    "bytes": 479321,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:46Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-30",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511827/hotel-booking/hotels/demo-exterior-30.jpg",
+    "format": "jpg",
+    "bytes": 366096,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:23:47Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-31",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511827/hotel-booking/hotels/demo-exterior-31.jpg",
+    "format": "jpg",
+    "bytes": 452487,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:23:47Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-32",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511827/hotel-booking/hotels/demo-exterior-32.jpg",
+    "format": "jpg",
+    "bytes": 425899,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:47Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-33",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511827/hotel-booking/hotels/demo-exterior-33.jpg",
+    "format": "jpg",
+    "bytes": 311357,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:47Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-34",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511828/hotel-booking/hotels/demo-exterior-34.jpg",
+    "format": "jpg",
+    "bytes": 329329,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:48Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-35",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511829/hotel-booking/hotels/demo-exterior-35.jpg",
+    "format": "jpg",
+    "bytes": 347112,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:23:49Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-36",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511829/hotel-booking/hotels/demo-exterior-36.jpg",
+    "format": "jpg",
+    "bytes": 196248,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:23:49Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-37",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511829/hotel-booking/hotels/demo-exterior-37.jpg",
+    "format": "jpg",
+    "bytes": 382353,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:23:49Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-38",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511830/hotel-booking/hotels/demo-exterior-38.jpg",
+    "format": "jpg",
+    "bytes": 308831,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:23:50Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-39",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511831/hotel-booking/hotels/demo-exterior-39.jpg",
+    "format": "jpg",
+    "bytes": 538973,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:23:51Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-exterior-40",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511830/hotel-booking/hotels/demo-exterior-40.jpg",
+    "format": "jpg",
+    "bytes": 255513,
+    "width": 1600,
+    "height": 1093,
+    "created_at": "2026-09-27T12:23:50Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511899/hotel-booking/hotels/demo-lobby-01.jpg",
+    "format": "jpg",
+    "bytes": 151230,
+    "width": 1600,
+    "height": 1060,
+    "created_at": "2026-09-27T12:24:59Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511898/hotel-booking/hotels/demo-lobby-02.jpg",
+    "format": "jpg",
+    "bytes": 276773,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:58Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511899/hotel-booking/hotels/demo-lobby-03.jpg",
+    "format": "jpg",
+    "bytes": 215903,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:59Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511900/hotel-booking/hotels/demo-lobby-04.jpg",
+    "format": "jpg",
+    "bytes": 235041,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:25:00Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511904/hotel-booking/hotels/demo-lobby-05.jpg",
+    "format": "jpg",
+    "bytes": 231813,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:04Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511901/hotel-booking/hotels/demo-lobby-06.jpg",
+    "format": "jpg",
+    "bytes": 312262,
+    "width": 1600,
+    "height": 1000,
+    "created_at": "2026-09-27T12:25:01Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511903/hotel-booking/hotels/demo-lobby-07.jpg",
+    "format": "jpg",
+    "bytes": 255604,
+    "width": 1600,
+    "height": 1068,
+    "created_at": "2026-09-27T12:25:03Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511903/hotel-booking/hotels/demo-lobby-08.jpg",
+    "format": "jpg",
+    "bytes": 243812,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:25:03Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511907/hotel-booking/hotels/demo-lobby-09.jpg",
+    "format": "jpg",
+    "bytes": 467898,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:25:07Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511904/hotel-booking/hotels/demo-lobby-10.jpg",
+    "format": "jpg",
+    "bytes": 129359,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:04Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-11",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511905/hotel-booking/hotels/demo-lobby-11.jpg",
+    "format": "jpg",
+    "bytes": 260482,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:05Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-12",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511906/hotel-booking/hotels/demo-lobby-12.jpg",
+    "format": "jpg",
+    "bytes": 460419,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:06Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-13",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511907/hotel-booking/hotels/demo-lobby-13.jpg",
+    "format": "jpg",
+    "bytes": 225834,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:07Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-14",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511906/hotel-booking/hotels/demo-lobby-14.jpg",
+    "format": "jpg",
+    "bytes": 192390,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:06Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-lobby-15",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511908/hotel-booking/hotels/demo-lobby-15.jpg",
+    "format": "jpg",
+    "bytes": 351564,
+    "width": 1600,
+    "height": 1052,
+    "created_at": "2026-09-27T12:25:08Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511831/hotel-booking/hotels/demo-pool-01.jpg",
+    "format": "jpg",
+    "bytes": 468392,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:23:51Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511831/hotel-booking/hotels/demo-pool-02.jpg",
+    "format": "jpg",
+    "bytes": 225812,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:51Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511832/hotel-booking/hotels/demo-pool-03.jpg",
+    "format": "jpg",
+    "bytes": 226104,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:52Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511834/hotel-booking/hotels/demo-pool-04.jpg",
+    "format": "jpg",
+    "bytes": 535378,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:54Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511833/hotel-booking/hotels/demo-pool-05.jpg",
+    "format": "jpg",
+    "bytes": 231804,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:53Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511833/hotel-booking/hotels/demo-pool-06.jpg",
+    "format": "jpg",
+    "bytes": 429615,
+    "width": 1600,
+    "height": 1064,
+    "created_at": "2026-09-27T12:23:53Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511834/hotel-booking/hotels/demo-pool-07.jpg",
+    "format": "jpg",
+    "bytes": 250252,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:54Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511836/hotel-booking/hotels/demo-pool-08.jpg",
+    "format": "jpg",
+    "bytes": 504330,
+    "width": 1600,
+    "height": 1199,
+    "created_at": "2026-09-27T12:23:56Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511836/hotel-booking/hotels/demo-pool-09.jpg",
+    "format": "jpg",
+    "bytes": 445648,
+    "width": 1600,
+    "height": 902,
+    "created_at": "2026-09-27T12:23:56Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511837/hotel-booking/hotels/demo-pool-10.jpg",
+    "format": "jpg",
+    "bytes": 235864,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:23:57Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-11",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511837/hotel-booking/hotels/demo-pool-11.jpg",
+    "format": "jpg",
+    "bytes": 218515,
+    "width": 1600,
+    "height": 1068,
+    "created_at": "2026-09-27T12:23:57Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-12",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511838/hotel-booking/hotels/demo-pool-12.jpg",
+    "format": "jpg",
+    "bytes": 197817,
+    "width": 1600,
+    "height": 1068,
+    "created_at": "2026-09-27T12:23:58Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-13",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511838/hotel-booking/hotels/demo-pool-13.jpg",
+    "format": "jpg",
+    "bytes": 248656,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:23:58Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-14",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511842/hotel-booking/hotels/demo-pool-14.jpg",
+    "format": "jpg",
+    "bytes": 480645,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:02Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-15",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511842/hotel-booking/hotels/demo-pool-15.jpg",
+    "format": "jpg",
+    "bytes": 438929,
+    "width": 1600,
+    "height": 1202,
+    "created_at": "2026-09-27T12:24:02Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-16",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511841/hotel-booking/hotels/demo-pool-16.jpg",
+    "format": "jpg",
+    "bytes": 296514,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:01Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-17",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511840/hotel-booking/hotels/demo-pool-17.jpg",
+    "format": "jpg",
+    "bytes": 268293,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:00Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-18",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511843/hotel-booking/hotels/demo-pool-18.jpg",
+    "format": "jpg",
+    "bytes": 424673,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:03Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-19",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511872/hotel-booking/hotels/demo-pool-19.jpg",
+    "format": "jpg",
+    "bytes": 256599,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:32Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-20",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511870/hotel-booking/hotels/demo-pool-20.jpg",
+    "format": "jpg",
+    "bytes": 160235,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:24:30Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-21",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511845/hotel-booking/hotels/demo-pool-21.jpg",
+    "format": "jpg",
+    "bytes": 199220,
+    "width": 1600,
+    "height": 1048,
+    "created_at": "2026-09-27T12:24:05Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-22",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511850/hotel-booking/hotels/demo-pool-22.jpg",
+    "format": "jpg",
+    "bytes": 441704,
+    "width": 1600,
+    "height": 1123,
+    "created_at": "2026-09-27T12:24:10Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-23",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511860/hotel-booking/hotels/demo-pool-23.jpg",
+    "format": "jpg",
+    "bytes": 379907,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:20Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-24",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511893/hotel-booking/hotels/demo-pool-24.jpg",
+    "format": "jpg",
+    "bytes": 316509,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:53Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-25",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511894/hotel-booking/hotels/demo-pool-25.jpg",
+    "format": "jpg",
+    "bytes": 390707,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:54Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-26",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511894/hotel-booking/hotels/demo-pool-26.jpg",
+    "format": "jpg",
+    "bytes": 329171,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:54Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-27",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511895/hotel-booking/hotels/demo-pool-27.jpg",
+    "format": "jpg",
+    "bytes": 346351,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:24:55Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-pool-28",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511901/hotel-booking/hotels/demo-pool-28.jpg",
+    "format": "jpg",
+    "bytes": 342405,
+    "width": 1600,
+    "height": 900,
+    "created_at": "2026-09-27T12:25:01Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511908/hotel-booking/hotels/demo-restaurant-01.jpg",
+    "format": "jpg",
+    "bytes": 162678,
+    "width": 1600,
+    "height": 1101,
+    "created_at": "2026-09-27T12:25:08Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511909/hotel-booking/hotels/demo-restaurant-02.jpg",
+    "format": "jpg",
+    "bytes": 228273,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:09Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511910/hotel-booking/hotels/demo-restaurant-03.jpg",
+    "format": "jpg",
+    "bytes": 243388,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:10Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511909/hotel-booking/hotels/demo-restaurant-04.jpg",
+    "format": "jpg",
+    "bytes": 276642,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:09Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511909/hotel-booking/hotels/demo-restaurant-05.jpg",
+    "format": "jpg",
+    "bytes": 217550,
+    "width": 1600,
+    "height": 1030,
+    "created_at": "2026-09-27T12:25:09Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511910/hotel-booking/hotels/demo-restaurant-06.jpg",
+    "format": "jpg",
+    "bytes": 180014,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:10Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511911/hotel-booking/hotels/demo-restaurant-07.jpg",
+    "format": "jpg",
+    "bytes": 223932,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:11Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511911/hotel-booking/hotels/demo-restaurant-08.jpg",
+    "format": "jpg",
+    "bytes": 235313,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:25:11Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511911/hotel-booking/hotels/demo-restaurant-09.jpg",
+    "format": "jpg",
+    "bytes": 223061,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:25:11Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511912/hotel-booking/hotels/demo-restaurant-10.jpg",
+    "format": "jpg",
+    "bytes": 271696,
+    "width": 1600,
+    "height": 1063,
+    "created_at": "2026-09-27T12:25:12Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-11",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511912/hotel-booking/hotels/demo-restaurant-11.jpg",
+    "format": "jpg",
+    "bytes": 268630,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:12Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-12",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511912/hotel-booking/hotels/demo-restaurant-12.jpg",
+    "format": "jpg",
+    "bytes": 395017,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:12Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-13",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511913/hotel-booking/hotels/demo-restaurant-13.jpg",
+    "format": "jpg",
+    "bytes": 161912,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:13Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-14",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511913/hotel-booking/hotels/demo-restaurant-14.jpg",
+    "format": "jpg",
+    "bytes": 203617,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:13Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-15",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511913/hotel-booking/hotels/demo-restaurant-15.jpg",
+    "format": "jpg",
+    "bytes": 302238,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:13Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-16",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511914/hotel-booking/hotels/demo-restaurant-16.jpg",
+    "format": "jpg",
+    "bytes": 237435,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:14Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-17",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511914/hotel-booking/hotels/demo-restaurant-17.jpg",
+    "format": "jpg",
+    "bytes": 311898,
+    "width": 1600,
+    "height": 1206,
+    "created_at": "2026-09-27T12:25:14Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/hotels/demo-restaurant-18",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511915/hotel-booking/hotels/demo-restaurant-18.jpg",
+    "format": "jpg",
+    "bytes": 298785,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:15Z",
+    "folder": "hotel-booking/hotels"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511928/hotel-booking/reviews/demo-review-01.jpg",
+    "format": "jpg",
+    "bytes": 460787,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:28Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511929/hotel-booking/reviews/demo-review-02.jpg",
+    "format": "jpg",
+    "bytes": 402589,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:29Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511929/hotel-booking/reviews/demo-review-03.jpg",
+    "format": "jpg",
+    "bytes": 454156,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:29Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511930/hotel-booking/reviews/demo-review-04.jpg",
+    "format": "jpg",
+    "bytes": 400458,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:30Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511930/hotel-booking/reviews/demo-review-05.jpg",
+    "format": "jpg",
+    "bytes": 253789,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:30Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511930/hotel-booking/reviews/demo-review-06.jpg",
+    "format": "jpg",
+    "bytes": 287370,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:30Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511931/hotel-booking/reviews/demo-review-07.jpg",
+    "format": "jpg",
+    "bytes": 436157,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:31Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511931/hotel-booking/reviews/demo-review-08.jpg",
+    "format": "jpg",
+    "bytes": 356031,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:31Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511931/hotel-booking/reviews/demo-review-09.jpg",
+    "format": "jpg",
+    "bytes": 310423,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:31Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/demo-review-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511932/hotel-booking/reviews/demo-review-10.jpg",
+    "format": "jpg",
+    "bytes": 424058,
+    "width": 1600,
+    "height": 1205,
+    "created_at": "2026-09-27T12:25:32Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/reviews/nde0sgnldujurutwmilk",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790415296/hotel-booking/reviews/nde0sgnldujurutwmilk.png",
+    "format": "png",
+    "bytes": 68,
+    "width": 1,
+    "height": 1,
+    "created_at": "2026-09-26T09:34:56Z",
+    "folder": "hotel-booking/reviews"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-01",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511915/hotel-booking/room-types/demo-room-01.jpg",
+    "format": "jpg",
+    "bytes": 152609,
+    "width": 1600,
+    "height": 1066,
+    "created_at": "2026-09-27T12:25:15Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-02",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511915/hotel-booking/room-types/demo-room-02.jpg",
+    "format": "jpg",
+    "bytes": 117140,
+    "width": 1600,
+    "height": 1066,
+    "created_at": "2026-09-27T12:25:15Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-03",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511916/hotel-booking/room-types/demo-room-03.jpg",
+    "format": "jpg",
+    "bytes": 243916,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:16Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-04",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511917/hotel-booking/room-types/demo-room-04.jpg",
+    "format": "jpg",
+    "bytes": 256506,
+    "width": 1600,
+    "height": 1089,
+    "created_at": "2026-09-27T12:25:17Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-05",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511916/hotel-booking/room-types/demo-room-05.jpg",
+    "format": "jpg",
+    "bytes": 224065,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:16Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-06",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511916/hotel-booking/room-types/demo-room-06.jpg",
+    "format": "jpg",
+    "bytes": 195225,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:16Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-07",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511917/hotel-booking/room-types/demo-room-07.jpg",
+    "format": "jpg",
+    "bytes": 153514,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:17Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-08",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511917/hotel-booking/room-types/demo-room-08.jpg",
+    "format": "jpg",
+    "bytes": 218031,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:17Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-09",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511917/hotel-booking/room-types/demo-room-09.jpg",
+    "format": "jpg",
+    "bytes": 189295,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:17Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-10",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511918/hotel-booking/room-types/demo-room-10.jpg",
+    "format": "jpg",
+    "bytes": 258368,
+    "width": 1600,
+    "height": 1068,
+    "created_at": "2026-09-27T12:25:18Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-11",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511918/hotel-booking/room-types/demo-room-11.jpg",
+    "format": "jpg",
+    "bytes": 209832,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:18Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-12",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511919/hotel-booking/room-types/demo-room-12.jpg",
+    "format": "jpg",
+    "bytes": 200919,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:19Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-13",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511919/hotel-booking/room-types/demo-room-13.jpg",
+    "format": "jpg",
+    "bytes": 133395,
+    "width": 1600,
+    "height": 941,
+    "created_at": "2026-09-27T12:25:19Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-14",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511919/hotel-booking/room-types/demo-room-14.jpg",
+    "format": "jpg",
+    "bytes": 145071,
+    "width": 1600,
+    "height": 1067,
+    "created_at": "2026-09-27T12:25:19Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-15",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511920/hotel-booking/room-types/demo-room-15.jpg",
+    "format": "jpg",
+    "bytes": 250818,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:20Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-16",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511920/hotel-booking/room-types/demo-room-16.jpg",
+    "format": "jpg",
+    "bytes": 193087,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:20Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-17",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511921/hotel-booking/room-types/demo-room-17.jpg",
+    "format": "jpg",
+    "bytes": 346344,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:21Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-18",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511921/hotel-booking/room-types/demo-room-18.jpg",
+    "format": "jpg",
+    "bytes": 274220,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:21Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-19",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511951/hotel-booking/room-types/demo-room-19.jpg",
+    "format": "jpg",
+    "bytes": 160394,
+    "width": 1600,
+    "height": 1068,
+    "created_at": "2026-09-27T12:25:51Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-20",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511921/hotel-booking/room-types/demo-room-20.jpg",
+    "format": "jpg",
+    "bytes": 185029,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:21Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-21",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511921/hotel-booking/room-types/demo-room-21.jpg",
+    "format": "jpg",
+    "bytes": 142763,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:21Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-22",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511922/hotel-booking/room-types/demo-room-22.jpg",
+    "format": "jpg",
+    "bytes": 144503,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:22Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-23",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511922/hotel-booking/room-types/demo-room-23.jpg",
+    "format": "jpg",
+    "bytes": 202322,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:22Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-24",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511923/hotel-booking/room-types/demo-room-24.jpg",
+    "format": "jpg",
+    "bytes": 238840,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:23Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-25",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511923/hotel-booking/room-types/demo-room-25.jpg",
+    "format": "jpg",
+    "bytes": 147769,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:23Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-26",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511923/hotel-booking/room-types/demo-room-26.jpg",
+    "format": "jpg",
+    "bytes": 178270,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:23Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-27",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511924/hotel-booking/room-types/demo-room-27.jpg",
+    "format": "jpg",
+    "bytes": 304238,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:24Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-28",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511924/hotel-booking/room-types/demo-room-28.jpg",
+    "format": "jpg",
+    "bytes": 448755,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:24Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-29",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511925/hotel-booking/room-types/demo-room-29.jpg",
+    "format": "jpg",
+    "bytes": 307082,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:25Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-30",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511925/hotel-booking/room-types/demo-room-30.jpg",
+    "format": "jpg",
+    "bytes": 404175,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:25Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-31",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511925/hotel-booking/room-types/demo-room-31.jpg",
+    "format": "jpg",
+    "bytes": 356925,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:25Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-32",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511926/hotel-booking/room-types/demo-room-32.jpg",
+    "format": "jpg",
+    "bytes": 283579,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:26Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-33",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511926/hotel-booking/room-types/demo-room-33.jpg",
+    "format": "jpg",
+    "bytes": 398886,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:26Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-34",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511926/hotel-booking/room-types/demo-room-34.jpg",
+    "format": "jpg",
+    "bytes": 358940,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:26Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-35",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511927/hotel-booking/room-types/demo-room-35.jpg",
+    "format": "jpg",
+    "bytes": 273711,
+    "width": 1600,
+    "height": 1185,
+    "created_at": "2026-09-27T12:25:27Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-36",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511927/hotel-booking/room-types/demo-room-36.jpg",
+    "format": "jpg",
+    "bytes": 188985,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:27Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-37",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511927/hotel-booking/room-types/demo-room-37.jpg",
+    "format": "jpg",
+    "bytes": 155264,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:27Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-38",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511928/hotel-booking/room-types/demo-room-38.jpg",
+    "format": "jpg",
+    "bytes": 176524,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:28Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-39",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511928/hotel-booking/room-types/demo-room-39.jpg",
+    "format": "jpg",
+    "bytes": 127626,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:28Z",
+    "folder": "hotel-booking/room-types"
+  },
+  {
+    "public_id": "hotel-booking/room-types/demo-room-40",
+    "secure_url": "https://res.cloudinary.com/dfyfpuguj/image/upload/v1790511928/hotel-booking/room-types/demo-room-40.jpg",
+    "format": "jpg",
+    "bytes": 151167,
+    "width": 1600,
+    "height": 1200,
+    "created_at": "2026-09-27T12:25:28Z",
+    "folder": "hotel-booking/room-types"
+  }
+]

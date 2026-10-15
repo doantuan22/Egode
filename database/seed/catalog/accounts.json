@@ -1,0 +1,222 @@
+[
+  {
+    "user": "admin.nguyen",
+    "name": "Nguyễn Minh Tuấn",
+    "email": "admin.tuan@egode.vn",
+    "role": "Quản trị hệ thống",
+    "gender": "Nam",
+    "dob": "1985-04-12",
+    "phone": "0912111001",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$aAFaLkM.v8TnUQobjsfGtO.tVCG6t0cO03KE2kDwqH5.pVBqFHqnm"
+  },
+  {
+    "user": "admin.hoang",
+    "name": "Hoàng Mai Linh",
+    "email": "admin.linh@egode.vn",
+    "role": "Quản trị hệ thống",
+    "gender": "Nữ",
+    "dob": "1990-09-25",
+    "phone": "0912111002",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$qH5jdOBDn9SdwmEA74tDnOiObnequfYMJUVEf7FpAGfz8TVWMtS2e"
+  },
+  {
+    "user": "admin.tran",
+    "name": "Trần Quang Khải",
+    "email": "admin.khai@egode.vn",
+    "role": "Quản trị hệ thống",
+    "gender": "Nam",
+    "dob": "1988-11-18",
+    "phone": "0912111003",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$7MpxvK.dT8AxL7NZYyCs5OfXmvPFVpfLL5IBdvPc2r8DdAARonO6S"
+  },
+  {
+    "user": "admin.le",
+    "name": "Lê Thu Trang",
+    "email": "admin.trang@egode.vn",
+    "role": "Quản trị hệ thống",
+    "gender": "Nữ",
+    "dob": "1993-02-08",
+    "phone": "0912111004",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$GGPFW.kY4ruaqDtNPgpjM.VZ1Eky6RlG6jxB2HEIy4WAV/DYsHNuS"
+  },
+  {
+    "user": "owner.phamminh",
+    "name": "Phạm Minh Châu",
+    "email": "phamminh.chau@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1978-06-15",
+    "phone": "0983111011",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$W2zrbwquKb9.EnoWgGqrUuAyd/rT/npiyZmLQCV2DZ2RwRL9mpM3G"
+  },
+  {
+    "user": "owner.vuminh",
+    "name": "Vũ Minh Khang",
+    "email": "vuminh.khang@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1982-10-20",
+    "phone": "0983111012",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$i4o1wJOVbQcx2K33TCC9j.39dCNHehJ5PVkVe3F0g4HxP5Fl6n5YC"
+  },
+  {
+    "user": "owner.dangtuan",
+    "name": "Đặng Anh Tuấn",
+    "email": "dang.tuan@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1975-03-30",
+    "phone": "0983111013",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$NEw2X4jtizQNZS3Z.LETaeaxbcPNA.1l.kxqOuA1NmuX.hgWCXICu"
+  },
+  {
+    "user": "owner.nguyenthuy",
+    "name": "Nguyễn Bích Thủy",
+    "email": "nguyen.thuy@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nữ",
+    "dob": "1984-12-14",
+    "phone": "0983111014",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$GX0dG8xbFAnXTpOUW6K9NOK6.GPPrPiDwbZ7rF8eZxNFz69yuBYUu"
+  },
+  {
+    "user": "owner.tranlong",
+    "name": "Trần Bảo Long",
+    "email": "tran.long@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1980-07-22",
+    "phone": "0983111015",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$Khj9bUChC.cQ4IpALCKQbOyTZsRNTJCaNylwb/JhnXwLjwSc.oeA2"
+  },
+  {
+    "user": "owner.lexuan",
+    "name": "Lê Xuân Hùng",
+    "email": "le.xuanhung@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1986-05-19",
+    "phone": "0983111016",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$ngb4NYyD4Hr2XyGWRXBHUuj9s7wjMSWFIzvGGOdgGGbouSSbyEwCS"
+  },
+  {
+    "user": "owner.doanthi",
+    "name": "Đoàn Hồng Mai",
+    "email": "doan.hongmai@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nữ",
+    "dob": "1983-08-05",
+    "phone": "0983111017",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$.WYCxpH/o0o/P1vfJvJJBu5YY0nl0.XiDMUgvxpDqoc9GiWQ98.7C"
+  },
+  {
+    "user": "owner.nguyenquoc",
+    "name": "Nguyễn Quốc Đạt",
+    "email": "nguyen.quocdat@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1979-01-11",
+    "phone": "0983111018",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$e3RkyVmLKD43IY0DXgqhBuw0YIqjYNLunoSMq5e/Zdx6okz3dffZy"
+  },
+  {
+    "user": "owner.phanvan",
+    "name": "Phan Thanh Vân",
+    "email": "phan.thanhvan@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nữ",
+    "dob": "1987-09-02",
+    "phone": "0983111019",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$uxfTH9OLmlXMz.lNCsPOjuOnt92pGuk3.KFu0ERUtAj7cUOjnC6WK"
+  },
+  {
+    "user": "owner.buitrung",
+    "name": "Bùi Trung Kiên",
+    "email": "bui.trungkien@egode-partner.vn",
+    "role": "Chủ khách sạn",
+    "gender": "Nam",
+    "dob": "1981-11-28",
+    "phone": "0983111020",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$nO.gr.pJOe0hcZTPRZkJz.6/rXtAwK.mBg3JLJiMX36mPUGTVnCYy"
+  },
+  {
+    "user": "khach.namle",
+    "name": "Lê Hoàng Nam",
+    "email": "nam.lehoang@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nam",
+    "dob": "1994-03-15",
+    "phone": "0905222001",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$LvUDpSGUZQNhMbV./b5lXO9pPsQd9eU9pR463mEQBhkmW3oqgt8Ee"
+  },
+  {
+    "user": "khach.phuonganh",
+    "name": "Đỗ Phương Anh",
+    "email": "phuonganh.do@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nữ",
+    "dob": "1996-07-22",
+    "phone": "0905222002",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$fPycYWcX1YrwAa54tU2.neCyCMNp74klPt9bv1j4QilwkQdKu.GMu"
+  },
+  {
+    "user": "khach.ducthinh",
+    "name": "Vũ Đức Thịnh",
+    "email": "thinh.vuduc@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nam",
+    "dob": "1991-10-05",
+    "phone": "0905222003",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$kemzMmJ4ts57gpMV8CGRnO96RjWFtMbF517j7TCQ7DDa2/DVSGRIa"
+  },
+  {
+    "user": "khach.thuyduong",
+    "name": "Trần Thùy Dương",
+    "email": "duong.tranthuy@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nữ",
+    "dob": "1998-12-19",
+    "phone": "0905222004",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$ERTQv8hW8U2BfWppR362ouPckIaqrXwEb1uZ.GRr0dWze43RX/E4u"
+  },
+  {
+    "user": "khach.minhtri",
+    "name": "Phạm Minh Trí",
+    "email": "tri.phamminh@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nam",
+    "dob": "1989-04-30",
+    "phone": "0905222005",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$hjPpFkBUmH7RxMEgnunFg.PXIhFzFgqsVr4Y0ViNaAF7KErZj2OmW"
+  },
+  {
+    "user": "khach.ngocmai",
+    "name": "Nguyễn Ngọc Mai",
+    "email": "mai.nguyenngoc@gmail.com",
+    "role": "Khách hàng",
+    "gender": "Nữ",
+    "dob": "1995-08-14",
+    "phone": "0905222006",
+    "status": "Hoạt động",
+    "passwordHash": "$2b$12$VoHmsQieoAw3lSBiQ7a17OoRb9WfE/ag4/uHaVpnEiNGajjS/qww."
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "user": "owner.phamminh",
+    "cccd": "079100000000",
+    "license": "GPKD-450000",
+    "taxCode": "0310000000",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.phamminh-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.vuminh",
+    "cccd": "079101472583",
+    "license": "GPKD-450083",
+    "taxCode": "0310009317",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.vuminh-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.dangtuan",
+    "cccd": "079102945166",
+    "license": "GPKD-450166",
+    "taxCode": "0310018635",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.dangtuan-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.nguyenthuy",
+    "cccd": "079104417749",
+    "license": "GPKD-450249",
+    "taxCode": "0310027952",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.nguyenthuy-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.tranlong",
+    "cccd": "079105890332",
+    "license": "GPKD-450332",
+    "taxCode": "0310037270",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.tranlong-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.lexuan",
+    "cccd": "079107362915",
+    "license": "GPKD-450415",
+    "taxCode": "0310046587",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.lexuan-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.doanthi",
+    "cccd": "079108835498",
+    "license": "GPKD-450498",
+    "taxCode": "0310055905",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.doanthi-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.nguyenquoc",
+    "cccd": "079110308081",
+    "license": "GPKD-450581",
+    "taxCode": "0310065222",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.nguyenquoc-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.phanvan",
+    "cccd": "079111780664",
+    "license": "GPKD-450664",
+    "taxCode": "0310074540",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.phanvan-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  },
+  {
+    "user": "owner.buitrung",
+    "cccd": "079113253247",
+    "license": "GPKD-450747",
+    "taxCode": "0310083857",
+    "docUrl": "https://storage.egode.vn/partner-kyc/owner.buitrung-registration.pdf",
+    "status": "Đã duyệt",
+    "reason": null
+  }
+]

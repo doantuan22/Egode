@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Wi-Fi miễn phí",
+    "icon": "wifi"
+  },
+  {
+    "name": "Hồ bơi",
+    "icon": "pool"
+  },
+  {
+    "name": "Bãi đỗ xe",
+    "icon": "parking"
+  },
+  {
+    "name": "Nhà hàng",
+    "icon": "restaurant"
+  },
+  {
+    "name": "Phòng gym",
+    "icon": "gym"
+  },
+  {
+    "name": "Điều hòa nhiệt độ",
+    "icon": "ac"
+  },
+  {
+    "name": "Đưa đón sân bay",
+    "icon": "shuttle"
+  },
+  {
+    "name": "Spa & Massage",
+    "icon": "spa"
+  },
+  {
+    "name": "Bãi biển riêng",
+    "icon": "beach"
+  },
+  {
+    "name": "Quầy bar",
+    "icon": "bar"
+  },
+  {
+    "name": "Lễ tân 24/7",
+    "icon": "reception"
+  },
+  {
+    "name": "Bữa sáng miễn phí",
+    "icon": "breakfast"
+  },
+  {
+    "name": "Ban công",
+    "icon": "balcony"
+  },
+  {
+    "name": "Bồn tắm",
+    "icon": "bathtub"
+  },
+  {
+    "name": "TV màn hình phẳng",
+    "icon": "tv"
+  },
+  {
+    "name": "Minibar",
+    "icon": "minibar"
+  },
+  {
+    "name": "Két sắt an toàn",
+    "icon": "safe"
+  },
+  {
+    "name": "Máy sấy tóc",
+    "icon": "hairdryer"
+  },
+  {
+    "name": "Cho phép thú cưng",
+    "icon": "pet"
+  },
+  {
+    "name": "Khu vui chơi trẻ em",
+    "icon": "kids"
+  }
+]

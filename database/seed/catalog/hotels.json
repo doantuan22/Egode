@@ -1,0 +1,2610 @@
+[
+  {
+    "key": "H01",
+    "name": "Khách sạn Continental Sài Gòn",
+    "ownerUser": "owner.phamminh",
+    "cityName": "Hồ Chí Minh",
+    "provinceName": "Hồ Chí Minh",
+    "address": "132 - 134 Đồng Khởi, Phường Bến Nghé, Quận 1",
+    "stars": 4,
+    "description": "Khách sạn lịch sử đầu tiên của Sài Gòn xây dựng từ năm 1880, mang đậm phong cách kiến trúc Pháp cổ điển với sân vườn trung tâm lãng mạn và vị trí đắc địa đối diện Nhà hát Thành phố.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Quầy bar",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí",
+      "Spa & Massage"
+    ],
+    "officialWebsite": "https://continentalhotel.com.vn",
+    "addressVerifiedUrl": "https://continentalhotel.com.vn/contact-us",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://continentalhotel.com.vn/facilities",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 28,
+        "bedType": "Giường đôi",
+        "description": "Phòng Superior ấm cúng mang phong cách cổ điển với sàn gỗ tự nhiên, bàn làm việc và tiện nghi cao cấp.",
+        "priceBase": 1850000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Máy sấy tóc",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe City View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 36,
+        "bedType": "Giường King",
+        "description": "Phòng Deluxe rộng rãi nhìn ra phố Đồng Khởi sầm uất, trang bị bồn tắm nằm và minibar tiện lợi.",
+        "priceBase": 2450000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Junior Suite Opera View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 55,
+        "bedType": "Giường King",
+        "description": "Suite sang trọng với phòng khách riêng biệt và ban công ngắm trọn Nhà hát Thành phố.",
+        "priceBase": 3800000,
+        "inventory": 5,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H02",
+    "name": "Khách sạn Grand Sài Gòn",
+    "ownerUser": "owner.phamminh",
+    "cityName": "Hồ Chí Minh",
+    "provinceName": "Hồ Chí Minh",
+    "address": "08 Đồng Khởi, Phường Bến Nghé, Quận 1",
+    "stars": 5,
+    "description": "Khách sạn 5 sao cổ kính thành lập năm 1930, kết hợp hài hòa nét sang trọng kiểu Pháp thế kỷ 20 với hồ bơi ngoài trời giữa lòng hoa viên và quầy bar tầng thượng ngắm sông Sài Gòn.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://hotelgrandsaigon.com",
+    "addressVerifiedUrl": "https://hotelgrandsaigon.com/vi/lien-he/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://hotelgrandsaigon.com/vi/dich-vu/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 32,
+        "bedType": "Giường King",
+        "description": "Phòng Deluxe phong cách Pháp tinh tế với tầm nhìn thoáng đãng và nội thất gỗ sang trọng.",
+        "priceBase": 2600000,
+        "inventory": 14,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Premium Deluxe Twin",
+        "beds": 2,
+        "capacity": 2,
+        "area": 38,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn cao cấp phù hợp cho bạn bè hoặc đối tác đi công tác, có bồn tắm thư giãn.",
+        "priceBase": 2950000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Grand Suite River View",
+        "beds": 1,
+        "capacity": 3,
+        "area": 65,
+        "bedType": "Giường King",
+        "description": "Căn Suite thượng hạng nhìn thẳng ra sông Sài Gòn, có phòng khách tiếp khách riêng biệt.",
+        "priceBase": 4900000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H03",
+    "name": "Khách sạn Majestic Sài Gòn",
+    "ownerUser": "owner.phamminh",
+    "cityName": "Hồ Chí Minh",
+    "provinceName": "Hồ Chí Minh",
+    "address": "01 Đồng Khởi, Phường Bến Nghé, Quận 1",
+    "stars": 5,
+    "description": "Biểu tượng kiến trúc Art Deco 5 sao tọa lạc ngay ngã ba sông Sài Gòn từ năm 1925, nổi tiếng với ban công mở ngắm hoàng hôn bến Bạch Đằng và phong cách phục vụ chuẩn mực di sản.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://hotelmajesticsaigon.com",
+    "addressVerifiedUrl": "https://hotelmajesticsaigon.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://hotelmajesticsaigon.com/facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Colonial City Deluxe",
+        "beds": 1,
+        "capacity": 2,
+        "area": 35,
+        "bedType": "Giường King",
+        "description": "Phòng Colonial mang đậm hơi thở thời hoàng kim với sàn gỗ cổ điển và tầm nhìn phố Đồng Khởi.",
+        "priceBase": 2800000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Colonial River Deluxe",
+        "beds": 1,
+        "capacity": 2,
+        "area": 40,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn tuyệt đẹp hướng ra bến Bạch Đằng và sông Sài Gòn, ban công riêng lộng gió.",
+        "priceBase": 3400000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Majestic Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 70,
+        "bedType": "Giường King",
+        "description": "Suite thượng khách với nội thất chạm khắc thủ công, phòng khách rộng lớn và bồn tắm sục Jacuzzi.",
+        "priceBase": 5800000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H04",
+    "name": "Khách sạn Rex Sài Gòn",
+    "ownerUser": "owner.vuminh",
+    "cityName": "Hồ Chí Minh",
+    "provinceName": "Hồ Chí Minh",
+    "address": "141 Nguyễn Huệ, Phường Bến Nghé, Quận 1",
+    "stars": 5,
+    "description": "Khách sạn 5 sao danh tiếng nằm ngay góc phố đi bộ Nguyễn Huệ và Lê Lợi, sở hữu khu vườn đứng, hai hồ bơi sân thượng cùng nhà hàng Rooftop Garden huyền thoại.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://rexhotelsaigon.com",
+    "addressVerifiedUrl": "https://rexhotelsaigon.com/vi/lien-he/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://rexhotelsaigon.com/vi/tien-ich/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Premium Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 32,
+        "bedType": "Giường King",
+        "description": "Phòng nghỉ hiện đại với cửa sổ lớn nhìn xuống phố đi bộ Nguyễn Huệ rực rỡ ánh đèn.",
+        "priceBase": 2500000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Executive Family",
+        "beds": 2,
+        "capacity": 4,
+        "area": 50,
+        "bedType": "Giường đôi + 2 giường đơn",
+        "description": "Không gian gia đình hoàn hảo gồm một giường đôi và hai giường đơn, trang bị bồn tắm lớn.",
+        "priceBase": 3900000,
+        "inventory": 6,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Governor Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 60,
+        "bedType": "Giường King",
+        "description": "Suite đẳng cấp với nội thất trang nhã, phòng khách riêng và dịch vụ quản gia tận tâm.",
+        "priceBase": 5200000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H05",
+    "name": "Khách sạn Caravelle Sài Gòn",
+    "ownerUser": "owner.vuminh",
+    "cityName": "Hồ Chí Minh",
+    "provinceName": "Hồ Chí Minh",
+    "address": "19 - 23 Công Trường Lam Sơn, Phường Bến Nghé, Quận 1",
+    "stars": 5,
+    "description": "Khách sạn 5 sao biểu tượng khai trương năm 1959, nằm ngay cạnh Nhà hát Thành phố, nổi danh với Saigon Saigon Rooftop Bar và không gian nghỉ dưỡng tinh tế chuẩn quốc tế.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://caravellehotel.com",
+    "addressVerifiedUrl": "https://caravellehotel.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://caravellehotel.com/wellness/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 38,
+        "bedType": "Giường King",
+        "description": "Không gian nghỉ dưỡng thanh lịch nhìn ra Công trường Lam Sơn, phòng tắm lát đá cẩm thạch sang trọng.",
+        "priceBase": 3100000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Opera Twin Room",
+        "beds": 2,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường êm ái với góc nhìn trực diện mái vòm Nhà hát Thành phố, đầy đủ tiện nghi làm việc.",
+        "priceBase": 3600000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Heritage Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 80,
+        "bedType": "Giường King",
+        "description": "Căn Suite thượng khách với tầm nhìn bao quát trung tâm Sài Gòn, đặc quyền sử dụng Signature Lounge.",
+        "priceBase": 6500000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H06",
+    "name": "Khách sạn Sofitel Legend Metropole Hà Nội",
+    "ownerUser": "owner.dangtuan",
+    "cityName": "Hà Nội",
+    "provinceName": "Hà Nội",
+    "address": "15 Ngô Quyền, Phường Tràng Tiền, Quận Hoàn Kiếm",
+    "stars": 5,
+    "description": "Khách sạn 5 sao lịch sử lâu đời nhất thủ đô thành lập năm 1901, mang phong cách kiến trúc Pháp cổ kính xen lẫn nét thanh lịch Á Đông, sở hữu hồ bơi sân vườn và nhà hàng Pháp Le Beaulieu danh tiếng.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://sofitel-legend-metropole-hanoi.com",
+    "addressVerifiedUrl": "https://sofitel-legend-metropole-hanoi.com/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://sofitel-legend-metropole-hanoi.com/wellness/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Luxury Room",
+        "beds": 1,
+        "capacity": 2,
+        "area": 32,
+        "bedType": "Giường King",
+        "description": "Thiết kế cổ điển kiểu Pháp tại cánh Opera Wing, sàn gỗ nguyên khối và phòng tắm đá cẩm thạch.",
+        "priceBase": 4200000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Grand Luxury Garden View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 37,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn ra khoảng sân vườn xanh mát và hồ bơi lịch sử, mang lại cảm giác bình yên thư thái.",
+        "priceBase": 5100000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Prestige Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 64,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng với phòng khách riêng biệt, dịch vụ quản gia 24/7 và trà chiều cao cấp.",
+        "priceBase": 8500000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H07",
+    "name": "Khách sạn InterContinental Hà Nội Westlake",
+    "ownerUser": "owner.dangtuan",
+    "cityName": "Hà Nội",
+    "provinceName": "Hà Nội",
+    "address": "05 Từ Hoa, Phường Quảng An, Quận Tây Hồ",
+    "stars": 5,
+    "description": "Khách sạn 5 sao độc đáo xây dựng hoàn toàn trên mặt nước Hồ Tây thơ mộng, mang lại không gian tĩnh lặng, lãng mạn tách biệt khỏi nhịp sống sôi động của phố thị.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://hanoi.intercontinental.com",
+    "addressVerifiedUrl": "https://hanoi.intercontinental.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://hanoi.intercontinental.com/facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe Lake View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 43,
+        "bedType": "Giường King",
+        "description": "Phòng ngủ rộng rãi với ban công ngắm nhìn mặt nước Hồ Tây mênh mang lúc hoàng hôn.",
+        "priceBase": 3100000,
+        "inventory": 14,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Overwater Pavilion Lake View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 43,
+        "bedType": "Giường King",
+        "description": "Biệt thự nổi biệt lập ngay trên mặt hồ, không gian yên bình tuyệt đối với làn gió mát lành.",
+        "priceBase": 3800000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Westlake Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 80,
+        "bedType": "Giường King",
+        "description": "Căn Suite cao cấp với phòng khách riêng, phòng tắm nhìn ra hồ và ban công panorama.",
+        "priceBase": 6200000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H08",
+    "name": "Khách sạn Sheraton Hà Nội",
+    "ownerUser": "owner.dangtuan",
+    "cityName": "Hà Nội",
+    "provinceName": "Hà Nội",
+    "address": "K5 Nghi Tàm, 11 Xuân Diệu, Phường Quảng An, Quận Tây Hồ",
+    "stars": 5,
+    "description": "Khách sạn 5 sao ven Hồ Tây bao quanh bởi vườn cây xanh mát, sở hữu hồ bơi ngoài trời thư giãn, hệ thống nhà hàng Á - Âu đa dạng và trung tâm hội nghị tiêu chuẩn quốc tế.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://marriott.com",
+    "addressVerifiedUrl": "https://www.marriott.com/en-us/hotels/hanhs-sheraton-hanoi-hotel/overview/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.marriott.com/en-us/hotels/hanhs-sheraton-hanoi-hotel/amenities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 37,
+        "bedType": "Giường King",
+        "description": "Phòng Deluxe trang nhã với giường Sheraton Signature Bed êm ái và cửa sổ nhìn ra cảnh quan thành phố.",
+        "priceBase": 2700000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Grand Deluxe Lake View",
+        "beds": 2,
+        "capacity": 2,
+        "area": 37,
+        "bedType": "2 giường đơn",
+        "description": "Tầm nhìn ngoạn mục hướng ra Hồ Tây thơ mộng, trang bị bồn tắm nằm và nội thất tiện nghi.",
+        "priceBase": 3200000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Executive Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 67,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng với phòng khách thoáng đãng, bàn làm việc lớn và quyền lợi Sheraton Club Lounge.",
+        "priceBase": 5500000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H09",
+    "name": "Khách sạn Mövenpick Hà Nội",
+    "ownerUser": "owner.nguyenthuy",
+    "cityName": "Hà Nội",
+    "provinceName": "Hà Nội",
+    "address": "44 Lý Thường Kiệt, Phường Trần Hưng Đạo, Quận Hoàn Kiếm",
+    "stars": 5,
+    "description": "Khách sạn 5 sao kiến trúc Pháp đương đại ngay trung tâm thương mại Hà Nội, chỉ cách hồ Hoàn Kiếm 10 phút đi bộ, nổi tiếng với dịch vụ Giờ Sô-cô-la miễn phí hằng ngày mang phong cách Thụy Sĩ.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://movenpick.accor.com",
+    "addressVerifiedUrl": "https://all.accor.com/hotel/A232/index.en.shtml",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://all.accor.com/hotel/A232/index.en.shtml",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 30,
+        "bedType": "Giường King",
+        "description": "Thiết kế hiện đại thanh lịch với tông màu ấm áp, bàn làm việc tiện nghi và vòi sen tắm đứng áp lực cao.",
+        "priceBase": 2400000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 35,
+        "bedType": "Giường King",
+        "description": "Không gian rộng rãi hơn với ghế sofa thư giãn và bồn tắm ngâm mình cao cấp.",
+        "priceBase": 2900000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Junior Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 60,
+        "bedType": "Giường King",
+        "description": "Suite sang trọng có phòng khách riêng biệt, máy pha cà phê cao cấp và bữa sáng buffet phong phú.",
+        "priceBase": 4800000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H10",
+    "name": "Khách sạn L'Heritage Hà Nội",
+    "ownerUser": "owner.nguyenthuy",
+    "cityName": "Hà Nội",
+    "provinceName": "Hà Nội",
+    "address": "39 - 41 Hàng Gà, Phường Hàng Bồ, Quận Hoàn Kiếm",
+    "stars": 3,
+    "description": "Khách sạn boutique 3 sao duyên dáng ngay tại trung tâm 36 phố phường, phòng nghỉ trang bị nội thất gỗ ấm cúng, nhân viên chu đáo, thuận tiện khám phá ẩm thực đường phố và chợ đêm phố cổ.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí",
+      "Điều hòa nhiệt độ",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://lheritagehotels.com",
+    "addressVerifiedUrl": "https://lheritagehotels.com/contact-us",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://lheritagehotels.com/services",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 22,
+        "bedType": "Giường đôi",
+        "description": "Phòng tiêu chuẩn ấm cúng giữa phố cổ với đầy đủ tiện nghi thiết yếu và cửa sổ đón gió mát.",
+        "priceBase": 850000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Window",
+        "beds": 1,
+        "capacity": 2,
+        "area": 26,
+        "bedType": "Giường King",
+        "description": "Phòng Deluxe có cửa sổ nhìn ra con phố Hàng Gà tấp nập, bàn làm việc nhỏ và minibar.",
+        "priceBase": 1150000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Family Suite",
+        "beds": 2,
+        "capacity": 4,
+        "area": 40,
+        "bedType": "Giường đôi + 2 giường đơn",
+        "description": "Không gian gia đình ấm áp với một giường đôi và hai giường đơn, phù hợp cho kỳ nghỉ sum vầy.",
+        "priceBase": 1800000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H11",
+    "name": "InterContinental Danang Sun Peninsula Resort",
+    "ownerUser": "owner.tranlong",
+    "cityName": "Đà Nẵng",
+    "provinceName": "Đà Nẵng",
+    "address": "Bãi Bắc, Bán đảo Sơn Trà, Quận Sơn Trà",
+    "stars": 5,
+    "description": "Tuyệt tác khu nghỉ dưỡng 5 sao sang trọng bậc nhất thế giới do kiến trúc sư Bill Bensley thiết kế, ẩn mình giữa núi rừng nguyên sinh bán đảo Sơn Trà hướng nhìn vịnh biển riêng biệt lập.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Đưa đón sân bay",
+      "Khu vui chơi trẻ em"
+    ],
+    "officialWebsite": "https://danang.intercontinental.com",
+    "addressVerifiedUrl": "https://danang.intercontinental.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://danang.intercontinental.com/resort-facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Resort Classic Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 70,
+        "bedType": "Giường King",
+        "description": "Kiến trúc Đông Dương thanh nhã với ban công rộng mở ôm trọn vẻ đẹp hoang sơ của vịnh biển Bãi Bắc.",
+        "priceBase": 8900000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Terrace Suite Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 84,
+        "bedType": "Giường King",
+        "description": "Sân thượng riêng tư với ghế tắm nắng thư giãn, bồn tắm đá lộ thiên nhìn thẳng ra đại dương xanh thẳm.",
+        "priceBase": 11500000,
+        "inventory": 6,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Club Peninsula Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 123,
+        "bedType": "Giường King",
+        "description": "Suite đẳng cấp thượng lưu với đặc quyền Club InterContinental Lounge, bữa trà chiều và cocktail tối miễn phí.",
+        "priceBase": 16800000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H12",
+    "name": "Hyatt Regency Danang Resort & Spa",
+    "ownerUser": "owner.tranlong",
+    "cityName": "Đà Nẵng",
+    "provinceName": "Đà Nẵng",
+    "address": "05 Trường Sa, Phường Hòa Hải, Quận Ngũ Hành Sơn",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng 5 sao trải dài trên bãi cát trắng Non Nước nhìn ra Ngũ Hành Sơn, sở hữu hệ thống hồ bơi vô cực rộng lớn, spa truyền thống và ẩm thực phong phú.",
+    "checkIn": "15:00",
+    "checkOut": "11:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Khu vui chơi trẻ em"
+    ],
+    "officialWebsite": "https://hyatt.com",
+    "addressVerifiedUrl": "https://www.hyatt.com/en-US/hotel/vietnam/hyatt-regency-danang-resort-and-spa/danhr",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.hyatt.com/en-US/hotel/vietnam/hyatt-regency-danang-resort-and-spa/danhr/amenities",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng 1 King Bed Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "Giường King",
+        "description": "Phòng nghỉ hiện đại nhìn ra biển Non Nước, ban công rộng và bồn tắm sâu thư giãn tuyệt đối.",
+        "priceBase": 3800000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng 2 Twin Beds Garden View",
+        "beds": 2,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn êm ái hướng ra khu vườn nhiệt đới xanh mướt và lối đi rợp bóng dừa dẫn ra biển.",
+        "priceBase": 3400000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Regency Suite Ocean Front",
+        "beds": 1,
+        "capacity": 3,
+        "area": 84,
+        "bedType": "Giường King",
+        "description": "Căn Suite hướng biển tuyệt đẹp với phòng khách rộng lớn, ban công bao quát toàn cảnh bãi biển Đà Nẵng.",
+        "priceBase": 6800000,
+        "inventory": 5,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H13",
+    "name": "Pullman Danang Beach Resort",
+    "ownerUser": "owner.tranlong",
+    "cityName": "Đà Nẵng",
+    "provinceName": "Đà Nẵng",
+    "address": "101 Võ Nguyên Giáp, Phường Khuê Mỹ, Quận Ngũ Hành Sơn",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng biển 5 sao đẳng cấp quốc tế trên bãi biển Bắc Mỹ An, nơi hòa quyện hoàn hảo giữa không gian nhiệt đới xanh mướt, hồ bơi vô cực và các hoạt động thể thao biển sôi động.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://pullman-danang.com",
+    "addressVerifiedUrl": "https://www.pullman-danang.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.pullman-danang.com/wellness/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "Giường King",
+        "description": "Phòng Superior sang trọng nhìn ra khu vườn xanh ngát, ban công riêng và bồn tắm thư giãn.",
+        "priceBase": 2900000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn trực diện đại dương bao la, đón bình minh rực rỡ ngay từ chiếc giường êm ái.",
+        "priceBase": 3600000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Family Suite",
+        "beds": 2,
+        "capacity": 4,
+        "area": 72,
+        "bedType": "Giường đôi + 2 giường đơn",
+        "description": "Không gian gia đình hoàn hảo với khu vực sinh hoạt chung rộng rãi và thiết kế thân thiện cho trẻ nhỏ.",
+        "priceBase": 5600000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H14",
+    "name": "Khách sạn NALOD Đà Nẵng",
+    "ownerUser": "owner.lexuan",
+    "cityName": "Đà Nẵng",
+    "provinceName": "Đà Nẵng",
+    "address": "192 Võ Nguyên Giáp, Phường Phước Mỹ, Quận Sơn Trà",
+    "stars": 4,
+    "description": "Khách sạn 4 sao cao 21 tầng đối diện bờ biển Mỹ Khê xinh đẹp, thiết kế hiện đại với hồ bơi vô cực tầng cao ngắm trọn bình minh trên biển Đà Nẵng.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://nalod.com.vn",
+    "addressVerifiedUrl": "https://nalod.com.vn/lien-he",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://nalod.com.vn/dich-vu",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior City View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 33,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn bao quát thành phố Đà Nẵng và cầu Rồng lung linh về đêm, trang bị tiện nghi hiện đại.",
+        "priceBase": 1250000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 36,
+        "bedType": "Giường King",
+        "description": "Cửa kính kịch trần nhìn thẳng bãi biển Mỹ Khê cát trắng mịn màng, đón gió biển trong lành.",
+        "priceBase": 1650000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Ocean Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 65,
+        "bedType": "Giường King",
+        "description": "Suite tầng cao đẳng cấp với phòng khách riêng, bồn tắm ngắm biển và tầm nhìn toàn cảnh vịnh Đà Nẵng.",
+        "priceBase": 2900000,
+        "inventory": 5,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H15",
+    "name": "Khách sạn Hilton Đà Nẵng",
+    "ownerUser": "owner.lexuan",
+    "cityName": "Đà Nẵng",
+    "provinceName": "Đà Nẵng",
+    "address": "50 Bạch Đằng, Phường Hải Châu 1, Quận Hải Châu",
+    "stars": 5,
+    "description": "Tọa lạc ngay cung đường Bạch Đằng ven sông Hàn nhộn nhịp, khách sạn 5 sao Hilton mang lại trải nghiệm ngắm cầu quay sông Hàn và cầu Rồng lung linh về đêm từ mọi căn phòng.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://hilton.com",
+    "addressVerifiedUrl": "https://www.hilton.com/en/hotels/dadgshi-hilton-da-nang/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.hilton.com/en/hotels/dadgshi-hilton-da-nang/amenities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng King Guest Room River View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 36,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn trực diện sông Hàn thơ mộng với cầu quay lịch sử, nội thất cao cấp theo chuẩn Hilton quốc tế.",
+        "priceBase": 2400000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Twin Guest Room River View",
+        "beds": 2,
+        "capacity": 2,
+        "area": 36,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn êm ái nhìn ra sông Hàn, bàn làm việc công thái học và bồn tắm đứng hiện đại.",
+        "priceBase": 2400000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng King One Bedroom Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 72,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng với phòng khách biệt lập, bồn tắm nằm nhìn ra sông Hàn và quyền lợi Executive Lounge.",
+        "priceBase": 4600000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H16",
+    "name": "Dalat Palace Heritage Hotel",
+    "ownerUser": "owner.doanthi",
+    "cityName": "Đà Lạt",
+    "provinceName": "Lâm Đồng",
+    "address": "02 Trần Phú, Phường 3, TP. Đà Lạt",
+    "stars": 5,
+    "description": "Dinh thự nghỉ dưỡng 5 sao biểu tượng khởi dựng từ năm 1922, nằm trên đồi thông thơ mộng ngắm thẳng Hồ Xuân Hương, nổi bật với phong cách hoàng gia Pháp cổ, sàn gỗ quý và lò sưởi nguyên bản.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Phòng gym",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí",
+      "Lễ tân 24/7"
+    ],
+    "officialWebsite": "https://dalatpalacehotel.com",
+    "addressVerifiedUrl": "https://dalatpalacehotel.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://dalatpalacehotel.com/facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior Double Room",
+        "beds": 1,
+        "capacity": 2,
+        "area": 32,
+        "bedType": "Giường King",
+        "description": "Không gian quý phái với trần nhà cao, đèn chùm pha lê và lò sưởi cổ kính giữa tiết trời se lạnh Đà Lạt.",
+        "priceBase": 3600000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Luxury Room Lake View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 44,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn ngoạn mục hướng ra Hồ Xuân Hương và vườn hoa cẩm tú cầu rực rỡ trong khuôn viên dinh thự.",
+        "priceBase": 4800000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Royal Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 90,
+        "bedType": "Giường King",
+        "description": "Suite hoàng gia lộng lẫy từng đón tiếp nhiều nguyên thủ quốc gia, phòng khách tráng lệ và ban công panorama.",
+        "priceBase": 8200000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H17",
+    "name": "Khách sạn Vietsovpetro Đà Lạt",
+    "ownerUser": "owner.doanthi",
+    "cityName": "Đà Lạt",
+    "provinceName": "Lâm Đồng",
+    "address": "07 Hùng Vương, Phường 10, TP. Đà Lạt",
+    "stars": 4,
+    "description": "Khách sạn 4 sao nằm giữa đồi thông xanh ngát trên đường Hùng Vương, không gian thanh bình tĩnh lặng, khuôn viên hoa rực rỡ và bãi đỗ xe rộng rãi.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Quầy bar",
+      "Bãi đỗ xe",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí",
+      "Spa & Massage"
+    ],
+    "officialWebsite": "https://vietsovpetrohotel.vn",
+    "addressVerifiedUrl": "https://vietsovpetrohotel.vn/lien-he",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://vietsovpetrohotel.vn/dich-vu",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Standard Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 28,
+        "bedType": "Giường đôi",
+        "description": "Phòng nghỉ tiện nghi giữa rừng thông bạt ngàn, không khí mát mẻ tự nhiên và nội thất gỗ trang nhã.",
+        "priceBase": 1100000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Pine View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 35,
+        "bedType": "Giường King",
+        "description": "Cửa sổ lớn ngắm cảnh rừng thông reo trong sương sớm, trang bị bồn tắm nằm thư thái.",
+        "priceBase": 1450000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Grand Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 65,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng với phòng khách thoáng mát, ban công ngắm toàn cảnh thung lũng Đà Lạt.",
+        "priceBase": 2600000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H18",
+    "name": "Khách sạn Cẩm Đô Đà Lạt",
+    "ownerUser": "owner.doanthi",
+    "cityName": "Đà Lạt",
+    "provinceName": "Lâm Đồng",
+    "address": "81 Phan Đình Phùng, Phường 2, TP. Đà Lạt",
+    "stars": 3,
+    "description": "Khách sạn 3 sao trung tâm trên đường Phan Đình Phùng, chỉ mất vài phút tản bộ đến chợ Đà Lạt và hồ Xuân Hương, phòng ốc ấm cúng và mức giá hợp lý.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí",
+      "Máy sấy tóc"
+    ],
+    "officialWebsite": "https://camdohotel.com.vn",
+    "addressVerifiedUrl": "https://camdohotel.com.vn/lien-he",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://camdohotel.com.vn/dich-vu",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 22,
+        "bedType": "Giường đôi",
+        "description": "Phòng tiêu chuẩn ấm cúng ngay trung tâm, sạch sẽ và thuận tiện khám phá ẩm thực đêm.",
+        "priceBase": 750000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Máy sấy tóc",
+          "Điều hòa nhiệt độ"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Twin",
+        "beds": 2,
+        "capacity": 2,
+        "area": 26,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn êm ái với cửa sổ thoáng mát, đầy đủ tiện nghi thiết yếu.",
+        "priceBase": 950000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Family Room",
+        "beds": 2,
+        "capacity": 4,
+        "area": 36,
+        "bedType": "2 giường đôi",
+        "description": "Phòng gia đình rộng rãi có hai giường đôi lớn, phù hợp cho nhóm bạn hoặc gia đình 4 người.",
+        "priceBase": 1400000,
+        "inventory": 6,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Bồn tắm",
+          "Máy sấy tóc"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H19",
+    "name": "Khách sạn Empress Đà Lạt",
+    "ownerUser": "owner.nguyenquoc",
+    "cityName": "Đà Lạt",
+    "provinceName": "Lâm Đồng",
+    "address": "05 Nguyễn Thái Học, Phường 1, TP. Đà Lạt",
+    "stars": 3,
+    "description": "Khách sạn 3 sao mang lối kiến trúc biệt thự châu Âu cổ điển nép mình bên hồ Xuân Hương, vườn hoa nhỏ xinh và quán cà phê sân vườn yên tĩnh.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Nhà hàng",
+      "Quầy bar",
+      "Bãi đỗ xe",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://empresshotel.vn",
+    "addressVerifiedUrl": "https://empresshotel.vn/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://empresshotel.vn/facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Standard Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 24,
+        "bedType": "Giường đôi",
+        "description": "Kiến trúc biệt thự kiểu Pháp với nội thất gỗ cổ điển, ấm cúng và thanh lịch.",
+        "priceBase": 850000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Lake View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 30,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn tuyệt đẹp hướng ra hồ Xuân Hương thơ mộng, đón ánh nắng mai dịu dàng.",
+        "priceBase": 1200000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Empress Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 48,
+        "bedType": "Giường King",
+        "description": "Suite rộng rãi với phòng tiếp khách ấm áp, lò sưởi giả cổ và bồn tắm ngâm mình thư thái.",
+        "priceBase": 1950000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H20",
+    "name": "Khách sạn Du lịch Công Đoàn Đà Lạt",
+    "ownerUser": "owner.nguyenquoc",
+    "cityName": "Đà Lạt",
+    "provinceName": "Lâm Đồng",
+    "address": "01 Yersin, Phường 10, TP. Đà Lạt",
+    "stars": 2,
+    "description": "Khách sạn 2 sao kinh tế tọa lạc bên bờ hồ Xuân Hương cạnh công viên Yersin, khuôn viên rợp bóng thông cổ thụ, không gian khoáng đạt thích hợp cho khách đoàn và gia đình.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Bãi đỗ xe",
+      "Lễ tân 24/7",
+      "Nhà hàng",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://congdoandalathotel.com",
+    "addressVerifiedUrl": "https://congdoandalathotel.com/lien-he",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://congdoandalathotel.com/dich-vu",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Standard Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 20,
+        "bedType": "Giường đôi",
+        "description": "Phòng nghỉ tiêu chuẩn sạch sẽ, không gian yên bình rợp bóng thông ven hồ Xuân Hương.",
+        "priceBase": 500000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Standard Twin",
+        "beds": 2,
+        "capacity": 2,
+        "area": 22,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn tiện lợi cho bạn bè hoặc đồng nghiệp, cửa sổ nhìn ra vườn cây thoáng mát.",
+        "priceBase": 550000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Family Room",
+        "beds": 2,
+        "capacity": 4,
+        "area": 32,
+        "bedType": "2 giường đôi",
+        "description": "Phòng gia đình tiết kiệm với hai giường đôi, phù hợp cho nhóm bạn trẻ hoặc gia đình.",
+        "priceBase": 850000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H21",
+    "name": "Khách sạn Sheraton Nha Trang",
+    "ownerUser": "owner.phanvan",
+    "cityName": "Nha Trang",
+    "provinceName": "Khánh Hòa",
+    "address": "26 - 28 Trần Phú, Phường Lộc Thọ, TP. Nha Trang",
+    "stars": 5,
+    "description": "Tòa nhà 30 tầng hiện đại đối diện bãi biển Trần Phú, sở hữu hồ bơi vô cực trên cao nhìn thẳng vịnh Nha Trang cùng Altitude Rooftop Bar ngắm hoàng hôn đắt giá.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe"
+    ],
+    "officialWebsite": "https://marriott.com",
+    "addressVerifiedUrl": "https://www.marriott.com/en-us/hotels/nhasi-sheraton-nha-trang-hotel-and-spa/overview/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.marriott.com/en-us/hotels/nhasi-sheraton-nha-trang-hotel-and-spa/amenities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 33,
+        "bedType": "Giường King",
+        "description": "Tất cả các phòng đều có ban công riêng hướng thẳng ra vịnh biển Nha Trang trong xanh tuyệt đẹp.",
+        "priceBase": 2500000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Premium Deluxe King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 41,
+        "bedType": "Giường King",
+        "description": "Không gian góc rộng rãi với hai mặt kính ngắm nhìn trọn vẹn biển và toàn cảnh thành phố lung linh.",
+        "priceBase": 3100000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Executive Suite Ocean View",
+        "beds": 1,
+        "capacity": 3,
+        "area": 70,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng với phòng khách tách biệt, bồn tắm sục ngắm biển và đặc quyền Club Lounge.",
+        "priceBase": 5200000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H22",
+    "name": "Khách sạn Novotel Nha Trang",
+    "ownerUser": "owner.phanvan",
+    "cityName": "Nha Trang",
+    "provinceName": "Khánh Hòa",
+    "address": "50 Trần Phú, Phường Lộc Thọ, TP. Nha Trang",
+    "stars": 4,
+    "description": "Khách sạn 4 sao tiêu chuẩn quốc tế của tập đoàn Accor ngay trên con đường biển Trần Phú, 100% các phòng đều có ban công riêng nhìn ra đại dương xanh thẳm.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://novotelnhatrang.com",
+    "addressVerifiedUrl": "https://www.novotelnhatrang.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.novotelnhatrang.com/wellness/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Standard Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 36,
+        "bedType": "Giường King",
+        "description": "Phòng ngủ hiện đại với ban công nhìn ra bãi biển, trang bị tiện nghi chuẩn mực Novotel.",
+        "priceBase": 1600000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Superior Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 42,
+        "bedType": "Giường King",
+        "description": "Tầng cao thoáng mát với tầm nhìn bao quát vịnh biển, sofa thư giãn và bồn tắm nằm êm ái.",
+        "priceBase": 2100000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Executive Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 60,
+        "bedType": "Giường King",
+        "description": "Căn Suite sang trọng với ban công góc ngắm biển và quyền lợi đặc quyền Executive Lounge.",
+        "priceBase": 3600000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H23",
+    "name": "Khách sạn Nha Trang Lodge",
+    "ownerUser": "owner.phanvan",
+    "cityName": "Nha Trang",
+    "provinceName": "Khánh Hòa",
+    "address": "42 Trần Phú, Phường Lộc Thọ, TP. Nha Trang",
+    "stars": 4,
+    "description": "Khách sạn 4 sao kỳ cựu trên đại lộ Trần Phú với tầm nhìn thoáng đãng hướng biển, hồ bơi ngoài trời, nhà hàng hải sản tươi sống và vị trí gần chợ đêm Nha Trang.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Nhà hàng",
+      "Quầy bar",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://nhatranglodge.com",
+    "addressVerifiedUrl": "https://nhatranglodge.com/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://nhatranglodge.com/services/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Superior Sea View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 28,
+        "bedType": "Giường King",
+        "description": "Cửa sổ ngắm trọn biển xanh Trần Phú, phòng ốc ấm cúng và đầy đủ tiện nghi cho chuyến du lịch biển.",
+        "priceBase": 1100000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Két sắt an toàn",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Sea View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 34,
+        "bedType": "Giường King",
+        "description": "Không gian rộng rãi hơn với ban công nhìn biển, bồn tắm nằm thư giãn và minibar.",
+        "priceBase": 1450000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Lodge Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 55,
+        "bedType": "Giường King",
+        "description": "Suite thượng hạng tầng cao với phòng khách thoáng đãng ngắm toàn cảnh vịnh Nha Trang.",
+        "priceBase": 2400000,
+        "inventory": 5,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H24",
+    "name": "Hòn Tằm Resort Nha Trang",
+    "ownerUser": "owner.phanvan",
+    "cityName": "Nha Trang",
+    "provinceName": "Khánh Hòa",
+    "address": "Đảo Hòn Tằm, Vịnh Nha Trang, Phường Vĩnh Nguyên, TP. Nha Trang",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng 5 sao sinh thái trên đảo Hòn Tằm giữa vịnh biển thơ mộng, nổi tiếng với dịch vụ tắm bùn khoáng nóng trên đảo lớn nhất Việt Nam và các bungalow ven biển riêng tư.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Đưa đón sân bay",
+      "Khu vui chơi trẻ em"
+    ],
+    "officialWebsite": "https://hontamresort.vn",
+    "addressVerifiedUrl": "https://hontamresort.vn/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://hontamresort.vn/facilities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Tropical Deluxe Bungalow",
+        "beds": 1,
+        "capacity": 2,
+        "area": 50,
+        "bedType": "Giường King",
+        "description": "Bungalow gỗ mái lá nép mình giữa khu vườn nhiệt đới xanh mướt, chỉ cách bãi cát vài bước chân.",
+        "priceBase": 2800000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Premier Family Bungalow",
+        "beds": 2,
+        "capacity": 4,
+        "area": 65,
+        "bedType": "Giường đôi + 2 giường đơn",
+        "description": "Không gian lý tưởng cho gia đình tận hưởng kỳ nghỉ đảo, ban công rộng và bồn tắm tắm lộ thiên.",
+        "priceBase": 4200000,
+        "inventory": 6,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Romantic Sunset Villa",
+        "beds": 1,
+        "capacity": 2,
+        "area": 110,
+        "bedType": "Giường King",
+        "description": "Biệt thự sát biển với hồ bơi riêng tư, nơi ngắm hoàng hôn buông xuống vịnh Nha Trang lãng mạn bậc nhất.",
+        "priceBase": 6900000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H25",
+    "name": "The Anam Resort Cam Ranh",
+    "ownerUser": "owner.phanvan",
+    "cityName": "Nha Trang",
+    "provinceName": "Khánh Hòa",
+    "address": "Lô 3, Bãi Dài, Xã Cam Hải Đông, Huyện Cam Lâm",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng 5 sao phong cách Đông Dương cổ điển (Indochine) nép mình bên bãi biển Bãi Dài nguyên sơ, sở hữu thảm cỏ xanh mướt, 3 hồ bơi lớn và những căn biệt thự mái ngói thanh bình.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Phòng gym",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://theanam.com",
+    "addressVerifiedUrl": "https://www.theanam.com/contact-us",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.theanam.com/facilities",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Balcony Garden View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 55,
+        "bedType": "Giường King",
+        "description": "Phong cách Indochine hoài cổ với nền gạch bông thủ công, ban công rộng ngắm vườn dừa đung đưa trong gió.",
+        "priceBase": 3500000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Ocean View Premium",
+        "beds": 1,
+        "capacity": 2,
+        "area": 50,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn ngoạn mục hướng ra làn nước xanh ngọc lam của Bãi Dài, trang bị bồn tắm nằm đá cẩm thạch.",
+        "priceBase": 4400000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Ocean Front Pool Villa",
+        "beds": 1,
+        "capacity": 2,
+        "area": 150,
+        "bedType": "Giường King",
+        "description": "Biệt thự sát biển với hồ bơi riêng biệt lập, bước chân trực tiếp ra bãi cát trắng mịn màng.",
+        "priceBase": 8500000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H26",
+    "name": "JW Marriott Phu Quoc Emerald Bay Resort & Spa",
+    "ownerUser": "owner.buitrung",
+    "cityName": "Phú Quốc",
+    "provinceName": "Kiên Giang",
+    "address": "Bãi Khem, Phường An Thới, TP. Phú Quốc",
+    "stars": 5,
+    "description": "Kiệt tác nghỉ dưỡng 5 sao tại Bãi Khem mang chủ đề trường đại học giả tưởng thế kỷ 19 do Bill Bensley kiến tạo, sở hữu bãi cát trắng mịn như kem và hồ bơi hình vỏ sò trứ danh.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Phòng gym",
+      "Spa & Massage",
+      "Đưa đón sân bay",
+      "Khu vui chơi trẻ em"
+    ],
+    "officialWebsite": "https://marriott.com",
+    "addressVerifiedUrl": "https://www.marriott.com/en-us/hotels/pqcjw-jw-marriott-phu-quoc-emerald-bay-resort-and-spa/overview/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.marriott.com/en-us/hotels/pqcjw-jw-marriott-phu-quoc-emerald-bay-resort-and-spa/amenities/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Emerald Bay View King",
+        "beds": 1,
+        "capacity": 2,
+        "area": 54,
+        "bedType": "Giường King",
+        "description": "Thiết kế tinh xảo đậm chất học viện cổ điển với trần nhà cao, ban công nhìn ra vịnh ngọc Bãi Khem.",
+        "priceBase": 6500000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Deluxe Emerald Bay View Twin",
+        "beds": 2,
+        "capacity": 2,
+        "area": 54,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn êm ái sang trọng, bồn tắm nằm độc lập nhìn ra khung cảnh biển ngọc bích.",
+        "priceBase": 6800000,
+        "inventory": 10,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Turquoise Suite Ocean View",
+        "beds": 1,
+        "capacity": 3,
+        "area": 90,
+        "bedType": "Giường King",
+        "description": "Căn Suite thượng hạng với tông màu xanh ngọc lam quyến rũ, ban công đôi ngắm toàn cảnh Bãi Khem.",
+        "priceBase": 12500000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H27",
+    "name": "Premier Village Phu Quoc Resort",
+    "ownerUser": "owner.buitrung",
+    "cityName": "Phú Quốc",
+    "provinceName": "Kiên Giang",
+    "address": "Mũi Ông Đội, Phường An Thới, TP. Phú Quốc",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng biệt thự 5 sao tọa lạc tại dải đất Mũi Ông Đội độc nhất vô nhị, nơi du khách có thể chiêm ngưỡng cả bình minh và hoàng hôn trên cùng một điểm ngắm biển.",
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Phòng gym",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://premiervillage-phuquoc.com",
+    "addressVerifiedUrl": "https://www.premiervillage-phuquoc.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://www.premiervillage-phuquoc.com/wellness/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Biệt thự Island Villa with Private Pool",
+        "beds": 3,
+        "capacity": 6,
+        "area": 350,
+        "bedType": "2 giường King + 2 giường đơn",
+        "description": "Biệt thự 3 phòng ngủ giữa vườn cây nhiệt đới với hồ bơi riêng, phòng khách và bếp ăn tiện nghi.",
+        "priceBase": 8800000,
+        "inventory": 6,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Biệt thự Beachfront Villa with Private Pool",
+        "beds": 3,
+        "capacity": 6,
+        "area": 350,
+        "bedType": "2 giường King + 2 giường đơn",
+        "description": "Biệt thự sát biển với hồ bơi vô cực riêng, chỉ vài bước chân chạm vào làn nước biển trong vắt.",
+        "priceBase": 12500000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Biệt thự On The Rock Cliff Villa",
+        "beds": 3,
+        "capacity": 6,
+        "area": 400,
+        "bedType": "3 giường King",
+        "description": "Tuyệt tác biệt thự trên vách đá cheo leo nhìn ra hai mặt biển, nơi đón gió trời và hoàng hôn ngoạn mục.",
+        "priceBase": 16800000,
+        "inventory": 2,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H28",
+    "name": "La Veranda Resort Phú Quốc - MGallery",
+    "ownerUser": "owner.buitrung",
+    "cityName": "Phú Quốc",
+    "provinceName": "Kiên Giang",
+    "address": "Đường Trần Hưng Đạo, Phường Dương Đông, TP. Phú Quốc",
+    "stars": 5,
+    "description": "Khu nghỉ dưỡng phong cách trang viên kiểu Pháp thập niên 1920 bên bờ biển Bãi Trường, nổi bật với hành lang lộng gió, gạch bông cổ điển và vườn cây nhiệt đới xanh rì.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Spa & Massage",
+      "Lễ tân 24/7",
+      "Đưa đón sân bay"
+    ],
+    "officialWebsite": "https://laverandaresorts.com",
+    "addressVerifiedUrl": "https://laverandaresorts.com/contact-us/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://laverandaresorts.com/le-spa/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Deluxe Garden View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 38,
+        "bedType": "Giường King",
+        "description": "Phong cách thuộc địa lãng mạn với giường 4 cọc gỗ quý, quạt trần cổ và ban công hướng vườn hoa nhiệt đới.",
+        "priceBase": 3200000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Premier Ocean View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 46,
+        "bedType": "Giường King",
+        "description": "Tầm nhìn tuyệt đẹp hướng ra Bãi Trường, nơi ngắm hoàng hôn đỏ rực buông xuống đại dương.",
+        "priceBase": 4200000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Memorable Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 73,
+        "bedType": "Giường King",
+        "description": "Căn Suite trang viên cổ kính với phòng khách rộng lớn, bồn tắm mạ đồng phong cách Pháp thượng lưu.",
+        "priceBase": 6500000,
+        "inventory": 3,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H29",
+    "name": "Khách sạn Sài Gòn Phú Quốc Resort & Spa",
+    "ownerUser": "owner.buitrung",
+    "cityName": "Phú Quốc",
+    "provinceName": "Kiên Giang",
+    "address": "01 Trần Hưng Đạo, Phường Dương Đông, TP. Phú Quốc",
+    "stars": 4,
+    "description": "Khu nghỉ dưỡng 4 sao lâu năm nằm ngay trung tâm Dương Đông sát bờ biển, rợp bóng dừa xanh mát, có hồ bơi ngoài trời và dịch vụ chuyên nghiệp thân thiện.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Hồ bơi",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Quầy bar",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://saigonphuquocresort.vn",
+    "addressVerifiedUrl": "https://saigonphuquocresort.vn/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://saigonphuquocresort.vn/services/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Panorama Double",
+        "beds": 1,
+        "capacity": 2,
+        "area": 33,
+        "bedType": "Giường đôi",
+        "description": "Phòng nghỉ rợp bóng dừa với ban công đón gió biển, thuận tiện di chuyển ra bãi tắm riêng.",
+        "priceBase": 1350000,
+        "inventory": 15,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Star Cruise Twin",
+        "beds": 2,
+        "capacity": 2,
+        "area": 33,
+        "bedType": "2 giường đơn",
+        "description": "Hai giường đơn êm ái nhìn ra hồ bơi xanh mát, không gian thoáng đãng và yên bình.",
+        "priceBase": 1350000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Két sắt an toàn"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng President Suite",
+        "beds": 1,
+        "capacity": 3,
+        "area": 95,
+        "bedType": "Giường King",
+        "description": "Suite thượng khách cao cấp nhìn thẳng bãi biển, phòng khách rộng lớn và quầy bar mini.",
+        "priceBase": 3800000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm",
+          "Két sắt an toàn"
+        ]
+      }
+    ]
+  },
+  {
+    "key": "H30",
+    "name": "Nhật Lan Resort Phú Quốc",
+    "ownerUser": "owner.buitrung",
+    "cityName": "Phú Quốc",
+    "provinceName": "Kiên Giang",
+    "address": "Tổ 3, Ấp Cửa Lấp, Xã Dương Tơ, TP. Phú Quốc",
+    "stars": 3,
+    "description": "Khu nghỉ dưỡng bungalow 3 sao mộc mạc bên bờ biển Cửa Lấp, không gian vườn dừa yên bình, bãi cát thoai thoải và nhà hàng phục vụ hải sản tươi ngon.",
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "status": "Hoạt động",
+    "amenities": [
+      "Wi-Fi miễn phí",
+      "Bãi biển riêng",
+      "Nhà hàng",
+      "Lễ tân 24/7",
+      "Bãi đỗ xe",
+      "Bữa sáng miễn phí"
+    ],
+    "officialWebsite": "https://nhatlanresort.com",
+    "addressVerifiedUrl": "https://nhatlanresort.com/contact/",
+    "starVerifiedUrl": "https://vietnamtourism.gov.vn",
+    "amenitiesVerifiedUrl": "https://nhatlanresort.com/services/",
+    "verificationDate": "2026-10-15",
+    "rooms": [
+      {
+        "suffix": "R1",
+        "name": "Phòng Bungalow Garden View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 28,
+        "bedType": "Giường đôi",
+        "description": "Bungalow biệt lập giữa vườn hoa và rặng dừa xanh ngát, ban công hiên nhà thư giãn.",
+        "priceBase": 800000,
+        "inventory": 12,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R2",
+        "name": "Phòng Bungalow Sea View",
+        "beds": 1,
+        "capacity": 2,
+        "area": 32,
+        "bedType": "Giường đôi",
+        "description": "Tầm nhìn trực diện bãi biển cát vàng êm dịu, nghe tiếng sóng vỗ rì rào cả ngày lẫn đêm.",
+        "priceBase": 1100000,
+        "inventory": 8,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Máy sấy tóc"
+        ]
+      },
+      {
+        "suffix": "R3",
+        "name": "Phòng Family Bungalow",
+        "beds": 2,
+        "capacity": 4,
+        "area": 45,
+        "bedType": "2 giường đôi",
+        "description": "Bungalow gia đình rộng rãi với hai giường đôi, không gian thoáng đãng sát bờ biển.",
+        "priceBase": 1650000,
+        "inventory": 4,
+        "amenities": [
+          "Wi-Fi miễn phí",
+          "Điều hòa nhiệt độ",
+          "TV màn hình phẳng",
+          "Minibar",
+          "Ban công",
+          "Bồn tắm"
+        ]
+      }
+    ]
+  }
+]

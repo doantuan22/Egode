@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-10-15T08:35:28.220Z",
+  "cloudName": "dfyfpuguj",
+  "totalAssetsUnderHotelBooking": 152,
+  "allowedPrefixes": [
+    "hotel-booking/hotels/",
+    "hotel-booking/room-types/",
+    "hotel-booking/reviews/"
+  ],
+  "approvedCount": 152,
+  "rejectedCount": 0,
+  "rejectedAssets": [],
+  "otherAppFoldersPreserved": [
+    "lms",
+    "oneshop",
+    "samples"
+  ],
+  "summaryByFolder": {
+    "hotel-booking/hotels": 101,
+    "hotel-booking/room-types": 40,
+    "hotel-booking/reviews": 11
+  },
+  "samplePublicIdsToDelete": [
+    "hotel-booking/hotels/demo-exterior-01",
+    "hotel-booking/hotels/demo-exterior-02",
+    "hotel-booking/hotels/demo-exterior-03",
+    "hotel-booking/hotels/demo-exterior-04",
+    "hotel-booking/hotels/demo-exterior-05",
+    "hotel-booking/hotels/demo-exterior-06",
+    "hotel-booking/hotels/demo-exterior-07",
+    "hotel-booking/hotels/demo-exterior-08",
+    "hotel-booking/hotels/demo-exterior-09",
+    "hotel-booking/hotels/demo-exterior-10"
+  ],
+  "safetyStatus": "SAFE_FOR_CONFIRMATION"
+}
