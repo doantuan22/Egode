@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../common/utils/jwt';
 import { AppError } from '../common/errors/app-error';
 import { ROLE_NAMES } from '../common/constants/roles';
-import { ACCOUNT_STATUS } from '../common/constants/account-status';
+import { ACCOUNT_STATUS, PARTNER_APPLICATION_STATUS } from '../common/constants/account-status';
 import { getPrismaClient } from '../config/prisma';
 
 export interface AuthenticatedUser {
   maTaiKhoan: number;
   role: string;
+  /** True while the account has a partner application awaiting review: it is then held to the same limits as a partner. */
+  pendingPartner: boolean;
 }
 
 declare global {
@@ -48,7 +50,15 @@ export const authenticate = async (req: Request, _res: Response, next: NextFunct
   try {
     const account = await getPrismaClient().tAI_KHOAN.findUnique({
       where: { MaTaiKhoan: accountId },
-      select: { TrangThai: true, VAI_TRO: { select: { TenVaiTro: true } } },
+      select: {
+        TrangThai: true,
+        VAI_TRO: { select: { TenVaiTro: true } },
+        HO_SO_DOI_TAC_HO_SO_DOI_TAC_MaTaiKhoanToTAI_KHOAN: {
+          where: { TrangThaiDuyet: PARTNER_APPLICATION_STATUS.PENDING },
+          select: { MaHoSoDoiTac: true },
+          take: 1,
+        },
+      },
     });
     // 401 (not 403): the client then tries to refresh, the refresh is refused for a locked account, and the
     // session ends instead of the user being left "signed in" to a dead account.
@@ -56,14 +66,18 @@ export const authenticate = async (req: Request, _res: Response, next: NextFunct
       next(AppError.unauthorized('Tài khoản không khả dụng'));
       return;
     }
-    req.user = { maTaiKhoan: accountId, role: account.VAI_TRO.TenVaiTro };
+    req.user = {
+      maTaiKhoan: accountId,
+      role: account.VAI_TRO.TenVaiTro,
+      pendingPartner: account.HO_SO_DOI_TAC_HO_SO_DOI_TAC_MaTaiKhoanToTAI_KHOAN.length > 0,
+    };
     next();
   } catch (error) {
     next(error);
   }
 };
 
-export const requireRole = (...allowedRoles: string[]) => {
+const roleGuard = (allowPendingPartner: boolean, allowedRoles: string[]) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {
       next(AppError.unauthorized('Authentication required'));
@@ -73,8 +87,19 @@ export const requireRole = (...allowedRoles: string[]) => {
       next(AppError.forbidden('You do not have permission to perform this action'));
       return;
     }
+    // A customer whose partner application is pending is locked out of customer-only features, exactly as
+    // a partner is (those routes answer 403 to the partner role). Nothing is stored: the pending row is the signal.
+    if (!allowPendingPartner && req.user.pendingPartner && req.user.role === ROLE_NAMES.CUSTOMER) {
+      next(AppError.forbidden('Hồ sơ đối tác của bạn đang chờ duyệt. Chức năng này tạm thời bị khóa cho đến khi có kết quả'));
+      return;
+    }
     next();
   };
 };
+
+export const requireRole = (...allowedRoles: string[]) => roleGuard(false, allowedRoles);
+
+/** Like requireRole but a customer with a pending partner application still passes (only the application flow itself). */
+export const requireRoleAllowingPendingPartner = (...allowedRoles: string[]) => roleGuard(true, allowedRoles);
 
 export const requireAdmin = requireRole(ROLE_NAMES.ADMIN);

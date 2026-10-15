@@ -1,5 +1,6 @@
 import { AuthRepository } from './auth.repository';
 import { RolesRepository } from '../roles/roles.repository';
+import { PartnersRepository } from '../partners/partners.repository';
 import { AppError } from '../../common/errors/app-error';
 import { hashPassword, verifyPassword } from '../../common/utils/password';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../common/utils/jwt';
@@ -32,7 +33,8 @@ export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository = new AuthRepository(),
     private readonly rolesRepository: RolesRepository = new RolesRepository(),
-    private readonly emailService: EmailService = new NodemailerEmailService()
+    private readonly emailService: EmailService = new NodemailerEmailService(),
+    private readonly partnersRepository: PartnersRepository = new PartnersRepository()
   ) {}
 
   /**
@@ -80,7 +82,7 @@ export class AuthService {
     });
 
     const tokens = await this.issueTokens(account.MaTaiKhoan, ROLE_NAMES.CUSTOMER, account.MatKhau);
-    return { account: toSafeAccount(account), tokens };
+    return { account: { ...toSafeAccount(account), DangChoDuyetDoiTac: false, HoSoDoiTacBiTuChoi: false }, tokens };
   }
 
   async login(input: LoginInput): Promise<AuthResult> {
@@ -107,7 +109,11 @@ export class AuthService {
 
     const role = await this.rolesRepository.findById(account.MaVaiTro);
     const tokens = await this.issueTokens(account.MaTaiKhoan, role?.TenVaiTro ?? '', account.MatKhau);
-    return { account: toSafeAccount(account), tokens };
+    const flags = await this.partnersRepository.getApplicationFlags(account.MaTaiKhoan);
+    return {
+      account: { ...toSafeAccount(account), DangChoDuyetDoiTac: flags.pending, HoSoDoiTacBiTuChoi: flags.rejected },
+      tokens,
+    };
   }
 
   async refresh(refreshToken: string): Promise<AuthTokens> {

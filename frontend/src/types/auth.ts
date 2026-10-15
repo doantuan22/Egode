@@ -16,6 +16,10 @@ export interface Account {
   NgayCapNhat: string;
   /** Present on admin account responses. */
   VAI_TRO?: { TenVaiTro: string };
+  /** On login/register/me: true while a partner application is awaiting admin review. */
+  DangChoDuyetDoiTac?: boolean;
+  /** True when the latest partner application was rejected: show the re-apply button. */
+  HoSoDoiTacBiTuChoi?: boolean;
 }
 
 export interface Role {

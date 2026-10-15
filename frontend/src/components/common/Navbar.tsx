@@ -96,6 +96,12 @@ export function Navbar() {
       );
   }, [isDropdownOpen]);
 
+  // A customer whose partner application is pending is limited like a partner: browsing only.
+  const canUseCustomerFeatures = role === ROLE_NAMES.CUSTOMER && !meQuery.data?.DangChoDuyetDoiTac;
+
+  // Shown beside the avatar only for a customer whose latest partner application was rejected.
+  const canReapplyPartner = role === ROLE_NAMES.CUSTOMER && !!meQuery.data?.HoSoDoiTacBiTuChoi;
+
   const navLinks = [
     {
       to: '/',
@@ -109,7 +115,7 @@ export function Navbar() {
       to: '/support',
       label: 'Hỗ trợ',
     },
-  ];
+  ].filter((link) => link.to !== '/support' || !meQuery.data?.DangChoDuyetDoiTac);
 
   const roleDashboard =
     role === ROLE_NAMES.ADMIN
@@ -187,6 +193,15 @@ export function Navbar() {
           ========================================= */}
 
           <div className="site-header__actions">
+            {accessToken && canReapplyPartner && (
+              <Link
+                to="/partner/apply"
+                className="btn btn-outline btn-sm"
+                title={'Hồ sơ đối tác trước đó đã bị từ chối. Nộp lại hồ sơ'}
+              >
+                Nộp lại hồ sơ đối tác
+              </Link>
+            )}
             {accessToken ? (
               <div className="dropdown">
                 <button
@@ -258,8 +273,7 @@ export function Navbar() {
                     Tài khoản của tôi
                   </Link>
 
-                  {role ===
-                    ROLE_NAMES.CUSTOMER && (
+                  {canUseCustomerFeatures && (
                     <Link
                       to="/bookings"
                       className="dropdown-item"
@@ -275,8 +289,7 @@ export function Navbar() {
                     </Link>
                   )}
 
-                  {role ===
-                    ROLE_NAMES.CUSTOMER && (
+                  {canUseCustomerFeatures && (
                     <Link
                       to="/support"
                       className="dropdown-item"
@@ -469,8 +482,7 @@ export function Navbar() {
                   Tài khoản của tôi
                 </Link>
 
-                {role ===
-                  ROLE_NAMES.CUSTOMER && (
+                {canUseCustomerFeatures && (
                   <Link
                     to="/bookings"
                     onClick={
@@ -482,8 +494,7 @@ export function Navbar() {
                   </Link>
                 )}
 
-                {role ===
-                  ROLE_NAMES.CUSTOMER && (
+                {canUseCustomerFeatures && (
                   <Link
                     to="/support"
                     onClick={

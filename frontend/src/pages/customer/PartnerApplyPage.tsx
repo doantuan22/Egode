@@ -9,6 +9,7 @@ import { refreshSession } from '../../services/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { meQueryKey } from '../../features/auth/hooks';
 import { cn } from '../../lib/utils';
+import { partnerSignupLock } from '../../lib/partnerSignupLock';
 import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
 
@@ -46,7 +47,7 @@ export default function PartnerApplyPage() {
 
   // The confirmation is a form-only guard: the API receives the four business fields.
   const onSubmit = ({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }: ApplyPartnerFormValues) =>
-    applyMutation.mutate({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }, { onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
+    applyMutation.mutate({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }, { onSuccess: () => partnerSignupLock.release(), onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
 
   return (
     <div className="bg-surface-secondary text-ink font-sans antialiased min-h-[80vh] flex flex-col">

@@ -12,6 +12,7 @@ import {
 import { ApiError } from '../../services/apiClient';
 import { applyServerFieldErrors } from '../../lib/apiErrors';
 import { cn, toDateInputValue } from '../../lib/utils';
+import { partnerSignupLock } from '../../lib/partnerSignupLock';
 import { Button } from '../../components/common/Button';
 import { DateField } from '../../components/common/DateField';
 
@@ -57,6 +58,7 @@ export default function RegisterPage() {
         GioiTinh: data.GioiTinh || undefined,
       });
 
+      if (intent === 'partner') partnerSignupLock.activate();
       navigate(intent === 'partner' ? '/partner/apply' : '/', {
         replace: true,
       });

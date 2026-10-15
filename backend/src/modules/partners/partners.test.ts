@@ -215,3 +215,81 @@ describe('admin partner application workflow (UC32)', () => {
     expect(secondView.body.data).toBeNull();
   });
 });
+
+describe('account with a pending partner application is limited like a partner', () => {
+  it('flags the account on /profile/me and gets 403 on customer-only APIs, but may still read its application', async () => {
+    const { account, plainPassword } = await createTestAccount();
+    const login = await request(app).post('/api/auth/login').send({ identifier: account.Email, MatKhau: plainPassword });
+    const token = login.body.data.accessToken as string;
+    expect(login.body.data.account.DangChoDuyetDoiTac).toBe(false);
+
+    const apply = await request(app)
+      .post('/api/partners/apply')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ SoCCCD: '012345678901', SoGiayPhepKinhDoanh: 'GPKD-123456', MaSoThue: '0123456789', TepGiayTo: 'https://example.com/doc.pdf' });
+    expect(apply.status).toBe(201);
+
+    const me = await request(app).get('/api/profile/me').set('Authorization', `Bearer ${token}`);
+    expect(me.body.data.DangChoDuyetDoiTac).toBe(true);
+
+    for (const path of ['/api/bookings', '/api/support']) {
+      const res = await request(app).get(path).set('Authorization', `Bearer ${token}`);
+      expect(res.status).toBe(403);
+    }
+    const mine = await request(app).get('/api/partners/me').set('Authorization', `Bearer ${token}`);
+    expect(mine.status).toBe(200);
+
+    await deleteTestAccount(account.MaTaiKhoan);
+  });
+});
+
+describe('rejected application flag', () => {
+  it('sets HoSoDoiTacBiTuChoi on /profile/me after a rejection and clears it once a new application is pending', async () => {
+    const { account, plainPassword } = await createTestAccount();
+    const prisma = getPrismaClient();
+    await prisma.hO_SO_DOI_TAC.create({
+      data: {
+        SoCCCD: '012345678901', SoGiayPhepKinhDoanh: 'GPKD-1', MaSoThue: '0123456789', TepGiayTo: 'https://example.com/a.pdf',
+        TrangThaiDuyet: PARTNER_APPLICATION_STATUS.REJECTED, LyDoTuChoi: 'Thiếu giấy tờ', NgayNop: new Date(Date.now() - 60_000),
+        TAI_KHOAN_HO_SO_DOI_TAC_MaTaiKhoanToTAI_KHOAN: { connect: { MaTaiKhoan: account.MaTaiKhoan } },
+      },
+    });
+    const login = await request(app).post('/api/auth/login').send({ identifier: account.Email, MatKhau: plainPassword });
+    expect(login.body.data.account.HoSoDoiTacBiTuChoi).toBe(true);
+    expect(login.body.data.account.DangChoDuyetDoiTac).toBe(false);
+    const token = login.body.data.accessToken as string;
+
+    const again = await request(app)
+      .post('/api/partners/apply')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ SoCCCD: '012345678901', SoGiayPhepKinhDoanh: 'GPKD-123456', MaSoThue: '0123456789', TepGiayTo: 'https://example.com/doc.pdf' });
+    expect(again.status).toBe(201);
+    const me = await request(app).get('/api/profile/me').set('Authorization', `Bearer ${token}`);
+    expect(me.body.data.HoSoDoiTacBiTuChoi).toBe(false);
+    expect(me.body.data.DangChoDuyetDoiTac).toBe(true);
+
+    await deleteTestAccount(account.MaTaiKhoan);
+  });
+});
+
+describe('re-apply flag constraints', () => {
+  const baseApp = {
+    SoCCCD: '012345678901', SoGiayPhepKinhDoanh: 'GPKD-1', MaSoThue: '0123456789', TepGiayTo: 'https://example.com/a.pdf',
+    TrangThaiDuyet: PARTNER_APPLICATION_STATUS.REJECTED, LyDoTuChoi: 'x', NgayNop: new Date(Date.now() - 60_000),
+  };
+  it('is false for a customer who never applied', async () => {
+    const { account, plainPassword } = await createTestAccount();
+    const login = await request(app).post('/api/auth/login').send({ identifier: account.Email, MatKhau: plainPassword });
+    expect(login.body.data.account.HoSoDoiTacBiTuChoi).toBe(false);
+    await deleteTestAccount(account.MaTaiKhoan);
+  });
+  it('is false when the account has a rejected application but is no longer a customer', async () => {
+    const { account, plainPassword } = await createTestAccount({ role: ROLE_NAMES.PARTNER });
+    await getPrismaClient().hO_SO_DOI_TAC.create({
+      data: { ...baseApp, TAI_KHOAN_HO_SO_DOI_TAC_MaTaiKhoanToTAI_KHOAN: { connect: { MaTaiKhoan: account.MaTaiKhoan } } },
+    });
+    const login = await request(app).post('/api/auth/login').send({ identifier: account.Email, MatKhau: plainPassword });
+    expect(login.body.data.account.HoSoDoiTacBiTuChoi).toBe(false);
+    await deleteTestAccount(account.MaTaiKhoan);
+  });
+});

@@ -1,5 +1,7 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
+import { ROLE_NAMES } from '../../common/constants/roles';
+import { PARTNER_APPLICATION_STATUS } from '../../common/constants/account-status';
 
 export class PartnersRepository {
   async findLatestByAccount(maTaiKhoan: number) {
@@ -8,6 +10,24 @@ export class PartnersRepository {
       where: { MaTaiKhoan: maTaiKhoan },
       orderBy: { NgayNop: 'desc' },
     });
+  }
+
+  /**
+   * Flags derived from the account's LATEST application: waiting for review, or rejected (may re-apply).
+   * Both need an application row AND the Customer role — an account that already is a partner/admin, or
+   * has never applied, gets false/false.
+   */
+  async getApplicationFlags(maTaiKhoan: number): Promise<{ pending: boolean; rejected: boolean }> {
+    const prisma = getPrismaClient();
+    const [latest, account] = await Promise.all([
+      this.findLatestByAccount(maTaiKhoan),
+      prisma.tAI_KHOAN.findUnique({ where: { MaTaiKhoan: maTaiKhoan }, select: { VAI_TRO: { select: { TenVaiTro: true } } } }),
+    ]);
+    if (!latest || account?.VAI_TRO.TenVaiTro !== ROLE_NAMES.CUSTOMER) return { pending: false, rejected: false };
+    return {
+      pending: latest.TrangThaiDuyet === PARTNER_APPLICATION_STATUS.PENDING,
+      rejected: latest.TrangThaiDuyet === PARTNER_APPLICATION_STATUS.REJECTED,
+    };
   }
 
   async create(data: Prisma.HO_SO_DOI_TACCreateInput) {

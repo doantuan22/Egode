@@ -13,6 +13,10 @@ export interface SafeAccount {
   TrangThai: string;
   NgayTao: Date;
   NgayCapNhat: Date;
+  /** Derived from HO_SO_DOI_TAC (not a column): true while a partner application awaits review. Set on login/register/me. */
+  DangChoDuyetDoiTac?: boolean;
+  /** True when the latest partner application was rejected: the UI offers a re-apply button. */
+  HoSoDoiTacBiTuChoi?: boolean;
 }
 
 /** Strips MatKhau (password hash) before an account row ever reaches an API response. */
