@@ -24,6 +24,15 @@ describe('GET /api/health', () => {
     expect(res.body.data).toHaveProperty('status', 'ok');
   });
 
+  it('should return 200 OK for root GET /health (cloud hosting probe)', async () => {
+    const res = await request(app).get('/health');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body).toHaveProperty('message', 'Hotel Booking API is running');
+    expect(res.body.data).toHaveProperty('status', 'ok');
+  });
+
   it('should return 404 for unknown endpoints', async () => {
     const res = await request(app).get('/api/unknown-endpoint-404');
 

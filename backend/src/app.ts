@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import routes from './routes';
+import healthRoutes from './modules/health/health.routes';
 import { env } from './config/env';
 import { isAllowedOrigin } from './config/cors';
 import { timeOfDayJsonReplacer } from './common/utils/time-of-day';
@@ -36,6 +37,9 @@ app.use(requestLogging);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(cookieParser());
+
+// Health routes (available at /health, /health/live, /health/ready for Render and cloud probes)
+app.use('/', healthRoutes);
 
 // API Routes
 app.use('/api', routes);

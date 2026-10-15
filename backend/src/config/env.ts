@@ -9,11 +9,20 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(5000),
 
-  // Database
+  // Database discrete parameters (Amazon RDS for SQL Server)
+  DB_HOST: z.string().trim().optional(),
+  DB_PORT: z.coerce.number().int().min(1).max(65535).default(1433),
+  DB_NAME: z.string().trim().optional().default('HotelBooking'),
+  DB_USER: z.string().trim().optional(),
+  DB_PASSWORD: z.string().optional(),
+  DB_ENCRYPT: z.enum(['true', 'false']).optional(),
+  DB_TRUST_SERVER_CERTIFICATE: z.enum(['true', 'false']).optional(),
+
+  // Database Connection URL (can be provided directly or auto-built from DB_* discrete variables)
   DATABASE_URL: z
     .string()
     .default(
-      'sqlserver://localhost:1433;database=HotelBooking;user=sa;password=YourPassword;encrypt=false;trustServerCertificate=true'
+      'sqlserver://localhost:1433;database=HotelBooking;user=sa;password=YourPassword;encrypt=false;trustServerCertificate=true;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10'
     ),
 
   // CORS & Frontend
@@ -100,10 +109,10 @@ const envSchema = z.object({
     });
   }
 
-  // Northflank public HTTP ports terminate at its ingress/load balancer and provide X-Forwarded-For.
+  // Render public HTTP ports terminate at its ingress/load balancer and provide X-Forwarded-For.
   // Express must trust that managed ingress for per-client rate-limit keys; public access must go only through it.
   if (!value.TRUST_PROXY) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TRUST_PROXY'], message: 'TRUST_PROXY=true is required behind the Northflank public ingress so rate limits use client addresses' });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TRUST_PROXY'], message: 'TRUST_PROXY=true is required behind the Render / reverse proxy public ingress so rate limits use client addresses' });
   }
 
   if (!value.PAYMENT_PROVIDER) {
@@ -205,8 +214,36 @@ const envSchema = z.object({
   boundedIntegerOption('connectionLimit', 1, 50, ' connections');
 });
 
+export const buildDatabaseUrl = (input: NodeJS.ProcessEnv = process.env): string => {
+  const rawUrl = typeof input.DATABASE_URL === 'string' ? input.DATABASE_URL.trim() : '';
+  if (rawUrl) return rawUrl;
+
+  const host = typeof input.DB_HOST === 'string' ? input.DB_HOST.trim() : '';
+  if (host) {
+    const port = typeof input.DB_PORT === 'string' && input.DB_PORT.trim() ? input.DB_PORT.trim() : '1433';
+    const database = typeof input.DB_NAME === 'string' && input.DB_NAME.trim() ? input.DB_NAME.trim() : 'HotelBooking';
+    const user = typeof input.DB_USER === 'string' && input.DB_USER.trim() ? input.DB_USER.trim() : 'sa';
+    const password = typeof input.DB_PASSWORD === 'string' ? input.DB_PASSWORD : '';
+    const isProd = input.NODE_ENV === 'production';
+    const encrypt = typeof input.DB_ENCRYPT === 'string' && input.DB_ENCRYPT.trim() ? input.DB_ENCRYPT.trim() : (isProd ? 'true' : 'false');
+    const trustCert = typeof input.DB_TRUST_SERVER_CERTIFICATE === 'string' && input.DB_TRUST_SERVER_CERTIFICATE.trim() ? input.DB_TRUST_SERVER_CERTIFICATE.trim() : (isProd ? 'false' : 'true');
+    const connTimeout = typeof input.DB_CONNECTION_TIMEOUT === 'string' && input.DB_CONNECTION_TIMEOUT.trim() ? input.DB_CONNECTION_TIMEOUT.trim() : '15000';
+    const sockTimeout = typeof input.DB_SOCKET_TIMEOUT === 'string' && input.DB_SOCKET_TIMEOUT.trim() ? input.DB_SOCKET_TIMEOUT.trim() : '30000';
+    const poolTimeout = typeof input.DB_POOL_TIMEOUT === 'string' && input.DB_POOL_TIMEOUT.trim() ? input.DB_POOL_TIMEOUT.trim() : '10';
+    const connLimit = typeof input.DB_CONNECTION_LIMIT === 'string' && input.DB_CONNECTION_LIMIT.trim() ? input.DB_CONNECTION_LIMIT.trim() : '10';
+
+    return `sqlserver://${host}:${port};database=${database};user=${user};password=${password};encrypt=${encrypt};trustServerCertificate=${trustCert};connectionTimeout=${connTimeout};socketTimeout=${sockTimeout};poolTimeout=${poolTimeout};connectionLimit=${connLimit}`;
+  }
+
+  return 'sqlserver://localhost:1433;database=HotelBooking;user=sa;password=YourPassword;encrypt=false;trustServerCertificate=true;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10';
+};
+
 const parseEnv = () => {
-  const result = envSchema.safeParse(process.env);
+  const envWithDb = { ...process.env };
+  if (!envWithDb.DATABASE_URL || !envWithDb.DATABASE_URL.trim()) {
+    envWithDb.DATABASE_URL = buildDatabaseUrl(envWithDb);
+  }
+  const result = envSchema.safeParse(envWithDb);
   if (!result.success) {
     console.error('❌ Invalid environment variables configuration:');
     console.error(JSON.stringify(result.error.format(), null, 2));

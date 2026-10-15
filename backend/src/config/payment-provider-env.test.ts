@@ -93,6 +93,23 @@ describe('PAYMENT_PROVIDER', () => {
       .rejects.toThrow('Environment configuration validation failed');
   });
 
+  it('production accepts discrete DB_* variables when DATABASE_URL is omitted', async () => {
+    const { env } = await loadEnv({
+      PAYMENT_PROVIDER: 'simulated',
+      DATABASE_URL: '',
+      DB_HOST: 'rds-sqlserver.xxxx.rds.amazonaws.com',
+      DB_PORT: '1433',
+      DB_NAME: 'HotelBooking',
+      DB_USER: 'admin',
+      DB_PASSWORD: 'SecurePassword123!',
+      DB_ENCRYPT: 'true',
+      DB_TRUST_SERVER_CERTIFICATE: 'false',
+    });
+    expect(env.DATABASE_URL).toContain('sqlserver://rds-sqlserver.xxxx.rds.amazonaws.com:1433;database=HotelBooking');
+    expect(env.DATABASE_URL).toContain('encrypt=true');
+    expect(env.DATABASE_URL).toContain('trustServerCertificate=false');
+  });
+
   it('production requires trusted proxy handling and exact HTTPS origins', async () => {
     await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', TRUST_PROXY: 'false' })).rejects.toThrow('Environment configuration validation failed');
     await expect(loadEnv({ PAYMENT_PROVIDER: 'simulated', CORS_ORIGIN: 'https://app.test.invalid/path' })).rejects.toThrow('Environment configuration validation failed');
