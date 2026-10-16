@@ -1,0 +1,158 @@
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Times New Roman, Times, serif", "fontSize": "16px", "primaryColor": "#ffffff", "primaryTextColor": "#222222", "primaryBorderColor": "#7d9c58", "lineColor": "#82a8ae", "edgeLabelBackground": "#ffffff", "clusterBkg": "#ffffff", "clusterBorder": "#ffffff"}, "flowchart": {"curve": "stepBefore", "nodeSpacing": 22, "rankSpacing": 65, "diagramPadding": 20, "htmlLabels": true}}}%%
+graph LR;
+
+  %% Sơ đồ điều hướng chức năng theo bố cục ảnh mẫu.
+  %% Màn hình chính là nút tổng hợp điều hướng theo vai trò, không phải trang mới.
+  %% Ô viền cam: màn hình chính và đầu mối chức năng. Ô viền xanh: trang con.
+  %% Đường hai chiều: mở trang và quay lại nhóm chức năng.
+  %% Tổng cộng 51 mục trang, gồm lối chuyển hướng của chủ khách sạn và trang 404.
+
+  MAIN["MÀN HÌNH CHÍNH<br/>EGODE"];
+
+  subgraph CUSTOMER_AREA["KHÁCH HÀNG"];
+    CUSTOMER_HOME["Màn hình khách hàng<br/>Trang chủ"];
+    C_HOTELS["Danh sách<br/>khách sạn"];
+    C_HOTEL_DETAIL["Chi tiết khách sạn"];
+    C_BOOKINGS["Đơn đặt phòng<br/>của tôi"];
+    C_BOOKING_DETAIL["Chi tiết đặt phòng"];
+    C_PAYMENT_RESULT["Kết quả thanh toán"];
+    C_SUPPORT["Hỗ trợ<br/>và khiếu nại"];
+    C_SUPPORT_DETAIL["Chi tiết yêu cầu hỗ trợ"];
+    C_PROFILE["Hồ sơ cá nhân"];
+    C_PARTNER_APPLY["Đăng ký đối tác"];
+  end;
+
+  subgraph AUTH_AREA["TÀI KHOẢN"];
+    LOGIN["Màn hình<br/>đăng nhập"];
+    REGISTER["Đăng ký tài khoản"];
+    FORGOT_PASSWORD["Quên mật khẩu"];
+    RESET_PASSWORD["Đặt lại mật khẩu"];
+  end;
+
+  subgraph OWNER_AREA["CHỦ KHÁCH SẠN"];
+    OWNER_HOME["Màn hình chủ khách sạn<br/>Tổng quan"];
+    O_ENTRY["Khu vực chủ khách sạn<br/>Chuyển tới tổng quan"];
+    O_HOTELS["Khách sạn<br/>của tôi"];
+    O_HOTEL_NEW["Đăng ký khách sạn"];
+    O_HOTEL_DETAIL["Quản lý hồ sơ khách sạn"];
+    O_HOTEL_REVIEWS["Đánh giá của khách"];
+    O_ROOM_TYPES["Quản lý<br/>loại phòng"];
+    O_ROOM_DETAIL["Quản lý thông tin loại phòng"];
+    O_INVENTORY["Quỹ phòng và giá bán"];
+    O_BOOKINGS["Quản lý<br/>đặt phòng"];
+    O_BOOKING_DETAIL["Chi tiết đặt phòng"];
+    O_REVENUE["Doanh thu"];
+    O_REPORTS["Báo cáo thống kê"];
+    O_PROFILE["Hồ sơ cá nhân"];
+  end;
+
+  subgraph ADMIN_AREA["QUẢN TRỊ VIÊN"];
+    ADMIN_HOME["Màn hình quản trị<br/>Trung tâm điều hành"];
+    A_ACCOUNTS["Quản lý<br/>tài khoản"];
+    A_ACCOUNT_NEW["Tạo tài khoản"];
+    A_ACCOUNT_DETAIL["Chi tiết tài khoản"];
+    A_PARTNERS["Quản lý<br/>hồ sơ đối tác"];
+    A_PARTNER_DETAIL["Chi tiết hồ sơ đối tác"];
+    A_HOTELS["Quản lý<br/>khách sạn"];
+    A_HOTEL_DETAIL["Chi tiết khách sạn"];
+    A_AMENITIES["Quản lý tiện nghi"];
+    A_BOOKINGS["Quản lý<br/>đặt phòng"];
+    A_BOOKING_DETAIL["Chi tiết đặt phòng"];
+    A_PAYMENTS["Thanh toán<br/>và giao dịch"];
+    A_PAYMENT_DETAIL["Chi tiết giao dịch"];
+    A_REVIEWS["Quản lý<br/>đánh giá"];
+    A_REVIEW_DETAIL["Chi tiết đánh giá"];
+    A_SUPPORT["Hỗ trợ<br/>và khiếu nại"];
+    A_SUPPORT_DETAIL["Chi tiết yêu cầu hỗ trợ"];
+    A_PROMOTIONS["Quản lý<br/>khuyến mãi"];
+    A_PROMOTION_NEW["Tạo khuyến mãi"];
+    A_PROMOTION_DETAIL["Chỉnh sửa khuyến mãi"];
+    A_ANALYTICS["Báo cáo và thống kê hệ thống"];
+    A_PROFILE["Hồ sơ cá nhân"];
+  end;
+
+  NOT_FOUND["Không tìm thấy trang"];
+
+  %% Các nhánh chính: đặt màn hình chính giữa các khu vực như ảnh mẫu.
+  CUSTOMER_HOME <==>|"Khách hàng"| MAIN;
+  LOGIN <==> MAIN;
+  MAIN <==>|"Chủ khách sạn"| OWNER_HOME;
+  MAIN <==>|"Quản trị viên"| ADMIN_HOME;
+
+  %% Các nhánh bên trái màn hình chính.
+  C_HOTEL_DETAIL <--> C_HOTELS;
+  C_HOTELS <--> CUSTOMER_HOME;
+  C_PAYMENT_RESULT <--> C_BOOKING_DETAIL;
+  C_BOOKING_DETAIL <--> C_BOOKINGS;
+  C_BOOKINGS <--> CUSTOMER_HOME;
+  C_SUPPORT_DETAIL <--> C_SUPPORT;
+  C_SUPPORT <--> CUSTOMER_HOME;
+  C_PROFILE <--> CUSTOMER_HOME;
+  C_PARTNER_APPLY <--> CUSTOMER_HOME;
+
+  REGISTER <--> LOGIN;
+  RESET_PASSWORD <--> FORGOT_PASSWORD;
+  FORGOT_PASSWORD <--> LOGIN;
+
+  %% Các nhánh bên phải: quản lý của chủ khách sạn.
+  OWNER_HOME <--> O_HOTELS;
+  O_HOTELS <--> O_HOTEL_NEW;
+  O_HOTELS <--> O_HOTEL_DETAIL;
+  O_HOTEL_DETAIL <--> O_HOTEL_REVIEWS;
+  OWNER_HOME <--> O_ROOM_TYPES;
+  O_ROOM_TYPES <--> O_ROOM_DETAIL;
+  OWNER_HOME <--> O_INVENTORY;
+  OWNER_HOME <--> O_BOOKINGS;
+  O_BOOKINGS <--> O_BOOKING_DETAIL;
+  OWNER_HOME <--> O_REVENUE;
+  OWNER_HOME <--> O_REPORTS;
+  OWNER_HOME <--> O_PROFILE;
+  O_ENTRY -.-> OWNER_HOME;
+
+  %% Các nhánh bên phải: quản lý của quản trị viên.
+  ADMIN_HOME <--> A_ACCOUNTS;
+  A_ACCOUNTS <--> A_ACCOUNT_NEW;
+  A_ACCOUNTS <--> A_ACCOUNT_DETAIL;
+  ADMIN_HOME <--> A_PARTNERS;
+  A_PARTNERS <--> A_PARTNER_DETAIL;
+  ADMIN_HOME <--> A_HOTELS;
+  A_HOTELS <--> A_HOTEL_DETAIL;
+  A_HOTELS <--> A_AMENITIES;
+  ADMIN_HOME <--> A_BOOKINGS;
+  A_BOOKINGS <--> A_BOOKING_DETAIL;
+  ADMIN_HOME <--> A_PAYMENTS;
+  A_PAYMENTS <--> A_PAYMENT_DETAIL;
+  ADMIN_HOME <--> A_REVIEWS;
+  A_REVIEWS <--> A_REVIEW_DETAIL;
+  ADMIN_HOME <--> A_SUPPORT;
+  A_SUPPORT <--> A_SUPPORT_DETAIL;
+  ADMIN_HOME <--> A_PROMOTIONS;
+  A_PROMOTIONS <--> A_PROMOTION_NEW;
+  A_PROMOTIONS <--> A_PROMOTION_DETAIL;
+  ADMIN_HOME <--> A_ANALYTICS;
+  ADMIN_HOME <--> A_PROFILE;
+
+  %% Một số luồng chuyển trang liên quan giữa các nhóm chức năng.
+  REGISTER -.->|"Đăng ký khách hàng"| CUSTOMER_HOME;
+  REGISTER -.->|"Đăng ký đối tác"| C_PARTNER_APPLY;
+  C_HOTEL_DETAIL -.->|"Đặt phòng"| C_BOOKING_DETAIL;
+  MAIN -.->|"Địa chỉ không tồn tại"| NOT_FOUND;
+
+  %% Màu sắc và kiểu đường nối theo ảnh mẫu.
+  classDef main fill:#ffffff,stroke:#b58c59,stroke-width:3px,color:#222222,font-size:19px,font-weight:bold;
+  classDef hub fill:#ffffff,stroke:#b58c59,stroke-width:2px,color:#222222,font-size:17px;
+  classDef module fill:#ffffff,stroke:#b58c59,stroke-width:1.8px,color:#222222;
+  classDef page fill:#ffffff,stroke:#7d9c58,stroke-width:1.5px,color:#222222;
+
+  class MAIN main;
+  class CUSTOMER_HOME,LOGIN,OWNER_HOME,ADMIN_HOME hub;
+  class C_HOTELS,C_BOOKINGS,C_SUPPORT,O_HOTELS,O_ROOM_TYPES,O_BOOKINGS,A_ACCOUNTS,A_PARTNERS,A_HOTELS,A_BOOKINGS,A_PAYMENTS,A_REVIEWS,A_SUPPORT,A_PROMOTIONS module;
+  class C_HOTEL_DETAIL,C_BOOKING_DETAIL,C_PAYMENT_RESULT,C_SUPPORT_DETAIL,C_PROFILE,C_PARTNER_APPLY,REGISTER,FORGOT_PASSWORD,RESET_PASSWORD,O_ENTRY,O_HOTEL_NEW,O_HOTEL_DETAIL,O_HOTEL_REVIEWS,O_ROOM_DETAIL,O_INVENTORY,O_BOOKING_DETAIL,O_REVENUE,O_REPORTS,O_PROFILE,A_ACCOUNT_NEW,A_ACCOUNT_DETAIL,A_PARTNER_DETAIL,A_HOTEL_DETAIL,A_AMENITIES,A_BOOKING_DETAIL,A_PAYMENT_DETAIL,A_REVIEW_DETAIL,A_SUPPORT_DETAIL,A_PROMOTION_NEW,A_PROMOTION_DETAIL,A_ANALYTICS,A_PROFILE,NOT_FOUND page;
+
+  style CUSTOMER_AREA fill:#ffffff,stroke:none;
+  style AUTH_AREA fill:#ffffff,stroke:none;
+  style OWNER_AREA fill:#ffffff,stroke:none;
+  style ADMIN_AREA fill:#ffffff,stroke:none;
+
+  linkStyle default stroke:#82a8ae,stroke-width:1.2px;
+  linkStyle 0,1,2,3 stroke:#4f98ca,stroke-width:5px;

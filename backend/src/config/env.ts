@@ -39,7 +39,8 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
   SMTP_SECURE: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
   SMTP_USER: z.string().trim().optional().default(''),
-  SMTP_PASSWORD: z.string().optional().default(''),
+  // Gmail app-password hay bị paste kèm dấu cách (xxxx xxxx ...): chuẩn hoá bỏ hết khoảng trắng.
+  SMTP_PASSWORD: z.string().optional().default('').transform((value) => value.replace(/\s+/g, '')),
   SMTP_FROM: z.string().trim().optional().default(''),
 
   // JWT

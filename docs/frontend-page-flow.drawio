@@ -1,0 +1,1100 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-16T15:45:26Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="overview" name="01 - Điều hướng &amp; xác thực">
+    <mxGraphModel dx="1671" dy="1118" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1671" pageHeight="1118" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&quot;data&quot;:&quot;graph TD;\n\n  A[\&quot;Mở ứng dụng hoặc truy cập trang\&quot;];\n  B[\&quot;Khôi phục phiên từ refresh cookie\&quot;];\n  C{\&quot;Loại trang được yêu cầu?\&quot;};\n  PUB[\&quot;Trang công khai được yêu cầu\&quot;];\n  AUTH{\&quot;Đã có phiên hợp lệ?\&quot;};\n  LOGIN[\&quot;Đăng nhập\&quot;];\n  BACK[\&quot;Trở lại trang ban đầu\&quot;];\n  ROLE{\&quot;Vai trò trong phiên mới\&quot;};\n  HOME[\&quot;Trang chủ\&quot;];\n  OWNER[\&quot;Tổng quan chủ khách sạn\&quot;];\n  ADMIN[\&quot;Trung tâm điều hành\&quot;];\n  ALLOW[\&quot;Hiển thị trang được yêu cầu\&quot;];\n  GUEST{\&quot;Đã đăng nhập trước khi mở trang?\&quot;};\n  REGISTER[\&quot;Đăng ký\&quot;];\n  FORGOT[\&quot;Quên mật khẩu\&quot;];\n  PARTNERAPPLY[\&quot;Đăng ký đối tác\&quot;];\n  RESET[\&quot;Đặt lại mật khẩu\&quot;];\n  NF[\&quot;Không tìm thấy trang\&quot;];\n\n  A--&gt;B;\n  B--&gt;C;\n  C--&gt;|\&quot;Trang công khai\&quot;|PUB;\n  C--&gt;|\&quot;Cần đăng nhập\&quot;|AUTH;\n  AUTH--&gt;|\&quot;Chưa\&quot;|LOGIN;\n  LOGIN--&gt;|\&quot;Có trang đích được lưu\&quot;|BACK;\n  LOGIN--&gt;|\&quot;Không có trang đích\&quot;|ROLE;\n  ROLE--&gt;|\&quot;Khách hàng\&quot;|HOME;\n  ROLE--&gt;|\&quot;Chủ khách sạn\&quot;|OWNER;\n  ROLE--&gt;|\&quot;Quản trị viên\&quot;|ADMIN;\n  AUTH--&gt;|\&quot;Có, đúng vai trò\&quot;|ALLOW;\n  AUTH--&gt;|\&quot;Có, sai vai trò\&quot;|HOME;\n  C--&gt;|\&quot;Trang đăng nhập, đăng ký hoặc quên mật khẩu\&quot;|GUEST;\n  GUEST--&gt;|\&quot;Chưa, chọn đăng nhập\&quot;|LOGIN;\n  GUEST--&gt;|\&quot;Chưa, chọn đăng ký\&quot;|REGISTER;\n  GUEST--&gt;|\&quot;Chưa, chọn quên mật khẩu\&quot;|FORGOT;\n  GUEST--&gt;|\&quot;Rồi\&quot;|ROLE;\n  REGISTER--&gt;|\&quot;Đăng ký khách hàng\&quot;|HOME;\n  REGISTER--&gt;|\&quot;Ý định đối tác\&quot;|PARTNERAPPLY;\n  LOGIN--&gt;|\&quot;Quên mật khẩu\&quot;|FORGOT;\n  FORGOT--&gt;|\&quot;Mở liên kết email có token\&quot;|RESET;\n  C--&gt;|\&quot;Liên kết đặt lại mật khẩu\&quot;|RESET;\n  RESET--&gt;|\&quot;Thành công\&quot;|LOGIN;\n  C--&gt;|\&quot;Địa chỉ không tồn tại\&quot;|NF;&quot;,&quot;config&quot;:null}" id="mermaid-overview">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=20;" vertex="1">
+            <mxGeometry x="0" y="0" width="1671" height="1118" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Mở ứng dụng hoặc truy cập trang" mermaidId="n:A" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Mở ứng dụng hoặc truy cập trang" id="overview-n-A">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="693" y="40" width="285" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khôi phục phiên từ refresh cookie" mermaidId="n:B" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Khôi phục phiên từ refresh cookie" id="overview-n-B">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="686" y="204" width="300" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Loại trang được yêu cầu?" mermaidId="n:C" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Loại trang được yêu cầu?" id="overview-n-C">
+          <mxCell parent="mermaid-overview" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="716" y="368" width="239" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang công khai được yêu cầu" mermaidId="n:PUB" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trang công khai được yêu cầu" id="overview-n-PUB">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="92" y="566" width="274" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đã có phiên hợp lệ?" mermaidId="n:AUTH" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đã có phiên hợp lệ?" id="overview-n-AUTH">
+          <mxCell parent="mermaid-overview" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="424" y="555" width="228" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng nhập" mermaidId="n:LOGIN" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng nhập" id="overview-n-LOGIN">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="40" y="754" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trở lại trang ban đầu" mermaidId="n:BACK" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trở lại trang ban đầu" id="overview-n-BACK">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="311" y="929" width="228" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Vai trò trong phiên mới" mermaidId="n:ROLE" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Vai trò trong phiên mới" id="overview-n-ROLE">
+          <mxCell parent="mermaid-overview" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="288" y="742" width="249" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang chủ" mermaidId="n:HOME" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trang chủ" id="overview-n-HOME">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="595" y="754" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tổng quan chủ khách sạn" mermaidId="n:OWNER" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tổng quan chủ khách sạn" id="overview-n-OWNER">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="597" y="929" width="254" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trung tâm điều hành" mermaidId="n:ADMIN" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trung tâm điều hành" id="overview-n-ADMIN">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="909" y="929" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hiển thị trang được yêu cầu" mermaidId="n:ALLOW" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hiển thị trang được yêu cầu" id="overview-n-ALLOW">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="843" y="754" width="269" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đã đăng nhập trước khi mở trang?" mermaidId="n:GUEST" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đã đăng nhập trước khi mở trang?" id="overview-n-GUEST">
+          <mxCell parent="mermaid-overview" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="710" y="555" width="295" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký" mermaidId="n:REGISTER" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng ký" id="overview-n-REGISTER">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1170" y="754" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quên mật khẩu" mermaidId="n:FORGOT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quên mật khẩu" id="overview-n-FORGOT">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1418" y="754" width="213" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký đối tác" mermaidId="n:PARTNERAPPLY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng ký đối tác" id="overview-n-PARTNERAPPLY">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1157" y="929" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đặt lại mật khẩu" mermaidId="n:RESET" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đặt lại mật khẩu" id="overview-n-RESET">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1064" y="566" width="244" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Không tìm thấy trang" mermaidId="n:NF" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Không tìm thấy trang" id="overview-n-NF">
+          <mxCell parent="mermaid-overview" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1366" y="566" width="213" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:A-&gt;B#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="overview-edge-0">
+          <mxCell parent="mermaid-overview" source="overview-n-A" target="overview-n-B" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:B-&gt;C#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="overview-edge-1">
+          <mxCell parent="mermaid-overview" source="overview-n-B" target="overview-n-C" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang công khai" mermaidId="e:C-&gt;PUB#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Trang công khai" id="overview-edge-2">
+          <mxCell parent="mermaid-overview" source="overview-n-C" target="overview-n-PUB" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Cần đăng nhập" mermaidId="e:C-&gt;AUTH#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Cần đăng nhập" id="overview-edge-3">
+          <mxCell parent="mermaid-overview" source="overview-n-C" target="overview-n-AUTH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chưa" mermaidId="e:AUTH-&gt;LOGIN#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chưa" id="overview-edge-4">
+          <mxCell parent="mermaid-overview" source="overview-n-AUTH" target="overview-n-LOGIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Có trang đích được lưu" mermaidId="e:LOGIN-&gt;BACK#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Có trang đích được lưu" id="overview-edge-5">
+          <mxCell parent="mermaid-overview" source="overview-n-LOGIN" target="overview-n-BACK" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Không có trang đích" mermaidId="e:LOGIN-&gt;ROLE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Không có trang đích" id="overview-edge-6">
+          <mxCell parent="mermaid-overview" source="overview-n-LOGIN" target="overview-n-ROLE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khách hàng" mermaidId="e:ROLE-&gt;HOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Khách hàng" id="overview-edge-7">
+          <mxCell parent="mermaid-overview" source="overview-n-ROLE" target="overview-n-HOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chủ khách sạn" mermaidId="e:ROLE-&gt;OWNER#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chủ khách sạn" id="overview-edge-8">
+          <mxCell parent="mermaid-overview" source="overview-n-ROLE" target="overview-n-OWNER" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản trị viên" mermaidId="e:ROLE-&gt;ADMIN#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quản trị viên" id="overview-edge-9">
+          <mxCell parent="mermaid-overview" source="overview-n-ROLE" target="overview-n-ADMIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Có, đúng vai trò" mermaidId="e:AUTH-&gt;ALLOW#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Có, đúng vai trò" id="overview-edge-10">
+          <mxCell parent="mermaid-overview" source="overview-n-AUTH" target="overview-n-ALLOW" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Có, sai vai trò" mermaidId="e:AUTH-&gt;HOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Có, sai vai trò" id="overview-edge-11">
+          <mxCell parent="mermaid-overview" source="overview-n-AUTH" target="overview-n-HOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang đăng nhập, đăng ký hoặc quên mật khẩu" mermaidId="e:C-&gt;GUEST#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Trang đăng nhập, đăng ký hoặc quên mật khẩu" id="overview-edge-12">
+          <mxCell parent="mermaid-overview" source="overview-n-C" target="overview-n-GUEST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chưa, chọn đăng nhập" mermaidId="e:GUEST-&gt;LOGIN#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chưa, chọn đăng nhập" id="overview-edge-13">
+          <mxCell parent="mermaid-overview" source="overview-n-GUEST" target="overview-n-LOGIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chưa, chọn đăng ký" mermaidId="e:GUEST-&gt;REGISTER#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chưa, chọn đăng ký" id="overview-edge-14">
+          <mxCell parent="mermaid-overview" source="overview-n-GUEST" target="overview-n-REGISTER" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chưa, chọn quên mật khẩu" mermaidId="e:GUEST-&gt;FORGOT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chưa, chọn quên mật khẩu" id="overview-edge-15">
+          <mxCell parent="mermaid-overview" source="overview-n-GUEST" target="overview-n-FORGOT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Rồi" mermaidId="e:GUEST-&gt;ROLE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Rồi" id="overview-edge-16">
+          <mxCell parent="mermaid-overview" source="overview-n-GUEST" target="overview-n-ROLE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký khách hàng" mermaidId="e:REGISTER-&gt;HOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đăng ký khách hàng" id="overview-edge-17">
+          <mxCell parent="mermaid-overview" source="overview-n-REGISTER" target="overview-n-HOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Ý định đối tác" mermaidId="e:REGISTER-&gt;PARTNERAPPLY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Ý định đối tác" id="overview-edge-18">
+          <mxCell parent="mermaid-overview" source="overview-n-REGISTER" target="overview-n-PARTNERAPPLY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quên mật khẩu" mermaidId="e:LOGIN-&gt;FORGOT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quên mật khẩu" id="overview-edge-19">
+          <mxCell parent="mermaid-overview" source="overview-n-LOGIN" target="overview-n-FORGOT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Mở liên kết email có token" mermaidId="e:FORGOT-&gt;RESET#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Mở liên kết email có token" id="overview-edge-20">
+          <mxCell parent="mermaid-overview" source="overview-n-FORGOT" target="overview-n-RESET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Liên kết đặt lại mật khẩu" mermaidId="e:C-&gt;RESET#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Liên kết đặt lại mật khẩu" id="overview-edge-21">
+          <mxCell parent="mermaid-overview" source="overview-n-C" target="overview-n-RESET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thành công" mermaidId="e:RESET-&gt;LOGIN#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thành công" id="overview-edge-22">
+          <mxCell parent="mermaid-overview" source="overview-n-RESET" target="overview-n-LOGIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Địa chỉ không tồn tại" mermaidId="e:C-&gt;NF#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Địa chỉ không tồn tại" id="overview-edge-23">
+          <mxCell parent="mermaid-overview" source="overview-n-C" target="overview-n-NF" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="customer" name="02 - Khách hàng: đặt phòng &amp; hỗ trợ">
+    <mxGraphModel dx="1484" dy="1488" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1484" pageHeight="1488" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&quot;data&quot;:&quot;graph TD;\n\n  HOME[\&quot;Trang chủ\&quot;];\n  LIST[\&quot;Danh sách khách sạn\&quot;];\n  HOTEL[\&quot;Chi tiết khách sạn\&quot;];\n  SEARCH[\&quot;Chọn ngày, số khách, loại phòng\&quot;];\n  QUOTE[\&quot;Lấy báo giá và kiểm tra sức chứa / tồn phòng\&quot;];\n  PROMO[\&quot;Báo giá lại với mã khuyến mãi\&quot;];\n  SIGNED{\&quot;Đã đăng nhập?\&quot;};\n  LOGIN[\&quot;Đăng nhập\&quot;];\n  DISABLED[\&quot;Không thể xác nhận đặt phòng\&quot;];\n  CREATE[\&quot;Tạo đặt phòng\&quot;];\n  FREE{\&quot;Tổng thanh toán bằng 0?\&quot;};\n  RESULT[\&quot;Kết quả thanh toán\&quot;];\n  BOOKING[\&quot;Chi tiết đặt phòng\&quot;];\n  PROVIDER{\&quot;Cấu hình cổng thanh toán\&quot;};\n  SIM[\&quot;Xử lý thanh toán trong ứng dụng\&quot;];\n  VNPAY[\&quot;Chuyển tới cổng VNPAY\&quot;];\n  RETRY[\&quot;Thử thanh toán lại\&quot;];\n  SUPPORT[\&quot;Hỗ trợ và khiếu nại\&quot;];\n  BOOKINGS[\&quot;Đơn đặt phòng của tôi\&quot;];\n  REVIEW[\&quot;Đánh giá sau lưu trú (trong chi tiết đặt phòng)\&quot;];\n  TICKET[\&quot;Chi tiết yêu cầu hỗ trợ\&quot;];\n  PROFILE[\&quot;Hồ sơ cá nhân\&quot;];\n\n  HOME--&gt;|\&quot;Tìm theo điểm đến, ngày, khách\&quot;|LIST;\n  LIST--&gt;|\&quot;Chọn khách sạn\&quot;|HOTEL;\n  HOTEL--&gt;SEARCH;\n  SEARCH--&gt;QUOTE;\n  QUOTE--&gt;|\&quot;Thiếu phòng hoặc không đủ sức chứa\&quot;|SEARCH;\n  QUOTE--&gt;|\&quot;Nhập mã, bấm Áp dụng\&quot;|PROMO;\n  PROMO--&gt;|\&quot;Mã không hợp lệ\&quot;|SEARCH;\n  PROMO--&gt;|\&quot;Báo giá hợp lệ\&quot;|SIGNED;\n  QUOTE--&gt;|\&quot;Đủ điều kiện đặt\&quot;|SIGNED;\n  SIGNED--&gt;|\&quot;Chưa\&quot;|LOGIN;\n  LOGIN--&gt;|\&quot;Quay lại chi tiết khách sạn, giữ lựa chọn tìm kiếm\&quot;|HOTEL;\n  SIGNED--&gt;|\&quot;Có nhưng không phải khách hàng\&quot;|DISABLED;\n  SIGNED--&gt;|\&quot;Khách hàng\&quot;|CREATE;\n  CREATE--&gt;FREE;\n  FREE--&gt;|\&quot;Có, máy chủ xác nhận ngay\&quot;|RESULT;\n  FREE--&gt;|\&quot;Không\&quot;|BOOKING;\n  BOOKING--&gt;|\&quot;Thanh toán\&quot;|PROVIDER;\n  PROVIDER--&gt;|\&quot;Mô phỏng\&quot;|SIM;\n  SIM--&gt;RESULT;\n  PROVIDER--&gt;|\&quot;VNPAY\&quot;|VNPAY;\n  VNPAY--&gt;|\&quot;Quay về frontend\&quot;|RESULT;\n  RESULT--&gt;|\&quot;Đã xác nhận\&quot;|BOOKING;\n  RESULT--&gt;|\&quot;Đã xác nhận\&quot;|HOME;\n  RESULT--&gt;|\&quot;Thanh toán lỗi, đơn còn chờ: thử lại ngay tại trang kết quả\&quot;|RETRY;\n  RETRY--&gt;PROVIDER;\n  RESULT--&gt;|\&quot;Đang xử lý\&quot;|BOOKING;\n  RESULT--&gt;|\&quot;Đơn đã hủy nhưng đã thu tiền\&quot;|BOOKING;\n  RESULT--&gt;|\&quot;Đơn đã hủy nhưng đã thu tiền\&quot;|SUPPORT;\n  RESULT--&gt;|\&quot;Thiếu mã đặt phòng\&quot;|BOOKINGS;\n  RESULT--&gt;|\&quot;Thiếu mã đặt phòng\&quot;|SUPPORT;\n  BOOKINGS--&gt;|\&quot;Xem một đơn\&quot;|BOOKING;\n  BOOKINGS--&gt;|\&quot;Đơn hoàn tất: viết đánh giá\&quot;|REVIEW;\n  REVIEW--&gt;BOOKING;\n  BOOKING--&gt;|\&quot;Xem khách sạn\&quot;|HOTEL;\n  BOOKING--&gt;|\&quot;Hủy đơn / xem hoàn tiền\&quot;|BOOKING;\n  SUPPORT--&gt;|\&quot;Mở yêu cầu\&quot;|TICKET;\n  TICKET--&gt;SUPPORT;\n  HOME--&gt;|\&quot;Menu tài khoản\&quot;|PROFILE;\n  HOME--&gt;|\&quot;Menu đặt phòng\&quot;|BOOKINGS;\n  HOME--&gt;|\&quot;Menu hỗ trợ\&quot;|SUPPORT;&quot;,&quot;config&quot;:null}" id="mermaid-customer">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=20;" vertex="1">
+            <mxGeometry x="0" y="0" width="1484" height="1488" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang chủ" mermaidId="n:HOME" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trang chủ" id="customer-n-HOME">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="643" y="40" width="198" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Danh sách khách sạn" mermaidId="n:LIST" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Danh sách khách sạn" id="customer-n-LIST">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="78" y="204" width="279" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết khách sạn" mermaidId="n:HOTEL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết khách sạn" id="customer-n-HOTEL">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="40" y="378" width="295" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chọn ngày, số khách, loại phòng" mermaidId="n:SEARCH" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chọn ngày, số khách, loại phòng" id="customer-n-SEARCH">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="441" y="564" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lấy báo giá và kiểm tra sức chứa / tồn phòng" mermaidId="n:QUOTE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Lấy báo giá và kiểm tra sức chứa / tồn phòng" id="customer-n-QUOTE">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="250" y="740" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Báo giá lại với mã khuyến mãi" mermaidId="n:PROMO" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Báo giá lại với mã khuyến mãi" id="customer-n-PROMO">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="270" y="936" width="279" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đã đăng nhập?" mermaidId="n:SIGNED" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đã đăng nhập?" id="customer-n-SIGNED">
+          <mxCell parent="mermaid-customer" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="606" y="925" width="210" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng nhập" mermaidId="n:LOGIN" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng nhập" id="customer-n-LOGIN">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="212" y="1112" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Không thể xác nhận đặt phòng" mermaidId="n:DISABLED" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Không thể xác nhận đặt phòng" id="customer-n-DISABLED">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="460" y="1112" width="274" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tạo đặt phòng" mermaidId="n:CREATE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tạo đặt phòng" id="customer-n-CREATE">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="792" y="1112" width="198" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tổng thanh toán bằng 0?" mermaidId="n:FREE" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tổng thanh toán bằng 0?" id="customer-n-FREE">
+          <mxCell parent="mermaid-customer" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="618" y="1276" width="249" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Kết quả thanh toán" mermaidId="n:RESULT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Kết quả thanh toán" id="customer-n-RESULT">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="874" y="926" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết đặt phòng" mermaidId="n:BOOKING" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết đặt phòng" id="customer-n-BOOKING">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="393" y="378" width="305" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Cấu hình cổng thanh toán" mermaidId="n:PROVIDER" mermaidBaseStyle="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Cấu hình cổng thanh toán" id="customer-n-PROVIDER">
+          <mxCell parent="mermaid-customer" style="rhombus;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#FFF4CC;strokeColor=#D6A623;fontColor=#5F4B00;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="789" y="553" width="254" height="92" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Xử lý thanh toán trong ứng dụng" mermaidId="n:SIM" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Xử lý thanh toán trong ứng dụng" id="customer-n-SIM">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="648" y="750" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chuyển tới cổng VNPAY" mermaidId="n:VNPAY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chuyển tới cổng VNPAY" id="customer-n-VNPAY">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="996" y="750" width="239" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thử thanh toán lại" mermaidId="n:RETRY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Thử thanh toán lại" id="customer-n-RETRY">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1048" y="1112" width="223" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hỗ trợ và khiếu nại" mermaidId="n:SUPPORT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hỗ trợ và khiếu nại" id="customer-n-SUPPORT">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="415" y="204" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đơn đặt phòng của tôi" mermaidId="n:BOOKINGS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đơn đặt phòng của tôi" id="customer-n-BOOKINGS">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="763" y="204" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đánh giá sau lưu trú (trong chi tiết đặt phòng)" mermaidId="n:REVIEW" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đánh giá sau lưu trú (trong chi tiết đặt phòng)" id="customer-n-REVIEW">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="756" y="368" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết yêu cầu hỗ trợ" mermaidId="n:TICKET" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết yêu cầu hỗ trợ" id="customer-n-TICKET">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1154" y="378" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ cá nhân" mermaidId="n:PROFILE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ cá nhân" id="customer-n-PROFILE">
+          <mxCell parent="mermaid-customer" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1111" y="204" width="295" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tìm theo điểm đến, ngày, khách" mermaidId="e:HOME-&gt;LIST#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Tìm theo điểm đến, ngày, khách" id="customer-edge-0">
+          <mxCell parent="mermaid-customer" source="customer-n-HOME" target="customer-n-LIST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chọn khách sạn" mermaidId="e:LIST-&gt;HOTEL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chọn khách sạn" id="customer-edge-1">
+          <mxCell parent="mermaid-customer" source="customer-n-LIST" target="customer-n-HOTEL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTEL-&gt;SEARCH#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-2">
+          <mxCell parent="mermaid-customer" source="customer-n-HOTEL" target="customer-n-SEARCH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:SEARCH-&gt;QUOTE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-3">
+          <mxCell parent="mermaid-customer" source="customer-n-SEARCH" target="customer-n-QUOTE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thiếu phòng hoặc không đủ sức chứa" mermaidId="e:QUOTE-&gt;SEARCH#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thiếu phòng hoặc không đủ sức chứa" id="customer-edge-4">
+          <mxCell parent="mermaid-customer" source="customer-n-QUOTE" target="customer-n-SEARCH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Nhập mã, bấm Áp dụng" mermaidId="e:QUOTE-&gt;PROMO#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Nhập mã, bấm Áp dụng" id="customer-edge-5">
+          <mxCell parent="mermaid-customer" source="customer-n-QUOTE" target="customer-n-PROMO" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Mã không hợp lệ" mermaidId="e:PROMO-&gt;SEARCH#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Mã không hợp lệ" id="customer-edge-6">
+          <mxCell parent="mermaid-customer" source="customer-n-PROMO" target="customer-n-SEARCH" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Báo giá hợp lệ" mermaidId="e:PROMO-&gt;SIGNED#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Báo giá hợp lệ" id="customer-edge-7">
+          <mxCell parent="mermaid-customer" source="customer-n-PROMO" target="customer-n-SIGNED" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đủ điều kiện đặt" mermaidId="e:QUOTE-&gt;SIGNED#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đủ điều kiện đặt" id="customer-edge-8">
+          <mxCell parent="mermaid-customer" source="customer-n-QUOTE" target="customer-n-SIGNED" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chưa" mermaidId="e:SIGNED-&gt;LOGIN#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Chưa" id="customer-edge-9">
+          <mxCell parent="mermaid-customer" source="customer-n-SIGNED" target="customer-n-LOGIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay lại chi tiết khách sạn, giữ lựa chọn tìm kiếm" mermaidId="e:LOGIN-&gt;HOTEL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay lại chi tiết khách sạn, giữ lựa chọn tìm kiếm" id="customer-edge-10">
+          <mxCell parent="mermaid-customer" source="customer-n-LOGIN" target="customer-n-HOTEL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Có nhưng không phải khách hàng" mermaidId="e:SIGNED-&gt;DISABLED#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Có nhưng không phải khách hàng" id="customer-edge-11">
+          <mxCell parent="mermaid-customer" source="customer-n-SIGNED" target="customer-n-DISABLED" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khách hàng" mermaidId="e:SIGNED-&gt;CREATE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Khách hàng" id="customer-edge-12">
+          <mxCell parent="mermaid-customer" source="customer-n-SIGNED" target="customer-n-CREATE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:CREATE-&gt;FREE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-13">
+          <mxCell parent="mermaid-customer" source="customer-n-CREATE" target="customer-n-FREE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Có, máy chủ xác nhận ngay" mermaidId="e:FREE-&gt;RESULT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Có, máy chủ xác nhận ngay" id="customer-edge-14">
+          <mxCell parent="mermaid-customer" source="customer-n-FREE" target="customer-n-RESULT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Không" mermaidId="e:FREE-&gt;BOOKING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Không" id="customer-edge-15">
+          <mxCell parent="mermaid-customer" source="customer-n-FREE" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thanh toán" mermaidId="e:BOOKING-&gt;PROVIDER#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thanh toán" id="customer-edge-16">
+          <mxCell parent="mermaid-customer" source="customer-n-BOOKING" target="customer-n-PROVIDER" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Mô phỏng" mermaidId="e:PROVIDER-&gt;SIM#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Mô phỏng" id="customer-edge-17">
+          <mxCell parent="mermaid-customer" source="customer-n-PROVIDER" target="customer-n-SIM" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:SIM-&gt;RESULT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-18">
+          <mxCell parent="mermaid-customer" source="customer-n-SIM" target="customer-n-RESULT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="VNPAY" mermaidId="e:PROVIDER-&gt;VNPAY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="VNPAY" id="customer-edge-19">
+          <mxCell parent="mermaid-customer" source="customer-n-PROVIDER" target="customer-n-VNPAY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay về frontend" mermaidId="e:VNPAY-&gt;RESULT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay về frontend" id="customer-edge-20">
+          <mxCell parent="mermaid-customer" source="customer-n-VNPAY" target="customer-n-RESULT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đã xác nhận" mermaidId="e:RESULT-&gt;BOOKING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đã xác nhận" id="customer-edge-21">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đã xác nhận" mermaidId="e:RESULT-&gt;HOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đã xác nhận" id="customer-edge-22">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-HOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thanh toán lỗi, đơn còn chờ: thử lại ngay tại trang kết quả" mermaidId="e:RESULT-&gt;RETRY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thanh toán lỗi, đơn còn chờ: thử lại ngay tại trang kết quả" id="customer-edge-23">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-RETRY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:RETRY-&gt;PROVIDER#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-24">
+          <mxCell parent="mermaid-customer" source="customer-n-RETRY" target="customer-n-PROVIDER" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đang xử lý" mermaidId="e:RESULT-&gt;BOOKING#1" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đang xử lý" id="customer-edge-25">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đơn đã hủy nhưng đã thu tiền" mermaidId="e:RESULT-&gt;BOOKING#2" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đơn đã hủy nhưng đã thu tiền" id="customer-edge-26">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đơn đã hủy nhưng đã thu tiền" mermaidId="e:RESULT-&gt;SUPPORT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đơn đã hủy nhưng đã thu tiền" id="customer-edge-27">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thiếu mã đặt phòng" mermaidId="e:RESULT-&gt;BOOKINGS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thiếu mã đặt phòng" id="customer-edge-28">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-BOOKINGS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thiếu mã đặt phòng" mermaidId="e:RESULT-&gt;SUPPORT#1" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Thiếu mã đặt phòng" id="customer-edge-29">
+          <mxCell parent="mermaid-customer" source="customer-n-RESULT" target="customer-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Xem một đơn" mermaidId="e:BOOKINGS-&gt;BOOKING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Xem một đơn" id="customer-edge-30">
+          <mxCell parent="mermaid-customer" source="customer-n-BOOKINGS" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đơn hoàn tất: viết đánh giá" mermaidId="e:BOOKINGS-&gt;REVIEW#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đơn hoàn tất: viết đánh giá" id="customer-edge-31">
+          <mxCell parent="mermaid-customer" source="customer-n-BOOKINGS" target="customer-n-REVIEW" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:REVIEW-&gt;BOOKING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-32">
+          <mxCell parent="mermaid-customer" source="customer-n-REVIEW" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Xem khách sạn" mermaidId="e:BOOKING-&gt;HOTEL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Xem khách sạn" id="customer-edge-33">
+          <mxCell parent="mermaid-customer" source="customer-n-BOOKING" target="customer-n-HOTEL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hủy đơn / xem hoàn tiền" mermaidId="e:BOOKING-&gt;BOOKING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Hủy đơn / xem hoàn tiền" id="customer-edge-34">
+          <mxCell parent="mermaid-customer" source="customer-n-BOOKING" target="customer-n-BOOKING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Mở yêu cầu" mermaidId="e:SUPPORT-&gt;TICKET#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Mở yêu cầu" id="customer-edge-35">
+          <mxCell parent="mermaid-customer" source="customer-n-SUPPORT" target="customer-n-TICKET" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:TICKET-&gt;SUPPORT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="customer-edge-36">
+          <mxCell parent="mermaid-customer" source="customer-n-TICKET" target="customer-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Menu tài khoản" mermaidId="e:HOME-&gt;PROFILE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Menu tài khoản" id="customer-edge-37">
+          <mxCell parent="mermaid-customer" source="customer-n-HOME" target="customer-n-PROFILE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Menu đặt phòng" mermaidId="e:HOME-&gt;BOOKINGS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Menu đặt phòng" id="customer-edge-38">
+          <mxCell parent="mermaid-customer" source="customer-n-HOME" target="customer-n-BOOKINGS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Menu hỗ trợ" mermaidId="e:HOME-&gt;SUPPORT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Menu hỗ trợ" id="customer-edge-39">
+          <mxCell parent="mermaid-customer" source="customer-n-HOME" target="customer-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="partner_owner" name="03 - Đối tác &amp; chủ khách sạn">
+    <mxGraphModel dx="1551" dy="2260" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1551" pageHeight="2260" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&quot;data&quot;:&quot;graph TD;\n\n  REGISTER[\&quot;Đăng ký\&quot;];\n  APPLY[\&quot;Đăng ký đối tác\&quot;];\n  HOME[\&quot;Trang chủ\&quot;];\n  PENDING[\&quot;Trạng thái chờ duyệt\&quot;];\n  REAPPLY[\&quot;Sửa thông tin và nộp lại\&quot;];\n  ADMINLIST[\&quot;Hồ sơ đăng ký\&quot;];\n  ADMINDETAIL[\&quot;Chi tiết hồ sơ đối tác\&quot;];\n  APPROVED[\&quot;Hồ sơ được duyệt\&quot;];\n  OWNERROOT[\&quot;Khu vực chủ khách sạn\&quot;];\n  OWNERHOME[\&quot;Tổng quan\&quot;];\n  HOTELLIST[\&quot;Khách sạn của tôi\&quot;];\n  HOTELNEW[\&quot;Đăng ký khách sạn\&quot;];\n  HOTELMANAGE[\&quot;Quản lý hồ sơ khách sạn\&quot;];\n  HOTELREVIEWS[\&quot;Đánh giá của khách\&quot;];\n  ROOMLIST[\&quot;Loại phòng\&quot;];\n  ROOMDETAIL[\&quot;Quản lý loại phòng\&quot;];\n  INVENTORY[\&quot;Quỹ phòng và giá bán\&quot;];\n  OWNERBOOKINGS[\&quot;Danh sách đặt phòng\&quot;];\n  OWNERBOOKINGDETAIL[\&quot;Chi tiết đặt phòng\&quot;];\n  REVENUE[\&quot;Doanh thu\&quot;];\n  REPORTS[\&quot;Báo cáo thống kê\&quot;];\n  OWNERPROFILE[\&quot;Hồ sơ cá nhân\&quot;];\n\n  REGISTER--&gt;|\&quot;Đăng ký đối tác\&quot;|APPLY;\n  REGISTER--&gt;|\&quot;Đăng ký khách hàng\&quot;|HOME;\n  APPLY--&gt;|\&quot;Hồ sơ mới\&quot;|PENDING;\n  APPLY--&gt;|\&quot;Hồ sơ bị từ chối\&quot;|REAPPLY;\n  REAPPLY--&gt;PENDING;\n  PENDING--&gt;ADMINLIST;\n  ADMINLIST--&gt;ADMINDETAIL;\n  ADMINDETAIL--&gt;|\&quot;Từ chối, cần ghi lý do\&quot;|REAPPLY;\n  ADMINDETAIL--&gt;|\&quot;Phê duyệt, cấp vai trò chủ khách sạn\&quot;|APPROVED;\n  APPROVED--&gt;OWNERROOT;\n  OWNERROOT--&gt;OWNERHOME;\n  OWNERHOME--&gt;HOTELLIST;\n  OWNERHOME--&gt;HOTELNEW;\n  HOTELNEW--&gt;HOTELMANAGE;\n  HOTELLIST--&gt;HOTELMANAGE;\n  HOTELMANAGE--&gt;HOTELREVIEWS;\n  HOTELMANAGE--&gt;ROOMLIST;\n  ROOMLIST--&gt;ROOMDETAIL;\n  ROOMDETAIL--&gt;INVENTORY;\n  HOTELMANAGE--&gt;OWNERBOOKINGS;\n  OWNERBOOKINGS--&gt;OWNERBOOKINGDETAIL;\n  OWNERHOME--&gt;REVENUE;\n  OWNERHOME--&gt;REPORTS;\n  OWNERHOME--&gt;OWNERPROFILE;&quot;,&quot;config&quot;:null}" id="mermaid-partner_owner">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=20;" vertex="1">
+            <mxGeometry x="0" y="0" width="1551" height="2260" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký" mermaidId="n:REGISTER" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng ký" id="partner_owner-n-REGISTER">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="606" y="40" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký đối tác" mermaidId="n:APPLY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng ký đối tác" id="partner_owner-n-APPLY">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="494" y="225" width="315" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trang chủ" mermaidId="n:HOME" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trang chủ" id="partner_owner-n-HOME">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="867" y="225" width="190" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trạng thái chờ duyệt" mermaidId="n:PENDING" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trạng thái chờ duyệt" id="partner_owner-n-PENDING">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="502" y="389" width="234" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Sửa thông tin và nộp lại" mermaidId="n:REAPPLY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Sửa thông tin và nộp lại" id="partner_owner-n-REAPPLY">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="794" y="389" width="254" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ đăng ký" mermaidId="n:ADMINLIST" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ đăng ký" id="partner_owner-n-ADMINLIST">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="641" y="553" width="269" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết hồ sơ đối tác" mermaidId="n:ADMINDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết hồ sơ đối tác" id="partner_owner-n-ADMINDETAIL">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="630" y="717" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ được duyệt" mermaidId="n:APPROVED" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ được duyệt" id="partner_owner-n-APPROVED">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.3;fillColor=#EAF7EF;strokeColor=#65A77B;fontColor=#244B32;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="669" y="881" width="213" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khu vực chủ khách sạn" mermaidId="n:OWNERROOT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Khu vực chủ khách sạn" id="partner_owner-n-OWNERROOT">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="656" y="1045" width="239" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tổng quan" mermaidId="n:OWNERHOME" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tổng quan" id="partner_owner-n-OWNERHOME">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="641" y="1209" width="269" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khách sạn của tôi" mermaidId="n:HOTELLIST" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Khách sạn của tôi" id="partner_owner-n-HOTELLIST">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="40" y="1373" width="310" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký khách sạn" mermaidId="n:HOTELNEW" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đăng ký khách sạn" id="partner_owner-n-HOTELNEW">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="408" y="1373" width="320" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý hồ sơ khách sạn" mermaidId="n:HOTELMANAGE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý hồ sơ khách sạn" id="partner_owner-n-HOTELMANAGE">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="606" y="1537" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đánh giá của khách" mermaidId="n:HOTELREVIEWS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Đánh giá của khách" id="partner_owner-n-HOTELREVIEWS">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="362" y="1722" width="285" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Loại phòng" mermaidId="n:ROOMLIST" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Loại phòng" id="partner_owner-n-ROOMLIST">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="705" y="1722" width="218" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý loại phòng" mermaidId="n:ROOMDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý loại phòng" id="partner_owner-n-ROOMDETAIL">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="444" y="1886" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quỹ phòng và giá bán" mermaidId="n:INVENTORY" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quỹ phòng và giá bán" id="partner_owner-n-INVENTORY">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="606" y="2071" width="340" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Danh sách đặt phòng" mermaidId="n:OWNERBOOKINGS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Danh sách đặt phòng" id="partner_owner-n-OWNERBOOKINGS">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="981" y="1722" width="208" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết đặt phòng" mermaidId="n:OWNERBOOKINGDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết đặt phòng" id="partner_owner-n-OWNERBOOKINGDETAIL">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="842" y="1896" width="264" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Doanh thu" mermaidId="n:REVENUE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Doanh thu" id="partner_owner-n-REVENUE">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="786" y="1373" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Báo cáo thống kê" mermaidId="n:REPORTS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Báo cáo thống kê" id="partner_owner-n-REPORTS">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1047" y="1373" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ cá nhân" mermaidId="n:OWNERPROFILE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ cá nhân" id="partner_owner-n-OWNERPROFILE">
+          <mxCell parent="mermaid-partner_owner" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="1308" y="1373" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký đối tác" mermaidId="e:REGISTER-&gt;APPLY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đăng ký đối tác" id="partner_owner-edge-0">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-REGISTER" target="partner_owner-n-APPLY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đăng ký khách hàng" mermaidId="e:REGISTER-&gt;HOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Đăng ký khách hàng" id="partner_owner-edge-1">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-REGISTER" target="partner_owner-n-HOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ mới" mermaidId="e:APPLY-&gt;PENDING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Hồ sơ mới" id="partner_owner-edge-2">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-APPLY" target="partner_owner-n-PENDING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ bị từ chối" mermaidId="e:APPLY-&gt;REAPPLY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Hồ sơ bị từ chối" id="partner_owner-edge-3">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-APPLY" target="partner_owner-n-REAPPLY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:REAPPLY-&gt;PENDING#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-4">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-REAPPLY" target="partner_owner-n-PENDING" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:PENDING-&gt;ADMINLIST#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-5">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-PENDING" target="partner_owner-n-ADMINLIST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ADMINLIST-&gt;ADMINDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-6">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-ADMINLIST" target="partner_owner-n-ADMINDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Từ chối, cần ghi lý do" mermaidId="e:ADMINDETAIL-&gt;REAPPLY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Từ chối, cần ghi lý do" id="partner_owner-edge-7">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-ADMINDETAIL" target="partner_owner-n-REAPPLY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Phê duyệt, cấp vai trò chủ khách sạn" mermaidId="e:ADMINDETAIL-&gt;APPROVED#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Phê duyệt, cấp vai trò chủ khách sạn" id="partner_owner-edge-8">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-ADMINDETAIL" target="partner_owner-n-APPROVED" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:APPROVED-&gt;OWNERROOT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-9">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-APPROVED" target="partner_owner-n-OWNERROOT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERROOT-&gt;OWNERHOME#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-10">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERROOT" target="partner_owner-n-OWNERHOME" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERHOME-&gt;HOTELLIST#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-11">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERHOME" target="partner_owner-n-HOTELLIST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERHOME-&gt;HOTELNEW#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-12">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERHOME" target="partner_owner-n-HOTELNEW" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELNEW-&gt;HOTELMANAGE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-13">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-HOTELNEW" target="partner_owner-n-HOTELMANAGE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELLIST-&gt;HOTELMANAGE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-14">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-HOTELLIST" target="partner_owner-n-HOTELMANAGE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELMANAGE-&gt;HOTELREVIEWS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-15">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-HOTELMANAGE" target="partner_owner-n-HOTELREVIEWS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELMANAGE-&gt;ROOMLIST#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-16">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-HOTELMANAGE" target="partner_owner-n-ROOMLIST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ROOMLIST-&gt;ROOMDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-17">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-ROOMLIST" target="partner_owner-n-ROOMDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ROOMDETAIL-&gt;INVENTORY#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-18">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-ROOMDETAIL" target="partner_owner-n-INVENTORY" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELMANAGE-&gt;OWNERBOOKINGS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-19">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-HOTELMANAGE" target="partner_owner-n-OWNERBOOKINGS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERBOOKINGS-&gt;OWNERBOOKINGDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-20">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERBOOKINGS" target="partner_owner-n-OWNERBOOKINGDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERHOME-&gt;REVENUE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-21">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERHOME" target="partner_owner-n-REVENUE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERHOME-&gt;REPORTS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-22">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERHOME" target="partner_owner-n-REPORTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:OWNERHOME-&gt;OWNERPROFILE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="partner_owner-edge-23">
+          <mxCell parent="mermaid-partner_owner" source="partner_owner-n-OWNERHOME" target="partner_owner-n-OWNERPROFILE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="admin" name="04 - Quản trị viên">
+    <mxGraphModel dx="1274" dy="1340" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1274" pageHeight="1340" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&quot;data&quot;:&quot;graph TD;\n\n  DASH[\&quot;Trung tâm điều hành\&quot;];\n  ANALYTICS[\&quot;Báo cáo và thống kê hệ thống\&quot;];\n  APPS[\&quot;Hồ sơ đăng ký\&quot;];\n  APPDETAIL[\&quot;Chi tiết hồ sơ đối tác\&quot;];\n  HOTELS[\&quot;Quản lý khách sạn\&quot;];\n  HOTELDETAIL[\&quot;Chi tiết khách sạn\&quot;];\n  AMENITIES[\&quot;Quản lý tiện nghi\&quot;];\n  ACCDETAIL[\&quot;Chi tiết tài khoản\&quot;];\n  ACCOUNTS[\&quot;Quản lý tài khoản\&quot;];\n  ACCNEW[\&quot;Tạo tài khoản\&quot;];\n  BOOKINGS[\&quot;Danh sách đặt phòng\&quot;];\n  BOOKINGDETAIL[\&quot;Chi tiết đặt phòng\&quot;];\n  PAYMENTDETAIL[\&quot;Chi tiết giao dịch\&quot;];\n  PAYMENTS[\&quot;Thanh toán và giao dịch\&quot;];\n  REVIEWS[\&quot;Quản lý đánh giá\&quot;];\n  REVIEWDETAIL[\&quot;Chi tiết đánh giá\&quot;];\n  SUPPORT[\&quot;Hỗ trợ và khiếu nại\&quot;];\n  SUPPORTDETAIL[\&quot;Chi tiết yêu cầu hỗ trợ\&quot;];\n  PROMOS[\&quot;Quản lý khuyến mãi\&quot;];\n  PROMONEW[\&quot;Tạo khuyến mãi\&quot;];\n  PROMOEDIT[\&quot;Chỉnh sửa khuyến mãi\&quot;];\n  ADMINPROFILE[\&quot;Hồ sơ cá nhân\&quot;];\n\n  DASH--&gt;ANALYTICS;\n  DASH--&gt;APPS;\n  APPS--&gt;APPDETAIL;\n  DASH--&gt;HOTELS;\n  HOTELS--&gt;HOTELDETAIL;\n  HOTELS--&gt;AMENITIES;\n  HOTELDETAIL--&gt;ACCDETAIL;\n  HOTELDETAIL--&gt;|\&quot;Cập nhật / duyệt / từ chối / đình chỉ / kích hoạt lại\&quot;|HOTELDETAIL;\n  HOTELDETAIL--&gt;|\&quot;Quay lại danh sách\&quot;|HOTELS;\n  DASH--&gt;ACCOUNTS;\n  ACCOUNTS--&gt;ACCNEW;\n  ACCNEW--&gt;|\&quot;Tạo xong\&quot;|ACCOUNTS;\n  ACCOUNTS--&gt;ACCDETAIL;\n  ACCDETAIL--&gt;|\&quot;Cập nhật / khóa / mở khóa; vẫn ở chi tiết\&quot;|ACCDETAIL;\n  ACCDETAIL--&gt;|\&quot;Xóa hẳn\&quot;|ACCOUNTS;\n  ACCDETAIL--&gt;|\&quot;Quay lại danh sách\&quot;|ACCOUNTS;\n  DASH--&gt;BOOKINGS;\n  BOOKINGS--&gt;BOOKINGDETAIL;\n  BOOKINGDETAIL--&gt;HOTELDETAIL;\n  BOOKINGDETAIL--&gt;ACCDETAIL;\n  BOOKINGDETAIL--&gt;PAYMENTDETAIL;\n  DASH--&gt;PAYMENTS;\n  PAYMENTS--&gt;PAYMENTDETAIL;\n  DASH--&gt;REVIEWS;\n  REVIEWS--&gt;REVIEWDETAIL;\n  REVIEWDETAIL--&gt;|\&quot;Kiểm duyệt / gỡ đánh giá vi phạm; vẫn ở chi tiết\&quot;|REVIEWDETAIL;\n  REVIEWDETAIL--&gt;|\&quot;Quay lại danh sách\&quot;|REVIEWS;\n  DASH--&gt;SUPPORT;\n  SUPPORT--&gt;SUPPORTDETAIL;\n  SUPPORTDETAIL--&gt;|\&quot;Tiếp nhận hoặc lưu kết quả; vẫn ở chi tiết\&quot;|SUPPORTDETAIL;\n  SUPPORTDETAIL--&gt;|\&quot;Quay lại danh sách\&quot;|SUPPORT;\n  DASH--&gt;PROMOS;\n  PROMOS--&gt;PROMONEW;\n  PROMOS--&gt;PROMOEDIT;\n  PROMONEW--&gt;|\&quot;Tạo xong, mở chi tiết khuyến mãi\&quot;|PROMOEDIT;\n  PROMOEDIT--&gt;|\&quot;Lưu hoặc bật/tắt khuyến mãi\&quot;|PROMOS;\n  DASH--&gt;ADMINPROFILE;&quot;,&quot;config&quot;:null}" id="mermaid-admin">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=20;" vertex="1">
+            <mxGeometry x="0" y="0" width="1274" height="1340" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trung tâm điều hành" mermaidId="n:DASH" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Trung tâm điều hành" id="admin-n-DASH">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="40" y="636" width="310" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Báo cáo và thống kê hệ thống" mermaidId="n:ANALYTICS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Báo cáo và thống kê hệ thống" id="admin-n-ANALYTICS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="473" y="109" width="213" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ đăng ký" mermaidId="n:APPS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ đăng ký" id="admin-n-APPS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="445" y="226" width="269" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết hồ sơ đối tác" mermaidId="n:APPDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết hồ sơ đối tác" id="admin-n-APPDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="834" y="40" width="290" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý khách sạn" mermaidId="n:HOTELS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý khách sạn" id="admin-n-HOTELS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="480" y="343" width="198" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết khách sạn" mermaidId="n:HOTELDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết khách sạn" id="admin-n-HOTELDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="870" y="157" width="218" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý tiện nghi" mermaidId="n:AMENITIES" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý tiện nghi" id="admin-n-AMENITIES">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="854" y="274" width="249" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết tài khoản" mermaidId="n:ACCDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết tài khoản" id="admin-n-ACCDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="809" y="391" width="340" height="90" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý tài khoản" mermaidId="n:ACCOUNTS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý tài khoản" id="admin-n-ACCOUNTS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="476" y="460" width="208" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tạo tài khoản" mermaidId="n:ACCNEW" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tạo tài khoản" id="admin-n-ACCNEW">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="865" y="529" width="228" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Danh sách đặt phòng" mermaidId="n:BOOKINGS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Danh sách đặt phòng" id="admin-n-BOOKINGS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="476" y="577" width="208" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết đặt phòng" mermaidId="n:BOOKINGDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết đặt phòng" id="admin-n-BOOKINGDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="865" y="646" width="228" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết giao dịch" mermaidId="n:PAYMENTDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết giao dịch" id="admin-n-PAYMENTDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="865" y="763" width="228" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thanh toán và giao dịch" mermaidId="n:PAYMENTS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Thanh toán và giao dịch" id="admin-n-PAYMENTS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="476" y="694" width="208" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý đánh giá" mermaidId="n:REVIEWS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý đánh giá" id="admin-n-REVIEWS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="478" y="811" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết đánh giá" mermaidId="n:REVIEWDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết đánh giá" id="admin-n-REVIEWDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="868" y="880" width="223" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hỗ trợ và khiếu nại" mermaidId="n:SUPPORT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hỗ trợ và khiếu nại" id="admin-n-SUPPORT">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="478" y="928" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chi tiết yêu cầu hỗ trợ" mermaidId="n:SUPPORTDETAIL" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chi tiết yêu cầu hỗ trợ" id="admin-n-SUPPORTDETAIL">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="868" y="997" width="223" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quản lý khuyến mãi" mermaidId="n:PROMOS" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Quản lý khuyến mãi" id="admin-n-PROMOS">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="470" y="1045" width="218" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tạo khuyến mãi" mermaidId="n:PROMONEW" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Tạo khuyến mãi" id="admin-n-PROMONEW">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="860" y="1114" width="239" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Chỉnh sửa khuyến mãi" mermaidId="n:PROMOEDIT" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Chỉnh sửa khuyến mãi" id="admin-n-PROMOEDIT">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="860" y="1231" width="239" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hồ sơ cá nhân" mermaidId="n:ADMINPROFILE" mermaidBaseStyle="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" mermaidBaseValue="Hồ sơ cá nhân" id="admin-n-ADMINPROFILE">
+          <mxCell parent="mermaid-admin" style="rounded=1;absoluteArcSize=1;arcSize=10;html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#E8F0FE;strokeColor=#4F76B8;fontColor=#17365D;fontFamily=Arial;fontSize=13;" vertex="1">
+            <mxGeometry x="478" y="1162" width="203" height="69" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;ANALYTICS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-0">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-ANALYTICS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;APPS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-1">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-APPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:APPS-&gt;APPDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-2">
+          <mxCell parent="mermaid-admin" source="admin-n-APPS" target="admin-n-APPDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;HOTELS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-3">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-HOTELS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELS-&gt;HOTELDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-4">
+          <mxCell parent="mermaid-admin" source="admin-n-HOTELS" target="admin-n-HOTELDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELS-&gt;AMENITIES#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-5">
+          <mxCell parent="mermaid-admin" source="admin-n-HOTELS" target="admin-n-AMENITIES" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:HOTELDETAIL-&gt;ACCDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-6">
+          <mxCell parent="mermaid-admin" source="admin-n-HOTELDETAIL" target="admin-n-ACCDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Cập nhật / duyệt / từ chối / đình chỉ / kích hoạt lại" mermaidId="e:HOTELDETAIL-&gt;HOTELDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Cập nhật / duyệt / từ chối / đình chỉ / kích hoạt lại" id="admin-edge-7">
+          <mxCell parent="mermaid-admin" source="admin-n-HOTELDETAIL" target="admin-n-HOTELDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay lại danh sách" mermaidId="e:HOTELDETAIL-&gt;HOTELS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay lại danh sách" id="admin-edge-8">
+          <mxCell parent="mermaid-admin" source="admin-n-HOTELDETAIL" target="admin-n-HOTELS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;ACCOUNTS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-9">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-ACCOUNTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ACCOUNTS-&gt;ACCNEW#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-10">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCOUNTS" target="admin-n-ACCNEW" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tạo xong" mermaidId="e:ACCNEW-&gt;ACCOUNTS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Tạo xong" id="admin-edge-11">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCNEW" target="admin-n-ACCOUNTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ACCOUNTS-&gt;ACCDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-12">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCOUNTS" target="admin-n-ACCDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Cập nhật / khóa / mở khóa; vẫn ở chi tiết" mermaidId="e:ACCDETAIL-&gt;ACCDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Cập nhật / khóa / mở khóa; vẫn ở chi tiết" id="admin-edge-13">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCDETAIL" target="admin-n-ACCDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Xóa hẳn" mermaidId="e:ACCDETAIL-&gt;ACCOUNTS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Xóa hẳn" id="admin-edge-14">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCDETAIL" target="admin-n-ACCOUNTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay lại danh sách" mermaidId="e:ACCDETAIL-&gt;ACCOUNTS#1" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay lại danh sách" id="admin-edge-15">
+          <mxCell parent="mermaid-admin" source="admin-n-ACCDETAIL" target="admin-n-ACCOUNTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;BOOKINGS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-16">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-BOOKINGS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:BOOKINGS-&gt;BOOKINGDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-17">
+          <mxCell parent="mermaid-admin" source="admin-n-BOOKINGS" target="admin-n-BOOKINGDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:BOOKINGDETAIL-&gt;HOTELDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-18">
+          <mxCell parent="mermaid-admin" source="admin-n-BOOKINGDETAIL" target="admin-n-HOTELDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:BOOKINGDETAIL-&gt;ACCDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-19">
+          <mxCell parent="mermaid-admin" source="admin-n-BOOKINGDETAIL" target="admin-n-ACCDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:BOOKINGDETAIL-&gt;PAYMENTDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-20">
+          <mxCell parent="mermaid-admin" source="admin-n-BOOKINGDETAIL" target="admin-n-PAYMENTDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;PAYMENTS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-21">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-PAYMENTS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:PAYMENTS-&gt;PAYMENTDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-22">
+          <mxCell parent="mermaid-admin" source="admin-n-PAYMENTS" target="admin-n-PAYMENTDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;REVIEWS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-23">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-REVIEWS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:REVIEWS-&gt;REVIEWDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-24">
+          <mxCell parent="mermaid-admin" source="admin-n-REVIEWS" target="admin-n-REVIEWDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Kiểm duyệt / gỡ đánh giá vi phạm; vẫn ở chi tiết" mermaidId="e:REVIEWDETAIL-&gt;REVIEWDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Kiểm duyệt / gỡ đánh giá vi phạm; vẫn ở chi tiết" id="admin-edge-25">
+          <mxCell parent="mermaid-admin" source="admin-n-REVIEWDETAIL" target="admin-n-REVIEWDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay lại danh sách" mermaidId="e:REVIEWDETAIL-&gt;REVIEWS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay lại danh sách" id="admin-edge-26">
+          <mxCell parent="mermaid-admin" source="admin-n-REVIEWDETAIL" target="admin-n-REVIEWS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;SUPPORT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-27">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:SUPPORT-&gt;SUPPORTDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-28">
+          <mxCell parent="mermaid-admin" source="admin-n-SUPPORT" target="admin-n-SUPPORTDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tiếp nhận hoặc lưu kết quả; vẫn ở chi tiết" mermaidId="e:SUPPORTDETAIL-&gt;SUPPORTDETAIL#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Tiếp nhận hoặc lưu kết quả; vẫn ở chi tiết" id="admin-edge-29">
+          <mxCell parent="mermaid-admin" source="admin-n-SUPPORTDETAIL" target="admin-n-SUPPORTDETAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Quay lại danh sách" mermaidId="e:SUPPORTDETAIL-&gt;SUPPORT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Quay lại danh sách" id="admin-edge-30">
+          <mxCell parent="mermaid-admin" source="admin-n-SUPPORTDETAIL" target="admin-n-SUPPORT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;PROMOS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-31">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-PROMOS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:PROMOS-&gt;PROMONEW#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-32">
+          <mxCell parent="mermaid-admin" source="admin-n-PROMOS" target="admin-n-PROMONEW" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:PROMOS-&gt;PROMOEDIT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-33">
+          <mxCell parent="mermaid-admin" source="admin-n-PROMOS" target="admin-n-PROMOEDIT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tạo xong, mở chi tiết khuyến mãi" mermaidId="e:PROMONEW-&gt;PROMOEDIT#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Tạo xong, mở chi tiết khuyến mãi" id="admin-edge-34">
+          <mxCell parent="mermaid-admin" source="admin-n-PROMONEW" target="admin-n-PROMOEDIT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lưu hoặc bật/tắt khuyến mãi" mermaidId="e:PROMOEDIT-&gt;PROMOS#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="Lưu hoặc bật/tắt khuyến mãi" id="admin-edge-35">
+          <mxCell parent="mermaid-admin" source="admin-n-PROMOEDIT" target="admin-n-PROMOS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:DASH-&gt;ADMINPROFILE#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" mermaidBaseValue="" id="admin-edge-36">
+          <mxCell parent="mermaid-admin" source="admin-n-DASH" target="admin-n-ADMINPROFILE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#718096;strokeWidth=1.35;endArrow=classic;endFill=1;fontColor=#4B5563;fontFamily=Arial;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

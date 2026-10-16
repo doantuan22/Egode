@@ -3,11 +3,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { useForgotPassword } from '../../features/auth/hooks';
 import { forgotPasswordSchema, ForgotPasswordFormValues } from '../../features/auth/schemas';
+import { ApiError } from '../../services/apiClient';
 import { cn } from '../../lib/utils';
 import { Button } from '../../components/common/Button';
 
 export default function ForgotPasswordPage() {
   const mutation = useForgotPassword();
+  const { error: mutationError } = mutation;
+  const isRateLimited = mutationError instanceof ApiError && mutationError.statusCode === 429;
   const {
     register,
     handleSubmit,
@@ -74,8 +77,10 @@ export default function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
                 {mutation.isError && (
-                  <div className="rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink border border-danger/30">
-                    Có lỗi xảy ra, vui lòng kiểm tra lại email hoặc thử lại sau.
+                  <div className="rounded-lg bg-danger-light px-4 py-3 text-sm text-danger-ink border border-danger/30" role="alert">
+                    {isRateLimited
+                      ? 'Bạn đã thử quá nhiều lần trong 1 giờ. Vui lòng chờ rồi thử lại sau.'
+                      : 'Có lỗi xảy ra, vui lòng kiểm tra lại email hoặc thử lại sau.'}
                   </div>
                 )}
                 

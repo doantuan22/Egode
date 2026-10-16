@@ -9,7 +9,7 @@ import { passwordFingerprint, matchesPasswordFingerprint } from '../../common/ut
 import { toSafeAccount, SafeAccount } from '../../common/utils/account-mapper';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { ACCOUNT_STATUS } from '../../common/constants/account-status';
-import { EmailService, NodemailerEmailService } from '../email/email.service';
+import { EmailService, NodemailerEmailService, maskEmail } from '../email/email.service';
 import { env } from '../../config/env';
 import type {
   RegisterInput,
@@ -144,19 +144,50 @@ export class AuthService {
   async forgotPassword(input: ForgotPasswordInput): Promise<void> {
     const account = await this.authRepository.findByEmail(input.Email);
     // A locked account gets no reset mail either: same observable result as an unknown email.
-    if (!account || account.TrangThai === ACCOUNT_STATUS.LOCKED) return;
+    // A small random delay keeps the timing indistinguishable from the send-mail branch (anti timing-attack).
+    if (!account || account.TrangThai === ACCOUNT_STATUS.LOCKED) {
+      await new Promise((resolve) => setTimeout(resolve, 400 + Math.random() * 200));
+      return;
+    }
 
-    const token = signPasswordResetToken(account.MaTaiKhoan, account.MatKhau);
-    const resetUrl = new URL('/reset-password', env.FRONTEND_URL);
-    resetUrl.searchParams.set('token', token);
+    let resetUrl: string;
+    try {
+      resetUrl = this.buildPasswordResetUrl(account.MaTaiKhoan, account.MatKhau);
+    } catch (error) {
+      // FRONTEND_URL sai format: log chi tiết để dev sửa, client vẫn nhận success chung.
+      console.warn(
+        `Password reset skipped: FRONTEND_URL không hợp lệ (${env.FRONTEND_URL}) to=${maskEmail(account.Email)} reason=${error instanceof Error ? error.message : String(error)}`
+      );
+      return;
+    }
 
     try {
-      await this.emailService.sendPasswordResetEmail({ to: account.Email, resetUrl: resetUrl.toString() });
-    } catch {
+      await this.emailService.sendPasswordResetEmail({ to: account.Email, resetUrl });
+    } catch (error) {
       // Do not expose delivery errors: doing so only for a known account
-      // would reintroduce account enumeration. Never log token/SMTP details.
-      console.warn('Password reset email delivery failed');
+      // would reintroduce account enumeration. Never log token/SMTP secrets.
+      const meta = (error as { meta?: { toMasked?: string; host?: string; port?: number; reason?: string } }).meta;
+      console.warn(
+        `Password reset email delivery failed to=${meta?.toMasked ?? maskEmail(account.Email)} host=${meta?.host ?? '?'}:${meta?.port ?? '?'} reason=${meta?.reason ?? (error instanceof Error ? error.message : String(error))}`
+      );
     }
+  }
+
+  private buildPasswordResetUrl(maTaiKhoan: number, passwordHash: string): string {
+    const base = env.FRONTEND_URL.replace(/\/$/, '');
+    let parsed: URL;
+    try {
+      parsed = new URL(base);
+    } catch {
+      throw new Error('FRONTEND_URL không phải URL hợp lệ');
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw new Error('FRONTEND_URL phải dùng http/https');
+    }
+    const token = signPasswordResetToken(maTaiKhoan, passwordHash);
+    const resetUrl = new URL('/reset-password', parsed.toString());
+    resetUrl.searchParams.set('token', token);
+    return resetUrl.toString();
   }
 
   async resetPassword(input: ResetPasswordInput): Promise<void> {

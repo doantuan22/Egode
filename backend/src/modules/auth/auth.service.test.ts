@@ -60,8 +60,23 @@ describe('AuthService password reset delivery', () => {
     const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
     await expect(service.forgotPassword({ Email: account.Email })).resolves.toBeUndefined();
-    expect(warning).toHaveBeenCalledWith('Password reset email delivery failed');
+    expect(warning).toHaveBeenCalledOnce();
+    const logged = String(warning.mock.calls[0]?.[0] ?? '');
+    expect(logged).toContain('Password reset email delivery failed');
+    expect(logged).toContain('cu***@example.com');
+    expect(logged).not.toContain('customer@example.com');
     warning.mockRestore();
+  });
+
+  it('delays the response for unknown emails to prevent timing attacks', async () => {
+    const emailService = new FakeEmailService();
+    const repository = { findByEmail: vi.fn().mockResolvedValue(null) } as unknown as AuthRepository;
+    const service = new AuthService(repository, {} as RolesRepository, emailService);
+
+    const started = Date.now();
+    await service.forgotPassword({ Email: 'unknown@example.com' });
+    expect(Date.now() - started).toBeGreaterThanOrEqual(350);
+    expect(emailService.messages).toHaveLength(0);
   });
 });
 
