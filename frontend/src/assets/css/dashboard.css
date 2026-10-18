@@ -5120,3 +5120,22 @@
 .dashboard-shell--owner [class~="text-[24px]"] {
   font-size: var(--owner-font-24);
 }
+
+/* Admin on laptop screens. Admin rules are tuned in px for a wide monitor, so at 1181-1599px (a 1366-1536px laptop, or a
+   1080p screen at 125%/150% Windows scaling) the sidebar, toolbars, tables and action buttons were too big and overlapped.
+   Scale the whole admin shell down instead (like browser zoom 85-90%) so it gets the layout width of a large screen.
+   `zoom` also scales viewport units, so the viewport-height rules are divided by the zoom factor to keep filling the screen.
+   Below 1181px the sidebar is an off-canvas drawer and the shell is left at 100%. */
+.dashboard-shell--admin { --admin-zoom: 1; }
+@media (min-width: 1181px) and (max-width: 1599px) { .dashboard-shell--admin { --admin-zoom: 0.9; } }
+@media (min-width: 1181px) and (max-width: 1399px) { .dashboard-shell--admin { --admin-zoom: 0.85; } }
+@media (min-width: 1181px) {
+  .dashboard-shell--admin {
+    zoom: var(--admin-zoom);
+    min-height: calc(100vh / var(--admin-zoom));
+  }
+  .dashboard-shell--admin .dashboard-sidebar { height: calc(100vh / var(--admin-zoom)); }
+  .dashboard-shell--admin .dashboard-main { min-height: calc(100vh / var(--admin-zoom)); }
+  .dashboard-shell--admin .dashboard-content { min-height: calc(100vh / var(--admin-zoom) - 72px); }
+  .dashboard-shell--admin .dashboard-content__canvas { min-height: calc(100vh / var(--admin-zoom) - 140px); }
+}
