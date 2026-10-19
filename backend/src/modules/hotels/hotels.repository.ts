@@ -66,8 +66,20 @@ export class HotelsRepository {
                 },
               ]
             : []),
+          // Every selected amenity must be offered, either by the hotel itself or by one of its sellable room
+          // types (Ban công, Bồn tắm, Minibar... are only ever attached to rooms).
           ...(params.amenityIds ?? []).map((maTienNghi) => ({
-            KHACH_SAN_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } },
+            OR: [
+              { KHACH_SAN_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } } },
+              {
+                LOAI_PHONG: {
+                  some: {
+                    TrangThai: ROOM_TYPE_STATUS.ACTIVE,
+                    LOAI_PHONG_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } },
+                  },
+                },
+              },
+            ],
           })),
         ],
         LOAI_PHONG: { some: { TrangThai: ROOM_TYPE_STATUS.ACTIVE } },

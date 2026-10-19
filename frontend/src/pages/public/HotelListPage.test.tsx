@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import HotelListPage from './HotelListPage';
 import { useSearchHotels } from '../../features/hotels/hooks';
@@ -38,5 +39,40 @@ describe('HotelListPage guest count', () => {
     renderWithProviders(<HotelListPage />, { route: '/hotels?guests=abc' });
 
     expect(lastParams()).toMatchObject({ guests: 2 });
+  });
+});
+
+describe('HotelListPage scrolls to the results', () => {
+  const scrollIntoView = vi.fn();
+  beforeEach(() => {
+    scrollIntoView.mockClear();
+    Element.prototype.scrollIntoView = scrollIntoView;
+  });
+
+  it('does not scroll on first render', () => {
+    renderWithProviders(<HotelListPage />, { route: '/hotels' });
+    expect(scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it('scrolls the results section into view when the user searches', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<HotelListPage />, { route: '/hotels' });
+
+    await user.click(screen.getByRole('button', { name: /Tìm kiếm/ }));
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.instances[0]).toBe(screen.getByRole('heading', { name: /Tìm thấy/ }).closest('section'));
+  });
+
+  it('scrolls when a filter is applied, and when the filters are reset', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<HotelListPage />, { route: '/hotels' });
+
+    await user.click(screen.getByRole('button', { name: 'Từ 4 sao trở lên' }));
+    await user.click(screen.getByRole('button', { name: /Áp dụng bộ lọc/ }));
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /Xóa bộ lọc/ }));
+    expect(scrollIntoView).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useSearchHotels } from '../../features/hotels/hooks';
@@ -118,6 +118,8 @@ export default function HotelListPage() {
   const amenitiesQuery =
     useAmenities();
 
+  const resultsRef = useRef<HTMLElement>(null);
+
   const updateParams = (
     patch: Record<
       string,
@@ -153,6 +155,10 @@ export default function HotelListPage() {
     }
 
     setSearchParams(next);
+
+    // Every call is a user action (search, filter, sort, page): bring the refreshed results into view.
+    // No explicit `behavior`, so the CSS `scroll-behavior` (smooth, or instant under reduced motion) decides.
+    resultsRef.current?.scrollIntoView?.({ block: 'start' });
   };
 
   const resetFilters = () => {
@@ -547,8 +553,10 @@ export default function HotelListPage() {
         ================================================= */}
 
         <section
+          ref={resultsRef}
           className="
             mt-6
+            scroll-mt-24
             space-y-5
           "
         >

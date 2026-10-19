@@ -38,6 +38,7 @@ export function TravelSearchBar({ currentSearch, onSearch, variant = 'compact', 
   if (draftSearch.location && !destinationOptions.some((item) => item.value === draftSearch.location)) {
     destinationOptions.unshift({ value: draftSearch.location, label: draftSearch.location });
   }
+  destinationOptions.unshift({ value: '', label: 'Tất cả địa điểm' });
 
   const { location: currentLocation, checkIn: currentCheckIn, checkOut: currentCheckOut, guests: currentGuests } = currentSearch;
 
