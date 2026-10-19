@@ -841,6 +841,7 @@ export default function HotelListPage() {
                     hotel={
                       hotel
                     }
+                    listSearch={searchParams.toString()}
                     search={
                       `checkIn=${params.checkIn}` +
                       `&checkOut=${params.checkOut}` +

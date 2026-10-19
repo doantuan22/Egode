@@ -5,7 +5,7 @@ import { cn } from '../../../lib/utils';
 import { formatRating } from '../../../features/reviews/rating';
 
 /** Breadcrumb, hotel name, star rating, address and the share action. */
-export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: () => void }) {
+export function HotelHeader({ hotel, onShare, listUrl = '/hotels' }: { hotel: HotelDetail; onShare: () => void; listUrl?: string }) {
   return (
     <>
       <section className="bg-surface-secondary border-b border-border/80">
@@ -13,7 +13,7 @@ export function HotelHeader({ hotel, onShare }: { hotel: HotelDetail; onShare: (
           <nav aria-label="Đường dẫn" className="flex items-center gap-2 text-ink-muted overflow-x-auto py-1">
             <Link to="/" className="hover:text-primary font-medium transition-colors">Trang chủ</Link>
             <Icon name="caret-right" className="text-sm text-border-strong" />
-            <Link to="/hotels" className="hover:text-primary font-medium transition-colors">Khách sạn</Link>
+            <Link to={listUrl} className="hover:text-primary font-medium transition-colors">Khách sạn</Link>
             <Icon name="caret-right" className="text-sm text-border-strong" />
             <span className="font-semibold text-ink truncate max-w-[12.5rem] sm:max-w-none">{hotel.TenKhachSan}</span>
           </nav>

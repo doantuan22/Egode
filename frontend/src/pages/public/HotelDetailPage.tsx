@@ -4,6 +4,7 @@ import {
 } from 'react';
 
 import {
+  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
@@ -97,6 +98,9 @@ export default function HotelDetailPage() {
 
   const navigate =
     useNavigate();
+
+  const routerLocation =
+    useLocation();
 
   const [
     searchParams,
@@ -192,6 +196,20 @@ export default function HotelDetailPage() {
         'guests'
       )
     );
+
+  // "Back to the list" restores what the list was showing (location, filters, sort, page), which the list card handed over in
+  // the router state; the stay dates / guests edited on this page win. Without that state (direct link, shared URL) only the
+  // stay is carried over.
+  const listUrl = (() => {
+    const state = routerLocation.state as { listSearch?: unknown } | null;
+    const back = new URLSearchParams(typeof state?.listSearch === 'string' ? state.listSearch : '');
+    for (const key of ['checkIn', 'checkOut', 'guests']) {
+      const value = searchParams.get(key);
+      if (value) back.set(key, value);
+    }
+    const query = back.toString();
+    return query ? `/hotels?${query}` : '/hotels';
+  })();
 
   /* =========================================================
      SELECTED ROOMS
@@ -371,7 +389,7 @@ export default function HotelDetailPage() {
         String(
           values.guests
         ),
-    });
+    }, { state: routerLocation.state });
   };
 
   /* =========================================================
@@ -812,7 +830,7 @@ export default function HotelDetailPage() {
             type="button"
             onClick={() =>
               navigate(
-                '/hotels'
+                listUrl
               )
             }
             className="
@@ -869,6 +887,7 @@ export default function HotelDetailPage() {
 
         <HotelHeader
           hotel={hotel}
+          listUrl={listUrl}
           onShare={
             shareHotel
           }
