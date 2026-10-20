@@ -1,14 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 005: Booking
--- Tables: DAT_PHONG, CHI_TIET_DAT_PHONG
--- Depends on: 001 (TAI_KHOAN), 002 (KHACH_SAN), 003 (LOAI_PHONG),
---             004 (KHUYEN_MAI, CHINH_SACH_HUY)
--- G0-02: bảng CHI_TIET_GIA_DAT_PHONG KHÔNG được tạo.
--- =====================================================================
+-- Migration 005: đặt phòng gồm DAT_PHONG và CHI_TIET_DAT_PHONG
 
--- -----------------------------------------------------------------
 -- DAT_PHONG (Bảng 6.16)
--- -----------------------------------------------------------------
 CREATE TABLE DAT_PHONG (
     MaDatPhong             INT IDENTITY(1,1) NOT NULL,
     MaXacNhanDatPhong      VARCHAR(20)       NOT NULL,
@@ -45,9 +37,7 @@ CREATE TABLE DAT_PHONG (
 );
 GO
 
--- -----------------------------------------------------------------
 -- CHI_TIET_DAT_PHONG (Bảng 6.17)
--- -----------------------------------------------------------------
 CREATE TABLE CHI_TIET_DAT_PHONG (
     MaChiTietDatPhong  INT IDENTITY(1,1) NOT NULL,
     MaDatPhong         INT               NOT NULL,

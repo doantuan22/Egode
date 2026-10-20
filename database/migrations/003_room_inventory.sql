@@ -1,12 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 003: Room Inventory
--- Tables: LOAI_PHONG, HINH_ANH_LOAI_PHONG, LOAI_PHONG_TIEN_NGHI, QUY_PHONG_GIA
--- Depends on: 002_hotel_catalog.sql (KHACH_SAN, TIEN_NGHI)
--- =====================================================================
+-- Migration 003: quỹ phòng gồm LOAI_PHONG, HINH_ANH_LOAI_PHONG, LOAI_PHONG_TIEN_NGHI, QUY_PHONG_GIA
 
--- -----------------------------------------------------------------
 -- LOAI_PHONG (Bảng 6.9)
--- -----------------------------------------------------------------
 CREATE TABLE LOAI_PHONG (
     MaLoaiPhong    INT IDENTITY(1,1) NOT NULL,
     MaKhachSan     INT               NOT NULL,
@@ -25,9 +19,7 @@ CREATE TABLE LOAI_PHONG (
 );
 GO
 
--- -----------------------------------------------------------------
 -- HINH_ANH_LOAI_PHONG (Bảng 6.10)
--- -----------------------------------------------------------------
 CREATE TABLE HINH_ANH_LOAI_PHONG (
     MaHinhAnhLoaiPhong  INT IDENTITY(1,1) NOT NULL,
     MaLoaiPhong         INT               NOT NULL,
@@ -39,9 +31,7 @@ CREATE TABLE HINH_ANH_LOAI_PHONG (
 );
 GO
 
--- -----------------------------------------------------------------
 -- LOAI_PHONG_TIEN_NGHI (Bảng 6.11, khóa chính ghép)
--- -----------------------------------------------------------------
 CREATE TABLE LOAI_PHONG_TIEN_NGHI (
     MaLoaiPhong  INT NOT NULL,
     MaTienNghi   INT NOT NULL,
@@ -53,12 +43,7 @@ CREATE TABLE LOAI_PHONG_TIEN_NGHI (
 );
 GO
 
--- -----------------------------------------------------------------
--- QUY_PHONG_GIA (Bảng 6.12)
--- DDI-02 (RESOLVED): một loại phòng chỉ có một bản ghi quỹ phòng/giá cho
--- mỗi ngày áp dụng — UNIQUE (MaLoaiPhong, NgayApDung). Quyết định của
--- người dùng, xem database/docs/db0-report.md.
--- -----------------------------------------------------------------
+-- QUY_PHONG_GIA (Bảng 6.12): mỗi loại phòng chỉ có một bản ghi mỗi ngày áp dụng
 CREATE TABLE QUY_PHONG_GIA (
     MaQuyPhong     INT IDENTITY(1,1) NOT NULL,
     MaLoaiPhong    INT               NOT NULL,

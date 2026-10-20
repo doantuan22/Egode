@@ -1,8 +1,4 @@
-/* =====================================================================
-   verify-demo-data.sql — business-invariant checks for seeded data.
-   Every query must return 0 violations. Safe to run any time (read-only).
-     sqlcmd -S localhost -U sa -P <password> -d <database> -C -f 65001 -i database/scripts/verify-demo-data.sql
-   ===================================================================== */
+/* Kiểm tra các quy tắc nghiệp vụ của dữ liệu demo, mỗi truy vấn phải trả về 0 vi phạm */
 SET NOCOUNT ON;
 DECLARE @today DATE = CAST(SYSUTCDATETIME() AS DATE);
 

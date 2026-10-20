@@ -1,14 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 004: Commercial (Cancellation Policy, Promotion)
--- Tables: CHINH_SACH_HUY, CHI_TIET_CHINH_SACH_HUY, KHUYEN_MAI
--- No dependency on hotel catalog tables (system-level per Gate 0 override).
--- =====================================================================
+-- Migration 004: chính sách hủy và khuyến mãi
 
--- -----------------------------------------------------------------
--- CHINH_SACH_HUY (Bảng 6.13)
--- G0-03: KHÔNG có MaDatPhong.
--- Override 0.2: KHÔNG có MaKhachSan (mô hình hóa ở mức hệ thống).
--- -----------------------------------------------------------------
+-- CHINH_SACH_HUY (Bảng 6.13): cấp hệ thống, không có MaDatPhong và MaKhachSan
 CREATE TABLE CHINH_SACH_HUY (
     MaChinhSachHuy  INT IDENTITY(1,1) NOT NULL,
     TenChinhSach    NVARCHAR(150)     NOT NULL,
@@ -19,9 +11,7 @@ CREATE TABLE CHINH_SACH_HUY (
 );
 GO
 
--- -----------------------------------------------------------------
 -- CHI_TIET_CHINH_SACH_HUY (Bảng 6.14)
--- -----------------------------------------------------------------
 CREATE TABLE CHI_TIET_CHINH_SACH_HUY (
     MaChiTietChinhSach     INT IDENTITY(1,1) NOT NULL,
     MaChinhSachHuy         INT               NOT NULL,
@@ -35,10 +25,7 @@ CREATE TABLE CHI_TIET_CHINH_SACH_HUY (
 );
 GO
 
--- -----------------------------------------------------------------
--- KHUYEN_MAI (Bảng 6.15)
--- G0-01: bảng KHUYEN_MAI_KHACH_SAN KHÔNG được tạo.
--- -----------------------------------------------------------------
+-- KHUYEN_MAI (Bảng 6.15): không có bảng KHUYEN_MAI_KHACH_SAN
 CREATE TABLE KHUYEN_MAI (
     MaKhuyenMai         INT IDENTITY(1,1) NOT NULL,
     MaCode               VARCHAR(50)       NOT NULL,

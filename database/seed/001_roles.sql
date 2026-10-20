@@ -1,13 +1,4 @@
--- =====================================================================
--- DB-1 seed: VAI_TRO baseline roles
--- Idempotent: safe to run multiple times against the same database.
---
--- Only the roles actually used by real accounts in the current design are
--- seeded (Customer, Hotel Owner/Partner, System Admin). Per M1 instructions:
--- Guest/anonymous is NOT a database account and gets no role row here, and
--- no CSKH/Employee/HotelStaff/Moderator role is invented — the ERD/use
--- cases do not call for one (G0-09).
--- =====================================================================
+-- Seed các vai trò nền tảng của VAI_TRO, chạy lại an toàn
 
 MERGE VAI_TRO AS target
 USING (VALUES

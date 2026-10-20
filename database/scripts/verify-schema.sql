@@ -1,19 +1,9 @@
--- =====================================================================
--- DB-0 verify-schema.sql
--- Read-only verification of the baseline schema against Gate 0 rules
--- and the 22 official tables. Run against the target database after
--- migrations 001-006 have been applied.
---
--- Each check PRINTs PASS/FAIL. Exits with RAISERROR (severity 16) if
--- any check fails, so the script can be used in CI with @@ERROR checks.
--- =====================================================================
+-- Kiểm tra schema nền tảng, chỉ đọc
 
 SET NOCOUNT ON;
 DECLARE @FailCount INT = 0;
 
--- -----------------------------------------------------------------
--- Check 1: exactly the 22 official tables exist (no more, no less)
--- -----------------------------------------------------------------
+-- Kiểm tra 1: có đúng 22 bảng chính thức
 DECLARE @ExpectedTables TABLE (TableName SYSNAME);
 INSERT INTO @ExpectedTables (TableName) VALUES
     ('VAI_TRO'), ('TAI_KHOAN'), ('HO_SO_DOI_TAC'), ('DIA_PHUONG'),
@@ -54,9 +44,7 @@ END
 ELSE
     PRINT 'PASS: no unexpected extra tables';
 
--- -----------------------------------------------------------------
--- Check 2: G0-01 - KHUYEN_MAI_KHACH_SAN must not exist
--- -----------------------------------------------------------------
+-- Kiểm tra 2: không có bảng KHUYEN_MAI_KHACH_SAN
 IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'KHUYEN_MAI_KHACH_SAN')
 BEGIN
     PRINT 'FAIL: G0-01 violated - KHUYEN_MAI_KHACH_SAN exists';
@@ -65,9 +53,7 @@ END
 ELSE
     PRINT 'PASS: G0-01 - KHUYEN_MAI_KHACH_SAN absent';
 
--- -----------------------------------------------------------------
--- Check 3: G0-02 - CHI_TIET_GIA_DAT_PHONG must not exist
--- -----------------------------------------------------------------
+-- Kiểm tra 3: không có bảng CHI_TIET_GIA_DAT_PHONG
 IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'CHI_TIET_GIA_DAT_PHONG')
 BEGIN
     PRINT 'FAIL: G0-02 violated - CHI_TIET_GIA_DAT_PHONG exists';
@@ -76,9 +62,7 @@ END
 ELSE
     PRINT 'PASS: G0-02 - CHI_TIET_GIA_DAT_PHONG absent';
 
--- -----------------------------------------------------------------
--- Check 4: G0-03 - CHINH_SACH_HUY must NOT have MaDatPhong
--- -----------------------------------------------------------------
+-- Kiểm tra 4: CHINH_SACH_HUY không có MaDatPhong
 IF EXISTS (
     SELECT 1 FROM sys.columns c
     JOIN sys.tables t ON t.object_id = c.object_id
@@ -91,9 +75,7 @@ END
 ELSE
     PRINT 'PASS: G0-03 - CHINH_SACH_HUY has no MaDatPhong';
 
--- -----------------------------------------------------------------
--- Check 5: G0-04 - HO_SO_DOI_TAC must have MaTaiKhoanDuyet
--- -----------------------------------------------------------------
+-- Kiểm tra 5: HO_SO_DOI_TAC có MaTaiKhoanDuyet
 IF EXISTS (
     SELECT 1 FROM sys.columns c
     JOIN sys.tables t ON t.object_id = c.object_id
@@ -106,9 +88,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 6: DAT_PHONG -> CHINH_SACH_HUY FK via MaChinhSachHuy exists
--- -----------------------------------------------------------------
+-- Kiểm tra 6: DAT_PHONG có khóa ngoại tới CHINH_SACH_HUY
 IF EXISTS (
     SELECT 1
     FROM sys.foreign_keys fk
@@ -127,9 +107,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 7: every table has a primary key
--- -----------------------------------------------------------------
+-- Kiểm tra 7: mọi bảng có khóa chính
 IF EXISTS (
     SELECT 1 FROM sys.tables t
     WHERE t.type = 'U'
@@ -151,11 +129,7 @@ END
 ELSE
     PRINT 'PASS: every table has a primary key';
 
--- -----------------------------------------------------------------
--- Check 8: all FKs reference existing tables/columns (integrity is
--- guaranteed by SQL Server at creation time; this re-confirms no FK
--- is disabled/not-trusted, which would indicate NOCHECK was used)
--- -----------------------------------------------------------------
+-- Kiểm tra 8: mọi khóa ngoại đều tin cậy và đang bật
 IF EXISTS (
     SELECT 1 FROM sys.foreign_keys WHERE is_not_trusted = 1 OR is_disabled = 1
 )
@@ -168,9 +142,7 @@ END
 ELSE
     PRINT 'PASS: all foreign keys are trusted and enabled';
 
--- -----------------------------------------------------------------
--- Check 9: key UNIQUE constraints present
--- -----------------------------------------------------------------
+-- Kiểm tra 9: các ràng buộc UNIQUE chính
 IF EXISTS (SELECT 1 FROM sys.indexes i JOIN sys.tables t ON t.object_id = i.object_id
            WHERE t.name = 'TAI_KHOAN' AND i.name = 'UQ_TAI_KHOAN_TenDangNhap' AND i.is_unique = 1)
    AND EXISTS (SELECT 1 FROM sys.indexes i JOIN sys.tables t ON t.object_id = i.object_id
@@ -188,9 +160,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 10: no money column uses FLOAT/REAL
--- -----------------------------------------------------------------
+-- Kiểm tra 10: cột tiền không dùng FLOAT hoặc REAL
 IF EXISTS (
     SELECT 1 FROM sys.columns c
     JOIN sys.tables t ON t.object_id = c.object_id AND t.type = 'U'
@@ -209,9 +179,7 @@ END
 ELSE
     PRINT 'PASS: no FLOAT/REAL columns in schema';
 
--- -----------------------------------------------------------------
--- Check 11: CHECK constraints exist (count sanity, expect >= 25)
--- -----------------------------------------------------------------
+-- Kiểm tra 11: số ràng buộc CHECK đủ
 DECLARE @CheckCount INT;
 SELECT @CheckCount = COUNT(*) FROM sys.check_constraints;
 IF @CheckCount >= 25
@@ -222,12 +190,10 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 12: DDI-01 (RESOLVED) - exact nullability per the user's decision
--- -----------------------------------------------------------------
+-- Kiểm tra 12: cột cho phép NULL đúng quyết định
 DECLARE @NullabilityExpected TABLE (TableName SYSNAME, ColumnName SYSNAME, ExpectNullable BIT);
 INSERT INTO @NullabilityExpected (TableName, ColumnName, ExpectNullable) VALUES
-    ('TAI_KHOAN', 'SoDienThoai', 0),  -- stays NOT NULL
+    ('TAI_KHOAN', 'SoDienThoai', 0),
     ('TAI_KHOAN', 'NgaySinh', 1),
     ('TAI_KHOAN', 'GioiTinh', 1),
     ('TAI_KHOAN', 'AnhDaiDien', 1),
@@ -255,10 +221,7 @@ END
 ELSE
     PRINT 'PASS: DDI-01 - nullability matches the resolved decision (SoDienThoai NOT NULL; NgaySinh/GioiTinh/AnhDaiDien/KHACH_SAN.MoTa/LOAI_PHONG.MoTa/TIEN_NGHI.BieuTuong/DANH_GIA.NoiDung NULL)';
 
--- -----------------------------------------------------------------
--- Check 13: DDI-02 (RESOLVED) - UNIQUE (MaLoaiPhong, NgayApDung) on
--- QUY_PHONG_GIA, verified by actual key columns, not just constraint name.
--- -----------------------------------------------------------------
+-- Kiểm tra 13: UNIQUE MaLoaiPhong và NgayApDung trên QUY_PHONG_GIA
 IF EXISTS (
     SELECT i.index_id
     FROM sys.indexes i
@@ -278,9 +241,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 14: Migration 007 indexes are present and enabled.
--- -----------------------------------------------------------------
+-- Kiểm tra 14: các chỉ mục của migration 007 tồn tại và đang bật
 DECLARE @ExpectedIndexes TABLE (TableName SYSNAME, IndexName SYSNAME);
 INSERT INTO @ExpectedIndexes (TableName, IndexName) VALUES
     ('DAT_PHONG', 'IX_DAT_PHONG_TrangThai_NgayTao'),
@@ -319,10 +280,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Check 15: Migration 008 procedure is present; there are no unreviewed
--- user functions or triggers that could change the application's data.
--- -----------------------------------------------------------------
+-- Kiểm tra 15: thủ tục migration 008 tồn tại, không có hàm hay trigger lạ
 IF OBJECT_ID('dbo.usp_KhoaKhuyenMaiChoDatPhong', 'P') IS NOT NULL
     PRINT 'PASS: Migration 008 booking-promotion lock procedure exists';
 ELSE
@@ -366,9 +324,7 @@ BEGIN
     SET @FailCount += 1;
 END
 
--- -----------------------------------------------------------------
--- Summary
--- -----------------------------------------------------------------
+-- Tổng kết
 IF @FailCount = 0
     PRINT '=== verify-schema.sql: ALL CHECKS PASSED ===';
 ELSE

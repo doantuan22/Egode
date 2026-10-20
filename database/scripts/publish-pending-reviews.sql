@@ -1,15 +1,4 @@
--- =====================================================================
--- One-off data fix: publish reviews that were written under the old
--- "admin must approve first" rule.
---
--- Reviews are now created straight as 'Hiển thị'. Rows left over from
--- before that change are still 'Chờ duyệt', so they stay invisible and
--- uncounted until an admin opens each one. This moves them to 'Hiển thị'
--- as well, so old and new reviews follow the same rule.
---
--- Only 'Chờ duyệt' rows are touched; 'Ẩn' and 'Vi phạm' (admin decisions)
--- are left alone. Safe to re-run: a second run updates 0 rows.
--- =====================================================================
+-- Chuyển các đánh giá Chờ duyệt cũ sang Hiển thị, chạy lại an toàn
 
 SELECT TrangThai, COUNT(*) AS SoLuong FROM DANH_GIA GROUP BY TrangThai;
 

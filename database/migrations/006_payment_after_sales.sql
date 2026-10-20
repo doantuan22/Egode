@@ -1,12 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 006: Payment & After-Sales
--- Tables: THANH_TOAN, HOAN_TIEN, DANH_GIA, HINH_ANH_DANH_GIA, YEU_CAU_HO_TRO
--- Depends on: 001 (TAI_KHOAN), 002 (KHACH_SAN), 005 (DAT_PHONG)
--- =====================================================================
+-- Migration 006: thanh toán và hậu mãi
 
--- -----------------------------------------------------------------
 -- THANH_TOAN (Bảng 6.18)
--- -----------------------------------------------------------------
 CREATE TABLE THANH_TOAN (
     MaThanhToan            INT IDENTITY(1,1) NOT NULL,
     MaDatPhong             INT               NOT NULL,
@@ -22,9 +16,7 @@ CREATE TABLE THANH_TOAN (
 );
 GO
 
--- -----------------------------------------------------------------
 -- HOAN_TIEN (Bảng 6.19)
--- -----------------------------------------------------------------
 CREATE TABLE HOAN_TIEN (
     MaHoanTien          INT IDENTITY(1,1) NOT NULL,
     MaThanhToan         INT               NOT NULL,
@@ -42,10 +34,7 @@ CREATE TABLE HOAN_TIEN (
 );
 GO
 
--- -----------------------------------------------------------------
--- DANH_GIA (Bảng 6.20)
--- RB26 (7.2/7.5): MaDatPhong vừa là FK vừa là UNIQUE (1 đơn tối đa 1 đánh giá)
--- -----------------------------------------------------------------
+-- DANH_GIA (Bảng 6.20): mỗi đơn đặt phòng có tối đa một đánh giá
 CREATE TABLE DANH_GIA (
     MaDanhGia       INT IDENTITY(1,1) NOT NULL,
     MaDatPhong      INT               NOT NULL,
@@ -66,9 +55,7 @@ CREATE TABLE DANH_GIA (
 );
 GO
 
--- -----------------------------------------------------------------
 -- HINH_ANH_DANH_GIA (Bảng 6.21)
--- -----------------------------------------------------------------
 CREATE TABLE HINH_ANH_DANH_GIA (
     MaHinhAnhDanhGia  INT IDENTITY(1,1) NOT NULL,
     MaDanhGia         INT               NOT NULL,
@@ -79,11 +66,7 @@ CREATE TABLE HINH_ANH_DANH_GIA (
 );
 GO
 
--- -----------------------------------------------------------------
--- YEU_CAU_HO_TRO (Bảng 6.22)
--- G0-09: không có actor/module riêng cho CSKH — MaTaiKhoanXuLy → TAI_KHOAN.
--- Override 0.2: không có MaKhachSan (không có trong bảng 6.22).
--- -----------------------------------------------------------------
+-- YEU_CAU_HO_TRO (Bảng 6.22): người xử lý tham chiếu TAI_KHOAN
 CREATE TABLE YEU_CAU_HO_TRO (
     MaYeuCauHoTro           INT IDENTITY(1,1) NOT NULL,
     MaTaiKhoanKhachHang     INT               NOT NULL,

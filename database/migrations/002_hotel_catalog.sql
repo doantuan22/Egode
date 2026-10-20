@@ -1,12 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 002: Hotel Catalog
--- Tables: KHACH_SAN, HINH_ANH_KHACH_SAN, TIEN_NGHI, KHACH_SAN_TIEN_NGHI
--- Depends on: 001_core_identity.sql (TAI_KHOAN, DIA_PHUONG)
--- =====================================================================
+-- Migration 002: danh mục khách sạn gồm KHACH_SAN, HINH_ANH_KHACH_SAN, TIEN_NGHI, KHACH_SAN_TIEN_NGHI
 
--- -----------------------------------------------------------------
 -- KHACH_SAN (Bảng 6.5)
--- -----------------------------------------------------------------
 CREATE TABLE KHACH_SAN (
     MaKhachSan        INT IDENTITY(1,1) NOT NULL,
     MaTaiKhoanSoHuu   INT               NOT NULL,
@@ -35,9 +29,7 @@ CREATE TABLE KHACH_SAN (
 );
 GO
 
--- -----------------------------------------------------------------
 -- HINH_ANH_KHACH_SAN (Bảng 6.6)
--- -----------------------------------------------------------------
 CREATE TABLE HINH_ANH_KHACH_SAN (
     MaHinhAnh    INT IDENTITY(1,1) NOT NULL,
     MaKhachSan   INT               NOT NULL,
@@ -49,9 +41,7 @@ CREATE TABLE HINH_ANH_KHACH_SAN (
 );
 GO
 
--- -----------------------------------------------------------------
 -- TIEN_NGHI (Bảng 6.7)
--- -----------------------------------------------------------------
 CREATE TABLE TIEN_NGHI (
     MaTienNghi    INT IDENTITY(1,1) NOT NULL,
     TenTienNghi   NVARCHAR(150)     NOT NULL,
@@ -61,9 +51,7 @@ CREATE TABLE TIEN_NGHI (
 );
 GO
 
--- -----------------------------------------------------------------
 -- KHACH_SAN_TIEN_NGHI (Bảng 6.8, khóa chính ghép)
--- -----------------------------------------------------------------
 CREATE TABLE KHACH_SAN_TIEN_NGHI (
     MaKhachSan   INT NOT NULL,
     MaTienNghi   INT NOT NULL,

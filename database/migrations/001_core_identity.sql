@@ -1,13 +1,6 @@
--- =====================================================================
--- DB-0 Baseline Migration 001: Core Identity
--- Tables: VAI_TRO, TAI_KHOAN, DIA_PHUONG, HO_SO_DOI_TAC
--- Source: database/DATABASE_SOURCE_CHAPTER_6_7.md (Chapter 6/7 + Gate 0)
--- Must run on an empty database, before 002_hotel_catalog.sql.
--- =====================================================================
+-- Migration 001: bảng danh tính gồm VAI_TRO, TAI_KHOAN, DIA_PHUONG, HO_SO_DOI_TAC
 
--- -----------------------------------------------------------------
 -- VAI_TRO (Bảng 6.1)
--- -----------------------------------------------------------------
 CREATE TABLE VAI_TRO (
     MaVaiTro   INT IDENTITY(1,1) NOT NULL,
     TenVaiTro  NVARCHAR(100)     NOT NULL,
@@ -17,9 +10,7 @@ CREATE TABLE VAI_TRO (
 );
 GO
 
--- -----------------------------------------------------------------
 -- TAI_KHOAN (Bảng 6.2)
--- -----------------------------------------------------------------
 CREATE TABLE TAI_KHOAN (
     MaTaiKhoan    INT IDENTITY(1,1) NOT NULL,
     MaVaiTro      INT               NOT NULL,
@@ -45,9 +36,7 @@ CREATE TABLE TAI_KHOAN (
 );
 GO
 
--- -----------------------------------------------------------------
 -- DIA_PHUONG (Bảng 6.4)
--- -----------------------------------------------------------------
 CREATE TABLE DIA_PHUONG (
     MaDiaPhuong  INT IDENTITY(1,1) NOT NULL,
     TenThanhPho  NVARCHAR(150)     NOT NULL,
@@ -57,9 +46,7 @@ CREATE TABLE DIA_PHUONG (
 );
 GO
 
--- -----------------------------------------------------------------
 -- HO_SO_DOI_TAC (Bảng 6.3 + G0-04: MaTaiKhoanDuyet)
--- -----------------------------------------------------------------
 CREATE TABLE HO_SO_DOI_TAC (
     MaHoSoDoiTac         INT IDENTITY(1,1) NOT NULL,
     MaTaiKhoan           INT               NOT NULL,
