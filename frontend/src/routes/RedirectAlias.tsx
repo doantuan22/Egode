@@ -1,6 +1,6 @@
 import { Navigate, useLocation, useParams } from 'react-router-dom';
 
-/** Redirects to `to`, filling `:params` from the current match and keeping the query string (and the hash unless `to` has one). */
+/** Chuyển hướng giữ tham số, query và hash */
 export function RedirectAlias({ to }: { to: string }) {
   const params = useParams();
   const { search, hash } = useLocation();

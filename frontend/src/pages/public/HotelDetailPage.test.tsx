@@ -317,7 +317,7 @@ describe('HotelDetailPage price quote', () => {
   });
 
   describe('promo code: typed (promoInput) is not applied (appliedPromo) until "Áp dụng"; the backend revalidates it', () => {
-    /** Plays the backend: SALE10 gives 10% off but only up to 2 rooms; anything else is not valid. */
+    /** Giả lập backend: SALE10 giảm 10% tối đa 2 phòng */
     const backendQuote = (req: { rooms: Array<{ soLuong: number }>; promoCode?: string }) => {
       const rooms = req.rooms[0].soLuong;
       const total = 700000 * rooms;
@@ -352,7 +352,7 @@ describe('HotelDetailPage price quote', () => {
 
       expect(requests().every((r) => r.promoCode === undefined)).toBe(true);
       expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }] }));
-      expect(promoInput()).toHaveValue('SALE10'); // still waiting to be applied
+      expect(promoInput()).toHaveValue('SALE10');
       expect(screen.getByText('Áp dụng mã để cập nhật báo giá trước khi tiếp tục.')).toBeInTheDocument();
       expect(screen.queryByText('Áp dụng thành công')).not.toBeInTheDocument();
     });
@@ -367,11 +367,11 @@ describe('HotelDetailPage price quote', () => {
       expect(screen.getByText('Áp dụng thành công')).toBeInTheDocument();
       expect(screen.getAllByText(formatCurrencyVND(630000)).length).toBeGreaterThan(0);
 
-      await addRoom(user); // 2 rooms: still valid
+      await addRoom(user);
 
       expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }], promoCode: 'SALE10' }));
       expect(screen.getByText('Áp dụng thành công')).toBeInTheDocument();
-      expect(screen.getAllByText(formatCurrencyVND(1260000)).length).toBeGreaterThan(0); // 1.400.000 − 10%
+      expect(screen.getAllByText(formatCurrencyVND(1260000)).length).toBeGreaterThan(0);
       expect(screen.queryByRole('alert', { name: '' })?.textContent ?? '').not.toContain('Mã khuyến mãi');
     });
 
@@ -381,15 +381,15 @@ describe('HotelDetailPage price quote', () => {
       await addRoom(user);
       await user.type(promoInput(), 'SALE10');
       await apply(user);
-      await addRoom(user); // 2
-      await addRoom(user); // 3 rooms → the backend says the code no longer applies
+      await addRoom(user);
+      await addRoom(user);
 
       await waitFor(() => expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 3 }] })));
       expect(screen.getByText('Mã khuyến mãi SALE10: Mã chỉ áp dụng cho tối đa 2 phòng')).toBeInTheDocument();
       expect(promoInput()).toHaveValue('');
       expect(screen.queryByText(/Khuyến mãi giảm/)).not.toBeInTheDocument();
       expect(screen.getAllByText(formatCurrencyVND(2100000)).length).toBeGreaterThan(0);
-      // it stays removed: going back to 2 rooms does not silently bring it back
+      // Mã đã gỡ không tự quay lại khi đổi số phòng
       await user.click(screen.getByRole('button', { name: 'Giảm phòng Phòng Superior' }));
       expect(lastRequest()).toEqual(request({ rooms: [{ maLoaiPhong: 11, soLuong: 2 }] }));
     });
@@ -569,7 +569,7 @@ describe('HotelDetailPage guests (party size) flow', () => {
   it('rooms that cannot hold everyone: a warning with the real numbers, and booking is not offered', async () => {
     openFor(5);
     const user = userEvent.setup();
-    await addRoom(user); // 1 × 2 guests
+    await addRoom(user);
 
     expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 2 khách, chưa đủ cho 5 khách');
     expect(screen.queryByRole('button', { name: /Tạo đặt phòng/ })).not.toBeInTheDocument();
@@ -578,7 +578,7 @@ describe('HotelDetailPage guests (party size) flow', () => {
   it('says it once: even when the server refuses the quote with the same sentence, only the one capacity notice shows', async () => {
     mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 2 khách, không đủ cho 5 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
     openFor(5);
-    await addRoom(userEvent.setup()); // 1 × 2 guests
+    await addRoom(userEvent.setup());
 
     expect(screen.getAllByRole('alert')).toHaveLength(1);
     expect(screen.getByRole('alert')).toHaveTextContent('chưa đủ cho 5 khách');
@@ -590,9 +590,9 @@ describe('HotelDetailPage guests (party size) flow', () => {
     const user = userEvent.setup();
     await addRoom(user);
     await addRoom(user);
-    expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 4 khách'); // 4 < 5
-    mockQuote({ data: { ...quote, ChiTietPhong: [{ ...line, SoLuongYeuCau: 3 }] } }); // the quote for 3 rooms arrives
-    await addRoom(user); // 6 >= 5
+    expect(screen.getByRole('alert')).toHaveTextContent('chỉ chứa tối đa 4 khách');
+    mockQuote({ data: { ...quote, ChiTietPhong: [{ ...line, SoLuongYeuCau: 3 }] } });
+    await addRoom(user);
 
     expect(screen.queryByText(/chưa đủ cho 5 khách/)).not.toBeInTheDocument();
     expect(screen.getByText(/Sức chứa các phòng đã chọn: 6 khách/)).toBeInTheDocument();
@@ -602,7 +602,7 @@ describe('HotelDetailPage guests (party size) flow', () => {
   it("shows the server's own capacity message when it refuses a quote the page thought was fine", async () => {
     mockQuote({ data: undefined, isError: true, error: new ApiError('Các phòng đã chọn chỉ chứa tối đa 1 khách, không đủ cho 2 khách', 400, undefined, 'CAPACITY_EXCEEDED') });
     openFor(2);
-    await addRoom(userEvent.setup()); // 1 × 2 guests: enough as far as the page knows
+    await addRoom(userEvent.setup());
 
     expect(screen.getAllByText(/không đủ cho 2 khách/)).toHaveLength(1);
   });

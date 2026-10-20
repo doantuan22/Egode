@@ -4,13 +4,12 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
 import { validateProductionApiBaseUrl } from './build/production-api-url.ts';
 
-// https://vite.dev/config/
+// Cấu hình Vite
 export default defineConfig(({ mode }) => {
   const fileEnv = loadEnv(mode, process.cwd(), 'VITE_');
   const apiBaseUrl = process.env.VITE_API_BASE_URL ?? fileEnv.VITE_API_BASE_URL;
 
-  // Cloudflare Pages is a static host in this architecture, so a relative /api silently resolves to its HTML fallback.
-  // Require an explicit API URL at build time to prevent shipping an unusable artifact.
+  // Yêu cầu URL API khi build vì host tĩnh không có /api
   if (mode === 'production') {
     validateProductionApiBaseUrl(apiBaseUrl);
   }
@@ -25,8 +24,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true,
-      // Dev: with no VITE_API_BASE_URL the SPA calls the relative /api; forward it to the local API so the app and the
-      // refresh cookie (host-only, Path=/api/auth) live on ONE origin. Dev only: no effect on the production build.
+      // Chuyển /api tới API local khi chạy dev
       proxy: {
         '/api': { target: process.env.VITE_DEV_API_TARGET || 'http://localhost:5000', changeOrigin: false },
       },

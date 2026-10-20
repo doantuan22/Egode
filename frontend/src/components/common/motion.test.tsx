@@ -15,6 +15,7 @@ describe('Reveal', () => {
   });
 
   it('shows its block at once when IntersectionObserver is missing (nothing stays hidden)', () => {
+    // Giả lập môi trường không có API
     // @ts-expect-error — simulating an environment without the API
     delete globalThis.IntersectionObserver;
     render(<Reveal as="section" data-testid="block">hello</Reveal>);

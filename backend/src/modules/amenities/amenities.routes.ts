@@ -4,7 +4,7 @@ import { AmenitiesController } from './amenities.controller';
 const router = Router();
 const controller = new AmenitiesController();
 
-// Public, read-only — supports the M2 search filter UI (amenity checkboxes).
+// Danh sách tiện nghi công khai cho bộ lọc tìm kiếm
 router.get('/', controller.list);
 
 export default router;

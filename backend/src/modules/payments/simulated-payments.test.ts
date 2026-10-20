@@ -20,11 +20,7 @@ import {
 import { decodeGatewayRef } from './vnpay';
 import { getPaymentProvider } from './payment-provider';
 
-/**
- * Simulated payments and refunds (PAYMENT_PROVIDER=simulated): nothing leaves the process, yet the same rows are
- * written as with the real gateway — THANH_TOAN "Thành công" + booking "Đã xác nhận", and on cancel a HOAN_TIEN that
- * runs through the normal three-step lifecycle and ends "Thành công" with NgayHoanTien.
- */
+/** Thanh toán và hoàn tiền giả lập ghi cùng dữ liệu như cổng thật */
 const prisma = () => getPrismaClient();
 const day = (n: number) => new Date(`${addDaysToDateKey(businessToday(), n)}T00:00:00Z`);
 
@@ -66,7 +62,7 @@ beforeAll(async () => {
   cityId = (await createTestDiaPhuong()).MaDiaPhuong;
   hotelId = (await createTestHotel(owner.account.MaTaiKhoan, cityId)).MaKhachSan;
   policyId = (await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }])).MaChinhSachHuy;
-  strictPolicyId = (await createTestCancellationPolicy([{ soGioTruocNhanPhong: 100000, tyLeHoanTien: 100 }])).MaChinhSachHuy; // 0 % in practice
+  strictPolicyId = (await createTestCancellationPolicy([{ soGioTruocNhanPhong: 100000, tyLeHoanTien: 100 }])).MaChinhSachHuy;
 });
 
 afterAll(async () => {
@@ -116,7 +112,7 @@ describe('POST /api/bookings/:id/payments/simulate', () => {
     expect(payment).toMatchObject({ TrangThai: 'Thành công', PhuongThucThanhToan: 'VNPAY (mô phỏng)' });
     expect(Number(payment.SoTien)).toBe(900_000);
     expect(Number(payment.SoTien)).toBe(Number(row.TongTienThanhToan));
-    // transaction number + pay date are stored like a real confirmation, so a refund can find them
+    // Số giao dịch và ngày thanh toán được lưu như xác nhận thật
     const ref = decodeGatewayRef(payment.MaGiaoDichDoiTac);
     expect(ref.transactionNo).toMatch(/^\d{8}$/);
     expect(ref.payDate).toMatch(/^\d{14}$/);
@@ -234,7 +230,7 @@ describe('simulated refund on cancel', () => {
   const paidBooking = async (customerId: number, total: number, policy = policyId, offset = 30) => {
     const booking = await createTestBookingDirect(customerId, hotelId, policy, day(offset), day(offset + 1), { trangThai: 'Đã xác nhận', tongTienPhong: total });
     bookingIds.push(booking.MaDatPhong);
-    // a payment WITHOUT a VNPAY transaction number (like seed / older rows): the simulated refund must not need one
+    // Thanh toán không có số giao dịch VNPAY vẫn hoàn tiền được
     const payment = await createTestPayment(booking.MaDatPhong, total, 'Thành công', `NOTXN${booking.MaDatPhong}`);
     return { booking, payment };
   };
@@ -256,7 +252,7 @@ describe('simulated refund on cancel', () => {
     expect(Number(refunds[0].SoTienHoan)).toBe(1_000_000);
     expect(refunds[0].NgayHoanTien).not.toBeNull();
     expect(refunds[0].NgayHoanTien!.getTime()).toBeGreaterThanOrEqual(refunds[0].NgayYeuCau.getTime());
-    // the booking detail the client reads back carries the refund
+    // Chi tiết đơn đã kèm thông tin hoàn tiền
     const refund = res.body.data.ThanhToan[0].HoanTien;
     expect(refund).toHaveLength(1);
     expect(refund[0]).toMatchObject({ TrangThai: 'Thành công', SoTienHoan: 1_000_000 });
@@ -275,7 +271,7 @@ describe('simulated refund on cancel', () => {
     expect(payment.HOAN_TIEN).toHaveLength(1);
     expect(payment.HOAN_TIEN[0].TrangThai).toBe('Thành công');
     expect(Number(payment.HOAN_TIEN[0].SoTienHoan)).toBe(640_000);
-    // cancelling again changes nothing
+    // Hủy lần nữa không thay đổi gì
     expect((await cancel(booking.MaDatPhong, who.token)).status).toBe(400);
     expect(await prisma().hOAN_TIEN.count({ where: { MaThanhToan: payment.MaThanhToan } })).toBe(1);
   });

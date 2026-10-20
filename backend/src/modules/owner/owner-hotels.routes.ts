@@ -72,7 +72,7 @@ router.delete(
   controller.removeImage
 );
 
-// Room types nested under their hotel — item-level operations live at /owner/room-types/:id
+// Loại phòng thuộc khách sạn
 router.get(
   '/:hotelId/room-types',
   validateRequest({ params: roomTypeHotelIdParamSchema }),

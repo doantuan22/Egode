@@ -6,7 +6,7 @@ import { amenityIdSchema, createAmenitySchema, hotelIdSchema, listHotelsSchema, 
 const router = Router(); const controller = new AdminHotelsController();
 router.use(authenticate, requireAdmin);
 router.get('/', validateRequest({ query: listHotelsSchema }), controller.list);
-// Amenity catalogue — declared before '/:id' so "amenities" is never parsed as a hotel id.
+// Danh mục tiện nghi, khai báo trước '/:id'
 router.get('/amenities', controller.listAmenities);
 router.post('/amenities', validateRequest({ body: createAmenitySchema }), controller.createAmenity);
 router.patch('/amenities/:id', validateRequest({ params: amenityIdSchema, body: updateAmenitySchema }), controller.updateAmenity);

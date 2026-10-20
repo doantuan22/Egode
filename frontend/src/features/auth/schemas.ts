@@ -6,10 +6,7 @@ export const loginSchema = z.object({
 });
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
-// An untouched <input type="date">/<select> submits '' — kept as a plain
-// literal union (no preprocess/transform) so type inference stays simple
-// and consistent between `tsc --noEmit` and the stricter `tsc -b` build.
-// Components convert '' to undefined when building the API payload.
+// Ô ngày hoặc select chưa chọn trả về chuỗi rỗng
 export const GENDER_OPTIONS = ['Nam', 'Nữ', 'Khác'] as const;
 
 export const registerSchema = z
@@ -21,14 +18,13 @@ export const registerSchema = z
     Email: z.string().email('Email không đúng định dạng').max(255),
     HoTen: z.string().trim().min(2, 'Họ và tên ít nhất 2 ký tự').max(150),
     SoDienThoai: z.string().regex(/^\+?[0-9]{8,15}$/, 'Số điện thoại không hợp lệ'),
-    // DDI-01 (resolved): optional — nullable in the baseline, not required at registration.
+    // Số điện thoại có thể để trống
     NgaySinh: z.string().optional(),
-    // An untouched radio group reports null, not undefined: both mean "not chosen".
+    // Radio chưa chọn là null, cùng nghĩa với chưa chọn
     GioiTinh: z.enum([...GENDER_OPTIONS, '']).nullish(),
     MatKhau: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
     confirmMatKhau: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
-    // Form-only consent (not sent to the API, no DB column): must be exactly true, so the rule lives in the schema
-    // and not in an HTML `required` attribute (the form is noValidate, which switches that attribute off).
+    // Đồng ý điều khoản chỉ có ở form và phải đúng là true
     DongYDieuKhoan: z.boolean().refine((accepted) => accepted, 'Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật'),
   })
   .refine((data) => data.MatKhau === data.confirmMatKhau, {
@@ -54,7 +50,7 @@ export const resetPasswordSchema = z
   });
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-// Same policy as the backend (changePasswordSchema): the current password is required, the new one has 8-128 characters.
+// Cùng quy tắc với backend khi đổi mật khẩu
 export const changePasswordSchema = z
   .object({
     MatKhauCu: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại').max(128),

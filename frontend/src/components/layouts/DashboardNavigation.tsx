@@ -78,7 +78,7 @@ export function DashboardNavigation({ role }: { role: DashboardRole }) {
     navigate('/login', { replace: true });
   };
   const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
-  // Below this width (same breakpoint as layout.css) the sidebar is an off-canvas drawer, above it a permanent landmark.
+  // Dưới ngưỡng này thanh bên là ngăn kéo
   const isOffCanvas = useMediaQuery('(max-width: 1180px)');
   const sidebarRef = useRef<HTMLElement>(null);
   useDrawerBehavior({ open: isSidebarOpen, onClose: closeSidebar, containerRef: sidebarRef, enabled: isOffCanvas });

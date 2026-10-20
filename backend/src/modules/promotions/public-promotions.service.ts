@@ -3,7 +3,7 @@ import { businessToday, dateKeyOf } from '../../common/utils/business-time';
 import { promotionUnavailableReason } from '../quotes/promotion-pricing';
 import { PromotionsRepository } from './promotions.repository';
 
-/** What a guest may see of a promotion: how to use it and until when — never usage counters or internal ids. */
+/** Thông tin khuyến mãi khách được xem */
 export interface AvailablePromotion {
   MaCode: string;
   LoaiGiamGia: string;
@@ -19,10 +19,7 @@ const toNumber = (value: unknown): number => Number(value);
 export class PublicPromotionsService {
   constructor(private readonly repository: PromotionsRepository = new PromotionsRepository()) {}
 
-  /**
-   * The codes a guest can pick while booking right now: active, today (Vietnam day) inside the promotion's
-   * window, and not out of uses. The same rules a typed code goes through when the quote is priced.
-   */
+  /** Các mã khách chọn được ở thời điểm đặt phòng */
   async listAvailable(now: Date = new Date()): Promise<AvailablePromotion[]> {
     const candidates = await this.repository.findActiveOnDay(businessToday(now), PROMOTION_STATUS.ACTIVE);
     const used = await this.repository.countUsageByIds(candidates.map((promo) => promo.MaKhuyenMai));

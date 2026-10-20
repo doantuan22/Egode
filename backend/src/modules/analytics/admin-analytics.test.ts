@@ -99,7 +99,7 @@ describe('GET /admin/analytics — RBAC', () => {
   it('200 for an admin token, with system-wide account/hotel/booking counts', async () => {
     const res = await request(app).get('/api/admin/analytics').set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.TongTaiKhoan).toBeGreaterThanOrEqual(3); // at least the 3 fixture accounts
+    expect(res.body.data.TongTaiKhoan).toBeGreaterThanOrEqual(3);
     expect(res.body.data.TongKhachSan).toBeGreaterThanOrEqual(1);
   });
 });

@@ -12,10 +12,7 @@ interface AdminListPanelProps {
   children: ReactNode;
 }
 
-/**
- * Admin-only list surface: filters + result summary + refresh + table.
- * Keeps list pages compact and predictable without changing public/customer UI.
- */
+/** Khung danh sách của admin gồm bộ lọc, tóm tắt kết quả, làm mới và bảng */
 export function AdminListPanel({
   filters,
   total,

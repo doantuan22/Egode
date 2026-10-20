@@ -58,7 +58,7 @@ export const moderateReview = async (id: number, trangThai: string): Promise<Adm
   return res.data as AdminReviewDetail;
 };
 
-/** UC37 safe-delete: server decides the final hidden status; no client body. */
+/** Xóa an toàn do máy chủ quyết định trạng thái */
 export const removeViolationReview = async (id: number): Promise<AdminReviewDetail> => {
   const res = await apiClient<AdminReviewDetail>(`/admin/reviews/${id}`, { method: 'DELETE' });
   return res.data as AdminReviewDetail;

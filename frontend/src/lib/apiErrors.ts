@@ -1,16 +1,12 @@
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
 
-/**
- * The error contract of the API (backend/src/common/errors/error-codes.ts):
- *   { success:false, message, code, details? }   — details: [{ field, message }] for validation.
- * Everything that reads an error body or an ApiError goes through here, so no screen ever shows a raw object.
- */
+/** Dạng lỗi chuẩn của API và các hàm đọc lỗi */
 export interface FieldIssue {
   field: string;
   message: string;
 }
 
-/** The [{ field, message }] entries of a `details` value; anything that does not look like one is dropped. */
+/** Các mục field và message trong details */
 export function parseFieldIssues(details: unknown): FieldIssue[] {
   if (!Array.isArray(details)) return [];
   const issues: FieldIssue[] = [];
@@ -22,7 +18,7 @@ export function parseFieldIssues(details: unknown): FieldIssue[] {
   return issues;
 }
 
-/** The distinct messages of a `details` list joined for a banner, or null when it has none. */
+/** Các thông báo khác nhau trong details, nối thành một dòng */
 export function joinIssueMessages(details: unknown): string | null {
   const messages = [...new Set(parseFieldIssues(details).map((issue) => issue.message))];
   return messages.length > 0 ? messages.join('. ') : null;
@@ -31,7 +27,7 @@ export function joinIssueMessages(details: unknown): string | null {
 const isApiError = (error: unknown): error is Error & { statusCode: number; details?: unknown; code?: string } =>
   error instanceof Error && error.name === 'ApiError';
 
-/** One message per field (the first the server gave for it). */
+/** Một thông báo cho mỗi trường */
 export function fieldErrorsOf(error: unknown): Record<string, string> {
   const byField: Record<string, string> = {};
   if (!isApiError(error)) return byField;
@@ -39,16 +35,12 @@ export function fieldErrorsOf(error: unknown): Record<string, string> {
   return byField;
 }
 
-/** Text safe to show for any thrown value: the server's message for an ApiError, otherwise the caller's fallback. */
+/** Văn bản an toàn để hiển thị cho mọi lỗi */
 export function errorMessage(error: unknown, fallback: string): string {
   return isApiError(error) && error.message ? error.message : fallback;
 }
 
-/**
- * Puts the server's field errors on the matching inputs of a react-hook-form form. Only fields the form really
- * has (`knownFields`, matched on the part before the first dot) are mapped; the first one gets focus.
- * Returns true when at least one error landed on an input — the caller can then skip its generic banner.
- */
+/** Đưa lỗi của server vào các ô nhập tương ứng của form */
 export function applyServerFieldErrors<T extends FieldValues>(error: unknown, setError: UseFormSetError<T>, knownFields: readonly string[]): boolean {
   let applied = 0;
   for (const [field, message] of Object.entries(fieldErrorsOf(error))) {

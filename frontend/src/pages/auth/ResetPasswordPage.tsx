@@ -14,7 +14,7 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const token = searchParams.get('token') ?? '';
   const mutation = useResetPassword();
-  // The same email link serves "forgot password" (signed out) and "change password" from the profile (signed in).
+  // Cùng một liên kết email cho quên mật khẩu và đổi mật khẩu từ hồ sơ
   const isChangingPassword = useAuthStore((s) => !!s.accessToken);
   const { signOut } = useSignOut();
 
@@ -33,11 +33,11 @@ export default function ResetPasswordPage() {
   const onSubmit = async (data: ResetPasswordFormValues) => {
     try {
       await mutation.mutateAsync(data);
-      // Every session was just invalidated, this one included: drop it locally so /login is not bounced back home.
+      // Mọi phiên đã bị vô hiệu nên xóa phiên cục bộ
       if (isChangingPassword) await signOut();
       navigate('/login', { replace: true });
     } catch {
-      // surfaced via mutation.isError below
+      // Lỗi hiển thị qua mutation.isError bên dưới
     }
   };
 
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="bg-white w-full max-w-[36.25rem] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
           
-          {/* Stepper */}
+          {/* Các bước */}
           <div className="flex items-center justify-between mb-8 relative">
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-border -z-10"></div>
             

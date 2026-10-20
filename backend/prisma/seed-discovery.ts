@@ -1,15 +1,4 @@
-/**
- * M2 dev/demo data seed for Discovery (search, hotel detail, rooms, price,
- * availability). Idempotent: safe to re-run — every insert is guarded by a
- * lookup on a natural/unique key first, and QUY_PHONG_GIA rows use
- * Prisma upsert against UQ_QUY_PHONG_GIA_MaLoaiPhong_NgayApDung.
- *
- * NOT a .sql script (like database/seed/001_roles.sql) because TAI_KHOAN
- * needs a real bcrypt password hash, which T-SQL cannot compute — this
- * runs through the same Prisma client / hashPassword() the app uses.
- *
- * Run from backend/: npx tsx prisma/seed-discovery.ts
- */
+/** Seed dữ liệu demo cho tìm kiếm, chi tiết khách sạn, phòng, giá và tồn kho */
 import { getPrismaClient, disconnectPrisma } from '../src/config/prisma';
 import { hashPassword } from '../src/common/utils/password';
 import { ROLE_NAMES } from '../src/common/constants/roles';
@@ -29,7 +18,7 @@ const addDays = (base: Date, days: number): Date => {
   return d;
 };
 const today = addDays(new Date(), 0);
-const isWeekendNight = (date: Date) => [5, 6].includes(date.getUTCDay()); // Fri/Sat night premium
+const isWeekendNight = (date: Date) => [5, 6].includes(date.getUTCDay());
 
 async function getRoleId(name: string): Promise<number> {
   const role = await prisma.vAI_TRO.findUnique({ where: { TenVaiTro: name } });
@@ -155,7 +144,7 @@ async function ensureHotel(seed: HotelSeed, ownerId: number, adminId: number, di
     });
   }
 
-  // Amenities: link any missing ones (safe to re-run — checks existing pairs)
+  // Gắn các tiện nghi còn thiếu
   for (const amenityName of seed.amenities) {
     const amenity = await prisma.tIEN_NGHI.findUnique({ where: { TenTienNghi: amenityName } });
     if (!amenity) continue;
@@ -213,7 +202,7 @@ async function ensureRoomType(hotelId: number, seed: RoomTypeSeed): Promise<numb
     }
   }
 
-  // Daily price/inventory for the next 45 days (upsert — safe to re-run).
+  // Tạo giá và tồn kho cho 45 ngày tới
   for (let i = 0; i < 45; i++) {
     const date = addDays(today, i);
     const gia = Math.round(seed.giaCoBan * (isWeekendNight(date) ? 1.15 : 1));
@@ -250,9 +239,7 @@ async function ensureBooking(params: {
 
   const existing = await prisma.dAT_PHONG.findUnique({ where: { MaXacNhanDatPhong: params.maXacNhan } });
   if (existing) {
-    // Re-anchor the booking window to "today" on every re-run — these fixtures are
-    // consumed by date-relative availability tests (addDays(N) from *test* run time),
-    // so a frozen historical date silently drifts out of the tests' query window.
+    // Dời ngày đặt phòng về hôm nay mỗi lần chạy lại
     await prisma.dAT_PHONG.update({
       where: { MaDatPhong: existing.MaDatPhong },
       data: {
@@ -298,11 +285,7 @@ async function ensureBooking(params: {
   });
 }
 
-/**
- * Reusable for the availability seed contract test as well as the CLI seed.
- * Keeping this as the single entry point prevents date-relative demo bookings
- * from drifting away from date-relative API tests.
- */
+/** Seed đặt phòng dùng chung cho test tồn kho và CLI */
 export async function seedDiscovery(): Promise<void> {
   console.log('[seed-discovery] Ensuring accounts...');
   const ownerId = await ensureAccount({
@@ -525,7 +508,7 @@ export async function seedDiscovery(): Promise<void> {
     where: { MaKhachSan: danangResortId, TenLoaiPhong: 'Deluxe' },
   });
 
-  // Partial booking: 4 of 6 Standard rooms taken at Grand Saigon for day 5-7 from today.
+  // Đặt một phần: 4/6 phòng Standard bị giữ
   await ensureBooking({
     maXacNhan: 'SEED-BOOK-001',
     customerId,
@@ -539,7 +522,7 @@ export async function seedDiscovery(): Promise<void> {
     giaMotDem: 900000,
   });
 
-  // Fully sold out: all 2 Suite rooms taken at Da Nang Resort for day 10-12.
+  // Hết phòng: toàn bộ phòng Suite bị giữ
   await ensureBooking({
     maXacNhan: 'SEED-BOOK-002',
     customerId,
@@ -553,7 +536,7 @@ export async function seedDiscovery(): Promise<void> {
     giaMotDem: 3200000,
   });
 
-  // Cancelled booking: must NOT reduce Deluxe availability at Da Nang for day 10-12.
+  // Đơn đã hủy không làm giảm số phòng trống
   await ensureBooking({
     maXacNhan: 'SEED-BOOK-003',
     customerId,

@@ -51,7 +51,7 @@ export default function AdminPartnerApplicationDetailPage() {
       </Link>
 
       <div className="bg-white border border-border rounded-[12px] overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold">
@@ -83,7 +83,7 @@ export default function AdminPartnerApplicationDetailPage() {
           )}
 
           <div className="admin-partner-review__evidence">
-          {/* 1. Thông tin người nộp */}
+          {/* Thông tin người nộp */}
           <section className="admin-partner-review__section space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-user-circle text-primary"></i> 1. Thông tin người đại diện nộp hồ sơ
@@ -108,7 +108,7 @@ export default function AdminPartnerApplicationDetailPage() {
             </div>
           </section>
 
-          {/* 2. Thông tin pháp lý */}
+          {/* Thông tin pháp lý */}
           <section className="admin-partner-review__section space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-buildings text-primary"></i> 2. Thông tin pháp lý doanh nghiệp
@@ -125,7 +125,7 @@ export default function AdminPartnerApplicationDetailPage() {
             </div>
           </section>
 
-          {/* 3. Tệp đính kèm */}
+          {/* Tệp đính kèm */}
           <section className="admin-partner-review__section space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-file-pdf text-success"></i> 3. Hồ sơ pháp lý & Giấy tờ thẩm định
@@ -149,7 +149,7 @@ export default function AdminPartnerApplicationDetailPage() {
           </section>
           </div>
 
-          {/* Xử lý duyệt / từ chối */}
+          {/* Xử lý duyệt hoặc từ chối */}
           {pending && (
             <section className="admin-partner-review__decision space-y-4">
                <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">

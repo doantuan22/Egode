@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-/** Whether a CSS media query currently matches; follows changes (resize, rotate). False where matchMedia does not exist. */
+/** Kiểm tra media query có khớp không và theo dõi thay đổi */
 export function useMediaQuery(query: string): boolean {
   return useSyncExternalStore(
     (notify) => {

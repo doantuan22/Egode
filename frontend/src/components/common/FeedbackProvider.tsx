@@ -1,4 +1,3 @@
-/* The context hooks intentionally live beside their provider for one source of truth. */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,9 +18,9 @@ export interface ToastOptions {
   duration?: number;
 }
 
-/** The icon (Phosphor name) that carries each tone, so the kind of message is readable before a word is. */
+/** Biểu tượng theo từng loại thông báo */
 const TOAST_ICONS = { success: 'check-circle', error: 'warning-octagon', warning: 'warning', info: 'info' } as const;
-/** A refusal or failure is worth more time on screen than a confirmation. */
+/** Lỗi hiện lâu hơn thông báo thành công */
 const toastDuration = (options: ToastOptions) => options.duration ?? (options.tone === 'error' ? 8000 : 5000);
 
 interface FeedbackContextValue {

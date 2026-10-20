@@ -49,7 +49,7 @@ describe('POST /api/auth/register', () => {
       where: { MaTaiKhoan: res.body.data.account.MaTaiKhoan },
     });
     expect(row?.MatKhau).not.toBe(payload.MatKhau);
-    expect(row?.MatKhau.startsWith('$2')).toBe(true); // bcrypt hash prefix
+    expect(row?.MatKhau.startsWith('$2')).toBe(true);
     expect(await verifyPassword(payload.MatKhau, row!.MatKhau)).toBe(true);
   });
 
@@ -94,7 +94,7 @@ describe('POST /api/auth/register', () => {
     expect(res.body.data.account.NgaySinh).toBeNull();
     expect(res.body.data.account.GioiTinh).toBeNull();
     expect(res.body.data.account.AnhDaiDien).toBeNull();
-    // SoDienThoai stays mandatory — confirms DDI-01 didn't loosen it too.
+    // Số điện thoại vẫn bắt buộc
     expect(res.body.data.account.SoDienThoai).toBe(payload.SoDienThoai);
     createdAccountIds.push(res.body.data.account.MaTaiKhoan);
   });
@@ -178,14 +178,14 @@ describe('POST /api/auth/login — BUG-004: locked account is not a password ora
 
     expect(correct.status).toBe(403);
     expect(wrong.status).toBe(403);
-    // An attacker must not be able to tell the two apart: same status, same body, no tokens/cookie.
+    // Phản hồi giống nhau cho hai trường hợp
     expect(wrong.body).toEqual(correct.body);
     expect(correct.body.success).toBe(false);
     expect(correct.body.message).toBe('Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên');
     expect(correct.body.data).toBeUndefined();
     expect(correct.headers['set-cookie']).toBeUndefined();
     expect(wrong.headers['set-cookie']).toBeUndefined();
-    // Neither the submitted password nor any hash may be echoed back.
+    // Không trả lại mật khẩu hay hash
     for (const res of [correct, wrong]) {
       const raw = JSON.stringify(res.body);
       expect(raw).not.toContain(plainPassword);
@@ -344,7 +344,7 @@ describe('POST /api/auth/change-password', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
 
-    // Neither the response nor anything logged may carry a password or hash.
+    // Không ghi log mật khẩu hay hash
     const stored = await getPrismaClient().tAI_KHOAN.findUnique({ where: { MaTaiKhoan: account.MaTaiKhoan } });
     const serializedResponse = JSON.stringify(res.body);
     for (const secret of [plainPassword, NEW_PASSWORD, stored!.MatKhau]) {
@@ -425,7 +425,7 @@ describe('POST /api/auth/change-password', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ MatKhauCu: plainPassword, MatKhauMoi: NEW_PASSWORD });
 
-    // The locked account is stopped by the authentication middleware itself (401), before the endpoint runs.
+    // Tài khoản bị khóa bị middleware chặn
     expect(res.status).toBe(401);
     const stored = await getPrismaClient().tAI_KHOAN.findUniqueOrThrow({ where: { MaTaiKhoan: account.MaTaiKhoan } });
     expect(stored.TrangThai).toBe(ACCOUNT_STATUS.LOCKED);

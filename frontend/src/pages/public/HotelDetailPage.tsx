@@ -58,9 +58,7 @@ import { PageSpinner } from '../../components/common/PageSpinner';
 import { shareUrl } from '../../lib/share';
 import { useActiveSection } from '../../hooks/useActiveSection';
 
-/* =========================================================
-   PAGE SECTIONS
-========================================================= */
+/* Các phần của trang */
 
 const PAGE_SECTIONS = [
   {
@@ -114,26 +112,19 @@ export default function HotelDetailPage() {
     Record<number, number>
   >({});
 
-  /*
-   * Mã đang gõ trong ô nhập — CHƯA có hiệu lực.
-   * Chỉ nút "Áp dụng" mới biến nó thành appliedPromo.
-   */
+  /* Mã đang gõ trong ô nhập, chưa có hiệu lực */
   const [
     promoInput,
     setPromoInput,
   ] = useState('');
 
-  /*
-   * Mã đã áp dụng: duy nhất mã này được gửi lên backend để báo giá / đặt phòng.
-   * Mỗi lần đổi phòng / ngày / số khách, báo giá chạy lại với mã này và backend
-   * quyết định nó còn hợp lệ hay không.
-   */
+  /* Mã đã áp dụng, chỉ mã này được gửi lên backend */
   const [
     appliedPromo,
     setAppliedPromo,
   ] = useState('');
 
-  /* Lý do mã đã bị gỡ (backend báo không hợp lệ / hết hợp lệ). */
+  /* Lý do mã bị gỡ */
   const [
     promoNotice,
     setPromoNotice,
@@ -171,9 +162,7 @@ export default function HotelDetailPage() {
         state.role
     );
 
-  /* =========================================================
-     SEARCH PARAMS
-  ========================================================= */
+  /* Tham số tìm kiếm */
 
   const defaults =
     defaultSearchDates();
@@ -197,9 +186,7 @@ export default function HotelDetailPage() {
       )
     );
 
-  // "Back to the list" restores what the list was showing (location, filters, sort, page), which the list card handed over in
-  // the router state; the stay dates / guests edited on this page win. Without that state (direct link, shared URL) only the
-  // stay is carried over.
+  // Quay lại danh sách khôi phục bộ lọc do trạng thái router
   const listUrl = (() => {
     const state = routerLocation.state as { listSearch?: unknown } | null;
     const back = new URLSearchParams(typeof state?.listSearch === 'string' ? state.listSearch : '');
@@ -211,9 +198,7 @@ export default function HotelDetailPage() {
     return query ? `/hotels?${query}` : '/hotels';
   })();
 
-  /* =========================================================
-     SELECTED ROOMS
-  ========================================================= */
+  /* Phòng đã chọn */
 
   const selectedRoomLines =
     Object.entries(
@@ -248,9 +233,7 @@ export default function HotelDetailPage() {
       0
     );
 
-  /* =========================================================
-     QUOTE
-  ========================================================= */
+  /* Báo giá */
 
   const quoteQuery =
     useQuote(
@@ -273,9 +256,7 @@ export default function HotelDetailPage() {
         : null
     );
 
-  /* =========================================================
-     HOTEL DATA
-  ========================================================= */
+  /* Dữ liệu khách sạn */
 
   const hotelQuery =
     useHotelDetail(
@@ -296,9 +277,7 @@ export default function HotelDetailPage() {
       hotelLoaded
     );
 
-  /* =========================================================
-     BOOKING PANEL VISIBILITY
-  ========================================================= */
+  /* Hiển thị khung đặt phòng */
 
   const [
     bookingPanelVisible,
@@ -335,9 +314,7 @@ export default function HotelDetailPage() {
       observer.disconnect();
   }, [hotelLoaded]);
 
-  /* =========================================================
-     ROOMS
-  ========================================================= */
+  /* Phòng */
 
   const roomsQuery =
     useHotelRooms(
@@ -349,9 +326,7 @@ export default function HotelDetailPage() {
       }
     );
 
-  /* =========================================================
-     CAPACITY OF THE ROOMS CHOSEN (a hint — the server decides)
-  ========================================================= */
+  /* Gợi ý sức chứa của phòng đã chọn */
 
   const selectedCapacity = selectedRoomLines.reduce(
     (sum, line) =>
@@ -361,9 +336,7 @@ export default function HotelDetailPage() {
     0
   );
 
-  /* =========================================================
-     DATE SEARCH
-  ========================================================= */
+  /* Tìm theo ngày */
 
   const onDatesSubmit = (
     values: {
@@ -392,9 +365,7 @@ export default function HotelDetailPage() {
     }, { state: routerLocation.state });
   };
 
-  /* =========================================================
-     ROOM QUANTITY
-  ========================================================= */
+  /* Số lượng phòng */
 
   const setRoomQuantity = (
     maLoaiPhong: number,
@@ -445,9 +416,7 @@ export default function HotelDetailPage() {
     );
   };
 
-  /* =========================================================
-     PROMO
-  ========================================================= */
+  /* Mã khuyến mãi */
 
   const changePromoInput = (
     value: string
@@ -479,7 +448,7 @@ export default function HotelDetailPage() {
     const code =
       promoInput.trim();
 
-    // Same code again: the query key does not change, so ask the backend again explicitly.
+    // Cùng một mã thì hỏi lại backend rõ ràng
     if (
       code ===
         appliedPromo &&
@@ -493,7 +462,7 @@ export default function HotelDetailPage() {
     );
   };
 
-  /** A code picked from the list of available codes: it is typed in and applied in one step. */
+  /** Chọn mã từ danh sách thì nhập và áp dụng một bước */
   const selectPromo = (code: string) => {
     bookingMutation.reset();
     setPromoNotice(null);
@@ -502,9 +471,7 @@ export default function HotelDetailPage() {
     setAppliedPromo(code);
   };
 
-  /* =========================================================
-     QUOTE MATCH
-  ========================================================= */
+  /* Khớp báo giá */
 
   const quoteMatchesSelection =
     quoteMatchesRequest(
@@ -522,10 +489,7 @@ export default function HotelDetailPage() {
     appliedPromo ===
     promoInput.trim();
 
-  /*
-   * Backend là nguồn quyết định: nếu báo giá cho mã đã áp dụng trả về "không hợp lệ"
-   * (sai mã, hết hạn, không đủ điều kiện sau khi đổi phòng/ngày...), gỡ mã và báo rõ lý do.
-   */
+  /* Backend quyết định mã còn hợp lệ, không hợp lệ thì gỡ và báo lý do */
   const quoteData =
     quoteQuery.data;
 
@@ -564,9 +528,7 @@ export default function HotelDetailPage() {
     quoteMatchesSelection,
   ]);
 
-  /* =========================================================
-     CONFIRM BOOKING
-  ========================================================= */
+  /* Xác nhận đặt phòng */
 
   const confirmBooking = () => {
     if (
@@ -602,7 +564,7 @@ export default function HotelDetailPage() {
         onSuccess: (
           booking
         ) => {
-          // Nothing to pay (total 0): the server confirmed it on the spot, so there is no payment step.
+          // Tổng bằng 0 đã được xác nhận nên không có bước thanh toán
           if (booking.TrangThai === BOOKING_STATUS.CONFIRMED) {
             navigate(`/payment/result?bookingId=${booking.MaDatPhong}&status=success`);
             return;
@@ -621,9 +583,7 @@ export default function HotelDetailPage() {
     );
   };
 
-  /* =========================================================
-     LOADING
-  ========================================================= */
+  /* Đang tải */
 
   if (
     hotelQuery.isLoading
@@ -647,9 +607,7 @@ export default function HotelDetailPage() {
     );
   }
 
-  /* =========================================================
-     ERROR
-  ========================================================= */
+  /* Lỗi */
 
   if (
     hotelQuery.isError ||
@@ -704,9 +662,7 @@ export default function HotelDetailPage() {
   const hotel =
     hotelQuery.data;
 
-  /* =========================================================
-     MOBILE BOOKING
-  ========================================================= */
+  /* Thanh đặt phòng trên điện thoại */
 
   const goToBookingPanel =
     () =>
@@ -720,9 +676,7 @@ export default function HotelDetailPage() {
             'smooth',
         });
 
-  /* =========================================================
-     SUMMARY TOTAL
-  ========================================================= */
+  /* Tổng tiền tóm tắt */
 
   const summaryTotal =
     quoteQuery.isError
@@ -738,9 +692,7 @@ export default function HotelDetailPage() {
           : 'Cần điều chỉnh lựa chọn'
         : 'Đang cập nhật báo giá…';
 
-  /* =========================================================
-     SHARE
-  ========================================================= */
+  /* Chia sẻ */
 
   const shareHotel =
     async () => {
@@ -1041,7 +993,7 @@ export default function HotelDetailPage() {
             "
           >
 
-            {/* Rooms */}
+            {/* Phòng */}
 
             <div
               className="
@@ -1076,7 +1028,7 @@ export default function HotelDetailPage() {
               />
             </div>
 
-            {/* Overview */}
+            {/* Tổng quan */}
 
             <div
               className="
@@ -1097,7 +1049,7 @@ export default function HotelDetailPage() {
               />
             </div>
 
-            {/* Amenities */}
+            {/* Tiện nghi */}
 
             <div
               className="
@@ -1118,7 +1070,7 @@ export default function HotelDetailPage() {
               />
             </div>
 
-            {/* Guest reviews */}
+            {/* Đánh giá của khách */}
 
             <HotelReviews
               hotelId={
@@ -1150,7 +1102,7 @@ export default function HotelDetailPage() {
               "
             >
 
-              {/* Panel heading */}
+              {/* Tiêu đề khung */}
 
               <div
                 className="
@@ -1313,9 +1265,7 @@ export default function HotelDetailPage() {
   );
 }
 
-/* =========================================================
-   BENEFIT
-========================================================= */
+/* Lợi ích */
 
 function HotelBenefit({
   icon,

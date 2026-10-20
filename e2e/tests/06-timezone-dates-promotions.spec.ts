@@ -1,10 +1,6 @@
 import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, type Account } from '../support/fixtures';
 
-/**
- * Business time is Asia/Ho_Chi_Minh, whatever the visitor's browser clock says. The same assertions run in two browser
- * time zones, one far behind Vietnam and one far ahead, so that at ANY hour of the day at least one of them has a local
- * calendar date different from the Vietnamese date — a UI that used the browser's date would fail one of them.
- */
+/** Giờ nghiệp vụ là Việt Nam bất kể múi giờ trình duyệt */
 const API = 'http://localhost:5100/api';
 let owner: Account;
 let hotel: { id: number; name: string };
@@ -35,12 +31,12 @@ for (const timezoneId of ['Pacific/Honolulu', 'Pacific/Kiritimati']) {
       await login(page, customer);
       await page.goto(`/hotels/${hotel.id}?checkIn=${addDays(today, 3)}&checkOut=${addDays(today, 4)}&guests=2`);
 
-      // open the stay's date editor: yesterday (VN) is disabled, today (VN) is selectable
+      // Hôm qua bị vô hiệu, hôm nay chọn được
       await page.locator('form.travel-search').first().getByRole('button', { name: /Nhận & trả phòng/ }).click();
       await expect(page.locator(`td[data-day="${today}"] button`).first()).toBeEnabled();
       await expect(page.locator(`td[data-day="${addDays(today, -1)}"] button`).first()).toBeDisabled();
 
-      // the backend agrees: check-in today is accepted, check-in yesterday is refused, no row is created for it
+      // Backend chấp nhận nhận phòng hôm nay và từ chối hôm qua
       const api = await playwright.request.newContext();
       const token = (await (await api.post(`${API}/auth/login`, { data: { identifier: customer.email, MatKhau: customer.password } })).json()).data.accessToken;
       const headers = { Authorization: `Bearer ${token}` };
@@ -65,7 +61,7 @@ for (const timezoneId of ['Pacific/Honolulu', 'Pacific/Kiritimati']) {
       await expect(page.getByText(/14:00/).first()).toBeVisible();
       await expect(page.getByText(/12:00/).first()).toBeVisible();
 
-      // the server's own check-in instant is stayDay 14:00 Vietnam time = 07:00 UTC, in every browser time zone
+      // Giờ nhận phòng của máy chủ là 14:00 giờ Việt Nam
       const detail = await (await page.request.post(`${API}/auth/refresh`, { headers: { Origin: 'http://localhost:5174' } })).json();
       const booking = await (await page.request.get(`${API}/bookings/${paid.id}`, { headers: { Authorization: `Bearer ${detail.data.accessToken}` } })).json();
       expect(booking.data.ThoiDiemNhanPhong).toBe(`${stayDay}T07:00:00.000Z`);
@@ -94,7 +90,7 @@ test.describe('promotion boundaries are Vietnamese calendar days (inclusive)', (
     await expect(panel.getByRole('button', { name: /Tạo đặt phòng/ })).toBeEnabled();
 
     await apply(ended.code);
-    await expect(panel.getByRole('alert')).toContainText(ended.code); // removed again, with the reason
+    await expect(panel.getByRole('alert')).toContainText(ended.code);
     await expect(panel).not.toContainText('Khuyến mãi giảm');
 
     await apply(notYet.code);

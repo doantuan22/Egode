@@ -30,7 +30,7 @@ export default function BookingDetailPage() {
   const [cancelFlow, setCancelFlow] = useState<CancelFlowState>({ phase: 'idle' });
   const retryRefundMutation = useRetryRefund(bookingId);
 
-  // Linked from the booking list ("Đánh giá"): the review section only exists after the booking has loaded.
+  // Mục đánh giá chỉ có sau khi đơn đã tải
   const bookingLoaded = Boolean(bookingQuery.data);
   useEffect(() => {
     if (bookingLoaded && location.hash === '#danh-gia') document.getElementById('danh-gia')?.scrollIntoView();
@@ -56,12 +56,12 @@ export default function BookingDetailPage() {
   const previewAmount = computeRefundAmountPreview(successfulPaid, previewPercent);
 
   const confirmCancel = (note: string | undefined, onDone: () => void) => {
-    // Nothing was paid: a plain cancellation, no refund to wait for.
+    // Chưa thanh toán thì hủy thường, không có hoàn tiền
     if (successfulPaid <= 0) {
       cancelMutation.mutate({ ghiChu: note }, { onSuccess: onDone });
       return;
     }
-    // Paid: show the processing animation, then what happens to the money.
+    // Đã thanh toán thì hiện hiệu ứng xử lý rồi kết quả tiền
     setCancelFlow({ phase: 'processing' });
     void (async () => {
       try {
@@ -104,7 +104,7 @@ export default function BookingDetailPage() {
 
       <div className="two-col-layout">
         
-        {/* Left Column */}
+        {/* Cột trái */}
         <div className="flex flex-col gap-6">
           
           <div className="card card-body">
@@ -190,7 +190,7 @@ export default function BookingDetailPage() {
 
         </div>
 
-        {/* Right Column */}
+        {/* Cột phải */}
         <aside className="flex flex-col gap-5">
           <BookingSummary
             booking={booking}

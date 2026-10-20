@@ -156,8 +156,7 @@ export default function HotelListPage() {
 
     setSearchParams(next);
 
-    // Every call is a user action (search, filter, sort, page): bring the refreshed results into view.
-    // No explicit `behavior`, so the CSS `scroll-behavior` (smooth, or instant under reduced motion) decides.
+    // Mỗi lần thao tác đưa kết quả mới vào tầm nhìn
     resultsRef.current?.scrollIntoView?.({ block: 'start' });
   };
 
@@ -198,7 +197,7 @@ export default function HotelListPage() {
         "
       >
 
-        {/* BACKGROUND */}
+        {/* Nền */}
 
         <div
           className="
@@ -246,7 +245,7 @@ export default function HotelListPage() {
 
         </div>
 
-        {/* HERO TEXT */}
+        {/* Chữ chính */}
 
         <div
           className="
@@ -259,7 +258,7 @@ export default function HotelListPage() {
 
           <div className="max-w-[40.625rem]">
 
-            {/* BADGE */}
+            {/* Huy hiệu */}
 
             <div
               className="
@@ -292,7 +291,7 @@ export default function HotelListPage() {
               EGODE · KHÁCH SẠN
             </div>
 
-            {/* TITLE */}
+            {/* Tiêu đề */}
 
             <h1
               className="
@@ -322,7 +321,7 @@ export default function HotelListPage() {
               </span>
             </h1>
 
-            {/* DESCRIPTION */}
+            {/* Mô tả */}
 
             <p
               className="
@@ -343,7 +342,7 @@ export default function HotelListPage() {
               nhanh chóng và dễ dàng.
             </p>
 
-            {/* BENEFITS */}
+            {/* Lợi ích */}
 
             <div
               className="
@@ -403,7 +402,7 @@ export default function HotelListPage() {
             "
           >
 
-            {/* SEARCH HEADING */}
+            {/* Tiêu đề tìm kiếm */}
 
             <div
               className="
@@ -561,7 +560,7 @@ export default function HotelListPage() {
           "
         >
 
-          {/* RESULT TOOLBAR */}
+          {/* Thanh công cụ kết quả */}
 
           <div
             className="
@@ -581,7 +580,7 @@ export default function HotelListPage() {
             "
           >
 
-            {/* LEFT */}
+            {/* Bên trái */}
 
             <div>
 
@@ -636,7 +635,7 @@ export default function HotelListPage() {
 
               </div>
 
-              {/* CHIPS */}
+              {/* Chip bộ lọc */}
 
               <div
                 className="
@@ -677,7 +676,7 @@ export default function HotelListPage() {
 
             </div>
 
-            {/* SORT */}
+            {/* Sắp xếp */}
 
             <div
               className="
@@ -737,9 +736,7 @@ export default function HotelListPage() {
 
           ) : query.isError ? (
 
-            /* ===============================================
-                ERROR
-            =============================================== */
+            /* Lỗi */
 
             <div
               role="alert"
@@ -790,9 +787,7 @@ export default function HotelListPage() {
             query.data.items.length ===
               0 ? (
 
-            /* ===============================================
-                EMPTY
-            =============================================== */
+            /* Không có kết quả */
 
             <div
               className="
@@ -826,9 +821,7 @@ export default function HotelListPage() {
 
           ) : (
 
-            /* ===============================================
-                HOTEL LIST
-            =============================================== */
+            /* Danh sách khách sạn */
 
             <div className="space-y-4 motion-stagger">
 
@@ -887,7 +880,7 @@ export default function HotelListPage() {
                   "
                 >
 
-                  {/* PREVIOUS */}
+                  {/* Trang trước */}
 
                   <button
                     type="button"
@@ -927,7 +920,7 @@ export default function HotelListPage() {
                     />
                   </button>
 
-                  {/* CURRENT */}
+                  {/* Trang hiện tại */}
 
                   <span
                     aria-current="page"
@@ -947,7 +940,7 @@ export default function HotelListPage() {
                     {params.page}
                   </span>
 
-                  {/* TOTAL */}
+                  {/* Tổng số */}
 
                   <span
                     className="
@@ -965,7 +958,7 @@ export default function HotelListPage() {
                     }
                   </span>
 
-                  {/* NEXT */}
+                  {/* Trang sau */}
 
                   <button
                     type="button"
@@ -1021,9 +1014,7 @@ export default function HotelListPage() {
   );
 }
 
-/* =========================================================
-   HERO CHIP
-========================================================= */
+/* Chip phần đầu */
 
 function HeroChip({
   icon,
@@ -1065,9 +1056,7 @@ function HeroChip({
   );
 }
 
-/* =========================================================
-   RESULT CHIP
-========================================================= */
+/* Chip kết quả */
 
 function ResultChip({
   icon,
@@ -1111,9 +1100,7 @@ function ResultChip({
   );
 }
 
-/* =========================================================
-   SKELETON
-========================================================= */
+/* Khung chờ tải */
 
 function HotelCardSkeletons() {
   return (

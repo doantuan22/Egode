@@ -13,12 +13,7 @@ import { maskReviewerName } from './reviewer-name';
 
 const REVIEW_IMAGE_FOLDER = 'hotel-booking/reviews';
 
-/**
- * The booking was already reviewed. Two shapes of the same race: P2002 when both
- * inserts collide on UQ_DANH_GIA_MaDatPhong, and P2014 when the winner has already
- * committed by the time the loser's nested connect to DAT_PHONG checks the
- * one-review-per-booking relation.
- */
+/** Đơn đã được đánh giá do hai yêu cầu cùng lúc */
 const isDuplicateReviewError = (err: unknown): boolean =>
   err instanceof Prisma.PrismaClientKnownRequestError &&
   (err.code === 'P2002' || (err.code === 'P2014' && err.meta?.relation === 'DANH_GIAToDAT_PHONG'));
@@ -26,7 +21,7 @@ const isDuplicateReviewError = (err: unknown): boolean =>
 export class ReviewsService {
   constructor(private readonly repository: ReviewsRepository = new ReviewsRepository()) {}
 
-  /** Ownership + eligibility (RB9: booking must actually be "Hoàn tất") — never trusted from the client. */
+  /** Kiểm tra quyền sở hữu và điều kiện đánh giá */
   private async assertOwnedCompletedBooking(maDatPhong: number, customerId: number) {
     await completeFinishedBookings(getPrismaClient());
     const booking = await this.repository.findBookingForReview(maDatPhong);
@@ -48,13 +43,11 @@ export class ReviewsService {
 
     validateReviewImages(input.hinhAnh);
 
-    // BUG-005: images reach Cloudinary BEFORE the review row exists, so any
-    // failure from the first upload up to the DB commit would orphan them.
-    // Track exactly what THIS request uploaded and delete it if anything throws.
+    // Theo dõi ảnh đã tải lên để xóa nếu lỗi
     const uploadedImages: UploadImageResult[] = [];
     try {
       for (const dataUri of input.hinhAnh ?? []) {
-        // Recorded right after each success, so a later failure still knows about it.
+        // Ghi nhận ngay sau mỗi lần tải thành công
         uploadedImages.push(await CloudinaryIntegration.uploadImage(dataUri, REVIEW_IMAGE_FOLDER));
       }
 
@@ -65,14 +58,14 @@ export class ReviewsService {
           maKhachSan: booking.MaKhachSan,
           diemDanhGia: input.diemDanhGia,
           noiDung: input.noiDung ?? null,
-          // No pre-moderation: a review is public as soon as it is posted. The admin can still hide it afterwards.
+          // Đánh giá hiển thị ngay khi đăng
           trangThai: REVIEW_STATUS.VISIBLE,
         },
         uploadedImages.map((image) => image.url)
       );
     } catch (err) {
       await this.deleteUploadedImages(uploadedImages);
-      // RB26 (UQ_DANH_GIA_MaDatPhong) — guards the same-instant double-submit race the findByBookingId check above can't fully close.
+      // Chặn gửi trùng cùng lúc
       if (isDuplicateReviewError(err)) {
         throw AppError.conflict('Đặt phòng này đã được đánh giá');
       }
@@ -80,12 +73,7 @@ export class ReviewsService {
     }
   }
 
-  /**
-   * Best-effort rollback of this request's Cloudinary uploads. Never throws, so
-   * it cannot mask the error that triggered it, and one failed delete never
-   * stops the others. Failures log only the publicId and error type — no raw
-   * provider message, image data, URL, or credentials.
-   */
+  /** Xóa ảnh đã tải lên khi lỗi, không ném lỗi */
   private async deleteUploadedImages(images: UploadImageResult[]): Promise<void> {
     if (images.length === 0) return;
     const results = await Promise.allSettled(images.map((image) => CloudinaryIntegration.deleteImage(image.publicId)));
@@ -100,7 +88,7 @@ export class ReviewsService {
     });
   }
 
-  /** null when the customer hasn't reviewed this booking yet — not an error (same convention as GET /partners/me). */
+  /** Trả null khi khách chưa đánh giá đơn này */
   async getMyReview(maDatPhong: number, customerId: number) {
     await this.assertOwnedCompletedBooking(maDatPhong, customerId);
     return this.repository.findByBookingId(maDatPhong);
@@ -123,7 +111,7 @@ export class ReviewsService {
     return review;
   }
 
-  /** The visible reviews of a hotel that is itself public, newest first, with the reviewer's name abbreviated. */
+  /** Đánh giá hiển thị của khách sạn công khai, mới nhất trước */
   async listPublicForHotel(maKhachSan: number, query: PublicReviewsQuery) {
     if (!(await this.repository.isPublicHotel(maKhachSan))) throw AppError.notFound('Không tìm thấy khách sạn');
     const { items, total } = await this.repository.listPublicByHotel(maKhachSan, query.page, query.limit);
@@ -141,18 +129,14 @@ export class ReviewsService {
     };
   }
 
-  /** Customer can never reach this — no TrangThai field exists anywhere in the customer-facing create schema, and this action is admin-only routed. */
+  /** Khách không thể đổi trạng thái đánh giá */
   async moderate(maDanhGia: number, trangThai: string) {
     const review = await this.repository.findByIdAdmin(maDanhGia);
     if (!review) throw AppError.notFound('Không tìm thấy đánh giá');
     return this.repository.updateStatus(maDanhGia, trangThai);
   }
 
-  /**
-   * UC37 safe-delete. The row and review images stay available to admins for
-   * audit/history; the existing `Ẩn` state removes a flagged review from
-   * public-visible states. A second request is deliberately idempotent.
-   */
+  /** Xóa an toàn bằng cách chuyển sang Ẩn */
   async removeViolation(maDanhGia: number) {
     const review = await this.repository.findByIdAdmin(maDanhGia);
     if (!review) throw AppError.notFound('Không tìm thấy đánh giá');
@@ -161,7 +145,7 @@ export class ReviewsService {
       throw AppError.conflict('Chỉ có thể gỡ đánh giá đã được đánh dấu vi phạm');
     }
     await this.repository.updateStatus(maDanhGia, REVIEW_STATUS.HIDDEN);
-    // Preserve the admin-detail response contract after the state transition.
+    // Giữ nguyên dạng phản hồi chi tiết cho admin
     return (await this.repository.findByIdAdmin(maDanhGia))!;
   }
 }

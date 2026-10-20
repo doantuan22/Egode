@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-/** Returns `value` only after it stopped changing for `delayMs` — keeps search-as-you-type to one request per pause. */
+/** Trả giá trị sau khi ngừng đổi trong khoảng chờ */
 export function useDebouncedValue<T>(value: T, delayMs = 350): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {

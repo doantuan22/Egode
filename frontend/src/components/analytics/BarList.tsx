@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 export interface BarListItem {
   label: string;
   value: number;
-  /** Tailwind bg-* class for this row's fill — defaults to the app's primary blue when omitted (a plain magnitude ranking, not a category needing distinct hues). */
+  /** Lớp màu nền của thanh, mặc định là màu chính */
   colorClass?: string;
   formattedValue?: string;
 }

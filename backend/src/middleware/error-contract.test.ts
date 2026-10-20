@@ -10,11 +10,7 @@ import { ROLE_NAMES } from '../common/constants/roles';
 import { AppError } from '../common/errors/app-error';
 import { ERROR_CODES, codeForStatus } from '../common/errors/error-codes';
 
-/**
- * Bug #11 — one error shape for the whole API:  { success:false, message, code, details? }
- *   validation → code VALIDATION_ERROR, details [{ field, message }]
- * Nothing else (`errors`, `error`, stacks, SQL, internals) is part of a response.
- */
+/** Mọi lỗi API có cùng một dạng phản hồi */
 const SHAPE_KEYS = ['success', 'message', 'code', 'details'];
 const expectOnlyContractKeys = (body: object) => {
   for (const key of Object.keys(body)) expect(SHAPE_KEYS).toContain(key);

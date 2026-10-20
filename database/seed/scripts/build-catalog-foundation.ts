@@ -5,7 +5,7 @@ import { hashPassword } from '../../../backend/src/common/utils/password';
 const CATALOG_DIR = path.resolve(__dirname, '../catalog');
 mkdirSync(CATALOG_DIR, { recursive: true });
 
-// 1. LOCATIONS
+// Địa điểm
 const LOCATIONS = [
   { city: 'Hồ Chí Minh', province: 'Hồ Chí Minh', country: 'Việt Nam' },
   { city: 'Hà Nội', province: 'Hà Nội', country: 'Việt Nam' },
@@ -20,7 +20,7 @@ const LOCATIONS = [
   { city: 'Vũng Tàu', province: 'Bà Rịa - Vũng Tàu', country: 'Việt Nam' },
 ];
 
-// 2. MASTER AMENITIES
+// Tiện nghi chung
 const AMENITIES = [
   { name: 'Wi-Fi miễn phí', icon: 'wifi' },
   { name: 'Hồ bơi', icon: 'pool' },
@@ -44,15 +44,15 @@ const AMENITIES = [
   { name: 'Khu vui chơi trẻ em', icon: 'kids' },
 ];
 
-// 3. ACCOUNTS
+// Tài khoản
 const ACCOUNTS = [
-  // 4 System Admins
+  // Quản trị viên hệ thống
   { user: 'admin.nguyen', name: 'Nguyễn Minh Tuấn', email: 'admin.tuan@egode.vn', role: 'Quản trị hệ thống', gender: 'Nam', dob: '1985-04-12', phone: '0912111001', status: 'Hoạt động', pass: 'Admin#Egode2026@Tuan' },
   { user: 'admin.hoang', name: 'Hoàng Mai Linh', email: 'admin.linh@egode.vn', role: 'Quản trị hệ thống', gender: 'Nữ', dob: '1990-09-25', phone: '0912111002', status: 'Hoạt động', pass: 'Admin#Egode2026@Linh' },
   { user: 'admin.tran', name: 'Trần Quang Khải', email: 'admin.khai@egode.vn', role: 'Quản trị hệ thống', gender: 'Nam', dob: '1988-11-18', phone: '0912111003', status: 'Hoạt động', pass: 'Admin#Egode2026@Khai' },
   { user: 'admin.le', name: 'Lê Thu Trang', email: 'admin.trang@egode.vn', role: 'Quản trị hệ thống', gender: 'Nữ', dob: '1993-02-08', phone: '0912111004', status: 'Hoạt động', pass: 'Admin#Egode2026@Trang' },
 
-  // 10 Hotel Owners
+  // Chủ khách sạn
   { user: 'owner.phamminh', name: 'Phạm Minh Châu', email: 'phamminh.chau@egode-partner.vn', role: 'Chủ khách sạn', gender: 'Nam', dob: '1978-06-15', phone: '0983111011', status: 'Hoạt động', pass: 'Partner#Egode2026@Chau' },
   { user: 'owner.vuminh', name: 'Vũ Minh Khang', email: 'vuminh.khang@egode-partner.vn', role: 'Chủ khách sạn', gender: 'Nam', dob: '1982-10-20', phone: '0983111012', status: 'Hoạt động', pass: 'Partner#Egode2026@Khang' },
   { user: 'owner.dangtuan', name: 'Đặng Anh Tuấn', email: 'dang.tuan@egode-partner.vn', role: 'Chủ khách sạn', gender: 'Nam', dob: '1975-03-30', phone: '0983111013', status: 'Hoạt động', pass: 'Partner#Egode2026@Tuan' },
@@ -64,7 +64,7 @@ const ACCOUNTS = [
   { user: 'owner.phanvan', name: 'Phan Thanh Vân', email: 'phan.thanhvan@egode-partner.vn', role: 'Chủ khách sạn', gender: 'Nữ', dob: '1987-09-02', phone: '0983111019', status: 'Hoạt động', pass: 'Partner#Egode2026@Van' },
   { user: 'owner.buitrung', name: 'Bùi Trung Kiên', email: 'bui.trungkien@egode-partner.vn', role: 'Chủ khách sạn', gender: 'Nam', dob: '1981-11-28', phone: '0983111020', status: 'Hoạt động', pass: 'Partner#Egode2026@Kien' },
 
-  // 6 Verified Customers
+  // Khách hàng đã xác minh
   { user: 'khach.namle', name: 'Lê Hoàng Nam', email: 'nam.lehoang@gmail.com', role: 'Khách hàng', gender: 'Nam', dob: '1994-03-15', phone: '0905222001', status: 'Hoạt động', pass: 'Customer#Egode2026@Nam' },
   { user: 'khach.phuonganh', name: 'Đỗ Phương Anh', email: 'phuonganh.do@gmail.com', role: 'Khách hàng', gender: 'Nữ', dob: '1996-07-22', phone: '0905222002', status: 'Hoạt động', pass: 'Customer#Egode2026@Anh' },
   { user: 'khach.ducthinh', name: 'Vũ Đức Thịnh', email: 'thinh.vuduc@gmail.com', role: 'Khách hàng', gender: 'Nam', dob: '1991-10-05', phone: '0905222003', status: 'Hoạt động', pass: 'Customer#Egode2026@Thinh' },
@@ -83,7 +83,7 @@ async function main() {
     })
   );
 
-  // 4. PARTNER APPLICATIONS (for the 10 owners)
+  // Hồ sơ đối tác
   const PARTNER_APPLICATIONS = ACCOUNTS.filter((a) => a.role === 'Chủ khách sạn').map((a, i) => ({
     user: a.user,
     cccd: `0${String(79_100_000_000 + i * 1_472_583).slice(0, 11)}`,
@@ -94,7 +94,7 @@ async function main() {
     reason: null,
   }));
 
-  // 5. POLICIES & PROMOTIONS
+  // Chính sách và khuyến mãi
   const POLICIES = {
     cancellationPolicy: {
       name: 'Chính sách hủy linh hoạt tiêu chuẩn',

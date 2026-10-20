@@ -8,7 +8,7 @@ export class QuotesRepository {
     return prisma.kHACH_SAN.findFirst({ where: { MaKhachSan: maKhachSan, TrangThai: HOTEL_STATUS.ACTIVE } });
   }
 
-  /** Same price/availability shape as the M2 public rooms endpoint — reused, not duplicated. */
+  /** Dùng lại dạng giá và tồn kho của endpoint phòng công khai */
   async findRoomTypesByIds(maKhachSan: number, maLoaiPhongList: number[], checkIn: Date, checkOut: Date) {
     const prisma = getPrismaClient();
     return prisma.lOAI_PHONG.findMany({
@@ -26,7 +26,7 @@ export class QuotesRepository {
     return prisma.kHUYEN_MAI.findUnique({ where: { MaCode: maCode } });
   }
 
-  /** Bookings already placed with this code, excluding cancelled ones (never overcounted). */
+  /** Số đơn chưa hủy đã dùng mã này */
   async countPromotionUsage(maKhuyenMai: number): Promise<number> {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.count({

@@ -9,7 +9,7 @@ const tiers = [
 describe('selectRefundPercent', () => {
   it('picks the most generous satisfied tier', () => {
     expect(selectRefundPercent(tiers, 200)).toBe(100);
-    expect(selectRefundPercent(tiers, 72)).toBe(100); // exactly at threshold — inclusive
+    expect(selectRefundPercent(tiers, 72)).toBe(100);
   });
 
   it('falls to the lower tier just under the top threshold', () => {

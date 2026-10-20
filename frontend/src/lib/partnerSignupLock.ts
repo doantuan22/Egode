@@ -1,10 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-/**
- * Client-only flag: a visitor who just registered with the "partner" intent is kept on the
- * application page until they submit it or cancel. Nothing is stored server-side; the account
- * stays an ordinary customer account either way.
- */
+/** Cờ phía client giữ khách vừa đăng ký đối tác ở trang hồ sơ */
 const STORAGE_KEY = 'egode:partner-signup-lock';
 const listeners = new Set<() => void>();
 
@@ -24,7 +20,7 @@ function write(value: boolean) {
     if (value) window.sessionStorage.setItem(STORAGE_KEY, '1');
     else window.sessionStorage.removeItem(STORAGE_KEY);
   } catch {
-    // Storage can be unavailable (private mode); the in-memory flag still works for this page load.
+    // Bộ nhớ có thể không dùng được nên dùng cờ trong bộ nhớ
   }
   listeners.forEach((listener) => listener());
 }

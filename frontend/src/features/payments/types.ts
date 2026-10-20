@@ -19,7 +19,7 @@ export interface PaymentConfig {
   provider: PaymentProvider;
 }
 
-/** POST /bookings/:id/payments/simulate — the payment is already recorded and the booking confirmed. */
+/** Kết quả thanh toán giả lập */
 export interface SimulatedPaymentResponse {
   maThanhToan: number;
   maGiaoDichDoiTac: string;

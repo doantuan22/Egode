@@ -63,7 +63,7 @@ export default function RegisterPage() {
         replace: true,
       });
     } catch (error) {
-      // Field problems go onto their inputs; the banner (registerMutation.error) still says what happened.
+      // Lỗi trường gắn vào ô nhập, banner nêu lỗi chung
       applyServerFieldErrors(error, setError, REGISTER_FIELDS);
     }
   };
@@ -174,7 +174,7 @@ export default function RegisterPage() {
           <section className="hidden lg:block">
             <div className="max-w-[47.5rem]">
               <div className="relative inline-block">
-                {/* DÒNG 1 */}
+                {/* Dòng 1 */}
 
                 <h1
                   className="
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                   Khám phá kỳ nghỉ
                 </h1>
 
-                {/* DÒNG 2 */}
+                {/* Dòng 2 */}
 
                 <div
                   className="
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                   </span>
                 </div>
 
-                {/* SUN DOODLE */}
+                {/* Hình mặt trời */}
 
                 <svg
                   viewBox="0 0 80 80"
@@ -365,7 +365,7 @@ export default function RegisterPage() {
                       </filter>
                     </defs>
 
-                    {/* NÉT CỌ CHÍNH */}
+                    {/* Nét cọ chính */}
 
                     <path
                       d="
@@ -382,7 +382,7 @@ export default function RegisterPage() {
                       filter="url(#brushSoftGlow)"
                     />
 
-                    {/* NÉT CỌ NHỎ */}
+                    {/* Nét cọ nhỏ */}
 
                     <path
                       d="
@@ -401,7 +401,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* DESCRIPTION */}
+              {/* Mô tả */}
 
               <p
                 className="
@@ -462,9 +462,7 @@ export default function RegisterPage() {
 
           <div className="flex justify-center lg:justify-end">
             {intent === null ? (
-              /* =============================================
-                  STEP 1
-              ============================================= */
+              /* Bước 1 */
 
               <section
                 className="
@@ -485,7 +483,7 @@ export default function RegisterPage() {
                   overflowY: 'auto',
                 }}
               >
-                {/* LOGO */}
+                {/* Logo */}
 
                 <div className="mb-4 flex justify-center">
                   <img
@@ -583,9 +581,7 @@ export default function RegisterPage() {
                 </p>
               </section>
             ) : (
-              /* =============================================
-                  STEP 2
-              ============================================= */
+              /* Bước 2 */
 
               <section
                 className="
@@ -605,7 +601,7 @@ export default function RegisterPage() {
                   overflowY: 'auto',
                 }}
               >
-                {/* FORM HEADER */}
+                {/* Tiêu đề form */}
 
                 <div
                   className="
@@ -676,7 +672,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* FORM */}
+                {/* Form */}
 
                 <form
                   onSubmit={handleSubmit(onSubmit)}
@@ -977,7 +973,7 @@ export default function RegisterPage() {
                     </FormField>
                   </div>
 
-                  {/* TERMS */}
+                  {/* Điều khoản */}
 
                   <label
                     className="
@@ -1025,7 +1021,7 @@ export default function RegisterPage() {
                     </p>
                   )}
 
-                  {/* SUBMIT */}
+                  {/* Nút gửi */}
 
                   <Button
                     type="submit"
@@ -1081,9 +1077,7 @@ export default function RegisterPage() {
   );
 }
 
-/* =========================================================
-   FEATURE CARD
-========================================================= */
+/* Thẻ tính năng */
 
 interface FeatureCardProps {
   icon: string;
@@ -1141,9 +1135,7 @@ function FeatureCard({
   );
 }
 
-/* =========================================================
-   INTENT OPTION
-========================================================= */
+/* Lựa chọn kiểu đăng ký */
 
 interface IntentOptionProps {
   value: 'customer' | 'partner';
@@ -1253,9 +1245,7 @@ function IntentOption({
   );
 }
 
-/* =========================================================
-   FORM FIELD
-========================================================= */
+/* Ô nhập của form */
 
 interface FormFieldProps {
   label: string;

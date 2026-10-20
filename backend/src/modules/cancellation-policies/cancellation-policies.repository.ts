@@ -19,13 +19,7 @@ export class CancellationPoliciesRepository {
     });
   }
 
-  /**
-   * CHINH_SACH_HUY has no MaKhachSan/MaDatPhong (Gate 0 G0-03 + system-level
-   * modeling per M1 DDI notes) — there is no per-hotel mapping to resolve
-   * "the" policy from. M4 treats the oldest still-ACTIVE policy (lowest id)
-   * as the single system-wide default applied to every quote. Deterministic
-   * and stable: any policy created later (e.g. by an admin) never displaces it.
-   */
+  /** Chính sách hủy hoạt động cũ nhất là mặc định toàn hệ thống */
   async findActiveDefault() {
     const prisma = getPrismaClient();
     return prisma.cHINH_SACH_HUY.findFirst({

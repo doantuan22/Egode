@@ -22,7 +22,7 @@
   --shadow-md: var(--elevation-2);
   --shadow-lg: var(--elevation-3);
 
-  /* Tailwind utilities consume the same semantic CSS tokens as component CSS. */
+  /* Tailwind dùng cùng token CSS ngữ nghĩa */
   --color-primary-50: color-mix(in srgb, var(--color-action-primary) 5%, white);
   --color-primary-100: color-mix(in srgb, var(--color-action-primary) 12%, white);
   --color-primary-200: color-mix(in srgb, var(--color-action-primary) 24%, white);
@@ -51,7 +51,7 @@
   --color-danger: var(--state-danger);
   --color-danger-light: var(--state-danger-subtle);
 
-  /* Text-safe state colors (>= 4.5:1 on white and on the *-light backgrounds): text-success-ink etc. */
+  /* Màu chữ trạng thái đủ tương phản */
   --color-success-ink: var(--color-success-text);
   --color-warning-ink: var(--color-warning-text);
   --color-danger-ink: var(--color-danger-text);

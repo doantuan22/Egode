@@ -57,7 +57,7 @@ describe('PartnerApplyPage mandatory confirmation checkbox', () => {
     await submit(user);
 
     await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
-    expect(mutate.mock.calls[0][0]).toEqual(valid); // no XacNhanThongTin leaks to the API
+    expect(mutate.mock.calls[0][0]).toEqual(valid);
     expect(screen.queryByText(CONFIRM_ERROR)).not.toBeInTheDocument();
   });
 
@@ -80,7 +80,7 @@ describe('PartnerApplyPage mandatory confirmation checkbox', () => {
   it('the other fields keep their own messages — the checkbox neither hides nor replaces them', async () => {
     renderWithProviders(<PartnerApplyPage />);
     const user = userEvent.setup();
-    await user.click(confirmBox()); // confirmed, but the form is empty
+    await user.click(confirmBox());
 
     await submit(user);
 

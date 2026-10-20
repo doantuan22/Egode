@@ -27,7 +27,7 @@ export class HealthController {
     }
   };
 
-  /** Backward-compatible endpoint: the legacy ?db=true flag now has readiness semantics. */
+  /** Endpoint cũ giữ tương thích, cờ db=true nay kiểm tra readiness */
   getHealth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (req.query.db === 'true') return this.getReadiness(req, res, next);
     return this.getLiveness(req, res, next);

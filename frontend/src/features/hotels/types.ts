@@ -5,7 +5,7 @@ export interface DiaPhuong {
   QuocGia: string;
 }
 
-/** GET /api/locations row — DiaPhuong plus its count of publicly listed hotels and a cover image. */
+/** Địa điểm kèm số khách sạn niêm yết và ảnh bìa */
 export interface LocationSummary extends DiaPhuong {
   SoKhachSan: number;
   AnhDaiDien: string | null;
@@ -26,7 +26,7 @@ export interface HotelSearchItem {
   AnhDaiDien: string | null;
   GiaTuDauTu: number | null;
   ConPhong: boolean;
-  /** Visible reviews only; null average = no review yet. */
+  /** Chỉ tính đánh giá hiển thị */
   DiemTrungBinh?: number | null;
   SoLuongDanhGia?: number;
 }

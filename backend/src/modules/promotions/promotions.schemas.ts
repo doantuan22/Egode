@@ -3,9 +3,7 @@ import { DISCOUNT_TYPE, PROMOTION_STATUS } from '../../common/constants/commerci
 
 export const promotionIdParamSchema = z.object({ id: z.coerce.number().int().positive() });
 
-// Per-field ranges mirror the DB CHECK constraints 1:1 (CK_KHUYEN_MAI_* in
-// 004_commercial.sql) so a bad request fails fast with a clear 400 instead
-// of a raw DB constraint-violation error.
+// Khoảng giá trị khớp ràng buộc CHECK của CSDL
 export const createPromotionSchema = z.object({
   MaCode: z
     .string()

@@ -2,12 +2,12 @@ import { Button } from '../../common/Button';
 
 interface MobileBookingBarProps {
   roomCount: number;
-  /** Already-formatted total, or the status text while there is no total yet. */
+  /** Tổng tiền đã định dạng hoặc trạng thái */
   total: string;
   onOpenPanel: () => void;
 }
 
-/** Fixed summary of the selected rooms on small screens, where the booking panel is at the bottom of the page. */
+/** Tóm tắt phòng đã chọn cố định trên điện thoại */
 export function MobileBookingBar({ roomCount, total, onOpenPanel }: MobileBookingBarProps) {
   return (
     <div className="hotel-mobile-bar lg:hidden" role="region" aria-label="Tóm tắt lựa chọn phòng">

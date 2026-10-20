@@ -20,7 +20,7 @@ describe('useCountdown', () => {
   });
 
   it('does not depend on the device clock: time already passed since the data arrived is subtracted', () => {
-    // the data arrived 4 seconds ago
+    // Dữ liệu đến cách đây 4 giây
     const { result } = renderHook(() => useCountdown(10, T0 - 4000, () => undefined));
     expect(result.current).toBe(6);
   });

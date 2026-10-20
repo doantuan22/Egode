@@ -11,14 +11,7 @@ export interface AdminDateRange {
   to?: Date;
 }
 
-/**
- * Admin-only aggregates that sit outside the owner/admin-shared
- * AnalyticsRepository (booking/revenue/room-type/occupancy) — system-wide
- * counts that have no per-hotel scope to begin with (accounts, hotels) or
- * that genuinely have no date column to range-filter on (DANH_GIA has no
- * NgayTao — see M8 report §3 for why review counts are reported as
- * all-time totals only, not "theo khoảng thời gian").
- */
+/** Thống kê toàn hệ thống dành riêng cho admin */
 export class AdminAnalyticsRepository {
   async countAccountsByRole(): Promise<CountByLabel[]> {
     const prisma = getPrismaClient();
@@ -34,7 +27,7 @@ export class AdminAnalyticsRepository {
     return rows.map((r) => ({ Label: r.TrangThai, SoLuong: r._count._all }));
   }
 
-  /** By ThoiGianGiaoDich — every attempt (Chờ xử lý/Thành công/Thất bại), not just successful ones (that total is analytics.repository's sumSuccessfulPayments). */
+  /** Tổng thanh toán theo thời điểm giao dịch, gồm mọi trạng thái */
   async countPaymentsByStatus(range: AdminDateRange): Promise<CountByLabel[]> {
     const prisma = getPrismaClient();
     const rows = await prisma.tHANH_TOAN.groupBy({
@@ -48,7 +41,7 @@ export class AdminAnalyticsRepository {
     return rows.map((r) => ({ Label: r.TrangThai, SoLuong: r._count._all }));
   }
 
-  /** By NgayYeuCau (when the refund was requested) — includes still-pending/failed ones, unlike sumSuccessfulRefunds. */
+  /** Tổng hoàn tiền theo ngày yêu cầu, gồm cả đang chờ và thất bại */
   async countRefundsByStatus(range: AdminDateRange): Promise<CountByLabel[]> {
     const prisma = getPrismaClient();
     const rows = await prisma.hOAN_TIEN.groupBy({
@@ -62,7 +55,7 @@ export class AdminAnalyticsRepository {
     return rows.map((r) => ({ Label: r.TrangThai, SoLuong: r._count._all }));
   }
 
-  /** All-time only — DANH_GIA has no created-date column, so there is nothing accurate to range-filter on. */
+  /** Số đánh giá toàn thời gian vì không có ngày tạo */
   async countReviewsByStatus(): Promise<CountByLabel[]> {
     const prisma = getPrismaClient();
     const rows = await prisma.dANH_GIA.groupBy({ by: ['TrangThai'], _count: { _all: true } });

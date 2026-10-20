@@ -17,20 +17,16 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { HOTEL_STATUS, ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * `amenities=1,2` keeps hotels that offer EVERY listed amenity, either on the hotel itself (KHACH_SAN_TIEN_NGHI) or on one of
- * its sellable room types (LOAI_PHONG_TIEN_NGHI) — Ban công, Bồn tắm, Minibar... exist only on rooms, so a hotel-only match
- * made them return nothing.
- */
+/** Lọc tiện nghi giữ khách sạn có đủ mọi tiện nghi ở khách sạn hoặc loại phòng */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const prisma = () => getPrismaClient();
 
 let ownerId = 0;
 let diaPhuongId = 0;
 let cityName = '';
-let amenityA = 0; // attached to hotels
-let amenityB = 0; // attached to hotels
-let amenityR = 0; // attached to room types
+let amenityA = 0;
+let amenityB = 0;
+let amenityR = 0;
 const hotels: Record<string, number> = {};
 const nameToKey = new Map<number, string>();
 
@@ -46,7 +42,7 @@ const addHotel = async (key: string, opts: { hotelAmenities?: number[]; rooms?: 
   for (const maTienNghi of opts.hotelAmenities ?? []) {
     await prisma().kHACH_SAN_TIEN_NGHI.create({ data: { MaKhachSan: hotel.MaKhachSan, MaTienNghi: maTienNghi } });
   }
-  // Every hotel gets at least one sellable room so it is a search candidate; `rooms` adds amenity-bearing ones.
+  // Mỗi khách sạn có ít nhất một phòng bán được
   const rooms = opts.rooms ?? [{}];
   for (const room of rooms) {
     const roomType = await createTestRoomType(hotel.MaKhachSan);
@@ -69,13 +65,13 @@ beforeAll(async () => {
 
   await addHotel('hotelA_roomR', { hotelAmenities: [amenityA], rooms: [{ amenities: [amenityR] }] });
   await addHotel('hotelA', { hotelAmenities: [amenityA] });
-  // Two room types both carrying R: the hotel must still be listed once.
+  // Hai loại phòng cùng có tiện nghi thì khách sạn chỉ xuất hiện một lần
   await addHotel('roomR_twice', { rooms: [{ amenities: [amenityR] }, { amenities: [amenityR] }] });
-  // R only on a room type that is no longer sold (+ one plain active room): R must NOT count.
+  // Tiện nghi chỉ ở loại phòng đã ngừng bán thì không tính
   await addHotel('roomR_discontinued', { rooms: [{ amenities: [amenityR], status: ROOM_TYPE_STATUS.DISCONTINUED }, {}] });
   await addHotel('plain');
   await addHotel('hotelB_roomR', { hotelAmenities: [amenityB], rooms: [{ amenities: [amenityR] }] });
-  // A hotel that is not live never appears, whatever it offers.
+  // Khách sạn chưa hoạt động không bao giờ xuất hiện
   await addHotel('suspended_hotelA_roomR', { hotelAmenities: [amenityA], rooms: [{ amenities: [amenityR] }], status: HOTEL_STATUS.SUSPENDED });
 });
 
@@ -119,7 +115,7 @@ describe('GET /api/hotels?amenities=… (hotel-level and room-level amenities)',
   it('several amenities are AND-ed, each satisfied by the hotel OR a room (mixed levels)', async () => {
     expect((await search({ amenities: `${amenityA},${amenityR}` })).keys).toEqual(['hotelA_roomR']);
     expect((await search({ amenities: `${amenityB},${amenityR}` })).keys).toEqual(['hotelB_roomR']);
-    expect((await search({ amenities: `${amenityR},${amenityA}` })).keys).toEqual(['hotelA_roomR']); // order is irrelevant
+    expect((await search({ amenities: `${amenityR},${amenityA}` })).keys).toEqual(['hotelA_roomR']);
   });
 
   it('amenities no single hotel combines return an empty page, not an error', async () => {
@@ -155,7 +151,7 @@ describe('GET /api/hotels?amenities=… (hotel-level and room-level amenities)',
   it('combines with the other filters instead of replacing them', async () => {
     expect((await search({ amenities: amenityR, minPrice: 99999999 })).keys).toEqual([]);
     expect((await search({ amenities: amenityR, maxPrice: 100000 })).keys).toEqual(['hotelA_roomR', 'hotelB_roomR', 'roomR_twice']);
-    expect((await search({ amenities: amenityR, starRating: 4 })).keys).toEqual([]); // test hotels are 3 stars
+    expect((await search({ amenities: amenityR, starRating: 4 })).keys).toEqual([]);
     expect((await search({ amenities: amenityR, starRating: 3 })).keys).toEqual(['hotelA_roomR', 'hotelB_roomR', 'roomR_twice']);
     expect((await search({ amenities: amenityR, keyword: 'zzz-no-such-hotel' })).keys).toEqual([]);
     expect((await search({ amenities: amenityR, location: 'zzz-no-such-city' })).keys).toEqual([]);

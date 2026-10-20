@@ -11,7 +11,7 @@ export class OwnerReviewsController {
       if (!req.user) throw AppError.unauthorized();
       const { id } = req.params as unknown as { id: number };
       const result = await this.service.list(req.user.maTaiKhoan, id, req.query as unknown as OwnerReviewsQuery);
-      // `summary` rides next to `data` and `pagination`, the same envelope GET /hotels/:id/reviews uses.
+      // summary đi cùng data và pagination
       res.status(200).json({ success: true, data: result.items, pagination: result.pagination, summary: result.summary });
     } catch (error) {
       next(error);

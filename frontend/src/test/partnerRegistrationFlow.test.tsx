@@ -12,11 +12,7 @@ import { ROLE_NAMES } from '../lib/roles';
 import { partnerSignupLock } from '../lib/partnerSignupLock';
 import { renderWithProviders } from './testUtils';
 
-/**
- * Partner-registration flow on the client: the sign-up lock, the navbar for an account whose application is
- * pending / rejected, and the register -> apply hand-off. Backend rules are covered by
- * backend/src/modules/partners/partner-registration-flow.test.ts.
- */
+/** Luồng đăng ký đối tác phía client */
 
 vi.mock('../features/auth/hooks');
 vi.mock('../pages/customer/PartnerApplyPage', () => ({ default: () => <div>TRANG NOP HO SO</div> }));
@@ -166,7 +162,7 @@ describe('navbar by partner-application state', () => {
     expect(links()).not.toContain('/support');
     expect(screen.queryByRole('link', { name: 'Hỗ trợ / Khiếu nại' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Nộp lại hồ sơ đối tác' })).not.toBeInTheDocument();
-    // Still a customer: own profile and browsing remain.
+    // Vẫn là khách nên xem hồ sơ và duyệt được
     expect(links()).toContain('/profile');
     expect(links()).toContain('/hotels');
   });
@@ -175,7 +171,7 @@ describe('navbar by partner-application state', () => {
     renderNavbar(ROLE_NAMES.CUSTOMER, { HoSoDoiTacBiTuChoi: true });
     const button = screen.getByRole('link', { name: 'Nộp lại hồ sơ đối tác' });
     expect(button).toHaveAttribute('href', '/partner/apply');
-    // Customer features are open again after a rejection.
+    // Sau khi bị từ chối các tính năng khách mở lại
     expect(links()).toContain('/bookings');
   });
 

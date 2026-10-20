@@ -20,10 +20,7 @@ import { REVIEW_STATUS } from '../../common/constants/review';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 import { maskReviewerName } from './reviewer-name';
 
-/**
- * Bug #10 — only "Hiển thị" reviews are public (guest or signed in), paginated, with the reviewer's name
- * abbreviated; the rating summary on hotel detail and in search counts those reviews and nothing else.
- */
+/** Chỉ đánh giá Hiển thị là công khai, tên người đánh giá được viết tắt */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const prisma = () => getPrismaClient();
 
@@ -56,7 +53,7 @@ beforeAll(async () => {
   cityName = dp.TenThanhPho;
   hotelId = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
   otherHotelId = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
-  // A hotel appears in search only with an active room type that has stock for the stay.
+  // Khách sạn chỉ xuất hiện khi có loại phòng còn tồn kho
   for (const hotel of [hotelId, otherHotelId]) {
     const roomType = await createTestRoomType(hotel);
     await prisma().qUY_PHONG_GIA.create({ data: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: new Date(`${day(1)}T00:00:00Z`), GiaPhong: 100000, SoLuongPhong: 2, TrangThai: 'Mở bán' } });
@@ -75,7 +72,7 @@ afterAll(async () => {
   await deleteTestDiaPhuong(diaPhuongId);
 });
 
-/** One review (and the completed booking it needs) by a new customer with the given real name. */
+/** Một đánh giá và đơn hoàn tất của khách mới */
 const addReview = async (opts: { hotel?: number; score: number; status: string; name?: string; text?: string; image?: string }) => {
   const customer = await createTestAccount({ role: ROLE_NAMES.CUSTOMER });
   accountIds.push(customer.account.MaTaiKhoan);
@@ -168,7 +165,7 @@ describe('only "Hiển thị" reviews are public and counted', () => {
     expect((await detail()).DanhGia).toEqual({ DiemTrungBinh: 5, SoLuongDanhGia: 1 });
     expect((await publicList()).body.data.map((r: { MaDanhGia: number }) => r.MaDanhGia)).toEqual([a.MaDanhGia]);
 
-    // UC37 safe removal turns the violation into "Ẩn": still not public.
+    // Xóa an toàn chuyển sang Ẩn
     expect((await request(app).delete(`/api/admin/reviews/${b.MaDanhGia}`).set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
     expect((await detail()).DanhGia.SoLuongDanhGia).toBe(1);
 
@@ -226,7 +223,7 @@ describe('who can read them, and what they see', () => {
     expect(page1.body.data.map((r: { DiemDanhGia: number }) => r.DiemDanhGia)).toEqual([5, 4]);
     expect(page2.body.data.map((r: { DiemDanhGia: number }) => r.DiemDanhGia)).toEqual([3, 2]);
     expect(page3.body.data.map((r: { DiemDanhGia: number }) => r.DiemDanhGia)).toEqual([1]);
-    expect(page1.body.summary).toEqual({ DiemTrungBinh: 3, SoLuongDanhGia: 5 }); // the summary is about all of them, not the page
+    expect(page1.body.summary).toEqual({ DiemTrungBinh: 3, SoLuongDanhGia: 5 });
   });
 
   it('rejects an out-of-range limit and hides reviews of a hotel that is not public', async () => {

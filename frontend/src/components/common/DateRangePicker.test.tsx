@@ -18,9 +18,9 @@ describe('DateRangePicker bounds', () => {
   it('while choosing a check-out: allows at most maxNights nights after the check-in', () => {
     renderWithProviders(<DateRangePicker value={{ from: '2099-05-01', to: '' }} min="2099-04-20" maxCheckIn="2099-05-20" maxNights={3} onChange={vi.fn()} />);
 
-    expect(day('2099-05-04')).not.toBeDisabled(); // 3 nights
-    expect(day('2099-05-05')).toBeDisabled(); // 4 nights
-    // The check-in window only limits the check-in, not the day the guest leaves.
+    expect(day('2099-05-04')).not.toBeDisabled();
+    expect(day('2099-05-05')).toBeDisabled();
+    // Cửa sổ nhận phòng chỉ giới hạn ngày nhận
     expect(day('2099-05-25')).toBeDisabled();
   });
 

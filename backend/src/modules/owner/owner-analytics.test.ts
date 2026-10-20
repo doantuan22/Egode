@@ -124,7 +124,7 @@ describe('GET /owner/hotels/:id/analytics — revenue correctness', () => {
 
     const cancelledNeverPaid = await createTestBookingDirect(customerId, hotelAId, policyId, addDays(10), addDays(12), {
       trangThai: BOOKING_STATUS.CANCELLED,
-      tongTienPhong: 5_000_000, // large, to make it obvious if wrongly counted
+      tongTienPhong: 5_000_000,
     });
 
     const confirmedFailedPayment = await createTestBookingDirect(customerId, hotelAId, policyId, addDays(10), addDays(12), {
@@ -141,7 +141,7 @@ describe('GET /owner/hotels/:id/analytics — revenue correctness', () => {
 
     const statusCounts: Array<{ TrangThai: string; SoLuong: number }> = res.body.data.BookingTheoTrangThai;
     const cancelledCount = statusCounts.find((s) => s.TrangThai === BOOKING_STATUS.CANCELLED)?.SoLuong ?? 0;
-    expect(cancelledCount).toBeGreaterThanOrEqual(1); // the cancelled booking is still counted as a booking, just not as revenue
+    expect(cancelledCount).toBeGreaterThanOrEqual(1);
 
     void cancelledNeverPaid;
   });
@@ -199,7 +199,7 @@ describe('GET /owner/hotels/:id/analytics — room types and occupancy', () => {
     const prisma = getPrismaClient();
     const roomType = await createTestRoomType(hotelAId);
     const checkIn = addDays(30);
-    const checkOut = addDays(32); // 2 nights
+    const checkOut = addDays(32);
     await prisma.qUY_PHONG_GIA.createMany({
       data: [
         { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: addDays(30), GiaPhong: 500000, SoLuongPhong: 4, TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE },
@@ -212,10 +212,7 @@ describe('GET /owner/hotels/:id/analytics — room types and occupancy', () => {
     });
     await prisma.cHI_TIET_DAT_PHONG.create({ data: { MaDatPhong: booking.MaDatPhong, MaLoaiPhong: roomType.MaLoaiPhong, SoLuongPhong: 2 } });
 
-    // Room-type popularity is attributed by booking creation date (NgayTao, i.e. "today" in this
-    // fixture), while occupancy is attributed by the stay's own calendar nights (addDays(30..31)) —
-    // two different date fields by design (see analytics.repository.ts) — so the query range here
-    // must cover both: today (for NgayTao) through the stay window (for occupancy).
+    // Khoảng ngày truy vấn phải phủ cả ngày tạo đơn và kỳ lưu trú
     const res = await request(app)
       .get(`/api/owner/hotels/${hotelAId}/analytics`)
       .query({ from: iso(addDays(-1)), to: iso(addDays(31)) })
@@ -225,7 +222,7 @@ describe('GET /owner/hotels/:id/analytics — room types and occupancy', () => {
     const top = res.body.data.LoaiPhongPhoBien.find((r: { MaLoaiPhong: number }) => r.MaLoaiPhong === roomType.MaLoaiPhong);
     expect(top?.SoLuongDaDat).toBe(2);
 
-    // 2 rooms booked x 2 nights = 4 booked room-nights; capacity = 4 rooms x 2 nights = 8 sellable room-nights -> 50%.
+    // 2 phòng x 2 đêm trên 8 đêm phòng bán được là 50%
     expect(res.body.data.TongPhongDem).toBe(4);
     expect(res.body.data.TongPhongCoTheBan).toBe(8);
     expect(res.body.data.TyLeLapDay).toBe(50);

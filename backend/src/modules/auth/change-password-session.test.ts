@@ -8,11 +8,7 @@ import { env } from '../../config/env';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { ACCOUNT_STATUS } from '../../common/constants/account-status';
 
-/**
- * Bug #12 — change-password is a PROTECTED endpoint. When the 15-minute access token has expired but the session is
- * still alive (refresh cookie), the client must be able to refresh and retry; these tests walk that exact sequence
- * against the real API, and pin the field-level errors the form maps onto its inputs.
- */
+/** Đổi mật khẩu cần access token, hết hạn thì refresh rồi thử lại */
 const ids: number[] = [];
 const NEW_PASSWORD = 'Brand-New-Passw0rd!';
 
@@ -23,7 +19,7 @@ afterAll(async () => {
 const signedIn = async () => {
   const created = await createTestAccount({ role: ROLE_NAMES.CUSTOMER });
   ids.push(created.account.MaTaiKhoan);
-  const agent = request.agent(app); // keeps the refresh cookie like a browser does
+  const agent = request.agent(app);
   const login = await agent.post('/api/auth/login').send({ identifier: created.account.Email, MatKhau: created.plainPassword });
   return { ...created, id: created.account.MaTaiKhoan, agent, accessToken: login.body.data.accessToken as string };
 };
@@ -51,7 +47,7 @@ describe('POST /api/auth/change-password with an expired access token', () => {
 
     const changed = await user.agent.post('/api/auth/change-password').set('Authorization', `Bearer ${fresh}`).send(body);
     expect(changed.status).toBe(200);
-    expect(changed.body.data.accessToken).toEqual(expect.any(String)); // this device keeps its session
+    expect(changed.body.data.accessToken).toEqual(expect.any(String));
 
     expect((await request(app).post('/api/auth/login').send({ identifier: user.account.Email, MatKhau: user.plainPassword })).status).toBe(401);
     const relogin = await request(app).post('/api/auth/login').send({ identifier: user.account.Email, MatKhau: NEW_PASSWORD });
@@ -67,8 +63,8 @@ describe('POST /api/auth/change-password with an expired access token', () => {
     expect(changed.status).toBe(200);
 
     expect((await request(app).get('/api/profile/me').set('Authorization', `Bearer ${changed.body.data.accessToken}`)).status).toBe(200);
-    expect((await user.agent.post('/api/auth/refresh')).status).toBe(200); // this device: the cookie was replaced
-    expect((await otherDevice.post('/api/auth/refresh')).status).toBe(401); // other devices must sign in again
+    expect((await user.agent.post('/api/auth/refresh')).status).toBe(200);
+    expect((await otherDevice.post('/api/auth/refresh')).status).toBe(401);
   });
 });
 

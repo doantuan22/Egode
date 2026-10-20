@@ -16,7 +16,7 @@ const request = {
 
 function setup() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  // Simulate a user who already opened "Đặt phòng của tôi" and one booking detail.
+  // Người dùng đã mở danh sách và một chi tiết đơn
   queryClient.setQueryData(['bookings'], []);
   queryClient.setQueryData(['bookings', 7], { MaDatPhong: 7 });
   const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
@@ -36,7 +36,7 @@ describe('useCreateBooking', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(queryClient.getQueryState(['bookings'])?.isInvalidated).toBe(true);
-    // Prefix matching: the detail key ['bookings', id] is invalidated by the same call.
+    // Khóa chi tiết cũng bị vô hiệu theo tiền tố
     expect(queryClient.getQueryState(['bookings', 7])?.isInvalidated).toBe(true);
   });
 

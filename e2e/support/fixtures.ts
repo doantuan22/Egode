@@ -2,7 +2,7 @@ import { test as base, expect, type Page } from '@playwright/test';
 
 const FIXTURE = 'http://localhost:5191';
 
-/** Calls the fixture server (seed data / read rows back / clean up). */
+/** Gọi máy chủ dữ liệu mẫu */
 export const fx = async <T = any>(path: string, body: Record<string, unknown> = {}): Promise<T> => {
   const res = await fetch(`${FIXTURE}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const json = (await res.json()) as { data?: T; error?: string };
@@ -32,7 +32,7 @@ export const addDays = (key: string, n: number) => {
 
 export const money = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
-/** Signs in through the real login form. */
+/** Đăng nhập qua form thật */
 export async function login(page: Page, account: Pick<Account, 'email' | 'password'>) {
   await page.goto('/login');
   await page.locator('#identifier').fill(account.email);
@@ -44,20 +44,20 @@ export async function login(page: Page, account: Pick<Account, 'email' | 'passwo
 export const test = base;
 export { expect };
 
-// Tests that create secondary browser contexts must not leak them into later E2E cases.
+// Đóng các ngữ cảnh trình duyệt phụ
 test.afterEach(async ({ browser, page }) => {
   const primaryContext = page.context();
   await Promise.all(browser.contexts().filter((context) => context !== primaryContext).map((context) => context.close()));
 });
 
-/** Opens the navbar account menu and signs out. */
+/** Mở menu tài khoản và đăng xuất */
 export async function logout(page: Page) {
   await page.locator('button.site-header__user').click();
   await page.getByRole('banner').getByRole('button', { name: 'Đăng xuất' }).click();
   await expect(page.locator('button.site-header__user')).toHaveCount(0);
 }
 
-/** The refresh cookie as the browser holds it (HttpOnly, so only visible through the context). */
+/** Cookie refresh như trình duyệt đang giữ */
 export const refreshCookie = async (page: Page) => (await page.context().cookies()).find((c) => c.name === 'refresh_token');
 
 let counter = 0;

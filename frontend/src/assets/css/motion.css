@@ -1,20 +1,11 @@
-/* ==========================================================================
-   MOTION
-   One place for the site's movement. Rules:
-   - only `opacity` and `transform` are animated (no layout work, stays smooth);
-   - everything that moves sits under `prefers-reduced-motion: no-preference`, so reduced-motion users get none of it;
-   - enter animations only: a leaving element is removed at once (that keeps focus and tests simple);
-   - gentle: long, soft easing and small distances, never a full blank-to-visible flash. A page change keeps the old
-     page on screen until the next is ready, then the new one settles in from ~60% opacity.
-   Easing: --ease-out for things arriving, --ease-spring for small pops.
-   ========================================================================== */
+/* Chuyển động của trang: chỉ animate opacity và transform */
 
 :root {
   --ease-out: cubic-bezier(0.22, 0.7, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
 }
 
-/* ---------- Navigation progress: a thin bar that only appears when a page takes a moment (NavigationProgress) ---------- */
+/* Thanh tiến trình điều hướng */
 .nav-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 400; height: 2px; pointer-events: none; opacity: 0; }
 .nav-progress span { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: linear-gradient(90deg, var(--color-action-primary), #38bdf8); box-shadow: 0 0 8px rgb(56 189 248 / 55%); }
 .nav-progress[data-phase='loading'] { opacity: 1; }
@@ -22,7 +13,7 @@
 .nav-progress[data-phase='done'] { opacity: 0; transition: opacity 0.4s ease 0.12s; }
 .nav-progress[data-phase='done'] span { width: 100%; transition: width 0.25s ease-out; }
 
-/* ---------- Page placeholder for a first visit (RouteFallback) ---------- */
+/* Khung chờ khi vào trang lần đầu */
 .route-fallback { position: relative; min-height: 60vh; }
 .route-fallback__body { width: min(100% - 2 * var(--gutter), var(--container-max)); margin: 0 auto; padding: 2.5rem 0; display: grid; gap: 0.875rem; }
 .route-fallback__title, .route-fallback__line, .route-fallback__grid > div { border-radius: 0.5rem; background: var(--color-surface-subtle); }
@@ -66,16 +57,12 @@
   .route-fallback__title, .route-fallback__line, .route-fallback__grid > div { animation: ui-skeleton-pulse 1.8s ease-in-out infinite; }
   @keyframes ui-skeleton-pulse { 50% { opacity: 0.7; } }
 
-  /* ---------- Page to page (usePageTransitionLocation) ----------
-     The browser holds a picture of the old page and a picture of the new one and dissolves one into the other. The two
-     fades share one duration and easing and are blended additively, so the brightness never dips or jumps; that is
-     what separates this from fading the page in on its own, which reads as a flash. The new picture also rises a few
-     pixels. The pictures are images, so the lift cannot disturb `position: fixed` elements inside the page. */
+  /* Chuyển giữa các trang */
   ::view-transition-group(root) { animation-duration: 0.42s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   ::view-transition-old(root) { animation: page-dissolve-out 0.42s cubic-bezier(0.4, 0, 0.2, 1) both; }
   ::view-transition-new(root) { animation: page-dissolve-in 0.42s cubic-bezier(0.4, 0, 0.2, 1) both; }
 
-  /* ---------- Content that lands after a skeleton: lists and grids arrive one by one ---------- */
+  /* Danh sách hiện lần lượt sau khung chờ */
   .motion-stagger > * { animation: motion-rise 0.42s var(--ease-out) backwards; }
   .motion-stagger > *:nth-child(1) { animation-delay: 0ms; }
   .motion-stagger > *:nth-child(2) { animation-delay: 45ms; }
@@ -86,15 +73,15 @@
   .motion-stagger > *:nth-child(7) { animation-delay: 270ms; }
   .motion-stagger > *:nth-child(n + 8) { animation-delay: 300ms; }
 
-  /* ---------- Scroll reveal (Reveal component): sections fade up the first time they are seen ---------- */
+  /* Mục hiện dần khi cuộn tới */
   [data-reveal='pending'] { opacity: 0; transform: translate3d(0, 1rem, 0); }
   [data-reveal='in'] { opacity: 1; transform: none; transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out); }
-  /* A block that was already on screen when the page appeared has no entrance of its own. */
+  /* Khối đã có trên màn hình thì không hiệu ứng vào */
   [data-reveal-instant] { transition: none !important; }
   [data-reveal-instant] .egode-benefits__grid > *,
   [data-reveal-instant] .egode-destination-grid > *,
   [data-reveal-instant] .egode-featured-grid > * { animation: none !important; }
-  /* Cards of a revealed section follow one after another. */
+  /* Các thẻ trong mục hiện nối tiếp nhau */
   [data-reveal='in'] .egode-benefits__grid > *,
   [data-reveal='in'] .egode-destination-grid > *,
   [data-reveal='in'] .egode-featured-grid > * { animation: motion-rise 0.65s var(--ease-out) backwards; }
@@ -108,7 +95,7 @@
   [data-reveal='in'] .egode-destination-grid > *:nth-child(n + 4),
   [data-reveal='in'] .egode-featured-grid > *:nth-child(n + 4) { animation-delay: 210ms; }
 
-  /* ---------- Overlays ---------- */
+  /* Lớp phủ */
   .toast { animation: motion-toast 0.4s var(--ease-spring) backwards; }
   .toast__timer { animation: toast-timer linear forwards; }
   @keyframes toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
@@ -122,7 +109,7 @@
 
   .dropdown-menu.open { animation: motion-pop 0.16s var(--ease-out); }
 
-  /* ---------- Press and lift ---------- */
+  /* Hiệu ứng nhấn và nâng */
   .btn { transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform 120ms var(--ease-out); }
   .btn:active:not(:disabled):not([aria-disabled='true']) { transform: translateY(1px) scale(0.985); }
 

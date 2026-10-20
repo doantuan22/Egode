@@ -16,15 +16,14 @@ import { KpiCard } from '../../components/owner/KpiCard';
 import { Card } from '../../components/common/Card';
 import { FilterChip } from '../../components/common/FilterChip';
 
-/** KPI period: the last N days against the N days before them. */
+/** Kỳ KPI: N ngày gần nhất so với N ngày trước đó */
 const KPI_PERIOD_DAYS = 30;
 
 export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotels' }) {
   const isOverview = mode === 'overview';
   const hotelsQuery = useMyHotels();
   const scope = useScopedHotels();
-  // Owner analytics are defined per hotel, so multi-property owners choose a
-  // scope instead of receiving an incorrect sum assembled in the browser.
+  // Thống kê theo từng khách sạn nên phải chọn phạm vi
   const analyticsHotelId = isOverview ? (scope.hotelId ?? 0) : 0;
   const ranges = useMemo(() => lastDaysRanges(KPI_PERIOD_DAYS), []);
   const currentAnalytics = useOwnerHotelAnalytics(analyticsHotelId, ranges.current);
@@ -50,7 +49,7 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
   return (
     <div className="owner-dashboard space-y-6">
       
-      {/* Page Header */}
+      {/* Tiêu đề trang */}
       <div className="page-header">
         <div>
           <h1>{isOverview ? 'Tổng quan' : 'Khách sạn của tôi'}</h1>
@@ -82,7 +81,7 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
         </div>
       ) : (
         <>
-          {/* Overview uses only the real property states returned by the API. */}
+          {/* Tổng quan trạng thái khách sạn từ API */}
           {isOverview && <div className="owner-status-summary grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="card p-4 flex justify-between items-center">
               <div>
@@ -150,7 +149,7 @@ export default function OwnerDashboardPage({ mode }: { mode: 'overview' | 'hotel
           </div>}
 
           {isOverview && <h2 className="text-base font-semibold text-heading">Cơ sở lưu trú của bạn</h2>}
-          {/* Property identity and current state stay together as the owner context. */}
+          {/* Thông tin và trạng thái khách sạn */}
           <div className="owner-hotel-list flex flex-col">
             {visibleHotels.map((hotel) => (
               <article key={hotel.MaKhachSan} className="owner-hotel-list__item flex flex-col md:flex-row gap-4 items-stretch md:items-center">
@@ -259,7 +258,7 @@ function KpiGrid({ current, previous }: { current: OwnerAnalytics; previous: Own
   );
 }
 
-/** What needs the owner today. Only counts the API can give: confirmed bookings checking in today. */
+/** Việc cần làm hôm nay */
 function TodayPanel({ checkIns, isError, to }: { checkIns: number | undefined; isError: boolean; to: string }) {
   return (
     <Card>

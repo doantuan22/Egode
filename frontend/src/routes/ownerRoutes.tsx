@@ -23,7 +23,7 @@ const OwnerInventoryPricingPage = lazy(() => import('../pages/owner/OwnerInvento
 const OwnerRevenuePage = lazy(() => import('../pages/owner/OwnerRevenuePage'));
 const OwnerReportsPage = lazy(() => import('../pages/owner/OwnerReportsPage'));
 
-/** Chủ khách sạn: the owner dashboard, plus the old /partner/* and /owner/hotels/:id/* URLs as redirects. */
+/** Chủ khách sạn và các URL cũ chuyển hướng */
 export const ownerRoutes = (
   <Route element={<ProtectedRoute allowedRoles={[ROLE_NAMES.PARTNER]} />}>
     <Route path="/owner" element={<LegacyOwnerModuleRoute to="/owner/overview" />} />
@@ -41,7 +41,7 @@ export const ownerRoutes = (
     <Route path="/owner/reports" element={<OwnerReportsPage />} />
     <Route path="/owner/profile" element={<ProfilePage />} />
 
-    {/* Controlled legacy aliases retain semantic IDs and hotel context. */}
+    {/* Alias cũ giữ id ngữ nghĩa và ngữ cảnh khách sạn */}
     <Route path="/partner/dashboard" element={<LegacyOwnerModuleRoute to="/owner/overview" />} />
     <Route path="/partner/hotels" element={<LegacyOwnerModuleRoute to="/owner/hotels" />} />
     <Route path="/partner/hotels/new" element={<LegacyOwnerModuleRoute to="/owner/hotels/new" />} />

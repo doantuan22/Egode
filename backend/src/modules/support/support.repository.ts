@@ -2,7 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
 import type { AdminListSupportQuery } from './support.schemas';
 
-// Detail reads and updates must return the same relations for the admin cache.
+// Đọc và cập nhật trả về cùng các quan hệ
 const supportDetailInclude = {
   DAT_PHONG: { select: { MaDatPhong: true, MaXacNhanDatPhong: true } },
   TAI_KHOAN_YEU_CAU_HO_TRO_MaTaiKhoanKhachHangToTAI_KHOAN: { select: { MaTaiKhoan: true, HoTen: true, Email: true } },

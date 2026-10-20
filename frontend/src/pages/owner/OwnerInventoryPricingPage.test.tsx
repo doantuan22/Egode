@@ -27,7 +27,7 @@ const open = () =>
     { route: '/owner/inventory-pricing?hotelId=1&roomTypeId=11' }
   );
 
-// 2030-01-01 is a Tuesday: 2030-01-01..2030-01-14 has two Mondays (01-07, 01-14).
+// 1/1/2030 là thứ Ba nên có hai thứ Hai
 const fillRange = async (user: ReturnType<typeof userEvent.setup>) => {
   const from = screen.getByLabelText('Từ ngày');
   const to = screen.getByLabelText('Đến ngày');
@@ -76,7 +76,7 @@ describe('OwnerInventoryPricingPage bulk update', () => {
     open();
     const user = userEvent.setup();
     await fillRange(user);
-    // Everything is ticked by default: leave only Monday.
+    // Mặc định chọn hết, chỉ giữ thứ Hai
     for (const day of ['T3', 'T4', 'T5', 'T6', 'T7', 'CN']) await user.click(screen.getByRole('checkbox', { name: day }));
 
     await user.click(screen.getByRole('button', { name: 'Cập nhật khoảng ngày' }));

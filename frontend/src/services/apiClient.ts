@@ -9,9 +9,9 @@ const API_BASE_URL =
 
 export class ApiError extends Error {
   public statusCode: number;
-  /** Server error `details` as sent (for validation: [{ field, message }]). */
+  /** Chi tiết lỗi từ server */
   public details?: unknown;
-  /** Server error `code` (VALIDATION_ERROR, NOT_FOUND, CONFLICT, ...); branch on this, not on the message. */
+  /** Mã lỗi của server */
   public code?: string;
 
   constructor(message: string, statusCode = 500, details?: unknown, code?: string) {
@@ -22,25 +22,19 @@ export class ApiError extends Error {
     this.code = code;
   }
 
-  /** Server messages per request field, ready to put on form inputs. */
+  /** Thông báo theo từng trường */
   get fieldErrors(): Record<string, string> {
     return fieldErrorsOf(this);
   }
 }
 
-/**
- * Auth endpoints a 401 must NOT trigger a refresh for: they are called without an access token (a 401 there means
- * "wrong credentials / bad token" — retrying after a refresh would be pointless or loop) or ARE the refresh.
- * Every other endpoint — including the protected /auth/change-password — refreshes the access token and retries once.
- */
+/** Các endpoint xác thực không refresh khi gặp 401 */
 const NO_REFRESH_ENDPOINTS = new Set(['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout', '/auth/forgot-password', '/auth/reset-password']);
 
 const buildUrl = (endpoint: string) =>
   `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
-// Concurrent 401s must share a single in-flight refresh instead of each
-// firing their own — otherwise every refresh call would rotate the cookie
-// and race the others out.
+// Nhiều 401 cùng lúc dùng chung một lần refresh
 let refreshPromise: Promise<string | null> | null = null;
 
 const refreshAccessToken = async (): Promise<string | null> => {
@@ -70,7 +64,7 @@ export const refreshSession = async (): Promise<boolean> => {
 };
 
 interface ApiClientOptions extends RequestInit {
-  /** Internal — prevents infinite refresh-retry loops. */
+  /** Ngăn vòng lặp refresh */
   _retried?: boolean;
 }
 
@@ -95,8 +89,7 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
 
   const data: TResponse = await response.json().catch(() => ({
     success: false,
-    // Typical cause: the request reached the SPA host (HTML fallback) instead of the API, i.e. VITE_API_BASE_URL is
-    // missing/wrong or the dev proxy / reverse proxy does not forward /api.
+    // Request tới nhầm máy chủ web thay vì API
     message: `Máy chủ API không trả về JSON (HTTP ${response.status}). Kiểm tra cấu hình VITE_API_BASE_URL / proxy tới API.`,
   }));
 
@@ -106,14 +99,13 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
       useAuthStore.getState().setAccessToken(newToken);
       return apiClient<T, TResponse>(endpoint, { ...options, _retried: true });
     }
-    // The session is gone for good: also drop this user's cached data so it cannot leak to whoever signs in next.
+    // Phiên đã mất nên xóa cả dữ liệu cache của người dùng
     clearUserCache();
     useAuthStore.getState().expireSession();
   }
 
   if (!response.ok || !data.success) {
-    // Error contract: { message, code, details }. Validation lists each problem in `details`; the banner text is
-    // those messages (more useful than a generic "invalid data"), and the same list drives the per-field errors.
+    // Lỗi xác thực liệt kê từng vấn đề trong details
     const message = (data.code === 'VALIDATION_ERROR' ? joinIssueMessages(data.details) : null) ?? (data.message || 'Request failed');
     throw new ApiError(message, response.status, data.details, data.code);
   }
@@ -121,7 +113,7 @@ export async function apiClient<T, TResponse extends ApiResponse<T> = ApiRespons
   return data;
 }
 
-/** Login/register both return { account, accessToken } and set the access token in the store. */
+/** Đăng nhập và đăng ký trả về tài khoản và access token */
 export const applyAuthResult = (result: AuthResult): void => {
   useAuthStore.getState().setAccessToken(result.accessToken);
 };

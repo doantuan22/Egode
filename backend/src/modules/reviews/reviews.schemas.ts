@@ -8,7 +8,7 @@ export const reviewIdParamSchema = z.object({ id: z.coerce.number().int().positi
 export const createReviewSchema = z.object({
   diemDanhGia: z.coerce.number().int().min(1, 'Điểm đánh giá phải từ 1 đến 5').max(5, 'Điểm đánh giá phải từ 1 đến 5'),
   noiDung: z.string().trim().max(2000).optional(),
-  // Data URIs — validated for real (type/size) in review-images.ts, this only bounds the array length cheaply.
+  // Data URI chỉ giới hạn độ dài mảng ở đây
   hinhAnh: z.array(z.string()).max(MAX_REVIEW_IMAGES).optional(),
 });
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;

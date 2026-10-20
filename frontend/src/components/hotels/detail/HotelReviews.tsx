@@ -9,7 +9,7 @@ import { formatRating } from '../../../features/reviews/rating';
 
 const PAGE_SIZE = 5;
 
-/** "Đánh giá": the visible reviews of the hotel (public: guests see them too), a page at a time. */
+/** Phần Đánh giá, phân trang */
 export function HotelReviews({ hotelId }: { hotelId: number }) {
   const [page, setPage] = useState(1);
   const query = useHotelReviews(hotelId, page, PAGE_SIZE);

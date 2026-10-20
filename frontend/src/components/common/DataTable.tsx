@@ -8,7 +8,7 @@ export interface Column<T> {
   header: ReactNode;
   cell: (row: T) => ReactNode;
   align?: 'left' | 'center' | 'right';
-  /** Extra classes for the header and body cells, e.g. a width. */
+  /** Class thêm cho ô tiêu đề và nội dung */
   className?: string;
 }
 
@@ -16,17 +16,17 @@ export interface DataTableProps<T> {
   columns: Column<T>[];
   rows: T[] | undefined;
   getRowKey: (row: T) => string | number;
-  /** Read out by screen readers; not shown. */
+  /** Chỉ đọc cho trình đọc màn hình */
   caption: string;
   isLoading?: boolean;
-  /** An error message; shown instead of the rows. */
+  /** Thông báo lỗi hiện thay cho các dòng */
   error?: string | null;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: string;
-  /** Rendered under the table inside the same card, typically the pagination. */
+  /** Nội dung dưới bảng, thường là phân trang */
   footer?: ReactNode;
-  /** Skip the card frame, for a table that already sits inside one. */
+  /** Bỏ khung thẻ khi bảng đã nằm trong khung */
   bare?: boolean;
 }
 
@@ -45,11 +45,7 @@ function TableSkeleton({ columns }: { columns: number }) {
   );
 }
 
-/**
- * The one list table: sticky header, horizontal scroll on narrow screens, and the same
- * loading / error / empty states everywhere. Row details open from a `Link` in a cell
- * (keyboard reachable), not from a click handler on the row.
- */
+/** Bảng danh sách dùng chung với trạng thái tải, lỗi và rỗng */
 export function DataTable<T>({ columns, rows, getRowKey, caption, isLoading, error, emptyTitle = 'Chưa có dữ liệu', emptyDescription, emptyIcon, footer, bare }: DataTableProps<T>) {
   let body: ReactNode;
   if (isLoading) body = <TableSkeleton columns={columns.length} />;

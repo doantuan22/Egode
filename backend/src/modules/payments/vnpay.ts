@@ -1,20 +1,10 @@
-/**
- * VNPAY Sandbox integration helpers (M6). Pure functions only — no I/O, no
- * DB — so signature building/verification can be unit-tested without a
- * network call or a real merchant account (see vnpay.test.ts).
- *
- * Signing algorithm mirrors VNPAY's own reference implementation exactly
- * (sort params by key, URL-encode each value with `%20` normalized to `+`,
- * join as `k=v&k=v...`, HMAC-SHA512 with the merchant hash secret) — this is
- * not a guess, it is the documented VNPAY checksum format, so a real
- * merchant account can be dropped in by only changing env vars.
- */
+/** Hàm thuần ký và kiểm tra chữ ký cho VNPAY sandbox */
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { env } from '../../config/env';
 
 export type VnpayParams = Record<string, string | number>;
 
-/** Sorts keys and %20→+ normalizes values exactly like VNPAY's sample `sortObject`. */
+/** Sắp xếp khóa và chuẩn hóa giá trị như mẫu của VNPAY */
 const encodeValue = (value: string | number): string =>
   encodeURIComponent(String(value)).replace(/%20/g, '+');
 
@@ -28,7 +18,7 @@ export const signVnpayParams = (params: VnpayParams, hashSecret: string): string
   return createHmac('sha512', hashSecret).update(Buffer.from(signData, 'utf-8')).digest('hex');
 };
 
-/** yyyyMMddHHmmss in Vietnam local time (UTC+7), as VNPAY requires. */
+/** Định dạng yyyyMMddHHmmss theo giờ Việt Nam */
 export const toVnpayDate = (date: Date): string => {
   const vn = new Date(date.getTime() + 7 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -44,25 +34,25 @@ export const generateTxnRef = (): string => {
 export const generateRefundRef = (): string => {
   const stamp = Date.now().toString(36).toUpperCase();
   const rand = randomBytes(4).toString('hex').toUpperCase();
-  return `RF${stamp}${rand}`; // well under HOAN_TIEN.MaGiaoDichDoiTac VARCHAR(100)
+  return `RF${stamp}${rand}`;
 };
 
 export interface BuildPaymentUrlInput {
   txnRef: string;
-  /** VND, already the final charge amount — caller must have derived this from DAT_PHONG, never from the client. */
+  /** Số tiền VND phải lấy từ đơn đặt phòng */
   amount: number;
   orderInfo: string;
   ipAddr: string;
   createDate?: Date;
 }
 
-/** Builds the full VNPAY-hosted payment page URL, including vnp_SecureHash. */
+/** Tạo URL trang thanh toán VNPAY kèm chữ ký */
 export const buildPaymentUrl = (input: BuildPaymentUrlInput): string => {
   const params: VnpayParams = {
     vnp_Version: '2.1.0',
     vnp_Command: 'pay',
     vnp_TmnCode: env.VNPAY_TMN_CODE,
-    vnp_Amount: Math.round(input.amount * 100), // VNPAY amount is VND × 100
+    vnp_Amount: Math.round(input.amount * 100),
     vnp_CurrCode: 'VND',
     vnp_TxnRef: input.txnRef,
     vnp_OrderInfo: input.orderInfo,
@@ -81,12 +71,7 @@ export const buildPaymentUrl = (input: BuildPaymentUrlInput): string => {
   return `${env.VNPAY_PAYMENT_URL}?${query}`;
 };
 
-/**
- * Verifies vnp_SecureHash against every other vnp_ param in the callback
- * (return URL redirect or IPN), recomputed with our own hash secret. Both
- * callback endpoints must call this before trusting anything else in the
- * query — an unsigned/tampered callback must never move money or state.
- */
+/** Kiểm tra chữ ký vnp_SecureHash của callback */
 export const verifyVnpaySignature = (query: Record<string, unknown>): boolean => {
   if (Object.keys(query).length > 50) return false;
   const receivedHash = typeof query.vnp_SecureHash === 'string' ? query.vnp_SecureHash : '';
@@ -104,7 +89,7 @@ export const verifyVnpaySignature = (query: Record<string, unknown>): boolean =>
   return timingSafeEqual(Buffer.from(expectedHash, 'hex'), Buffer.from(receivedHash, 'hex'));
 };
 
-/** VNPAY IPN response codes (fixed vocabulary defined by VNPAY, not ours). */
+/** Mã phản hồi IPN do VNPAY quy định */
 export const VNPAY_IPN_CODE = {
   SUCCESS: '00',
   ORDER_NOT_FOUND: '01',
@@ -114,13 +99,7 @@ export const VNPAY_IPN_CODE = {
   UNKNOWN_ERROR: '99',
 } as const;
 
-/**
- * THANH_TOAN.MaGiaoDichDoiTac (VARCHAR(100)) doubles as storage for both our
- * own vnp_TxnRef (set when the payment is created) and, once VNPAY confirms
- * it, their vnp_TransactionNo + vnp_PayDate too — packed as
- * `txnRef:transactionNo:payDate` — so a later refund call has everything
- * VNPAY's refund API needs without a schema change (no spare column for it).
- */
+/** Gói txnRef, số giao dịch và ngày thanh toán vào một mã */
 export const encodeGatewayRef = (txnRef: string, transactionNo?: string, payDate?: string): string =>
   transactionNo ? `${txnRef}:${transactionNo}:${payDate ?? ''}` : txnRef;
 

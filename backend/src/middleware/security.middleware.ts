@@ -23,7 +23,7 @@ interface RateLimitOptions {
 
 interface RateEntry { count: number; resetAt: number }
 
-/** Small in-process limiter. Production clusters should back this with a shared store. */
+/** Bộ giới hạn tần suất đơn giản trong bộ nhớ */
 export const createRateLimiter = ({ windowMs, max, keyPrefix }: RateLimitOptions) => {
   const entries = new Map<string, RateEntry>();
 
@@ -49,7 +49,7 @@ export const createRateLimiter = ({ windowMs, max, keyPrefix }: RateLimitOptions
       return;
     }
 
-    // Bound memory if an attacker rotates addresses for a long-running process.
+    // Giới hạn bộ nhớ khi bị đổi địa chỉ liên tục
     if (entries.size > 10_000) {
       for (const [entryKey, candidate] of entries) {
         if (candidate.resetAt <= now) entries.delete(entryKey);

@@ -10,8 +10,7 @@ export interface CandidateHotelParams {
   checkOut: Date;
 }
 
-/** Exported so other modules (e.g. quotes) can fetch room types with the
- * exact same price/availability shape without duplicating this query. */
+/** Xuất ra để module khác lấy loại phòng cùng dạng giá và tồn kho */
 export const roomTypeInclude = (checkIn: Date, checkOut: Date) => ({
   QUY_PHONG_GIA: {
     where: {
@@ -36,7 +35,7 @@ export const roomTypeInclude = (checkIn: Date, checkOut: Date) => ({
 });
 
 export class HotelsRepository {
-  /** Candidate hotels for search — full nested price/availability data for the requested range. */
+  /** Khách sạn ứng viên cho tìm kiếm */
   async findCandidateHotels(params: CandidateHotelParams) {
     const prisma = getPrismaClient();
     return prisma.kHACH_SAN.findMany({
@@ -66,8 +65,7 @@ export class HotelsRepository {
                 },
               ]
             : []),
-          // Every selected amenity must be offered, either by the hotel itself or by one of its sellable room
-          // types (Ban công, Bồn tắm, Minibar... are only ever attached to rooms).
+          // Mọi tiện nghi đã chọn phải có ở khách sạn hoặc loại phòng
           ...(params.amenityIds ?? []).map((maTienNghi) => ({
             OR: [
               { KHACH_SAN_TIEN_NGHI: { some: { MaTienNghi: maTienNghi } } },

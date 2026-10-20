@@ -7,7 +7,7 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   hint?: string;
 }
 
-/** Canonical multi-line text field — same base style as {@link Input}, without a fixed height. */
+/** Ô nhập nhiều dòng chuẩn */
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, hint, id, ...props }, ref) => {
     const generatedId = React.useId();

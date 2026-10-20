@@ -3,9 +3,7 @@ import type { HotelSearchItem } from '../../features/hotels/types';
 import { formatCurrencyVND } from '../../lib/utils';
 import { formatRating } from '../../features/reviews/rating';
 
-/**
- * Result row ordered around the information the current hotel API supplies. `listSearch` is the list page's full query string; the detail page's "back to list" restores it (filters, sort, page).
- */
+/** Dòng kết quả khách sạn, listSearch giữ bộ lọc để quay lại danh sách */
 export function HotelCard({ hotel, search, listSearch }: { hotel: HotelSearchItem; search: string; listSearch?: string }) {
   const detailUrl = `/hotels/${hotel.MaKhachSan}?${search}`;
   const state = { listSearch };

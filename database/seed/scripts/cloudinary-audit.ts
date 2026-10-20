@@ -6,11 +6,11 @@ async function main() {
   console.log(`Cloud Name: ${env.CLOUDINARY_CLOUD_NAME}`);
 
   try {
-    // 1. Check root folders
+    // Kiểm tra thư mục gốc
     const rootFolders = await cloudinary.api.root_folders();
     console.log('Root folders:', JSON.stringify(rootFolders.folders, null, 2));
 
-    // 2. Search resources with prefix 'hotel-booking'
+    // Tìm tài nguyên có tiền tố hotel-booking
     let nextCursor: string | undefined = undefined;
     const allAssets: any[] = [];
     do {
@@ -32,10 +32,10 @@ async function main() {
     }
     console.log('Asset counts by folder:', byFolder);
 
-    // Sample 5 assets
+    // Lấy mẫu 5 tài nguyên
     console.log('Sample assets:', allAssets.slice(0, 5).map(a => ({ public_id: a.public_id, secure_url: a.secure_url, bytes: a.bytes })));
 
-    // Check if there are assets OUTSIDE hotel-booking
+    // Kiểm tra tài nguyên nằm ngoài hotel-booking
     const nonProjectAssets: any[] = [];
     const allRootRes: any = await cloudinary.api.resources({
       type: 'upload',

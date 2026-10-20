@@ -7,9 +7,9 @@ import { buildBookedByDate, toDateKey } from '../hotels/availability';
 
 export interface RateUpsertItem {
   NgayApDung: Date;
-  /** Omitted = keep the stored price of that day. */
+  /** Bỏ trống thì giữ giá đã lưu */
   GiaPhong?: number;
-  /** Omitted = keep the stored room count of that day. */
+  /** Bỏ trống thì giữ số phòng đã lưu */
   SoLuongPhong?: number;
   TrangThai: string;
 }
@@ -25,19 +25,7 @@ export class OwnerRatesRepository {
     });
   }
 
-  /**
-   * Upserts each row against UQ_QUY_PHONG_GIA_MaLoaiPhong_NgayApDung — never creates a duplicate — but only if no
-   * night ends up with fewer rooms than are already booked for it.
-   *
-   * The whole check-and-write is one transaction that first takes the SAME lock a booking takes
-   * (QUY_PHONG_GIA WITH UPDLOCK, HOLDLOCK over the room type and date range, which also covers dates that have no
-   * row yet). A booking being created at the same moment therefore either commits first — and is counted below —
-   * or waits until this update commits and then sees the new quantity. Lock order is the booking's own order
-   * (rates first), so the two cannot deadlock.
-   *
-   * An item may omit GiaPhong and/or SoLuongPhong to change only the status: the stored value of that day is kept
-   * (and an unchanged room count cannot conflict with bookings). A day with no row yet needs both to be created.
-   */
+  /** Cập nhật giá và số phòng theo ngày dưới khóa, không giảm dưới số đã đặt */
   async bulkUpsertGuarded(maLoaiPhong: number, items: RateUpsertItem[]) {
     const prisma = getPrismaClient();
     const days = items.map((i) => Date.UTC(i.NgayApDung.getUTCFullYear(), i.NgayApDung.getUTCMonth(), i.NgayApDung.getUTCDate()));
@@ -50,7 +38,7 @@ export class OwnerRatesRepository {
         SELECT MaQuyPhong FROM QUY_PHONG_GIA WITH (UPDLOCK, HOLDLOCK, ROWLOCK)
         WHERE MaLoaiPhong = ${maLoaiPhong} AND NgayApDung >= ${first} AND NgayApDung < ${dayAfterLast}
       `);
-      // An expired unpaid hold no longer occupies a room, so it must not block a reduction either.
+      // Đơn chưa thanh toán đã quá hạn không chặn việc giảm số phòng
       await expireStalePendingBookings(tx);
 
       const lines = await tx.cHI_TIET_DAT_PHONG.findMany({
@@ -106,7 +94,6 @@ export class OwnerRatesRepository {
               ...(item.SoLuongPhong === undefined ? {} : { SoLuongPhong: item.SoLuongPhong }),
               TrangThai: item.TrangThai,
             },
-            // Both are present here: a day without a row and without both values was rejected above.
             create: {
               MaLoaiPhong: maLoaiPhong,
               NgayApDung: item.NgayApDung,

@@ -2,10 +2,10 @@ import type { RefundGateway, RefundRequestInput, RefundResult } from './refund-g
 import { VnpayRefundGateway } from './refund-gateway';
 import { getPaymentProvider } from './payment-provider';
 
-/** The simulated "gateway": the refund always goes through. Nothing leaves the process. */
+/** Cổng giả lập luôn hoàn tiền thành công */
 export class SimulatedRefundGateway implements RefundGateway {
   requiresOriginalTransaction(): boolean {
-    return false; // a simulated payment needs no VNPAY transaction number to be refunded
+    return false;
   }
 
   async requestRefund(input: RefundRequestInput): Promise<RefundResult> {
@@ -13,7 +13,7 @@ export class SimulatedRefundGateway implements RefundGateway {
   }
 }
 
-/** Picks the gateway per call from PAYMENT_PROVIDER, so the three-step refund flow is the same in both modes. */
+/** Chọn cổng hoàn tiền theo PAYMENT_PROVIDER */
 export class ConfiguredRefundGateway implements RefundGateway {
   private readonly simulated = new SimulatedRefundGateway();
   private readonly vnpay = new VnpayRefundGateway();

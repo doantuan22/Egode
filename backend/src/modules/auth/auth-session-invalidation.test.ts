@@ -9,10 +9,7 @@ import { getPrismaClient } from '../../config/prisma';
 import { signPasswordResetToken } from '../../common/utils/password-reset-token';
 import { REFRESH_TOKEN_COOKIE_NAME } from '../../common/utils/jwt';
 
-/**
- * BUG-012 — a password change/reset must kill the refresh tokens issued before it.
- * Refresh tokens carry a fingerprint of the password hash they were issued under.
- */
+/** Đổi hoặc đặt lại mật khẩu làm vô hiệu refresh token cũ */
 const createdAccountIds: number[] = [];
 afterAll(async () => {
   await Promise.all(createdAccountIds.map((id) => deleteTestAccount(id)));
@@ -29,7 +26,7 @@ const newAccount = async () => {
 
 const setCookies = (res: request.Response): string[] => (res.headers['set-cookie'] as unknown as string[] | undefined) ?? [];
 
-/** The `refresh_token=<jwt>` pair, ready to send back as a Cookie header. */
+/** Cặp refresh_token dùng làm header Cookie */
 const cookieFrom = (res: request.Response): string => {
   const raw = setCookies(res).find((c) => c.startsWith(`${REFRESH_TOKEN_COOKIE_NAME}=`));
   if (!raw) throw new Error('no refresh cookie in response');
@@ -59,7 +56,7 @@ describe('BUG-012 refresh tokens after change-password', () => {
     expect(stale.status).toBe(401);
     expect(stale.body.success).toBe(false);
     expect(stale.body.data?.accessToken).toBeUndefined();
-    expect(JSON.stringify(stale.body)).not.toContain('eyJ'); // no JWT anywhere in the response
+    expect(JSON.stringify(stale.body)).not.toContain('eyJ');
   });
 
   it('clears the dead refresh cookie with the same scope it was set with', async () => {
@@ -88,15 +85,15 @@ describe('BUG-012 refresh tokens after change-password', () => {
     const newAccess = changed.body.data.accessToken as string;
     const newCookie = cookieFrom(changed);
 
-    // Session B (another device) is out.
+    // Phiên B bị đăng xuất
     expect((await refreshWith(b.cookie)).status).toBe(401);
-    // Session A carries on with the replacement cookie and access token.
+    // Phiên A tiếp tục với cookie mới
     expect((await profileWith(newAccess)).status).toBe(200);
     const rotated = await refreshWith(newCookie);
     expect(rotated.status).toBe(200);
-    // The cookie issued by that refresh keeps working too (rotation is unaffected).
+    // Cookie mới vẫn dùng được
     expect((await refreshWith(cookieFrom(rotated))).status).toBe(200);
-    // And A's pre-change cookie is dead.
+    // Cookie cũ của A đã chết
     expect((await refreshWith(a.cookie)).status).toBe(401);
   });
 
@@ -121,7 +118,7 @@ describe('BUG-012 refresh tokens after change-password', () => {
     const a = await login(account.Email, plainPassword);
     await changePassword(a.accessToken, plainPassword);
 
-    // Known limitation: `authenticate` never reads the database, so only refresh tokens are revoked.
+    // Hạn chế đã biết: chỉ refresh token bị thu hồi
     expect((await profileWith(a.accessToken)).status).toBe(200);
   });
 
@@ -148,7 +145,7 @@ describe('BUG-012 refresh tokens after reset-password', () => {
     const reset = await request(app).post('/api/auth/reset-password').send({ token: resetToken, MatKhauMoi: NEW_PASSWORD });
 
     expect(reset.status).toBe(200);
-    expect(reset.headers['set-cookie']).toBeUndefined(); // reset does not log anyone in
+    expect(reset.headers['set-cookie']).toBeUndefined();
     expect(reset.body.data).toBeUndefined();
 
     const stale = await refreshWith(a.cookie);

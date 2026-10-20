@@ -44,7 +44,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (payload: LoginPayload) => authApi.login(payload),
     onSuccess: (result) => {
-      // Drop anything cached for a previous session before seeding the new account.
+      // Xóa dữ liệu của phiên trước
       clearUserCache(queryClient);
       applyAuthResult(result);
       queryClient.setQueryData(meQueryKey, result.account);
@@ -59,17 +59,13 @@ export function useLogout() {
     mutationFn: authApi.logout,
     onSettled: () => {
       clear();
-      // Every feature area caches per-user data (bookings, support, admin, owner...); public catalogue data stays.
+      // Xóa dữ liệu theo người dùng, giữ danh mục công khai
       clearUserCache(queryClient);
     },
   });
 }
 
-/**
- * Signs the user out and resolves once the local session and user cache are gone. It never
- * rejects: if the server request fails the local sign-out has still happened (useLogout clears
- * it in onSettled), so callers can always navigate away afterwards.
- */
+/** Đăng xuất và xóa phiên cục bộ, không bao giờ từ chối */
 export function useSignOut() {
   const { mutateAsync, isPending } = useLogout();
   const signOut = () => mutateAsync().then(() => undefined, () => undefined);
@@ -84,7 +80,7 @@ export function useResetPassword() {
   return useMutation({ mutationFn: (payload: ResetPasswordPayload) => authApi.resetPassword(payload) });
 }
 
-/** Changes the signed-in user's password; this device keeps its session through the new access token the server returns. */
+/** Đổi mật khẩu, thiết bị này giữ phiên bằng token mới */
 export function useChangePassword() {
   return useMutation({
     mutationFn: (payload: ChangePasswordPayload) => authApi.changePassword(payload),

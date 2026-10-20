@@ -12,11 +12,7 @@ export class PartnersRepository {
     });
   }
 
-  /**
-   * Flags derived from the account's LATEST application: waiting for review, or rejected (may re-apply).
-   * Both need an application row AND the Customer role — an account that already is a partner/admin, or
-   * has never applied, gets false/false.
-   */
+  /** Cờ chờ duyệt hoặc bị từ chối suy ra từ hồ sơ gần nhất */
   async getApplicationFlags(maTaiKhoan: number): Promise<{ pending: boolean; rejected: boolean }> {
     const prisma = getPrismaClient();
     const [latest, account] = await Promise.all([

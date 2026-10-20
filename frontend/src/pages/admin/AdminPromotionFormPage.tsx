@@ -94,7 +94,7 @@ export default function AdminPromotionFormPage() {
       </Link>
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold">

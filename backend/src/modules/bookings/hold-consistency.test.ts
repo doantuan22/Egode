@@ -19,12 +19,8 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * Bug #5 — an unpaid "Chờ thanh toán" booking older than PAYMENT_TIMEOUT_MINUTES no longer holds a room, and
- * every surface that depends on availability (search, rooms, quote, booking) or on booking statuses (analytics)
- * applies that same rule: they all agree, right before and right after the timeout.
- */
-const TTL = env.PAYMENT_TIMEOUT_MINUTES; // 15 by default
+/** Đơn chưa thanh toán quá hạn không còn giữ phòng ở mọi nơi */
+const TTL = env.PAYMENT_TIMEOUT_MINUTES;
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000);
 
@@ -61,7 +57,7 @@ beforeAll(async () => {
   policyId = (await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }])).MaChinhSachHuy;
 });
 
-// Each test starts from an empty hotel: leftovers of another test (a fresh hold, another room type) would change the answers.
+// Mỗi test bắt đầu từ khách sạn trống
 beforeEach(async () => {
   await prisma().cHI_TIET_DAT_PHONG.deleteMany({ where: { DAT_PHONG: { MaKhachSan: hotelId } } });
   await prisma().dAT_PHONG.deleteMany({ where: { MaKhachSan: hotelId } });
@@ -78,7 +74,7 @@ afterAll(async () => {
   await deleteTestDiaPhuong(diaPhuongId);
 });
 
-/** A room type with exactly ONE room, on sale for day+1, completely taken by an unpaid hold created `age` minutes ago. */
+/** Loại phòng một phòng bị giữ hết bởi đơn chưa thanh toán */
 const heldLastRoom = async (ageMinutes: number) => {
   const roomType = await createTestRoomType(hotelId);
   await prisma().qUY_PHONG_GIA.create({
@@ -128,7 +124,7 @@ describe(`just inside the ${TTL}-minute timeout, the hold still occupies the roo
     expect(q.KhaDung).toBe(false);
     expect(q.ChiTietPhong[0].SoPhongConLai).toBe(0);
     expect((await book(roomTypeId)).status).toBe(409);
-    expect(await status(holdId)).toBe(BOOKING_STATUS.PENDING_PAYMENT); // nothing was swept
+    expect(await status(holdId)).toBe(BOOKING_STATUS.PENDING_PAYMENT);
   });
 
   it('analytics still counts it as waiting for payment', async () => {
@@ -181,7 +177,7 @@ describe('the same rule across surfaces, one scenario', () => {
     const before = [(await search())!.ConPhong, (await rooms(roomTypeId)).ConHang, (await quote(roomTypeId)).KhaDung];
     expect(before).toEqual([false, false, false]);
 
-    // Time passes: the hold turns 16 minutes old.
+    // Thời gian trôi qua khiến đơn quá 16 phút
     await prisma().dAT_PHONG.update({ where: { MaDatPhong: holdId }, data: { NgayTao: minutesAgo(TTL + 1) } });
     const after = [(await search())!.ConPhong, (await rooms(roomTypeId)).ConHang, (await quote(roomTypeId)).KhaDung];
     expect(after).toEqual([true, true, true]);

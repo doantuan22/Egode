@@ -16,7 +16,7 @@ export function useApplyPartner() {
     mutationFn: (payload: ApplyPartnerPayload) => partnersApi.applyPartner(payload),
     onSuccess: (application) => {
       queryClient.setQueryData(myApplicationKey, application);
-      // The account's DangChoDuyetDoiTac flag changes with a new pending application.
+      // Cờ chờ duyệt đổi theo hồ sơ mới
       void queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     },
   });

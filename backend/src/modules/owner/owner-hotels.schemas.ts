@@ -2,10 +2,9 @@ import { z } from 'zod';
 import { validateImageDataUri } from '../../common/utils/image-upload';
 import { timeOfDaySchema } from '../../common/utils/time-of-day';
 
-const timeOfDay = timeOfDaySchema; // the same "HH:mm" contract as the admin API
+const timeOfDay = timeOfDaySchema;
 
-// TrangThai/MaTaiKhoanDuyet/NgayDuyet/MaTaiKhoanSoHuu are intentionally
-// excluded — owners cannot self-approve or reassign ownership (M3 §5).
+// Chủ khách sạn không tự duyệt hay đổi chủ sở hữu
 export const createHotelSchema = z.object({
   TenKhachSan: z.string().min(2, 'Tên khách sạn ít nhất 2 ký tự').max(255),
   DiaChiChiTiet: z.string().min(5, 'Địa chỉ chi tiết ít nhất 5 ký tự').max(500),
@@ -43,10 +42,7 @@ export const replaceAmenitiesSchema = z.object({
 export type ReplaceAmenitiesInput = z.infer<typeof replaceAmenitiesSchema>;
 
 export const uploadImageSchema = z.object({
-  // Data URI (base64) — see docs/m3-report.md for why this avoids adding
-  // multer/multipart parsing while still reusing the existing Cloudinary
-  // integration exactly as-is (CloudinaryIntegration.uploadImage accepts a
-  // file path OR a base64 string).
+  // Ảnh gửi dạng data URI base64
   image: z.string().min(1, 'Thiếu dữ liệu ảnh').transform(validateImageDataUri),
 });
 export type UploadImageInput = z.infer<typeof uploadImageSchema>;

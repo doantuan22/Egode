@@ -17,10 +17,7 @@ export class OwnerRatesService {
     return this.repository.listForRoomType(maLoaiPhong, query.from, query.to);
   }
 
-  /**
-   * Prices and room counts can only be set for today and later (Asia/Ho_Chi_Minh), never for a suspended
-   * hotel, and never below what is already booked for a night (enforced under lock in the repository).
-   */
+  /** Chỉ đặt giá từ hôm nay, không cho khách sạn bị đình chỉ, không dưới số đã đặt */
   async bulkUpsert(ownerId: number, maLoaiPhong: number, input: BulkUpsertRatesInput) {
     const roomType = await this.roomTypesService.getOwnedRoomType(ownerId, maLoaiPhong);
     if (roomType.KHACH_SAN.TrangThai === HOTEL_STATUS.SUSPENDED) {

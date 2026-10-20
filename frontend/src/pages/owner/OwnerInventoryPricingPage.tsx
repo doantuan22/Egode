@@ -71,7 +71,7 @@ export default function OwnerInventoryPricingPage() {
       return;
     }
     const data = new FormData(event.currentTarget);
-    // A blank price / quantity means "leave it as it is": the owner may only want to open or close the days.
+    // Để trống nghĩa là giữ nguyên
     const optionalNumber = (name: string) => {
       const raw = String(data.get(name) ?? '').trim();
       return raw === '' ? undefined : Number(raw);
@@ -80,7 +80,7 @@ export default function OwnerInventoryPricingPage() {
     const quantity = optionalNumber('quantity');
     const status = String(data.get('status'));
     const keepsStoredValues = price === undefined || quantity === undefined;
-    // Without both values a day can only be changed if it already has a rate row, so only those days are sent.
+    // Ngày chưa có dòng giá thì không gửi
     const existingDates = keepsStoredValues ? new Set(rows.map((row) => row.NgayApDung.slice(0, 10))) : undefined;
     const rates = buildRatePayload({ from, to, weekdays, price, quantity, status, onlyDates: existingDates });
     if (rates.length === 0) {

@@ -27,7 +27,7 @@ describe('validateReviewImages', () => {
   });
 
   it('rejects an oversized image (> 5MB decoded)', () => {
-    const hugeBase64 = 'iVBORw0KGgo'.padEnd(8_000_000, 'A'); // ~6MB decoded
+    const hugeBase64 = 'iVBORw0KGgo'.padEnd(8_000_000, 'A');
     expect(() => validateReviewImages([`data:image/png;base64,${hugeBase64}`])).toThrow(/5MB/);
   });
 

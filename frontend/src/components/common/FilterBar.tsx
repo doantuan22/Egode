@@ -3,11 +3,11 @@ import { Button } from './Button';
 
 export interface FilterBarProps {
   children: ReactNode;
-  /** Renders a "Xóa bộ lọc" button when given. */
+  /** Hiện nút Xóa bộ lọc khi có hàm xử lý */
   onReset?: () => void;
 }
 
-/** The frame every list page puts its filter fields in. The fields themselves stay `Input` / `Select`. */
+/** Khung chứa các ô lọc của trang danh sách */
 export function FilterBar({ children, onReset }: FilterBarProps) {
   return (
     <div role="search" className="surface-card flex flex-wrap items-end gap-3 p-4">

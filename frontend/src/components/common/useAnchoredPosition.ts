@@ -11,17 +11,13 @@ export interface AnchoredPosition {
 const GAP = 6;
 const MARGIN = 12;
 
-/**
- * Where to put a popover (rendered in a portal with `position: fixed`) so it hangs under `anchor`, or above it when
- * there is more room there. Fixed + portal keeps it from being clipped by the `overflow: hidden` cards and tables of
- * the dashboards. It closes (via `onClose`) when the page scrolls or resizes, instead of drifting away from its field.
- */
+/** Tính vị trí cửa sổ nổi dưới hoặc trên phần tử neo */
 export function useAnchoredPosition(
   anchor: RefObject<HTMLElement | null>,
   open: boolean,
   onClose: () => void,
   preferredHeight = 320,
-  /** Width of the popover when it is wider than the field (a calendar): keeps it inside the window. */
+  /** Chiều rộng cửa sổ khi rộng hơn ô neo */
   popoverWidth?: number
 ) {
   const [position, setPosition] = useState<AnchoredPosition | null>(null);
@@ -49,7 +45,7 @@ export function useAnchoredPosition(
   useEffect(() => {
     if (!open) return;
     const onScroll = (event: Event) => {
-      // Scrolling inside the popover itself (a long option list) must not close it.
+      // Cuộn bên trong cửa sổ không đóng nó
       if (event.target instanceof Element && event.target.closest('[data-anchored-popover]')) return;
       onClose();
     };

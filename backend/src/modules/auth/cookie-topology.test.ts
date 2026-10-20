@@ -13,14 +13,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { ACCOUNT_STATUS } from '../../common/constants/account-status';
 import type { AuthService } from './auth.service';
 
-/**
- * Bug #17 — the refresh cookie must reach the API in the deployment that is actually used.
- *  - SPA and API on the same site        → SameSite=Lax (default).
- *  - SPA and API on different sites      → SameSite=None; Secure, exact-origin credentialed CORS, Origin check on the
- *                                          two cookie-only endpoints.
- * The repo does not say which one production is (the SPA targets Cloudflare Pages; the API host is not stated), so the
- * policy is an explicit setting and production refuses to start without it.
- */
+/** Cookie refresh phải tới được API theo cách triển khai */
 const ALLOWED_ORIGIN = env.CORS_ORIGIN.split(',')[0].trim().replace(/\/$/, '');
 const FOREIGN_ORIGIN = 'https://evil.example';
 const ids: number[] = [];
@@ -45,7 +38,7 @@ describe('refreshCookieBaseOptions — the cookie policy for every environment',
     { nodeEnv: 'production', sameSite: 'lax' as const, expected: { secure: true, sameSite: 'lax' } },
     { nodeEnv: 'production', sameSite: 'strict' as const, expected: { secure: true, sameSite: 'strict' } },
     { nodeEnv: 'production', sameSite: 'none' as const, expected: { secure: true, sameSite: 'none' } },
-    // SameSite=None without Secure is rejected by every browser, so None forces Secure even in development.
+    // SameSite=None bắt buộc Secure
     { nodeEnv: 'development', sameSite: 'none' as const, expected: { secure: true, sameSite: 'none' } },
   ])('NODE_ENV=$nodeEnv SameSite=$sameSite → $expected', ({ nodeEnv, sameSite, expected }) => {
     expect(refreshCookieBaseOptions(nodeEnv, sameSite)).toEqual({ httpOnly: true, path: '/api/auth', ...expected });
@@ -94,7 +87,7 @@ describe('SameSite=None end to end: login, refresh and logout all use the cross-
       expect(header).toMatch(/Path=\/api\/auth/);
       expect(header).not.toMatch(/Domain=/i);
     }
-    expect(logout).toMatch(/Expires=Thu, 01 Jan 1970/); // the clear carries the very same scope, so it removes the cookie
+    expect(logout).toMatch(/Expires=Thu, 01 Jan 1970/);
   });
 });
 
@@ -212,9 +205,9 @@ describe('the cookie-only endpoints (refresh, logout) check the request Origin',
     const evil = await agent.post('/api/auth/refresh').set('Origin', FOREIGN_ORIGIN);
     expect(evil.status).toBe(403);
     expect(evil.body).toMatchObject({ success: false, code: 'FORBIDDEN' });
-    expect(setCookieOf(evil.headers)).toBeUndefined(); // nothing rotated, nothing cleared
+    expect(setCookieOf(evil.headers)).toBeUndefined();
 
-    expect((await agent.post('/api/auth/refresh').set('Origin', ALLOWED_ORIGIN)).status).toBe(200); // the session survived
+    expect((await agent.post('/api/auth/refresh').set('Origin', ALLOWED_ORIGIN)).status).toBe(200);
   });
 
   it('logout from a foreign origin is refused and does not clear the cookie; from the SPA origin it does', async () => {

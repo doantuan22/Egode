@@ -1,7 +1,4 @@
-/**
- * What the public may learn about who wrote a review: a family-name-first abbreviation, never the full name,
- * e-mail, phone, account id or booking. "Nguyễn Văn An" → "Nguyễn V. A."; a single word → its first letter + "***".
- */
+/** Tên người đánh giá hiển thị công khai dạng viết tắt */
 export const maskReviewerName = (hoTen: string | null | undefined): string => {
   const parts = (hoTen ?? '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return 'Khách hàng';

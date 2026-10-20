@@ -14,22 +14,21 @@ export interface HotelFilterValues {
 }
 
 interface HotelFilterBarProps {
-  /** The filters currently in the URL (the ones the results were fetched with). */
+  /** Bộ lọc hiện có trên URL */
   values: HotelFilterValues;
   amenities: Amenity[] | undefined;
-  /** Hotels the applied filters return, shown next to the apply button. */
+  /** Số khách sạn kết quả hiện cạnh nút áp dụng */
   totalHotels?: number;
-  /** Commits a whole filter set at once (the "Áp dụng bộ lọc" button, Enter in the keyword box, or a chip's ×). */
+  /** Áp dụng cả bộ lọc cùng lúc */
   onApply: (next: HotelFilterValues) => void;
   onReset: () => void;
 }
 
-// The filter is a MINIMUM ("starRating=N" lists hotels with HangSao >= N), so these are "N sao trở lên".
+// Lọc sao là mức tối thiểu
 const STARS = [3, 4, 5];
 const PRICE_MAX = 10_000_000;
 const PRICE_STEP = 100_000;
-// Amenity cards sit in a grid whose column count follows the card's width; collapsed, they fill ONE row (3 on a phone) and
-// the "Xem thêm" card closes that row.
+// Lưới tiện nghi thu gọn thành một hàng
 const AMENITY_MIN_WIDTH = 184;
 const AMENITY_GAP = 10;
 const AMENITY_FALLBACK_COLUMNS = 6;
@@ -53,7 +52,7 @@ const sameFilters = (a: HotelFilterValues, b: HotelFilterValues) =>
 const hasAny = (v: HotelFilterValues) =>
   Boolean(v.keyword) || v.minPrice !== undefined || v.maxPrice !== undefined || v.starRating !== undefined || (v.amenities?.length ?? 0) > 0;
 
-/** A price bound that is at its extreme (0 / 10.000.000) is "no bound": nothing is sent to the API. */
+/** Giá ở cực trị nghĩa là không giới hạn */
 function normalize(draft: HotelFilterValues): HotelFilterValues {
   let minPrice = draft.minPrice && draft.minPrice > 0 ? draft.minPrice : undefined;
   let maxPrice = draft.maxPrice !== undefined && draft.maxPrice >= PRICE_MAX ? undefined : draft.maxPrice;
@@ -68,7 +67,7 @@ function normalize(draft: HotelFilterValues): HotelFilterValues {
 }
 
 function PriceInput({ id, prefix, label, value, onChange }: { id: string; prefix: string; label: string; value: number; onChange: (value: number | undefined) => void }) {
-  // The box may be empty while the user types; the shown number snaps back to the real value on blur or a slider move.
+  // Ô nhập có thể trống khi gõ, khi rời ô thì về giá trị thật
   const [text, setText] = useState(() => money.format(value));
   const focused = useRef(false);
   useEffect(() => {
@@ -97,10 +96,7 @@ function PriceInput({ id, prefix, label, value, onChange }: { id: string; prefix
   );
 }
 
-/**
- * The filter card above the hotel results. It edits a DRAFT; "Áp dụng bộ lọc" (or Enter in the keyword box) commits it to the
- * URL through `onApply`, so dragging a slider never refetches. The chips under "Bộ lọc đang áp dụng" mirror what the results use.
- */
+/** Thẻ lọc trên kết quả, chỉnh bản nháp rồi áp dụng lên URL */
 export function HotelFilterBar({ values, amenities, totalHotels, onApply, onReset }: HotelFilterBarProps) {
   const uid = useId();
   const [open, setOpen] = useState(true);
@@ -124,7 +120,7 @@ export function HotelFilterBar({ values, amenities, totalHotels, onApply, onRese
     return () => observer.disconnect();
   }, [open, amenities?.length]);
 
-  // The URL is the source of truth: back/forward, a chip's ×, or a reset re-seeds the draft.
+  // URL là nguồn dữ liệu chính của bộ lọc
   const appliedKey = JSON.stringify([values.keyword ?? '', values.minPrice, values.maxPrice, values.starRating, [...(values.amenities ?? [])].sort()]);
   useEffect(() => setDraft(values), [appliedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -149,7 +145,7 @@ export function HotelFilterBar({ values, amenities, totalHotels, onApply, onRese
     }
   };
 
-  // Chips describe the APPLIED filters (what the results show); × applies the removal at once.
+  // Chip mô tả bộ lọc đang áp dụng
   const chips: Array<{ key: string; label: string; remove: () => void }> = [];
   if (values.keyword) chips.push({ key: 'keyword', label: `“${values.keyword}”`, remove: () => onApply({ ...values, keyword: undefined }) });
   for (const id of values.amenities ?? []) {

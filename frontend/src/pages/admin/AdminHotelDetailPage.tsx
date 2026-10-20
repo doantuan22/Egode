@@ -10,7 +10,7 @@ import { Select } from '../../components/common/Select';
 
 type HotelAction = 'update' | 'approve' | 'reject' | 'suspend' | 'reactivate';
 
-/** What each action is called in a failure notice. */
+/** Tên từng hành động trong thông báo lỗi */
 const FAILED_TITLE: Record<HotelAction, string> = {
   update: 'Không lưu được thay đổi',
   approve: 'Không duyệt được khách sạn',
@@ -117,7 +117,7 @@ const form = new FormData(event.currentTarget);
       </Link>
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold">
@@ -187,7 +187,7 @@ const form = new FormData(event.currentTarget);
             )}
           </div>
 
-          {/* Form Thông tin */}
+          {/* Form thông tin */}
           <div className="bg-surface-secondary border border-border rounded-2xl p-5 space-y-3">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-info text-primary"></i> Thông tin cơ sở & Chính sách
@@ -245,7 +245,7 @@ const form = new FormData(event.currentTarget);
             </form>
           </div>
 
-          {/* Quản lý Trạng thái */}
+          {/* Quản lý trạng thái */}
           <div className="bg-white border border-border rounded-2xl p-5 space-y-4">
             <h4 className="font-bold text-ink-sub uppercase tracking-wider text-[11px] flex items-center gap-1.5">
               <i className="ph-fill ph-shield-warning text-warning"></i> Quản lý vận hành & Trạng thái

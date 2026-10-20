@@ -93,7 +93,7 @@ describe('POST /api/admin/promotions (create)', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ ...createPromo(), PhamViApDung: 'Theo phạm vi', TrangThai: PROMOTION_STATUS.INACTIVE });
 
-    expect(res.status).toBe(201); // extra fields are simply dropped by the Zod schema
+    expect(res.status).toBe(201);
     promotionIds.push(res.body.data.MaKhuyenMai);
     expect(res.body.data.PhamViApDung).toBe(PROMOTION_SCOPE.SYSTEM_WIDE);
     expect(res.body.data.TrangThai).toBe(PROMOTION_STATUS.ACTIVE);
@@ -192,9 +192,9 @@ describe('PATCH /api/admin/promotions/:id (update) and activate/deactivate', () 
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ GiaTriGiam: 25 });
     expect(updated.status).toBe(200);
-    expect(updated.body.data.GiaTriGiam).toBe('25'); // Prisma Decimal serializes as string
+    expect(updated.body.data.GiaTriGiam).toBe('25');
 
-    // Updating only NgayKetThuc to before the EXISTING NgayBatDau must still be caught (merged-field validation).
+    // Sửa ngày kết thúc trước ngày bắt đầu hiện có vẫn bị bắt
     const badDate = await request(app)
       .patch(`/api/admin/promotions/${id}`)
       .set('Authorization', `Bearer ${adminToken}`)

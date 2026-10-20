@@ -28,7 +28,7 @@ beforeEach(() => {
   vi.mocked(usePaymentStatus).mockReset();
   mockStatus({});
   payMutate.mockReset();
-  vi.mocked(getPaymentConfig).mockResolvedValue({ provider: 'vnpay' }); // the real-gateway mode: paying again redirects to the gateway
+  vi.mocked(getPaymentConfig).mockResolvedValue({ provider: 'vnpay' });
   vi.mocked(useCreateVnpayPayment).mockReturnValue({ mutate: payMutate, isPending: false, isError: false, error: null } as unknown as ReturnType<typeof useCreateVnpayPayment>);
 });
 
@@ -165,7 +165,7 @@ describe('PaymentResultPage retry after a failed payment', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Thử thanh toán lại' }));
 
     await waitFor(() => expect(payMutate).toHaveBeenCalledOnce());
-    // The mutation's onSuccess sends the browser to the VNPAY payment URL.
+    // onSuccess chuyển trình duyệt tới URL thanh toán VNPAY
     const [, options] = payMutate.mock.calls[0] as [undefined, { onSuccess: (result: { paymentUrl: string }) => void }];
     const original = window.location;
     Object.defineProperty(window, 'location', { configurable: true, value: { href: '' } });

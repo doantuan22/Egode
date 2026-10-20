@@ -1,4 +1,4 @@
-/** Badge color per TrangThai — mirrors backend/src/common/constants/review.ts REVIEW_STATUS. */
+/** Màu nhãn theo trạng thái đánh giá */
 export const reviewStatusBadgeClass = (status: string): string => {
   switch (status) {
     case 'Hiển thị':

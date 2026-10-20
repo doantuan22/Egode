@@ -11,7 +11,7 @@ interface HotelSectionNavProps {
   onSelect: (id: string) => void;
 }
 
-/** Sticky in-page tabs, in the same order as the sections below them; the one being read is marked. */
+/** Thanh tab cố định theo thứ tự các phần */
 export function HotelSectionNav({ sections, activeId, onSelect }: HotelSectionNavProps) {
   return (
     <div className="sticky top-[var(--header-height)] z-30 bg-surface/95 backdrop-blur-md border-y border-border mt-3">

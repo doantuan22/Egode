@@ -2,12 +2,7 @@ import { useEffect, type RefObject } from 'react';
 
 const FOCUSABLE = 'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
-/**
- * Keyboard and scroll behaviour of an off-canvas drawer (WAI-ARIA modal dialog pattern):
- * while `open` it locks page scroll, moves focus into the drawer, keeps Tab / Shift+Tab inside it,
- * closes on Escape, and on close gives focus back to whatever opened it.
- * Pass `enabled: false` where the same markup is permanently visible (e.g. a desktop sidebar).
- */
+/** Hành vi bàn phím và cuộn của ngăn kéo */
 export function useDrawerBehavior({ open, onClose, containerRef, enabled = true }: {
   open: boolean;
   onClose: () => void;

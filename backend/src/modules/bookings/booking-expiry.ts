@@ -1,26 +1,11 @@
-/**
- * M6 §2 — a DAT_PHONG left in "Chờ thanh toán" must not hold a room forever.
- * No new column is added for this (M5/M6 keep the existing schema — see M6
- * report §3): the existing NgayTao + TrangThai are enough. A booking is
- * "expired" once it has been PENDING_PAYMENT for longer than
- * PAYMENT_TIMEOUT_MINUTES; expiring it means flipping it straight to the
- * existing "Đã hủy" status (not a new status value) — cancelled bookings
- * already free inventory via every TrangThai <> 'Đã hủy' check across the
- * codebase (availability, quote, booking creation, payment, refund), so
- * this one write is the single source of truth everywhere at once.
- *
- * Called lazily (no cron/timer) at every touchpoint that reads booking
- * status or inventory: booking creation (before locking rates), payment
- * creation/status, and booking list/detail/cancel. Idempotent — a booking
- * that is not PENDING_PAYMENT (or not old enough) is simply not matched.
- */
+/** Tự hủy đơn Chờ thanh toán quá hạn để giải phóng phòng */
 import { Prisma } from '../../generated/prisma/client';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { env } from '../../config/env';
 
 const EXPIRY_NOTE = 'Tự động hủy do quá hạn thanh toán';
 
-/** Structural type so this runs against either a bare PrismaClient or an open transaction. */
+/** Kiểu cấu trúc dùng được cho PrismaClient hoặc giao dịch */
 type RawExecutor = { $executeRaw(query: Prisma.Sql): Promise<number> };
 
 export const expireStalePendingBookings = async (
@@ -38,19 +23,11 @@ export const expireStalePendingBookings = async (
   return Number(result);
 };
 
-/**
- * The instant a "Chờ thanh toán" booking is auto-cancelled: NgayTao + the payment timeout. Same rule as the
- * `NgayTao < now - timeout` test in expireStalePendingBookings above, so what the customer is shown here is
- * exactly when the room is released.
- */
+/** Thời điểm đơn chờ thanh toán bị tự hủy */
 export const paymentDeadlineOf = (ngayTao: Date, timeoutMinutes: number = env.PAYMENT_TIMEOUT_MINUTES): Date =>
   new Date(ngayTao.getTime() + timeoutMinutes * 60_000);
 
-/**
- * Payment hold to expose on a booking view: the deadline and the seconds left (rounded up, floored at 0),
- * both null unless the booking is waiting for payment. Seconds are computed on the server so the customer's
- * countdown does not depend on their device clock being right.
- */
+/** Hạn thanh toán và số giây còn lại hiển thị cho đơn */
 export const paymentHold = (
   ngayTao: Date,
   trangThai: string,

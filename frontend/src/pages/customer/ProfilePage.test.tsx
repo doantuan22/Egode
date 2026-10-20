@@ -20,7 +20,7 @@ beforeEach(() => {
   mockChangePassword();
 });
 
-/** `behaviour` lets a test play out what the server answers by calling the mutate options. */
+/** Cho test mô phỏng phản hồi của server qua tùy chọn mutate */
 const mockChangePassword = (state: Record<string, unknown> = {}, behaviour?: (options: { onSuccess?: () => void; onError?: (e: unknown) => void }) => void) => {
   const mutate = vi.fn((_payload: unknown, options?: { onSuccess?: () => void; onError?: (e: unknown) => void }) => behaviour?.(options ?? {}));
   vi.mocked(useChangePassword).mockReturnValue({ mutate, isPending: false, isSuccess: false, isError: false, error: null, ...state } as unknown as ReturnType<typeof useChangePassword>);
@@ -32,7 +32,7 @@ const renderAs = (role: string, route = '/profile') => {
   return renderWithProviders(<ProfilePage />, { route });
 };
 
-/** A customer opens the password form from the side menu: /profile?muc=mat-khau. */
+/** Khách mở form mật khẩu từ menu bên */
 const PASSWORD_ROUTE = '/profile?muc=mat-khau';
 
 describe('ProfilePage for a customer: a side menu with three entries', () => {
@@ -45,7 +45,7 @@ describe('ProfilePage for a customer: a side menu with three entries', () => {
       ['Đổi mật khẩu', '/profile?muc=mat-khau'],
     ]);
     expect(screen.getByRole('button', { name: 'Đăng xuất' })).toBeInTheDocument();
-    // Bookings and support are in the avatar menu of the top bar, not here.
+    // Đơn đặt phòng và hỗ trợ nằm ở menu avatar
     expect(screen.queryByRole('link', { name: 'Đặt phòng của tôi' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Hỗ trợ/Khiếu nại' })).not.toBeInTheDocument();
   });
@@ -125,7 +125,7 @@ describe('ProfilePage password form helpers', () => {
 
     await user.clear(screen.getByLabelText('Mật khẩu mới'));
     await user.type(screen.getByLabelText('Mật khẩu mới'), 'Old-Passw0rd!');
-    expect(rule('Khác mật khẩu hiện tại')).toBe(false); // same as the current one
+    expect(rule('Khác mật khẩu hiện tại')).toBe(false);
     expect(rule('Mật khẩu xác nhận khớp')).toBe(false);
   });
 

@@ -4,7 +4,7 @@ import { Icon } from '../../common/Icon';
 import { cn } from '../../../lib/utils';
 import { formatRating } from '../../../features/reviews/rating';
 
-/** Breadcrumb, hotel name, star rating, address and the share action. */
+/** Đường dẫn, tên, hạng sao, địa chỉ và nút chia sẻ */
 export function HotelHeader({ hotel, onShare, listUrl = '/hotels' }: { hotel: HotelDetail; onShare: () => void; listUrl?: string }) {
   return (
     <>

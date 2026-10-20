@@ -47,7 +47,7 @@ router.delete(
   controller.removeImage
 );
 
-// Inventory / pricing (QUY_PHONG_GIA)
+// Tồn kho và giá phòng
 router.get(
   '/:id/rates',
   validateRequest({ params: roomTypeIdParamSchema, query: listRatesQuerySchema }),

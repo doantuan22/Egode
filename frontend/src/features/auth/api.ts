@@ -38,7 +38,7 @@ export const resetPassword = async (payload: ResetPasswordPayload): Promise<void
   await apiClient('/auth/reset-password', { method: 'POST', body: JSON.stringify(payload) });
 };
 
-/** Protected: needs the access token. The server answers with a fresh access token (and sets a new refresh cookie) because every older session is invalidated. */
+/** Đổi mật khẩu cần access token, server trả token mới */
 export const changePassword = async (payload: ChangePasswordPayload): Promise<{ accessToken: string }> => {
   const res = await apiClient<{ accessToken: string }>('/auth/change-password', {
     method: 'POST',

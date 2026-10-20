@@ -4,7 +4,7 @@ import type { AdminListReviewsQuery } from './reviews.schemas';
 import { REVIEW_STATUS } from '../../common/constants/review';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 
-// Moderation responses replace the cached admin detail, so retain all relations.
+// Giữ đủ quan hệ cho phản hồi kiểm duyệt
 const adminReviewDetailInclude = {
   HINH_ANH_DANH_GIA: true,
   TAI_KHOAN: { select: { MaTaiKhoan: true, HoTen: true, Email: true } },
@@ -27,14 +27,14 @@ export interface RatingSummary {
 }
 
 export class ReviewsRepository {
-  /** Only "Hiển thị" reviews are public; every other status (Chờ duyệt, Ẩn, Vi phạm) is invisible and uncounted. */
+  /** Chỉ đánh giá Hiển thị mới công khai */
   async listPublicByHotel(maKhachSan: number, page: number, limit: number) {
     const prisma = getPrismaClient();
     const where = { MaKhachSan: maKhachSan, TrangThai: REVIEW_STATUS.VISIBLE };
     const [items, total] = await Promise.all([
       prisma.dANH_GIA.findMany({
         where,
-        orderBy: { MaDanhGia: 'desc' }, // DANH_GIA has no date column; ids grow with time
+        orderBy: { MaDanhGia: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
         select: {
@@ -50,7 +50,7 @@ export class ReviewsRepository {
     return { items, total };
   }
 
-  /** The owner's view of one hotel's reviews: the same moderated ("Hiển thị") set the public sees, optionally one star level, with the stay dates. */
+  /** Đánh giá của một khách sạn cho chủ sở hữu */
   async listVisibleForOwner(maKhachSan: number, page: number, limit: number, diemDanhGia?: number) {
     const prisma = getPrismaClient();
     const where = { MaKhachSan: maKhachSan, TrangThai: REVIEW_STATUS.VISIBLE, ...(diemDanhGia ? { DiemDanhGia: diemDanhGia } : {}) };
@@ -74,7 +74,7 @@ export class ReviewsRepository {
     return { items, total };
   }
 
-  /** How many visible reviews gave each score (1-5) — always for the whole hotel, whatever star filter the list uses. */
+  /** Số đánh giá hiển thị theo từng mức điểm */
   async scoreDistribution(maKhachSan: number): Promise<Record<1 | 2 | 3 | 4 | 5, number>> {
     const prisma = getPrismaClient();
     const rows = await prisma.dANH_GIA.groupBy({
@@ -87,7 +87,7 @@ export class ReviewsRepository {
     return distribution;
   }
 
-  /** Average score and count of the visible reviews, for several hotels in one query. */
+  /** Điểm trung bình và số đánh giá hiển thị của nhiều khách sạn */
   async ratingSummaries(maKhachSanList: number[]): Promise<Map<number, RatingSummary>> {
     const summaries = new Map<number, RatingSummary>();
     if (maKhachSanList.length === 0) return summaries;

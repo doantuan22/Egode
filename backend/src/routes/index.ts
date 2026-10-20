@@ -26,17 +26,17 @@ import { openApiSpec } from '../config/openapi';
 
 const router = Router();
 
-// Health routes
+// Route kiểm tra sức khỏe
 router.use('/', healthRoutes);
 
-// Identity (M1)
+// Danh tính
 router.use('/auth', authRoutes);
 router.use('/profile', profileRoutes);
 router.use('/admin/accounts', accountsRoutes);
 router.use('/partners', partnersRoutes);
 router.use('/admin/partner-applications', adminPartnerApplicationRoutes);
 
-// Discovery (M2)
+// Tìm kiếm khách sạn
 router.use('/hotels', hotelsRoutes);
 router.use('/hotels', quotesRoutes);
 router.use('/amenities', amenitiesRoutes);
@@ -44,34 +44,34 @@ router.use('/locations', locationsRoutes);
 router.use('/cancellation-policies', cancellationPoliciesRoutes);
 router.use('/promotions', publicPromotionsRoutes);
 
-// Booking (M5)
+// Đặt phòng
 router.use('/hotels', bookingsRoutes);
 
-// Payment, cancellation & refund (M6)
+// Thanh toán, hủy đơn và hoàn tiền
 router.use('/bookings', myBookingsRoutes);
 router.use('/bookings', paymentsBookingRoutes);
 router.use('/payments', paymentsGatewayRoutes);
 
-// Owner / Supply (M3)
+// Chủ khách sạn
 router.use('/owner/hotels', ownerHotelsRoutes);
 router.use('/owner/room-types', ownerRoomTypesRoutes);
 router.use('/owner/hotels', ownerAnalyticsRoutes);
 
-// After-sales: review + support/complaint (M7)
+// Đánh giá và hỗ trợ
 router.use('/bookings', reviewsBookingRoutes);
 router.use('/admin/reviews', adminReviewsRoutes);
 router.use('/hotels', hotelReviewsRoutes);
 router.use('/support', supportRoutes);
 router.use('/admin/support', adminSupportRoutes);
 
-// Promotion management + analytics/reports (M8)
+// Khuyến mãi và thống kê
 router.use('/admin/promotions', promotionsRoutes);
 router.use('/admin/analytics', adminAnalyticsRoutes);
 router.use('/admin/hotels', adminHotelsRoutes);
 router.use('/admin/payments', adminPaymentsRoutes);
 router.use('/admin/bookings', adminBookingsRoutes);
 
-// OpenAPI specification route
+// Route đặc tả OpenAPI
 router.get('/openapi.json', (_req, res) => {
   res.json(openApiSpec);
 });

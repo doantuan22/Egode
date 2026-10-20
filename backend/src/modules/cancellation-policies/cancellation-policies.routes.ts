@@ -7,7 +7,7 @@ const router = Router();
 const controller = new CancellationPoliciesController();
 const idParamSchema = z.object({ id: z.coerce.number().int().positive() });
 
-// Public, read-only — CHINH_SACH_HUY is system-level data (no MaKhachSan/MaDatPhong).
+// Dữ liệu công khai, chỉ đọc
 router.get('/', controller.list);
 router.get('/:id', validateRequest({ params: idParamSchema }), controller.getOne);
 

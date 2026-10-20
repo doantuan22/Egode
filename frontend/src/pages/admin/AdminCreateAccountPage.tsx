@@ -10,7 +10,7 @@ export default function AdminCreateAccountPage() {
   const nav = useNavigate();
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
-  // Role ids are IDENTITY values that differ between databases — always resolve them from the API.
+  // Mã vai trò lấy từ API
   const roles = useRoles();
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +43,7 @@ export default function AdminCreateAccountPage() {
       </Link>
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center font-bold">
             <i className="ph ph-user-plus text-[20px]"></i>

@@ -1,11 +1,4 @@
-/**
- * E2E fixture server. Runs INSIDE the backend package (cwd = backend, so its .env / Prisma client / test factories
- * resolve exactly as they do for the Vitest suite) against the SQL Server test database, and gives the Playwright specs:
- *   - controlled test data (accounts, hotels, room types + stock, promotions, a completed stay) and read-back of the rows
- *     a spec wants to verify ("SQL verification"),
- *   - a cleanup that removes everything this run created, including rows made through the UI by `e2e_` accounts.
- * It is NOT part of the application: the application under test is the real built frontend + the real backend process.
- */
+/** Máy chủ dữ liệu mẫu cho E2E, chạy trong gói backend */
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,7 +32,7 @@ const created = {
   policies: new Set<number>(),
 };
 
-// The ids of admins a spec locked are kept on disk, so even a hard-killed run is repaired by the next start.
+// Lưu mã admin bị khóa ra đĩa để lần chạy sau khôi phục
 const LOCK_FILE = path.resolve(__dirname, '../.locked-admins.json');
 const lockedAdmins = new Set<number>(fs.existsSync(LOCK_FILE) ? (JSON.parse(fs.readFileSync(LOCK_FILE, 'utf8')) as number[]) : []);
 const persistLocked = () => (lockedAdmins.size > 0 ? fs.writeFileSync(LOCK_FILE, JSON.stringify([...lockedAdmins])) : fs.rmSync(LOCK_FILE, { force: true }));
@@ -48,7 +41,7 @@ async function restoreAdmins(): Promise<void> {
   lockedAdmins.clear();
   persistLocked();
 }
-void restoreAdmins(); // start-up repair of a previous crashed run
+void restoreAdmins();
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGBREAK'] as const) process.on(signal, () => void restoreAdmins().finally(() => process.exit(0)));
 
 const dateAt = (key: string) => new Date(`${key}T00:00:00Z`);
@@ -91,7 +84,7 @@ const routes: Record<string, Handler> = {
     return { id: hotel.MaKhachSan, cityId, cityName, name: b.name ?? hotel.TenKhachSan };
   },
 
-  /** A room type with stock/price rows for `days` nights starting `fromOffset` days from the Vietnam "today". */
+  /** Loại phòng có giá và tồn kho theo số đêm */
   '/room-type': async (b) => {
     const roomType = await createTestRoomType(b.hotelId);
     await prisma().lOAI_PHONG.update({
@@ -124,7 +117,7 @@ const routes: Record<string, Handler> = {
     return { id: promo.MaKhuyenMai, code: promo.MaCode };
   },
 
-  /** A finished stay (check-out in the past, status "Hoàn tất") so the customer can review it. */
+  /** Kỳ lưu trú đã xong để khách đánh giá */
   '/completed-booking': async (b) => {
     const policy = await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }]);
     created.policies.add(policy.MaChinhSachHuy);
@@ -135,7 +128,7 @@ const routes: Record<string, Handler> = {
     return { id: booking.MaDatPhong };
   },
 
-  /** A confirmed, paid booking created directly (check-in far ahead), for revenue/analytics checks. */
+  /** Đơn đã xác nhận và thanh toán để kiểm tra doanh thu */
   '/paid-booking': async (b) => {
     const policy = await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }]);
     created.policies.add(policy.MaChinhSachHuy);
@@ -144,11 +137,11 @@ const routes: Record<string, Handler> = {
       trangThai: 'Đã xác nhận',
       tongTienPhong: b.amount,
     });
-    await createTestPayment(booking.MaDatPhong, b.amount, 'Thành công', `E2E${booking.MaDatPhong}:14000001:20300101000000`); // txnRef:transactionNo:payDate, like a real VNPAY payment
+    await createTestPayment(booking.MaDatPhong, b.amount, 'Thành công', `E2E${booking.MaDatPhong}:14000001:20300101000000`);
     return { id: booking.MaDatPhong };
   },
 
-  /** A confirmed, paid booking with a real room line for `checkIn` (1 night), used to look at booking pages. */
+  /** Đơn đã xác nhận có dòng phòng thật cho một đêm */
   '/paid-booking-for': async (b) => {
     const policy = await createTestCancellationPolicy([{ soGioTruocNhanPhong: 24, tyLeHoanTien: 100 }]);
     created.policies.add(policy.MaChinhSachHuy);
@@ -161,7 +154,7 @@ const routes: Record<string, Handler> = {
     return { id: booking.MaDatPhong };
   },
 
-  /** Locks every active admin except `keep` so a spec can run with a known, tiny admin set; restored by /admin/restore. */
+  /** Khóa mọi admin hoạt động trừ một người */
   '/admin/isolate': async (b) => {
     const others = await prisma().tAI_KHOAN.findMany({
       where: { TrangThai: 'Hoạt động', VAI_TRO: { TenVaiTro: ROLE_NAMES.ADMIN }, MaTaiKhoan: { notIn: b.keep } },
@@ -177,7 +170,7 @@ const routes: Record<string, Handler> = {
     return { ok: true };
   },
 
-  /** Moves a pending booking's creation time into the past, as if `minutes` had gone by (lazy expiry then applies). */
+  /** Lùi thời gian tạo đơn chờ để kích hoạt hết hạn */
   '/backdate-booking': async (b) => {
     await prisma().dAT_PHONG.update({ where: { MaDatPhong: b.id }, data: { NgayTao: new Date(Date.now() - b.minutes * 60_000) } });
     return { ok: true };
@@ -248,12 +241,12 @@ const routes: Record<string, Handler> = {
 };
 
 async function cleanup(): Promise<void> {
-  await restoreAdmins(); // never leave the shared test DB without its admins
+  await restoreAdmins();
   const db = prisma();
-  // Accounts made through the UI (register form) use the e2e_ e-mail prefix.
+  // Tài khoản tạo qua giao diện dùng tiền tố e2e_
   for (const account of await db.tAI_KHOAN.findMany({ where: { Email: { startsWith: 'e2e_' } }, select: { MaTaiKhoan: true } })) created.accounts.add(account.MaTaiKhoan);
   const accountIds = [...created.accounts];
-  // Hotels owned by those accounts (created through the UI by an owner), and their cities are the factory's.
+  // Khách sạn của các tài khoản đó
   for (const hotel of await db.kHACH_SAN.findMany({ where: { MaTaiKhoanSoHuu: { in: accountIds } }, select: { MaKhachSan: true } })) created.hotels.add(hotel.MaKhachSan);
 
   const hotelIds = [...created.hotels];
@@ -269,10 +262,10 @@ async function cleanup(): Promise<void> {
   for (const id of hotelIds) await deleteTestHotel(id);
   for (const id of created.promotions) await deleteTestPromotion(id);
   for (const id of created.policies) await deleteTestCancellationPolicy(id);
-  // Applications a tracked admin reviewed must go before that admin (FK), whoever applied.
+  // Hồ sơ do admin được theo dõi duyệt phải xóa trước admin
   await db.hO_SO_DOI_TAC.deleteMany({ where: { OR: [{ MaTaiKhoan: { in: accountIds } }, { MaTaiKhoanDuyet: { in: accountIds } }] } });
   for (const id of accountIds) await deleteTestAccount(id);
-  // deleteTestAccount swallows FK errors: verify, so a leftover can never go unnoticed
+  // Kiểm tra để không sót dữ liệu
   const left = await db.tAI_KHOAN.count({ where: { MaTaiKhoan: { in: accountIds } } });
   if (left > 0) throw new Error(`cleanup left ${left} test account(s) behind`);
   for (const id of created.cities) await deleteTestDiaPhuong(id);

@@ -16,7 +16,7 @@ export class OwnerRoomTypesService {
     private readonly hotelsService: OwnerHotelsService = new OwnerHotelsService()
   ) {}
 
-  /** 404 if the room type doesn't exist, 403 if its hotel belongs to someone else. */
+  /** Tải loại phòng và kiểm tra quyền sở hữu */
   async getOwnedRoomType(ownerId: number, maLoaiPhong: number) {
     const roomType = await this.repository.findByIdWithHotel(maLoaiPhong);
     if (!roomType) throw AppError.notFound('Không tìm thấy loại phòng');
@@ -46,22 +46,16 @@ export class OwnerRoomTypesService {
 
   async update(ownerId: number, maLoaiPhong: number, input: UpdateRoomTypeInput) {
     await this.getOwnedRoomType(ownerId, maLoaiPhong);
-    // Switching a room type off through this endpoint takes the same guarded path as /deactivate, so the
-    // "no open booking" rule cannot be skipped by sending TrangThai in a profile update.
+    // Ngừng bán qua cập nhật cũng đi qua đường kiểm tra an toàn
     const { TrangThai, ...profile } = input;
-    // The guarded switch-off runs FIRST: when it is refused nothing else in this request is applied.
+    // Chạy bước ngừng bán trước
     if (TrangThai === ROOM_TYPE_STATUS.DISCONTINUED) await this.deactivate(ownerId, maLoaiPhong);
     if (Object.keys(profile).length > 0) await this.repository.update(maLoaiPhong, profile);
     if (TrangThai === ROOM_TYPE_STATUS.ACTIVE) await this.reactivate(ownerId, maLoaiPhong);
     return this.repository.findByIdWithHotel(maLoaiPhong);
   }
 
-  /**
-   * "Hoạt động" → "Ngừng bán". Refused while the room type is part of an open booking ("Chờ thanh toán", or "Đã
-   * xác nhận" with the stay not over): stopping sales must not leave guests holding a booking for a room type the
-   * hotel no longer offers. Unpaid holds past their deadline and finished stays are settled first, so they never
-   * block this. Cancelled and completed bookings never block.
-   */
+  /** Ngừng bán chỉ khi không còn đơn mở */
   async deactivate(ownerId: number, maLoaiPhong: number) {
     const roomType = await this.getOwnedRoomType(ownerId, maLoaiPhong);
     if (roomType.TrangThai === ROOM_TYPE_STATUS.DISCONTINUED) return roomType;
@@ -72,7 +66,7 @@ export class OwnerRoomTypesService {
 
     const changed = await this.repository.discontinueWhenNoOpenBookings(maLoaiPhong);
     if (!changed) {
-      // Lost a race: a booking arrived meanwhile (same answer) or the status moved under us.
+      // Mất cạnh tranh nên báo xung đột
       const current = await this.repository.countOpenBookings(maLoaiPhong);
       if (current > 0) throw this.openBookingsError(current);
     }
@@ -86,15 +80,12 @@ export class OwnerRoomTypesService {
     );
   }
 
-  /**
-   * "Ngừng bán" → "Hoạt động". The room type is on sale again for every night that still has an open rate in its
-   * inventory (rates and bookings were never touched by deactivating). Idempotent.
-   */
+  /** Bán lại loại phòng */
   async reactivate(ownerId: number, maLoaiPhong: number) {
     const roomType = await this.getOwnedRoomType(ownerId, maLoaiPhong);
     if (roomType.TrangThai === ROOM_TYPE_STATUS.ACTIVE) return roomType;
     await this.repository.update(maLoaiPhong, { TrangThai: ROOM_TYPE_STATUS.ACTIVE });
-    // Same shape as GET / deactivate: the page keeps this response as the room type it shows (amenities, images, hotel).
+    // Trả cùng dạng dữ liệu như khi xem chi tiết
     return (await this.repository.findByIdWithHotel(maLoaiPhong))!;
   }
 

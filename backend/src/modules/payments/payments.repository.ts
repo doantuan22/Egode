@@ -32,11 +32,7 @@ export class PaymentsRepository {
     });
   }
 
-  /**
-   * Takes an exclusive row lock on the booking (held until the surrounding transaction ends) and re-reads it.
-   * Concurrent "create payment" requests for the same booking queue here, so each one sees the payments
-   * written by the previous one and at most one "Chờ xử lý" payment can exist per booking.
-   */
+  /** Khóa dòng đơn đặt phòng để các yêu cầu thanh toán xếp hàng */
   async lockBookingById(tx: Prisma.TransactionClient, maDatPhong: number) {
     await tx.$queryRaw<Array<{ MaDatPhong: number }>>(Prisma.sql`
       SELECT MaDatPhong
@@ -50,7 +46,7 @@ export class PaymentsRepository {
     return tx.tHANH_TOAN.findFirst({ where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.SUCCESS } });
   }
 
-  /** The booking's still-open attempt, if any (oldest first, so a legacy duplicate resolves deterministically). */
+  /** Lần thanh toán đang mở của đơn */
   async findPendingPaymentTx(tx: Prisma.TransactionClient, maDatPhong: number) {
     return tx.tHANH_TOAN.findFirst({
       where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.PENDING },
@@ -76,13 +72,7 @@ export class PaymentsRepository {
     return prisma.tHANH_TOAN.findFirst({ where: { MaDatPhong: maDatPhong, TrangThai: PAYMENT_STATUS.SUCCESS } });
   }
 
-  /**
-   * Looks up by prefix because MaGiaoDichDoiTac is our vnp_TxnRef at creation
-   * time, then gets rewritten to `txnRef:transactionNo:payDate` once VNPAY
-   * confirms it (see vnpay.ts encodeGatewayRef) — both forms start with the
-   * same txnRef, so a startsWith match finds the row regardless of which
-   * callback (return vs IPN) arrives first or how many times it repeats.
-   */
+  /** Tìm theo tiền tố mã giao dịch vì mã được ghi lại sau khi VNPAY xác nhận */
   async findPaymentByTxnRef(tx: Prisma.TransactionClient, txnRef: string) {
     const rows = await tx.$queryRaw<THANH_TOAN[]>(Prisma.sql`
       SELECT TOP 1 *
@@ -101,7 +91,7 @@ export class PaymentsRepository {
     });
   }
 
-  /** Guarded — only flips a booking that is still PENDING_PAYMENT; returns 0 if it already expired/was cancelled/was already confirmed (idempotent, race-safe). */
+  /** Xác nhận đơn có điều kiện, an toàn khi gọi lặp */
   async confirmBookingIfPending(tx: Prisma.TransactionClient, maDatPhong: number, now: Date): Promise<number> {
     const res = await tx.dAT_PHONG.updateMany({
       where: { MaDatPhong: maDatPhong, TrangThai: BOOKING_STATUS.PENDING_PAYMENT },

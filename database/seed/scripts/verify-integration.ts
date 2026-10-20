@@ -8,7 +8,7 @@ async function verify() {
   const results: Record<string, { status: 'PASS' | 'FAIL'; details?: any }> = {};
 
   try {
-    // 1. Audit Accounts
+    // Kiểm tra tài khoản
     const admins = await prisma.tAI_KHOAN.findMany({
       where: { VAI_TRO: { TenVaiTro: 'Quản trị hệ thống' } },
       select: { MaTaiKhoan: true, TenDangNhap: true, Email: true, MatKhau: true, TrangThai: true },
@@ -30,7 +30,7 @@ async function verify() {
       details: { count: targetAdmins.length, usernames: targetAdmins.map((a) => a.TenDangNhap), passwordsVerified: allAdminPassOk },
     };
 
-    // 2. Audit Owners & Partner Profiles
+    // Kiểm tra chủ khách sạn và hồ sơ đối tác
     const owners = await prisma.tAI_KHOAN.findMany({
       where: { TenDangNhap: { startsWith: 'owner.' } },
       include: { HO_SO_DOI_TAC_HO_SO_DOI_TAC_MaTaiKhoanToTAI_KHOAN: true },
@@ -44,7 +44,7 @@ async function verify() {
       details: { ownersCount: owners.length, approvedPartnersCount: approvedPartners.length },
     };
 
-    // 3. Audit Customers
+    // Kiểm tra khách hàng
     const customers = await prisma.tAI_KHOAN.findMany({
       where: { TenDangNhap: { startsWith: 'khach.' } },
     });
@@ -53,7 +53,7 @@ async function verify() {
       details: { count: customers.length, usernames: customers.map((c) => c.TenDangNhap) },
     };
 
-    // 4. Audit 30 Real Hotels
+    // Kiểm tra 30 khách sạn thật
     const hotels = await prisma.kHACH_SAN.findMany({
       where: { TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { TenDangNhap: { startsWith: 'owner.' } } },
       include: {
@@ -87,7 +87,7 @@ async function verify() {
       details: { totalHotels: hotels.length, byCity, allHaveImages, allHaveAmenities, allHaveRooms },
     };
 
-    // 5. Audit 90 Room Types & Images
+    // Kiểm tra 90 loại phòng và ảnh
     const totalRooms = hotels.reduce((sum, h) => sum + h.LOAI_PHONG.length, 0);
     const roomsWithImages = hotels.every((h) => h.LOAI_PHONG.every((r) => r.HINH_ANH_LOAI_PHONG.length >= 1));
     const roomsWithAmenities = hotels.every((h) => h.LOAI_PHONG.every((r) => r.LOAI_PHONG_TIEN_NGHI.length >= 3));
@@ -97,7 +97,7 @@ async function verify() {
       details: { totalRooms, roomsWithImages, roomsWithAmenities },
     };
 
-    // 6. Audit Rates & Inventory Calendar (QUY_PHONG_GIA)
+    // Kiểm tra giá và tồn kho theo lịch
     const futureRatesCount = await prisma.qUY_PHONG_GIA.count({
       where: {
         LOAI_PHONG: {
@@ -125,7 +125,7 @@ async function verify() {
       details: { futureRatesCount, samplePrice: sampleRate?.GiaPhong, sampleQuantity: sampleRate?.SoLuongPhong },
     };
 
-    // 7. Test Image Availability via HTTP HEAD
+    // Kiểm tra ảnh truy cập được qua HTTP HEAD
     const sampleUrls = [
       hotels[0]?.HINH_ANH_KHACH_SAN[0]?.URL,
       hotels[10]?.HINH_ANH_KHACH_SAN[0]?.URL,
@@ -150,7 +150,7 @@ async function verify() {
       details: { checkedCount: sampleUrls.length, allLive: allImagesLive },
     };
 
-    // 8. Quality & Naming Check: No Forbidden Words in Displayed Data
+    // Kiểm tra không có từ cấm trong dữ liệu hiển thị
     const forbidden = ['demo', 'test', 'sample', 'fake', 'mock', 'lorem ipsum'];
     const dirtyHotels = hotels.filter((h) =>
       forbidden.some((w) => h.TenKhachSan.toLowerCase().includes(w) || (h.MoTa || '').toLowerCase().includes(w))
@@ -166,7 +166,7 @@ async function verify() {
       details: { dirtyHotels: dirtyHotels.length, dirtyAccounts: dirtyAccounts.length },
     };
 
-    // Print Results Summary
+    // In tổng kết kết quả
     console.log('SUMMARY TABLE:');
     for (const [name, res] of Object.entries(results)) {
       console.log(`[${res.status}] ${name}`);

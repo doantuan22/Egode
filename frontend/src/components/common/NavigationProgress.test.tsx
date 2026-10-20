@@ -38,7 +38,7 @@ describe('NavigationProgress', () => {
   it('stays hidden for a navigation that finishes quickly', () => {
     renderApp();
     fireEvent.click(screen.getByText('internal'));
-    // the page changed within the same tick, before the bar's delay
+    // Trang đổi trước khi thanh hiện
     act(() => { vi.advanceTimersByTime(1000); });
     expect(screen.getByText('next')).toBeInTheDocument();
     expect(phase()).toBe('idle');
@@ -55,7 +55,7 @@ describe('NavigationProgress', () => {
   });
 
   it('shows the bar when a click is not answered in time and finishes it when the location changes', () => {
-    // A link whose navigation is held back: the click is heard, the location does not change.
+    // Liên kết bị giữ lại, có click nhưng đường dẫn chưa đổi
     render(
       <MemoryRouter initialEntries={['/']}>
         <NavigationProgress />

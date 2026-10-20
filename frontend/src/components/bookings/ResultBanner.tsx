@@ -12,20 +12,16 @@ const TONE = {
 
 interface ResultBannerProps {
   tone: ResultTone;
-  /** The page `h1`. */
+  /** Tiêu đề h1 của trang */
   title: string;
   description?: ReactNode;
-  /** Extra content between the description and the actions (reference code, amount, an error message). */
+  /** Nội dung thêm giữa mô tả và các nút */
   children?: ReactNode;
-  /** One primary action first, then secondary ones; stacked on narrow screens. */
+  /** Nút chính đứng đầu, các nút phụ theo sau */
   actions?: ReactNode;
 }
 
-/**
- * The outcome of a payment: icon, title, one explanation and the next step.
- * Success and pending are announced as a status. An error is not given a live role here: the message that
- * explains it carries `role="alert"` itself, so it is read out once.
- */
+/** Kết quả thanh toán gồm biểu tượng, tiêu đề, giải thích và bước tiếp theo */
 export function ResultBanner({ tone, title, description, children, actions }: ResultBannerProps) {
   const { icon, circle } = TONE[tone];
   return (

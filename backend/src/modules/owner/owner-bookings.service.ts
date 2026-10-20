@@ -21,13 +21,7 @@ export class OwnerBookingsService {
     };
   }
 
-  /**
-   * BUG-008: booking status changes lazily (no cron) — a "Chờ thanh toán" booking past its
-   * payment hold becomes "Đã hủy", a "Đã xác nhận" one past check-out becomes "Hoàn tất" —
-   * so every read that shows a status must run the same two sweeps the customer-facing
-   * BookingsService runs, in the same order. Call it only AFTER the ownership check: both
-   * sweeps are system-wide UPDATEs and a rejected request must not trigger them.
-   */
+  /** Chạy hai bước cập nhật trạng thái đơn sau khi kiểm tra quyền sở hữu */
   private async refreshBookingLifecycle(): Promise<void> {
     await reconcileBookingLifecycle();
   }

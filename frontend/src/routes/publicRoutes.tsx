@@ -10,7 +10,7 @@ const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPasswordPage'));
 const HotelListPage = lazy(() => import('../pages/public/HotelListPage'));
 const HotelDetailPage = lazy(() => import('../pages/public/HotelDetailPage'));
 
-/** Pages anyone can open (a signed-in user is sent away from the sign-in/register pages). */
+/** Trang ai cũng mở được */
 export const publicRoutes = (
   <>
     <Route path="/" element={<HomePage />} />

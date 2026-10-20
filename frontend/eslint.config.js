@@ -20,12 +20,12 @@ export default tseslint.config(
     },
   },
   {
-    // Route tables export JSX fragments (declarations), not components: Fast Refresh does not apply to them.
+    // File bảng route xuất JSX nên không áp dụng Fast Refresh
     files: ['src/routes/*Routes.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },
   {
-    // MainLayout already renders the page's single <main id="main-content"> landmark.
+    // MainLayout đã render thẻ main duy nhất
     files: ['src/pages/**/*.tsx'],
     rules: {
       'no-restricted-syntax': [

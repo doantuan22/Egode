@@ -18,18 +18,15 @@ import { ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-s
 import { DISCOUNT_TYPE } from '../../common/constants/commercial';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * Bug #2 — a booking whose payable total is 0 (valid promotion, or a free rate) is confirmed directly:
- * no THANH_TOAN row (SoTien > 0 is a DB rule), no gateway call, never "Chờ thanh toán", never expired.
- */
+/** Đơn có tổng 0 được xác nhận ngay, không tạo thanh toán */
 const day = (offset: number) => addDaysToDateKey(businessToday(), offset);
 
 const accountIds: number[] = [];
 const promotionIds: number[] = [];
 let diaPhuongId = 0;
 let hotelId = 0;
-let paidRoom = 0; // 500.000đ / night
-let freeRoom = 0; // 0đ / night
+let paidRoom = 0;
+let freeRoom = 0;
 let customerToken = '';
 
 const login = async (email: string, password: string) =>
@@ -156,7 +153,7 @@ describe('a 0đ booking is a normal confirmed booking afterwards', () => {
     const created = await book(paidRoom, promo.MaCode);
     const bookingId = created.body.data.MaDatPhong as number;
 
-    // Age it far beyond PAYMENT_TIMEOUT_MINUTES; every read below runs the expiry sweep.
+    // Làm đơn cũ quá hạn thanh toán
     await getPrismaClient().dAT_PHONG.update({ where: { MaDatPhong: bookingId }, data: { NgayTao: new Date(Date.now() - 6 * 60 * 60 * 1000) } });
 
     const detail = await request(app).get(`/api/bookings/${bookingId}`).set('Authorization', `Bearer ${customerToken}`);
@@ -174,7 +171,7 @@ describe('a 0đ booking is a normal confirmed booking afterwards', () => {
     expect(first.status).toBe(201);
 
     await getPrismaClient().dAT_PHONG.update({ where: { MaDatPhong: first.body.data.MaDatPhong }, data: { NgayTao: new Date(Date.now() - 6 * 60 * 60 * 1000) } });
-    await request(app).get('/api/bookings').set('Authorization', `Bearer ${customerToken}`); // runs the sweep
+    await request(app).get('/api/bookings').set('Authorization', `Bearer ${customerToken}`);
 
     const second = await book(paidRoom, promo.MaCode);
     expect(second.status).toBe(400);

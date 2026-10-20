@@ -3,15 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../../lib/authStore';
 import { ROLE_HOME } from '../../lib/roles';
 
-/**
- * Guard for pages that only make sense signed out (login, register, forgot
- * password). A visitor who already has a session is sent to their home.
- *
- * The redirect only applies to a session that existed BEFORE the guest page was
- * shown. A session that appears while the form is on screen comes from that
- * form itself, which then navigates on its own (LoginPage -> returnTo,
- * RegisterPage -> /partner/apply), so redirecting here would fight it.
- */
+/** Chỉ cho người chưa đăng nhập vào, người đã đăng nhập được chuyển về trang chủ */
 export function GuestOnlyRoute() {
   const accessToken = useAuthStore((s) => s.accessToken);
   const role = useAuthStore((s) => s.role);

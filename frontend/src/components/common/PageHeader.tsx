@@ -3,11 +3,11 @@ import type { ReactNode } from 'react';
 export interface PageHeaderProps {
   title: string;
   description?: string;
-  /** Page-level actions, right-aligned (wraps under the title on narrow screens). */
+  /** Hành động của trang, căn phải */
   actions?: ReactNode;
 }
 
-/** The `h1` of a page. Keep it the only one on the page. */
+/** Thẻ h1 của trang, chỉ dùng một lần */
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

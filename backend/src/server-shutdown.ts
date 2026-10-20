@@ -2,7 +2,7 @@ import type { Server } from 'node:http';
 
 export const SHUTDOWN_TIMEOUT_MS = 20_000;
 
-/** Stop accepting traffic, drain in-flight requests, and then release the Prisma pool. */
+/** Ngừng nhận request, chờ xử lý xong rồi đóng kết nối Prisma */
 export const createGracefulShutdown = (
   server: Server,
   disconnect: () => Promise<void>,
@@ -14,7 +14,7 @@ export const createGracefulShutdown = (
 
   return (signal: NodeJS.Signals): void => {
     if (started) {
-      // A repeated termination signal indicates the operator/platform is no longer waiting for the drain.
+      // Tín hiệu dừng lặp lại nghĩa là không chờ nữa
       server.closeAllConnections();
       return;
     }

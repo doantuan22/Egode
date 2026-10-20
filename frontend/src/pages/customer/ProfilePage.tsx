@@ -14,7 +14,7 @@ import { PageSpinner } from '../../components/common/PageSpinner';
 import { Button } from '../../components/common/Button';
 import { DateField } from '../../components/common/DateField';
 
-/** Both sections of the customer's profile live in a frame of this height (the personal-details card sets it), so switching sections never resizes it. */
+/** Hai phần hồ sơ cùng nằm trong khung có chiều cao cố định */
 const CARD_MIN_HEIGHT = 'lg:min-h-[28rem]';
 
 const PASSWORD_FIELDS = [
@@ -30,7 +30,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const { signOut, isPending: isSigningOut } = useSignOut();
   const isCustomer = useAuthStore((state) => state.role) === ROLE_NAMES.CUSTOMER;
-  // Which part of the customer's profile is open lives in the link (?muc=mat-khau), so it can be bookmarked and survives a reload.
+  // Phần đang mở nằm trên URL
   const section = useSearchParams()[0].get('muc') === 'mat-khau' ? 'password' : 'profile';
 
   const {
@@ -62,7 +62,7 @@ export default function ProfilePage() {
   } = useForm<ChangePasswordFormValues>({ resolver: zodResolver(changePasswordSchema) });
 
   const [shownPasswords, setShownPasswords] = useState<Record<(typeof PASSWORD_FIELDS)[number]['name'], boolean>>({ MatKhauCu: false, MatKhauMoi: false, confirmMatKhauMoi: false });
-  // The same rules the server enforces, shown as the customer types: 8+ characters, not the current password, confirmation matches.
+  // Quy tắc mật khẩu như server, hiện khi gõ
   const [typedCurrent = '', typedNew = '', typedConfirm = ''] = watchPassword(['MatKhauCu', 'MatKhauMoi', 'confirmMatKhauMoi']);
   const passwordChecks = [
     { label: 'Ít nhất 8 ký tự', met: typedNew.length >= 8 },
@@ -207,7 +207,7 @@ export default function ProfilePage() {
           </div>
   );
 
-  // The content is centred in the frame, with roomier fields, so the card looks designed for its size rather than stretched.
+  // Nội dung căn giữa trong khung
   const passwordCard = (
     <div className={cn('bg-white rounded-xl border border-border shadow-sm p-6 lg:flex lg:p-8', CARD_MIN_HEIGHT)}>
       <div className="flex w-full flex-col gap-10 lg:flex-row lg:items-center">
@@ -287,8 +287,7 @@ export default function ProfilePage() {
     </div>
   );
 
-  // A customer gets a side menu (profile / password / sign out); admins and owners are already inside their dashboard
-  // and see both sections stacked.
+  // Khách có menu bên, admin và chủ khách sạn thấy hai phần xếp chồng
   if (!isCustomer) {
     return (
       <div className="bg-surface-secondary text-ink min-h-[80vh]">
@@ -311,7 +310,7 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-surface-secondary text-ink min-h-[80vh]">
-      {/* On a wide screen the frame starts 15% of the window height down, so a short card does not hug the top of an empty page. */}
+      {/* Màn hình rộng thì khung bắt đầu thấp hơn đầu trang */}
       <div className="page-container flex flex-col gap-6 pb-8 pt-8 md:flex-row md:pt-[15vh]">
         <aside className="w-full shrink-0 rounded-2xl border border-border bg-white p-4 shadow-sm md:w-[15.625rem]">
           <h2 className="px-3 pb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">Hồ sơ tài khoản</h2>

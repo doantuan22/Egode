@@ -11,7 +11,7 @@ export const registerSchema = z.object({
   MatKhau: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
   HoTen: z.string().trim().min(2, 'Họ tên ít nhất 2 ký tự').max(150),
   SoDienThoai: phoneNumberSchema,
-  // DDI-01 (resolved): optional at registration — nullable in the baseline.
+  // Số điện thoại có thể để trống khi đăng ký
   NgaySinh: z.coerce.date().optional(),
   GioiTinh: z.enum(['Nam', 'Nữ', 'Khác']).optional(),
 });

@@ -10,10 +10,7 @@ import { signPasswordResetToken } from '../common/utils/password-reset-token';
 import { AuthService } from '../modules/auth/auth.service';
 import type { EmailService } from '../modules/email/email.service';
 
-/**
- * Bug #6 — an access token only identifies the caller; whether the account is locked and which role it
- * holds are read from the database on every request.
- */
+/** Trạng thái khóa và vai trò được đọc từ CSDL ở mỗi request */
 const ids: number[] = [];
 const login = async (email: string, password: string) =>
   (await request(app).post('/api/auth/login').send({ identifier: email, MatKhau: password })).body.data.accessToken as string;
@@ -28,9 +25,9 @@ const setStatus = (id: number, TrangThai: string) => prisma().tAI_KHOAN.update({
 const setRole = async (id: number, role: string) => prisma().tAI_KHOAN.update({ where: { MaTaiKhoan: id }, data: { MaVaiTro: await getRoleId(role as never) } });
 
 const me = (token: string) => request(app).get('/api/profile/me').set('Authorization', `Bearer ${token}`);
-const myBookings = (token: string) => request(app).get('/api/bookings').set('Authorization', `Bearer ${token}`); // customers only
-const ownerHotels = (token: string) => request(app).get('/api/owner/hotels').set('Authorization', `Bearer ${token}`); // owners only
-const adminAccounts = (token: string) => request(app).get('/api/admin/accounts').set('Authorization', `Bearer ${token}`); // admins only
+const myBookings = (token: string) => request(app).get('/api/bookings').set('Authorization', `Bearer ${token}`);
+const ownerHotels = (token: string) => request(app).get('/api/owner/hotels').set('Authorization', `Bearer ${token}`);
+const adminAccounts = (token: string) => request(app).get('/api/admin/accounts').set('Authorization', `Bearer ${token}`);
 
 afterAll(async () => {
   await Promise.all(ids.map((id) => deleteTestAccount(id)));

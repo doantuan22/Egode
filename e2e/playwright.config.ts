@@ -1,15 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
-/**
- * Release E2E: the REAL frontend (production build served by `vite preview`), the REAL backend process, and the SQL
- * Server test database (backend/.env -> HotelBooking_DB0_Test). Nothing about the application is mocked.
- *   - NODE_ENV=test for the backend turns off ONLY the per-IP rate limiters (a suite that signs in dozens of times from
- *     one IP would otherwise hit the 10-logins-per-15-minutes limit), the request log and real SMTP.
- *   - The fixture server (backend package, tsx) seeds data, reads rows back, and cleans up.
- *   - Payments and refunds run in the app's own simulated mode (PAYMENT_PROVIDER=simulated): no external gateway at all.
- */
+/** Cấu hình E2E chạy frontend, backend và CSDL test thật */
 const API_PORT = 5100;
-const WEB_PORT = 5174; // already in backend/.env CORS_ORIGIN
+const WEB_PORT = 5174;
 const FIXTURE_PORT = 5191;
 
 export default defineConfig({
@@ -18,7 +11,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   workers: 1,
   fullyParallel: false,
-  retries: 0, // a failure is a finding to triage, not something to re-run until green
+  retries: 0,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   outputDir: 'test-results',
   use: {

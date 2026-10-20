@@ -37,7 +37,7 @@ export interface HotelDef {
 }
 
 const HOTELS: HotelDef[] = [
-  // ==================== TP. HỒ CHÍ MINH (5 hotels) ====================
+  // Khách sạn TP. Hồ Chí Minh
   {
     key: 'H01',
     name: 'Khách sạn Continental Sài Gòn',
@@ -324,7 +324,7 @@ const HOTELS: HotelDef[] = [
     ],
   },
 
-  // ==================== HÀ NỘI (5 hotels) ====================
+  // Khách sạn Hà Nội
   {
     key: 'H06',
     name: 'Khách sạn Sofitel Legend Metropole Hà Nội',
@@ -611,7 +611,7 @@ const HOTELS: HotelDef[] = [
     ],
   },
 
-  // ==================== ĐÀ NẴNG (5 hotels) ====================
+  // Khách sạn Đà Nẵng
   {
     key: 'H11',
     name: 'InterContinental Danang Sun Peninsula Resort',
@@ -898,7 +898,7 @@ const HOTELS: HotelDef[] = [
     ],
   },
 
-  // ==================== ĐÀ LẠT (5 hotels) ====================
+  // Khách sạn Đà Lạt
   {
     key: 'H16',
     name: 'Dalat Palace Heritage Hotel',
@@ -1185,7 +1185,7 @@ const HOTELS: HotelDef[] = [
     ],
   },
 
-  // ==================== NHA TRANG (5 hotels) ====================
+  // Khách sạn Nha Trang
   {
     key: 'H21',
     name: 'Khách sạn Sheraton Nha Trang',
@@ -1472,7 +1472,7 @@ const HOTELS: HotelDef[] = [
     ],
   },
 
-  // ==================== PHÚ QUỐC (5 hotels) ====================
+  // Khách sạn Phú Quốc
   {
     key: 'H26',
     name: 'JW Marriott Phu Quoc Emerald Bay Resort & Spa',
@@ -1760,7 +1760,7 @@ const HOTELS: HotelDef[] = [
   },
 ];
 
-// Extract rooms catalog
+// Trích danh mục phòng
 const ROOM_TYPES = HOTELS.flatMap((h) =>
   h.rooms.map((r) => ({
     key: `${h.key}-${r.suffix}`,
@@ -1779,7 +1779,7 @@ const ROOM_TYPES = HOTELS.flatMap((h) =>
   }))
 );
 
-// Prepare Source Manifest for Hotels
+// Chuẩn bị danh sách nguồn ảnh khách sạn
 const HOTELS_SOURCE_MANIFEST = HOTELS.map((h) => ({
   hotelKey: h.key,
   hotelName: h.name,
@@ -1797,7 +1797,7 @@ const HOTELS_SOURCE_MANIFEST = HOTELS.map((h) => ({
   verificationStatus: 'VERIFIED',
 }));
 
-// Output files
+// Ghi các file kết quả
 writeFileSync(path.join(CATALOG_DIR, 'hotels.json'), JSON.stringify(HOTELS, null, 2) + '\n');
 writeFileSync(path.join(CATALOG_DIR, 'room-types.json'), JSON.stringify(ROOM_TYPES, null, 2) + '\n');
 writeFileSync(path.join(SOURCES_DIR, 'hotels-source-manifest.json'), JSON.stringify(HOTELS_SOURCE_MANIFEST, null, 2) + '\n');

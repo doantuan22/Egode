@@ -1,33 +1,33 @@
-/* Egode — Calm Travel Commerce. Semantic CSS tokens are the source of truth. */
+/* Egode: token CSS ngữ nghĩa là nguồn chuẩn */
 :root {
-  /* Brand action */
+  /* Màu hành động chính */
   --color-action-primary: #2563EB;
   --color-action-primary-hover: #1D4ED8;
   --color-action-primary-active: #1E40AF;
   --color-action-primary-subtle: #EFF6FF;
 
-  /* Text */
+  /* Chữ */
   --color-text-primary: #1F2937;
   --color-text-secondary: #4B5563;
   --color-text-muted: #6B7280;
   --color-text-disabled: #9CA3AF;
   --color-text-on-action: #FFFFFF;
 
-  /* Surfaces */
+  /* Bề mặt */
   --color-surface-page: #F7F8FA;
   --color-surface-raised: #FFFFFF;
   --color-surface-subtle: #F1F5F9;
   --color-surface-selected: #EFF6FF;
   --color-surface-interactive: #F7F8FA;
 
-  /* Borders */
+  /* Viền */
   --color-border-default: #E5E7EB;
   --border-strong: #D1D5DB;
   --color-border-interactive: var(--color-action-primary);
   --color-border-focus: var(--color-action-primary);
   --focus-ring: 0 0 0 0.1875rem rgb(37 99 235 / 18%);
 
-  /* Semantic states */
+  /* Trạng thái ngữ nghĩa */
   --state-success: #16A34A;
   --state-success-subtle: #DCFCE7;
   --state-warning: #F59E0B;
@@ -40,11 +40,11 @@
   --color-warning-text: #92400E;
   --color-danger-text: #B91C1C;
 
-  /* Domain accents */
+  /* Màu theo miền nghiệp vụ */
   --color-rating: #F59E0B;
   --color-discount: #DC2626;
 
-  /* Finite typography roles */
+  /* Vai trò chữ */
   --font-family: 'Inter', Arial, sans-serif;
   --font-size-caption: 0.75rem;
   --font-size-supporting: 0.8125rem;
@@ -63,7 +63,7 @@
   --line-height-body: 1.5;
   --line-height-heading: 1.2;
 
-  /* 0.25rem spacing grid */
+  /* Lưới khoảng cách 0.25rem */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -75,19 +75,19 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  /* Four intentional radius levels */
+  /* Bốn mức bo góc */
   --radius-control-sm: 0.25rem;
   --radius-control: 0.5rem;
   --radius-surface: 0.75rem;
   --radius-pill: 999px;
 
-  /* Elevation is reserved for interactive floating surfaces */
+  /* Đổ bóng chỉ cho bề mặt nổi tương tác */
   --elevation-0: none;
   --elevation-1: 0 1px 2px rgb(15 23 42 / 4%);
   --elevation-2: 0 0.25rem 0.75rem rgb(15 23 42 / 10%);
   --elevation-3: 0 0.75rem 1.75rem rgb(15 23 42 / 14%);
 
-  /* Compatibility aliases for gradual migration */
+  /* Alias tương thích để chuyển dần */
   --color-primary: var(--color-action-primary);
   --color-primary-hover: var(--color-action-primary-hover);
   --color-primary-dark: var(--color-action-primary-active);
@@ -123,14 +123,14 @@
   --shadow-md: var(--elevation-2);
   --shadow-lg: var(--elevation-3);
 
-  /* Layout */
+  /* Bố cục */
   --header-height: 4.25rem;
   --sidebar-width: 16.5rem;
   --sidebar-width-collapsed: 4.75rem;
-  --container-max: 84rem; /* the one content width of the site: header, pages, footer. In rem so it grows with the fluid root size, see base.css */
-  --gutter: 1rem; /* space between the viewport edge and the content; grows with the viewport, see layout.css */
+  --container-max: 84rem; /* Bề rộng nội dung chung của trang */
+  --gutter: 1rem; /* Khoảng cách giữa mép màn hình và nội dung */
 
-  /* Motion */
+  /* Chuyển động */
   --transition-fast: 140ms ease;
   --transition-base: 180ms ease;
 }

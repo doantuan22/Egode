@@ -74,7 +74,7 @@ describe('GuestOnlyRoute', () => {
     renderGuest('/register');
     expect(screen.getByText('form đăng ký')).toBeInTheDocument();
 
-    // e.g. RegisterPage: token is stored first, then the page calls navigate('/partner/apply').
+    // Trang tự lưu token rồi chuyển hướng
     act(() => setAuth({ accessToken: 'token', role: ROLE_NAMES.CUSTOMER, isBootstrapping: false }));
 
     expect(screen.getByText('form đăng ký')).toBeInTheDocument();

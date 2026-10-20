@@ -18,13 +18,7 @@ type FlowState =
 const STEPS = ['Đang kết nối cổng thanh toán…', 'Đang xác thực giao dịch…', 'Đang xác nhận thanh toán và đặt phòng…'];
 const AUTO_CONTINUE_MS = 2000;
 
-/**
- * "Thanh toán ngay" for one booking, whichever payment mode the server runs:
- *  - simulated: a processing dialog (spinner + status lines), the server records the payment and confirms the booking,
- *    the dialog says it succeeded and moves on to the result page;
- *  - vnpay: the server returns the gateway URL and the browser is sent there (the original redirect flow).
- * Render `dialog` somewhere in the page; call `start()` from the pay button.
- */
+/** Luồng Thanh toán ngay theo chế độ giả lập hoặc VNPAY */
 export function usePaymentFlow(bookingId: number): { start: () => void; isBusy: boolean; redirectError: unknown; dialog: ReactNode } {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -37,7 +31,7 @@ export function usePaymentFlow(bookingId: number): { start: () => void; isBusy: 
     navigate(`/payment/result?bookingId=${bookingId}&status=success`);
   };
 
-  // After a success the dialog stays long enough to read, then continues by itself.
+  // Sau khi thành công hộp thoại tự chuyển tiếp
   const succeeded = state.phase === 'success';
   useEffect(() => {
     if (!succeeded) return;

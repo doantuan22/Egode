@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-// Icon fonts (the "ph ph-*" classes) are bundled from npm instead of a runtime <script> from a CDN.
+// Font biểu tượng được đóng gói từ npm
 import '@phosphor-icons/web/regular';
 import '@phosphor-icons/web/fill';
 import '@phosphor-icons/web/bold';

@@ -13,13 +13,13 @@ export interface SafeAccount {
   TrangThai: string;
   NgayTao: Date;
   NgayCapNhat: Date;
-  /** Derived from HO_SO_DOI_TAC (not a column): true while a partner application awaits review. Set on login/register/me. */
+  /** Đối tác có hồ sơ đang chờ duyệt */
   DangChoDuyetDoiTac?: boolean;
-  /** True when the latest partner application was rejected: the UI offers a re-apply button. */
+  /** Hồ sơ đối tác gần nhất bị từ chối */
   HoSoDoiTacBiTuChoi?: boolean;
 }
 
-/** Strips MatKhau (password hash) before an account row ever reaches an API response. */
+/** Loại bỏ mật khẩu băm trước khi trả về API */
 export const toSafeAccount = (account: TAI_KHOAN): SafeAccount => {
   const safe: Partial<TAI_KHOAN> = { ...account };
   delete safe.MatKhau;

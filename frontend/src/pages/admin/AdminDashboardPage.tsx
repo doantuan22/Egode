@@ -59,14 +59,14 @@ const countOf = (rows: CountByLabel[] | undefined, ...labels: string[]) =>
   rows ? rows.filter((row) => labels.includes(row.Label)).reduce((sum, row) => sum + row.SoLuong, 0) : undefined;
 
 export default function AdminDashboardPage() {
-  // Uses the existing audited aggregate endpoint. Detailed, date-filtered analysis stays in /admin/analytics.
+  // Dùng API tổng hợp có sẵn
   const analyticsQuery = useAdminAnalytics({});
   const analytics = analyticsQuery.data;
   const activeHotels = analytics?.KhachSanTheoTrangThai.find((item) => item.Label === 'Hoạt động')?.SoLuong ?? 0;
-  // One row is enough: only the server-side total is read.
+  // Chỉ cần tổng số từ server
   const pendingApplications = useAdminPartnerApplications('Chờ duyệt', 1, 1);
 
-  // Each tile opens the list already filtered to what is waiting (`status` is the filter every admin list reads from the URL).
+  // Mỗi ô mở danh sách đã lọc theo việc đang chờ
   const queue = [
     {
       to: '/admin/partner-applications?status=Chờ duyệt',

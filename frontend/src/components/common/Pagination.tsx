@@ -1,12 +1,12 @@
 const buttonClass =
   'px-3 py-1.5 rounded-lg border border-border bg-white text-ink-sub hover:bg-surface-secondary disabled:opacity-40 disabled:hover:bg-white text-xs font-medium transition';
 
-/** Footer of a paged list: "Trang 2 / 5 — Tổng 47 tài khoản" with previous / next buttons. */
+/** Chân danh sách phân trang kèm nút trước và sau */
 export function Pagination({ page, totalPages, total, itemLabel, onPageChange }: {
   page: number;
   totalPages: number;
   total: number;
-  /** What is being counted, e.g. "tài khoản". */
+  /** Tên đối tượng được đếm */
   itemLabel: string;
   onPageChange: (page: number) => void;
 }) {

@@ -9,14 +9,14 @@ export interface AdminHotel {
   MoTa: string | null;
   TrangThai: string;
   MaDiaPhuong: number;
-  /** "HH:mm", the same format the owner API uses. */
+  /** Giờ dạng HH:mm giống API chủ khách sạn */
   GioNhanPhong?: string;
   GioTraPhong?: string;
   DIA_PHUONG?: { TenThanhPho: string; TenTinh?: string };
   TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN?: AdminHotelOwner;
-  /** Cover first. The list carries only that one photo; the detail carries them all. */
+  /** Ảnh bìa đứng đầu, danh sách chỉ có một ảnh */
   HINH_ANH_KHACH_SAN?: AdminHotelImage[];
-  /** Only on the answer to "suspend": what happened to the hotel's open bookings. */
+  /** Chỉ có khi đình chỉ: kết quả xử lý các đơn đang mở */
   DonDaXuLy?: AdminHotelSuspensionOutcome;
 }
 export interface AdminHotelSuspensionOutcome { DonHoanTat: number; DonDaHuy: number; DonHoanTien: number }
@@ -34,7 +34,7 @@ export const rejectAdminHotel = async (id: number): Promise<AdminHotel> => (awai
 export const suspendAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/suspend`, { method: 'POST' })).data as AdminHotel;
 export const reactivateAdminHotel = async (id: number): Promise<AdminHotel> => (await apiClient<AdminHotel>(`/admin/hotels/${id}/reactivate`, { method: 'POST' })).data as AdminHotel;
 
-/** An amenity of the shared catalogue, with how many hotels / room types currently list it. */
+/** Một tiện nghi trong danh mục kèm số khách sạn và loại phòng đang dùng */
 export interface AdminAmenity { MaTienNghi: number; TenTienNghi: string; BieuTuong: string | null; SoKhachSan: number; SoLoaiPhong: number }
 export interface AdminAmenityPayload { TenTienNghi: string; BieuTuong: string | null }
 export const listAdminAmenities = async (): Promise<AdminAmenity[]> => (await apiClient<AdminAmenity[]>('/admin/hotels/amenities')).data ?? [];

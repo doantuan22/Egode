@@ -5,7 +5,7 @@ import { fromDateInputValue, toDateInputValue } from '../../lib/utils';
 import { addDaysToDateKey } from '../../lib/stayDates';
 
 export interface DateRangeValue {
-  /** YYYY-MM-DD, or '' while nothing is chosen. */
+  /** YYYY-MM-DD hoặc rỗng */
   from: string;
   to: string;
 }
@@ -13,23 +13,22 @@ export interface DateRangeValue {
 export interface DateRangePickerProps {
   value: DateRangeValue;
   onChange: (value: DateRangeValue) => void;
-  /** Earliest selectable day (YYYY-MM-DD). Omit to allow past days. */
+  /** Ngày sớm nhất chọn được */
   min?: string;
-  /** Latest selectable check-in (YYYY-MM-DD). */
+  /** Ngày nhận phòng muộn nhất */
   maxCheckIn?: string;
-  /** Longest stay in nights: once a check-in is picked, check-out days further away are disabled. */
+  /** Số đêm tối đa */
   maxNights?: number;
 }
 
-/** Inline check-in / check-out calendar. Works on `YYYY-MM-DD` strings so callers keep their string state and URL params. */
+/** Lịch chọn ngày nhận và trả phòng */
 export function DateRangePicker({ value, onChange, min, maxCheckIn, maxNights }: DateRangePickerProps) {
   const selected: DateRange = { from: fromDateInputValue(value.from), to: fromDateInputValue(value.to) };
   const minDate = fromDateInputValue(min);
   const waitingForCheckOut = Boolean(value.from) && !value.to;
   const lastCheckOut = waitingForCheckOut && maxNights !== undefined ? fromDateInputValue(addDaysToDateKey(value.from, maxNights)) : undefined;
   const lastCheckIn = fromDateInputValue(maxCheckIn);
-  // Choosing a check-out: nothing before the check-in's following day and nothing beyond maxNights.
-  // Choosing a check-in: nothing before today and nothing beyond the booking window.
+  // Giới hạn ngày chọn theo bước đang chọn
   const disabled: Matcher[] = [];
   if (minDate) disabled.push({ before: minDate });
   if (waitingForCheckOut) {
@@ -38,7 +37,7 @@ export function DateRangePicker({ value, onChange, min, maxCheckIn, maxNights }:
     disabled.push({ after: lastCheckIn });
   }
 
-  // A booking range always starts fresh once it is complete, instead of stretching the old one.
+  // Chọn xong một khoảng thì lần sau bắt đầu lại
   const pickDay = (day: Date) => {
     const iso = toDateInputValue(day);
     if (waitingForCheckOut && iso > value.from) onChange({ from: value.from, to: iso });

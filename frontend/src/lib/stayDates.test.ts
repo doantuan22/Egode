@@ -11,7 +11,7 @@ import {
   STAY_DATE_MESSAGES,
 } from './stayDates';
 
-const now = new Date('2026-03-10T12:00:00Z'); // business today = 2026-03-10
+const now = new Date('2026-03-10T12:00:00Z');
 const issue = (checkIn: string, checkOut: string, at: Date = now) => findStayDateIssue(checkIn, checkOut, at)?.message ?? null;
 
 describe('businessToday follows Vietnam time', () => {

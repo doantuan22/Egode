@@ -1,25 +1,13 @@
 import type { RefinementCtx } from 'zod';
 import { businessToday, MS_PER_DAY } from './business-time';
 
-/**
- * The one place that decides whether a stay's dates are acceptable. Search, room availability, quote
- * and booking all validate through here, so the rule cannot drift between endpoints.
- *
- *   checkIn  >= today (business time zone)        checkOut > checkIn
- *   1 <= nights <= MAX_NIGHTS                     checkIn  <= today + MAX_ADVANCE_DAYS
- *
- * "Today" is the calendar day in Asia/Ho_Chi_Minh, never the UTC day: between 00:00 and 07:00 Vietnam
- * time the UTC date is still yesterday. Stay dates themselves are date-only values (a `YYYY-MM-DD`
- * parses to UTC midnight of that day), so they are compared by their UTC calendar day, exactly like
- * `enumerateNights` does. Everything below works on day numbers, never on a per-night loop, so a
- * ridiculous range is rejected in O(1) before anything iterates it.
- */
+/** Nơi duy nhất kiểm tra ngày lưu trú hợp lệ */
 export { BUSINESS_TIME_ZONE, businessToday, addDaysToDateKey } from './business-time';
 export const MAX_NIGHTS = 30;
 export const MAX_ADVANCE_DAYS = 365;
 
 
-/** Whole days since the epoch of a Date's UTC calendar day. */
+/** Số ngày kể từ epoch của ngày UTC */
 const utcDayNumber = (date: Date): number => Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / MS_PER_DAY);
 
 const keyDayNumber = (key: string): number => Math.floor(Date.parse(`${key}T00:00:00Z`) / MS_PER_DAY);
@@ -36,7 +24,7 @@ export const STAY_DATE_MESSAGES = {
   tooManyNights: `Mỗi lần đặt tối đa ${MAX_NIGHTS} đêm`,
 } as const;
 
-/** Every rule the given dates break (empty = acceptable). `now` is injectable for boundary tests. */
+/** Các quy tắc ngày lưu trú bị vi phạm */
 export const findStayDateIssues = (checkIn: Date, checkOut: Date, now: Date = new Date()): StayDateIssue[] => {
   const issues: StayDateIssue[] = [];
   const today = keyDayNumber(businessToday(now));
@@ -50,7 +38,7 @@ export const findStayDateIssues = (checkIn: Date, checkOut: Date, now: Date = ne
   return issues;
 };
 
-/** `superRefine` callback shared by every schema that carries a `checkIn`/`checkOut` pair. */
+/** Kiểm tra chéo cho schema có cặp checkIn/checkOut */
 export const refineStayDates = (data: { checkIn: Date; checkOut: Date }, ctx: RefinementCtx): void => {
   for (const issue of findStayDateIssues(data.checkIn, data.checkOut)) {
     ctx.addIssue({ code: 'custom', path: [issue.path], message: issue.message });

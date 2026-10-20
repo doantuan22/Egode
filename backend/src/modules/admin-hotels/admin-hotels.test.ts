@@ -195,7 +195,7 @@ describe('hotel approval workflow (Bug #1)', () => {
     await asAdmin(request(app).post(`/api/admin/hotels/${pending.MaKhachSan}/reject`));
     expect((await asOwner(request(app).post(`/api/owner/hotels/${pending.MaKhachSan}/reactivate`))).status).toBe(400);
 
-    // Forged state: INACTIVE but with no approval trail must still be refused.
+    // Trạng thái giả mạo vẫn bị từ chối
     const never = await ownerCreatesHotel();
     await getPrismaClient().kHACH_SAN.update({ where: { MaKhachSan: never.MaKhachSan }, data: { TrangThai: HOTEL_STATUS.INACTIVE } });
     expect((await asOwner(request(app).post(`/api/owner/hotels/${never.MaKhachSan}/reactivate`))).status).toBe(400);

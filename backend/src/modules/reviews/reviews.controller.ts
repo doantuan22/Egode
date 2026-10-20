@@ -26,7 +26,7 @@ export class ReviewsController {
     }
   };
 
-  /** GET /hotels/:id/reviews — public, no sign-in needed. */
+  /** Danh sách đánh giá công khai của khách sạn */
   listPublic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };

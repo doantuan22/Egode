@@ -10,9 +10,9 @@ import { publicRoutes } from './publicRoutes';
 
 const NotFoundPage = lazy(() => import('../pages/public/NotFoundPage'));
 
-/** The whole route table: each area (public, customer, owner, admin) lives in its own module. */
+/** Toàn bộ bảng route, mỗi khu vực một module */
 export default function AppRoutes() {
-  // The routes render the location whose page has been dissolved in, not the one the URL already points at.
+  // Route hiển thị vị trí của trang đã chuyển xong
   const location = usePageTransitionLocation();
   return (
     <Suspense fallback={<div className="flex justify-center py-16" role="status" aria-live="polite"><span className="sr-only">Đang tải trang...</span><div className="h-8 w-8 animate-spin rounded-full border-2 border-border-strong border-t-blue-600" /></div>}>
@@ -23,7 +23,7 @@ export default function AppRoutes() {
           {ownerRoutes}
           {adminRoutes}
 
-          {/* Legacy URLs kept only as redirects to their canonical route. */}
+          {/* Các URL cũ chỉ để chuyển hướng */}
           {aliasRoutes()}
 
           <Route path="*" element={<NotFoundPage />} />

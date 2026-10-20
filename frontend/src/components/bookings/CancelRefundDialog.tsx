@@ -12,7 +12,7 @@ export type CancelFlowState =
 
 const STEPS = ['Đang gửi yêu cầu hủy đặt phòng…', 'Đang tính số tiền hoàn theo chính sách hủy…', 'Đang hoàn tiền về phương thức thanh toán ban đầu…'];
 
-/** Loading, then the outcome, of cancelling a booking that was already paid (so a refund may be due). */
+/** Trạng thái đang tải và kết quả khi hủy đơn đã thanh toán */
 export function CancelRefundDialog({ flow, onClose }: { flow: CancelFlowState; onClose: () => void }) {
   if (flow.phase === 'idle') return null;
 

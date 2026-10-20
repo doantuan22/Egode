@@ -18,7 +18,7 @@ export interface BookedRow {
   NgayTraPhong: Date;
 }
 
-/** A KHUYEN_MAI row read under usp_KhoaKhuyenMaiChoDatPhong's lock, plus its non-cancelled usage count at that moment. */
+/** Khuyến mãi đọc dưới khóa kèm số lượt dùng */
 export interface LockedPromotion {
   MaKhuyenMai: number;
   MaCode: string;
@@ -33,10 +33,10 @@ export interface LockedPromotion {
   DaDung: number;
 }
 
-/** THROW numbers raised by usp_KhoaKhuyenMaiChoDatPhong (database/migrations/008_promotion_booking_lock.sql). */
+/** Mã lỗi THROW của thủ tục khóa khuyến mãi */
 const PROMOTION_SQL_ERROR = { NOT_FOUND: 50011, EXHAUSTED: 50012 } as const;
 
-/** The SQL Server error number behind a failed raw query, or null if it is not one. */
+/** Mã lỗi SQL Server của truy vấn thất bại */
 const sqlErrorNumber = (err: unknown): number | null => {
   if (!(err instanceof Prisma.PrismaClientKnownRequestError) || err.code !== 'P2010') return null;
   const cause = (err.meta as { driverAdapterError?: { cause?: { code?: unknown } } } | undefined)?.driverAdapterError?.cause;
@@ -55,7 +55,7 @@ export interface InsertBookingData {
   soTienGiam: number;
   tongTienThanhToan: number;
   ghiChu: string | null;
-  /** Initial DAT_PHONG.TrangThai: "Chờ thanh toán" unless nothing is payable (see BookingsService.createBooking). */
+  /** Trạng thái ban đầu của đơn đặt phòng */
   trangThai: string;
 }
 
@@ -73,7 +73,7 @@ export class BookingsRepository {
     });
   }
 
-  /** Capacities read inside the booking transaction, so the final check sees what is committed now. */
+  /** Sức chứa đọc trong giao dịch đặt phòng */
   async findCapacities(tx: Prisma.TransactionClient, maKhachSan: number, ids: number[]) {
     return tx.lOAI_PHONG.findMany({
       where: { MaKhachSan: maKhachSan, MaLoaiPhong: { in: ids } },
@@ -86,15 +86,7 @@ export class BookingsRepository {
     return prisma.$transaction(fn);
   }
 
-  /**
-   * Gates concurrent bookings for the same room type(s)/date range. Locks
-   * every matching QUY_PHONG_GIA row with WITH (UPDLOCK, ROWLOCK, HOLDLOCK):
-   * a second transaction requesting an overlapping room type + date range
-   * blocks on this SELECT until this transaction commits or rolls back, then
-   * re-reads the now-committed booked count. U-locks (unlike shared locks)
-   * are mutually exclusive, so this serializes competing bookings at the
-   * read step instead of racing on the later INSERT (see M5 report §2).
-   */
+  /** Khóa các dòng quỹ phòng để tuần tự hóa đặt phòng đồng thời */
   async lockRatesForUpdate(
     tx: Prisma.TransactionClient,
     maLoaiPhongIds: number[],
@@ -111,7 +103,7 @@ export class BookingsRepository {
     `);
   }
 
-  /** Rooms already occupied by non-cancelled bookings overlapping the stay — read after the gating lock above is held. */
+  /** Số phòng đã bị các đơn chưa hủy chiếm trong kỳ lưu trú */
   async findBookedQuantities(
     tx: Prisma.TransactionClient,
     maLoaiPhongIds: number[],
@@ -141,16 +133,7 @@ export class BookingsRepository {
     }));
   }
 
-  /**
-   * First step of a booking that uses a promo code (BUG-001). Calls
-   * usp_KhoaKhuyenMaiChoDatPhong, which — inside THIS transaction — locks the
-   * promo's KHUYEN_MAI row (UPDLOCK, HOLDLOCK, ROWLOCK), and only then reads it
-   * and counts its non-cancelled bookings. The lock is held until the booking
-   * transaction ends, so concurrent bookings of the same promo queue here and
-   * each sees every earlier one. Must run BEFORE lockRatesForUpdate (lock order:
-   * KHUYEN_MAI -> QUY_PHONG_GIA -> INSERT). The procedure THROWs when the promo
-   * does not exist or its SoLuongGioiHan is already used up.
-   */
+  /** Khóa khuyến mãi trước khi khóa quỹ phòng */
   async lockPromotionForBooking(tx: Prisma.TransactionClient, maCode: string): Promise<LockedPromotion> {
     try {
       const rows = await tx.$queryRaw<LockedPromotion[]>`EXEC dbo.usp_KhoaKhuyenMaiChoDatPhong ${maCode}`;
@@ -167,7 +150,7 @@ export class BookingsRepository {
     }
   }
 
-  /** Same resolution rule as M4 (oldest still-active policy) — re-read fresh inside the transaction, never trusted from a prior quote. */
+  /** Chính sách hủy hiện hành đọc lại trong giao dịch */
   async findActiveCancellationPolicy(tx: Prisma.TransactionClient) {
     return tx.cHINH_SACH_HUY.findFirst({
       where: { TrangThai: CANCELLATION_POLICY_STATUS.ACTIVE },
@@ -208,7 +191,7 @@ export class BookingsRepository {
     });
   }
 
-  /** Newest first — a personal booking history list, no pagination (M6 §5, out of report/analytics scope). */
+  /** Lịch sử đặt phòng mới nhất trước, không phân trang */
   async listByCustomer(maTaiKhoanKhachHang: number) {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.findMany({
@@ -218,8 +201,7 @@ export class BookingsRepository {
           select: {
             TenKhachSan: true,
             DiaChiChiTiet: true,
-            // A history row needs only the cover image. Do not include the
-            // full gallery for every booking in the list response.
+            // Chỉ lấy ảnh bìa
             HINH_ANH_KHACH_SAN: {
               where: { AnhDaiDien: true },
               select: { URL: true },
@@ -232,7 +214,7 @@ export class BookingsRepository {
     });
   }
 
-  /** Fetched by id only (no owner filter) — the caller distinguishes 404 (no such booking) from 403 (not the owner), same convention as owner/hotels. */
+  /** Lấy theo mã đơn, service phân biệt 404 và 403 */
   async findDetailById(maDatPhong: number) {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.findUnique({
@@ -259,7 +241,7 @@ export class BookingsRepository {
     });
   }
 
-  /** Guarded "Đã xác nhận" → "Hoàn tất" with a note; 0 rows when the booking is no longer confirmed. */
+  /** Chuyển Đã xác nhận sang Hoàn tất kèm ghi chú */
   async completeBooking(tx: Prisma.TransactionClient, maDatPhong: number, note: string, now: Date): Promise<number> {
     const result = await tx.$executeRaw(Prisma.sql`
       UPDATE DAT_PHONG
@@ -272,7 +254,7 @@ export class BookingsRepository {
     return Number(result);
   }
 
-  /** Guarded transition — only succeeds if the booking is still in a cancellable state; races (double-cancel, expiry) resolve to 0 rows affected instead of corrupting state. */
+  /** Chuyển trạng thái hủy có điều kiện để tránh tranh chấp */
   async cancelBooking(tx: Prisma.TransactionClient, maDatPhong: number, note: string, now: Date): Promise<number> {
     const result = await tx.$executeRaw(Prisma.sql`
       UPDATE DAT_PHONG

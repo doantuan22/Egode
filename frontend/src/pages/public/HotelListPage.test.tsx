@@ -24,7 +24,7 @@ describe('HotelListPage guest count', () => {
     renderWithProviders(<HotelListPage />, { route: '/hotels' });
 
     expect(lastParams()).toMatchObject({ guests: 2 });
-    // shown in the search box (the 'Số khách' control) AND repeated in the results summary chip
+    // Hiện ở ô tìm kiếm và nhắc lại ở chip tóm tắt
     expect(screen.getByRole('button', { name: /Số khách\s*2 khách/ })).toBeInTheDocument();
     expect(screen.getAllByText('2 khách')).toHaveLength(2);
   });

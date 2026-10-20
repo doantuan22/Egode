@@ -1,11 +1,4 @@
-/**
- * Pure cross-field validation shared by create and update (M8 §1) — the
- * per-field range checks (GiaTriGiam > 0, GiaTriDonToiThieu >= 0, etc.) live
- * in the Zod schema and mirror the DB CHECK constraints exactly
- * (database/migrations/004_commercial.sql); this only covers checks that
- * need two fields together, which Zod's `.partial()` update schema can't
- * express on its own (a PATCH may touch only one of the two dates).
- */
+/** Kiểm tra chéo các trường khi tạo và cập nhật khuyến mãi */
 import { DISCOUNT_TYPE } from '../../common/constants/commercial';
 
 export interface PromotionFields {

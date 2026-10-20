@@ -7,25 +7,22 @@ export type SimulationPhase = 'processing' | 'success' | 'error';
 
 export interface SimulationDialogProps {
   phase: SimulationPhase;
-  /** Heading while processing, e.g. "Đang xử lý thanh toán". */
+  /** Tiêu đề khi đang xử lý */
   processingTitle: string;
-  /** Short status lines shown one after the other while processing. */
+  /** Các dòng trạng thái hiện lần lượt */
   steps: string[];
   successTitle: string;
   successContent?: ReactNode;
   errorTitle?: string;
   errorMessage?: string;
-  /** Label of the main button once finished (success or error). */
+  /** Nhãn nút chính khi đã xong */
   primaryLabel: string;
   onPrimary: () => void;
 }
 
 const STEP_MS = 900;
 
-/**
- * Modal for a simulated payment / refund: a spinner with changing status lines while it runs, then the outcome.
- * It cannot be dismissed while processing (no Escape, no button), so the customer cannot leave half-way through.
- */
+/** Hộp thoại giả lập thanh toán hoặc hoàn tiền */
 export function SimulationDialog({ phase, processingTitle, steps, successTitle, successContent, errorTitle = 'Không thể hoàn tất', errorMessage, primaryLabel, onPrimary }: SimulationDialogProps) {
   const titleId = useId();
   const primaryRef = useRef<HTMLButtonElement>(null);

@@ -1,7 +1,4 @@
-/**
- * What shows inside the layout when a page's code is still being fetched and there is no page on screen yet (the first
- * visit). Later navigations keep the old page until the next one is ready, so they never come through here.
- */
+/** Màn hình chờ khi mã trang đang tải ở lần truy cập đầu */
 export function RouteFallback() {
   return (
     <div role="status" aria-live="polite" className="route-fallback">

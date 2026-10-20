@@ -22,12 +22,12 @@ export interface CreatePaymentResult {
 export interface CallbackOutcome {
   rspCode: string;
   message: string;
-  /** Only meaningful for the return-URL redirect — irrelevant to the IPN JSON response. */
+  /** Chỉ dùng cho chuyển hướng về URL trả kết quả */
   redirectStatus: 'success' | 'failed' | 'unknown';
   maDatPhong: number | null;
 }
 
-/** Result of a simulated payment: the money was "taken", the payment row is written and the booking is confirmed. */
+/** Kết quả thanh toán giả lập */
 export interface SimulatedPaymentResult {
   maThanhToan: number;
   maGiaoDichDoiTac: string;
@@ -73,13 +73,11 @@ export class PaymentsService {
   async createVnpayPayment(maDatPhong: number, requesterId: number, ipAddr: string): Promise<CreatePaymentResult> {
     await expireStalePendingBookings(getPrismaClient());
 
-    // The booking row stays locked for the whole check-then-insert, so double clicks, retries and parallel
-    // tabs are serialized: at most one "Chờ xử lý" payment exists per booking at any time.
+    // Khóa đơn trong lúc kiểm tra và tạo để chỉ có một lần thanh toán đang chờ
     return this.repository.runInTransaction(async (tx) => {
       const { booking, amount } = await this.lockPayableBooking(tx, maDatPhong, requesterId);
 
-      // An attempt is already open: hand it back instead of opening a second one. The URL is rebuilt from
-      // the stored attempt (same txnRef, amount and creation time), so it is the same payment.
+      // Trả lại lần thanh toán đang mở thay vì tạo mới
       const pending = await this.repository.findPendingPaymentTx(tx, maDatPhong);
       if (pending) {
         const paymentUrl = buildPaymentUrl({
@@ -115,7 +113,7 @@ export class PaymentsService {
     });
   }
 
-  /** Locks the booking and checks it can be paid by this customer; the amount is ALWAYS re-read from DAT_PHONG. */
+  /** Khóa đơn và kiểm tra quyền thanh toán, số tiền lấy lại từ CSDL */
   private async lockPayableBooking(tx: Parameters<Parameters<PaymentsRepository['runInTransaction']>[0]>[0], maDatPhong: number, requesterId: number) {
     const booking = await this.repository.lockBookingById(tx, maDatPhong);
     if (!booking) throw AppError.notFound('Không tìm thấy đặt phòng');
@@ -125,11 +123,11 @@ export class PaymentsService {
     if (booking.TrangThai !== BOOKING_STATUS.PENDING_PAYMENT) {
       throw AppError.badRequest(`Không thể tạo yêu cầu thanh toán — đặt phòng đang ở trạng thái "${booking.TrangThai}"`);
     }
-    // Defensive — TrangThai should already be CONFIRMED once a payment succeeds, so this only guards a race.
+    // Chỉ phòng hờ tranh chấp
     const existingSuccess = await this.repository.findSuccessfulPaymentTx(tx, maDatPhong);
     if (existingSuccess) throw AppError.badRequest('Đặt phòng đã được thanh toán thành công');
 
-    // Nothing from the request body feeds into `amount` (M6 §1: "Backend phải tự lấy số tiền từ DAT_PHONG").
+    // Số tiền không lấy từ body yêu cầu
     const amount = toNumber(booking.TongTienThanhToan);
     if (amount <= 0) throw AppError.badRequest('Đặt phòng có tổng thanh toán bằng 0, không cần thanh toán qua cổng');
     return { booking, amount };
@@ -139,12 +137,7 @@ export class PaymentsService {
     return { provider: getPaymentProvider() };
   }
 
-  /**
-   * Simulated payment: no gateway, no redirect. Inside ONE transaction (the booking row stays locked) it writes the
-   * THANH_TOAN row as "Thành công" — with a transaction number and pay date packed into MaGiaoDichDoiTac exactly like a
-   * real VNPAY confirmation, so a later refund finds everything it needs — and confirms the booking. Double clicks and
-   * parallel tabs serialise on the lock: the first pays, the others find the booking already confirmed.
-   */
+  /** Thanh toán giả lập trong một giao dịch */
   async paySimulated(maDatPhong: number, requesterId: number): Promise<SimulatedPaymentResult> {
     if (getPaymentProvider() !== 'simulated') {
       throw AppError.badRequest('Thanh toán mô phỏng đang tắt (PAYMENT_PROVIDER không phải "simulated")');
@@ -158,7 +151,7 @@ export class PaymentsService {
       const transactionNo = String(10_000_000 + Math.floor(Math.random() * 89_999_999));
       const packedRef = encodeGatewayRef(txnRef, transactionNo, toVnpayDate(now));
 
-      // A pending attempt left by the real-gateway mode is closed by this payment rather than duplicated.
+      // Đóng lần thanh toán đang chờ của cổng thật
       const pending = await this.repository.findPendingPaymentTx(tx, maDatPhong);
       const payment = pending
         ? await this.repository.markPaymentOutcome(tx, pending.MaThanhToan, PAYMENT_STATUS.SUCCESS, packedRef)
@@ -187,13 +180,7 @@ export class PaymentsService {
     });
   }
 
-  /**
-   * Shared by both the return-URL redirect handler and the IPN handler
-   * (M6 §1 — "callback lặp lại không được tạo thanh toán kép hoặc cập
-   * nhật tài chính sai"). Idempotent: a payment already in a terminal
-   * state (Success/Failed) is never re-mutated — a repeat callback with
-   * the same vnp_TxnRef just re-reports the stored outcome.
-   */
+  /** Xử lý callback VNPAY một lần, an toàn khi gọi lặp */
   async handleCallback(query: Record<string, unknown>, ipAddr: string): Promise<CallbackOutcome> {
     if (!verifyVnpaySignature(query)) {
       return { rspCode: VNPAY_IPN_CODE.INVALID_SIGNATURE, message: 'Invalid signature', redirectStatus: 'failed', maDatPhong: null };
@@ -204,8 +191,7 @@ export class PaymentsService {
       return { rspCode: VNPAY_IPN_CODE.ORDER_NOT_FOUND, message: 'Missing vnp_TxnRef', redirectStatus: 'failed', maDatPhong: null };
     }
 
-    // Phase 1 — everything that is a database decision, in one transaction. A refund owed because the payment
-    // arrived after the booking was gone is only RECORDED here ("Chờ xử lý"); the gateway is not called.
+    // Giai đoạn 1: quyết định trong một giao dịch, chưa gọi cổng
     const { outcome, pendingRefund } = await this.repository.runInTransaction(async (tx) => {
       let pendingRefund: PendingRefund | null = null;
       const done = (outcome: CallbackOutcome) => ({ outcome, pendingRefund });
@@ -216,8 +202,7 @@ export class PaymentsService {
       }
 
       if (payment.TrangThai !== PAYMENT_STATUS.PENDING) {
-        // Duplicate callback for an already-finalized payment — report the
-        // stored outcome again, touch nothing (this is the idempotency guard).
+        // Callback trùng chỉ báo lại kết quả đã lưu
         return done({
           rspCode: VNPAY_IPN_CODE.ORDER_ALREADY_CONFIRMED,
           message: 'Order already confirmed',
@@ -229,7 +214,7 @@ export class PaymentsService {
       const expectedVnpAmount = Math.round(toNumber(payment.SoTien) * 100);
       const receivedVnpAmount = Number(query.vnp_Amount);
       if (!Number.isFinite(receivedVnpAmount) || receivedVnpAmount !== expectedVnpAmount) {
-        // Leave the payment PENDING — this could be a malformed retry; VNPAY may resend with correct data.
+        // Giữ thanh toán ở trạng thái chờ
         return done({ rspCode: VNPAY_IPN_CODE.INVALID_AMOUNT, message: 'Invalid amount', redirectStatus: 'failed', maDatPhong: payment.MaDatPhong });
       }
 
@@ -238,9 +223,7 @@ export class PaymentsService {
 
       if (!isSuccess) {
         await this.repository.markPaymentOutcome(tx, payment.MaThanhToan, PAYMENT_STATUS.FAILED);
-        // Per M6 §1 — payment failure must never confirm the booking; it is
-        // simply left as-is (still PENDING_PAYMENT, retryable, or already
-        // expired by the lazy sweep above).
+        // Thanh toán thất bại không xác nhận đơn
         return done({ rspCode: VNPAY_IPN_CODE.SUCCESS, message: 'Confirm Success', redirectStatus: 'failed', maDatPhong: payment.MaDatPhong });
       }
 
@@ -249,12 +232,7 @@ export class PaymentsService {
 
       const confirmed = await this.repository.confirmBookingIfPending(tx, payment.MaDatPhong, now);
       if (confirmed === 0) {
-        // The booking is no longer PENDING_PAYMENT — it expired or was
-        // cancelled while this payment was in flight. VNPAY still reports
-        // success, so the money really was captured for a booking that is
-        // no longer valid: owe the customer 100% back (never silently keep the
-        // money, never silently confirm a dead booking either — see M6 report
-        // §2/§4). Recorded as ONE "Chờ xử lý" refund, sent to the gateway below.
+        // Đơn đã hết hiệu lực nên tạo yêu cầu hoàn tiền đầy đủ
         pendingRefund = await this.refunds.openPendingRefund(
           tx,
           { MaThanhToan: payment.MaThanhToan, SoTien: payment.SoTien, MaGiaoDichDoiTac: packedRef },
@@ -268,7 +246,7 @@ export class PaymentsService {
       return done({ rspCode: VNPAY_IPN_CODE.SUCCESS, message: 'Confirm Success', redirectStatus: 'success', maDatPhong: payment.MaDatPhong });
     });
 
-    // Phase 2 — committed, no lock held: ask the gateway and settle the refund row.
+    // Giai đoạn 2: gọi cổng và cập nhật hoàn tiền
     if (pendingRefund) await this.refundProcessor.process(pendingRefund, ipAddr);
     return outcome;
   }
@@ -305,15 +283,7 @@ export class PaymentsService {
     };
   }
 
-  /**
-   * Retries a refund on the SAME HOAN_TIEN row — never a new one, never a different amount.
-   *   Thành công          → no-op, the gateway is not called again.
-   *   Thất bại            → claimed (→ "Chờ xử lý") and re-sent with the same refund id.
-   *   Chờ xử lý           → 409: an attempt is under way (cancel, callback or another retry).
-   * NgayYeuCau is never touched: it stays the date the refund was first requested.
-   * The claim is a short transaction under the row lock; the gateway is called after it commits, so two
-   * simultaneous retries cannot both reach the gateway and no lock is held while waiting for it.
-   */
+  /** Thử lại hoàn tiền trên cùng một dòng */
   async retryRefund(maHoanTien: number, requesterId: number, ipAddr: string): Promise<RefundView> {
     const claimed = await this.refunds.runInTransaction(async (tx) => {
       const refund = await this.refunds.lockRefund(tx, maHoanTien);
@@ -330,7 +300,7 @@ export class PaymentsService {
         throw AppError.badRequest(`Không thể thử lại yêu cầu hoàn tiền ở trạng thái "${refund.TrangThai}"`);
       }
 
-      // A refund may never push the payment's refunds above what the customer paid.
+      // Hoàn tiền không vượt quá số đã thanh toán
       const others = await this.refunds.sumReservedRefunds(tx, refund.MaThanhToan, refund.MaHoanTien);
       if (others + toNumber(refund.SoTienHoan) > toNumber(refund.THANH_TOAN.SoTien)) {
         throw AppError.badRequest('Số tiền hoàn vượt quá số tiền đã thanh toán');

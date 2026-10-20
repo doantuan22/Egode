@@ -37,7 +37,7 @@ describe('Navbar account menu', () => {
 
     expect(links()).toContain('/profile');
     expect(links()).toContain('/bookings');
-    // The top bar already links to the help centre as "Hỗ trợ"; "Hỗ trợ / Khiếu nại" is the avatar-menu entry (desktop menu + phone drawer).
+    // Mục Hỗ trợ / Khiếu nại nằm trong menu avatar
     expect(screen.getAllByRole('link', { name: 'Hỗ trợ / Khiếu nại' }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: 'Hỗ trợ / Khiếu nại' }).every((a) => a.getAttribute('href') === '/support')).toBe(true);
   });

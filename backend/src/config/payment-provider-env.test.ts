@@ -1,9 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
-/**
- * PAYMENT_PROVIDER in env.ts: development defaults to the simulation, production must choose, and the VNPAY
- * credentials are only demanded when the real gateway is chosen.
- */
+/** Kiểm tra cấu hình PAYMENT_PROVIDER trong env.ts */
 const base: Record<string, string> = {
   NODE_ENV: 'production',
   DATABASE_URL: 'sqlserver://db.internal:1433;database=HotelBooking;user=app;password=S3cret-Value-For-Test;encrypt=true;trustServerCertificate=false;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10',
@@ -35,11 +32,11 @@ const loadEnv = async (overrides: Record<string, string | undefined>) => {
   vi.resetModules();
   for (const key of Object.keys(process.env)) delete process.env[key];
   Object.assign(process.env, originalEnv, base);
-  // blank (not deleted): env.ts loads backend/.env for any variable that is absent, and a developer's .env has values
+  // Để trống biến để env.ts không nạp giá trị từ .env
   process.env.VNPAY_TMN_CODE = '';
   process.env.VNPAY_HASH_SECRET = '';
   process.env.PAYMENT_PROVIDER = '';
-  // the developer's own .env must not leak real VNPAY / provider values into these cases
+  // Tránh lộ giá trị VNPAY thật từ .env vào test
   process.env.VNPAY_PAYMENT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
   process.env.VNPAY_REFUND_URL = 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction';
   process.env.VNPAY_RETURN_URL = 'http://localhost:5000/api/payments/vnpay-return';
@@ -72,7 +69,7 @@ describe('PAYMENT_PROVIDER', () => {
   });
 
   it('production with "vnpay" needs the merchant code and secret, https return/IPN URLs, and non-sandbox endpoints', async () => {
-    await expect(loadEnv({ PAYMENT_PROVIDER: 'vnpay' })).rejects.toThrow('Environment configuration validation failed'); // nothing configured
+    await expect(loadEnv({ PAYMENT_PROVIDER: 'vnpay' })).rejects.toThrow('Environment configuration validation failed');
     await expect(loadEnv({ PAYMENT_PROVIDER: 'vnpay', ...vnpayComplete, VNPAY_TMN_CODE: undefined })).rejects.toThrow('Environment configuration validation failed');
     await expect(loadEnv({ PAYMENT_PROVIDER: 'vnpay', ...vnpayComplete, VNPAY_RETURN_URL: 'http://api.test.invalid/return' })).rejects.toThrow('Environment configuration validation failed');
     await expect(loadEnv({ PAYMENT_PROVIDER: 'vnpay', ...vnpayComplete, VNPAY_PAYMENT_URL: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html' })).rejects.toThrow('Environment configuration validation failed');

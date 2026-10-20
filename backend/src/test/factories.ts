@@ -24,8 +24,7 @@ export const getRoleId = async (roleName: RoleName): Promise<number> => {
 };
 
 let counter = 0;
-// Date.now() alone can collide when test files run in parallel processes;
-// mix in randomness + a per-module counter to keep TenDangNhap/Email unique.
+// Trộn ngẫu nhiên và bộ đếm để tên đăng nhập và email không trùng
 const unique = () => `${Date.now()}_${Math.random().toString(36).slice(2, 10)}_${++counter}`;
 
 export interface TestAccountOptions {
@@ -76,7 +75,7 @@ export const createTestDiaPhuong = async () => {
 
 export interface TestHotelOptions {
   status?: string;
-  /** Marks a non-active hotel as one an admin approved before (sets NgayDuyet). */
+  /** Đánh dấu khách sạn từng được admin duyệt */
   approved?: boolean;
 }
 
@@ -98,7 +97,7 @@ export const createTestHotel = async (
       GioTraPhong: new Date('1970-01-01T12:00:00Z'),
       TrangThai: options.status ?? HOTEL_STATUS.ACTIVE,
       NgayDangKy: now,
-      // A hotel that is live was approved at some point (real data always carries NgayDuyet).
+      // Khách sạn đang hoạt động luôn có ngày duyệt
       ...((options.status ?? HOTEL_STATUS.ACTIVE) === HOTEL_STATUS.ACTIVE || options.approved ? { NgayDuyet: now } : {}),
       NgayCapNhat: now,
       TAI_KHOAN_KHACH_SAN_MaTaiKhoanSoHuuToTAI_KHOAN: { connect: { MaTaiKhoan: ownerId } },
@@ -124,7 +123,7 @@ export const createTestRoomType = async (maKhachSan: number) => {
   });
 };
 
-/** Cascading cleanup for a hotel created via createTestHotel (room types, images, rates, amenities). */
+/** Dọn khách sạn kèm loại phòng, ảnh, giá và tiện nghi */
 export const deleteTestHotel = async (maKhachSan: number): Promise<void> => {
   const prisma = getPrismaClient();
   const roomTypes = await prisma.lOAI_PHONG.findMany({ where: { MaKhachSan: maKhachSan }, select: { MaLoaiPhong: true } });
@@ -194,13 +193,7 @@ export const deleteTestPromotion = async (maKhuyenMai: number): Promise<void> =>
   await prisma.kHUYEN_MAI.delete({ where: { MaKhuyenMai: maKhuyenMai } }).catch(() => undefined);
 };
 
-/**
- * A CHINH_SACH_HUY dedicated to one test — NOT the system-wide "oldest
- * active" default that createBooking resolves (see M5 report §6 /
- * cancellation-policies.repository.ts findActiveDefault). Attached directly
- * to a test booking's MaChinhSachHuy so tier-selection tests get exact,
- * known thresholds regardless of whatever the seeded default policy is.
- */
+/** Chính sách hủy riêng cho một test */
 export const createTestCancellationPolicy = async (
   tiers: Array<{ soGioTruocNhanPhong: number; tyLeHoanTien: number }>
 ) => {
@@ -239,15 +232,7 @@ export interface TestBookingOptions {
   ghiChu?: string | null;
 }
 
-/**
- * Inserts a DAT_PHONG row directly (bypassing POST /hotels/:id/bookings) so
- * payment/cancellation/refund tests can set up an exact starting state
- * (a specific TrangThai, a backdated NgayTao to simulate a timed-out hold,
- * a specific MaChinhSachHuy) without depending on real QUY_PHONG_GIA
- * inventory or the M5 pricing/locking flow — mirrors the direct-DB-insert
- * pattern already used for the M5 "cancelled booking" fixture (see
- * bookings.test.ts line ~245).
- */
+/** Thêm trực tiếp một đơn đặt phòng với trạng thái chính xác */
 export const createTestBookingDirect = async (
   maTaiKhoanKhachHang: number,
   maKhachSan: number,

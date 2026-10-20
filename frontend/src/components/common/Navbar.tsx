@@ -96,10 +96,10 @@ export function Navbar() {
       );
   }, [isDropdownOpen]);
 
-  // A customer whose partner application is pending is limited like a partner: browsing only.
+  // Khách có hồ sơ đối tác đang chờ chỉ được xem
   const canUseCustomerFeatures = role === ROLE_NAMES.CUSTOMER && !meQuery.data?.DangChoDuyetDoiTac;
 
-  // Shown beside the avatar only for a customer whose latest partner application was rejected.
+  // Hiện cạnh avatar khi hồ sơ đối tác gần nhất bị từ chối
   const canReapplyPartner = role === ROLE_NAMES.CUSTOMER && !!meQuery.data?.HoSoDoiTacBiTuChoi;
 
   const navLinks = [
@@ -356,7 +356,7 @@ export function Navbar() {
               </>
             )}
 
-            {/* MOBILE MENU BUTTON */}
+            {/* Nút mở menu trên điện thoại */}
 
             <button
               className="

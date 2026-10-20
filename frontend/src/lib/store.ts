@@ -9,11 +9,7 @@ interface UiState {
   closeModal: () => void;
 }
 
-/**
- * Global UI Client State Store (Zustand)
- * Note: Used exclusively for client-side UI states per TECH-0.
- * Server data MUST be managed by TanStack Query.
- */
+/** Kho trạng thái giao diện phía client */
 export const useUiStore = create<UiState>((set) => ({
   isSidebarOpen: false,
   activeModal: null,

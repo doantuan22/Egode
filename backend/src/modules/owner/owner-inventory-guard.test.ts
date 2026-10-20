@@ -18,12 +18,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, HOTEL_STATUS, ROOM_RATE_STATUS, ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * Bug #9 — the owner can change prices and room counts, but never below what is already booked for a night,
- * never for a past night, never while the hotel is suspended; switching a hotel or room type off only stops
- * NEW bookings. Check-and-write happens under the same lock a booking takes, so a booking arriving at the same
- * moment cannot slip past a reduction.
- */
+/** Chủ khách sạn không thể giảm giá phòng dưới số đã đặt */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const at = (n: number) => new Date(`${day(n)}T00:00:00Z`);
 const prisma = () => getPrismaClient();
@@ -63,7 +58,7 @@ afterAll(async () => {
   await deleteTestDiaPhuong(diaPhuongId);
 });
 
-/** A room type on sale for days 1..5 with `stock` rooms a night. */
+/** Loại phòng bán trong 5 ngày */
 const roomTypeWithStock = async (stock = 5) => {
   const roomType = await createTestRoomType(hotelId);
   for (let d = 1; d <= 5; d++) {
@@ -74,7 +69,7 @@ const roomTypeWithStock = async (stock = 5) => {
   return roomType.MaLoaiPhong;
 };
 
-/** Rooms taken from `fromDay` (check-in) to `toDay` (check-out), in the given status. */
+/** Phòng bị chiếm từ ngày nhận đến ngày trả */
 const occupy = async (roomTypeId: number, rooms: number, fromDay: number, toDay: number, trangThai: string = BOOKING_STATUS.CONFIRMED, ngayTao?: Date) => {
   const booking = await createTestBookingDirect(customerId, hotelId, policyId, at(fromDay), at(toDay), { trangThai, ngayTao });
   await prisma().cHI_TIET_DAT_PHONG.create({ data: { MaDatPhong: booking.MaDatPhong, MaLoaiPhong: roomTypeId, SoLuongPhong: rooms } });
@@ -92,14 +87,14 @@ const stockOn = async (roomTypeId: number, d: number) =>
 describe('SoLuongPhong can never drop below the rooms already booked for that night', () => {
   it('multi-day update where every night stays >= its booked count is accepted (including nights with no booking)', async () => {
     const rt = await roomTypeWithStock(5);
-    await occupy(rt, 3, 2, 4); // nights day2, day3 → 3 rooms
-    await occupy(rt, 1, 3, 4, BOOKING_STATUS.PENDING_PAYMENT, new Date()); // fresh hold: night day3 → 4 rooms in total
-    await occupy(rt, 5, 2, 3, BOOKING_STATUS.CANCELLED); // cancelled: never counts
+    await occupy(rt, 3, 2, 4);
+    await occupy(rt, 1, 3, 4, BOOKING_STATUS.PENDING_PAYMENT, new Date());
+    await occupy(rt, 5, 2, 3, BOOKING_STATUS.CANCELLED);
 
     const res = await putRates(rt, [
-      { d: 1, qty: 0 }, // no booking: may go to zero
-      { d: 2, qty: 3 }, // exactly the 3 booked
-      { d: 3, qty: 4 }, // exactly 3 confirmed + 1 held
+      { d: 1, qty: 0 },
+      { d: 2, qty: 3 },
+      { d: 3, qty: 4 },
       { d: 4, qty: 1 },
       { d: 5, qty: 2, price: 650000 },
     ]);
@@ -115,17 +110,17 @@ describe('SoLuongPhong can never drop below the rooms already booked for that ni
     await occupy(rt, 3, 2, 4);
 
     const res = await putRates(rt, [
-      { d: 1, qty: 1, price: 111111 }, // fine on its own
-      { d: 2, qty: 2 }, // 3 booked → refused
-      { d: 3, qty: 2 }, // 3 booked → refused
-      { d: 5, qty: 1, price: 222222 }, // fine on its own
+      { d: 1, qty: 1, price: 111111 },
+      { d: 2, qty: 2 },
+      { d: 3, qty: 2 },
+      { d: 5, qty: 1, price: 222222 },
     ]);
 
     expect(res.status).toBe(409);
     expect(res.body.message).toContain(day(2));
     expect(res.body.message).toMatch(/3 phòng/);
     expect(res.body.details).toHaveLength(2);
-    expect((await stockOn(rt, 1)).SoLuongPhong).toBe(5); // untouched, price too
+    expect((await stockOn(rt, 1)).SoLuongPhong).toBe(5);
     expect(Number((await stockOn(rt, 1)).GiaPhong)).toBe(500000);
     expect(Number((await stockOn(rt, 5)).GiaPhong)).toBe(500000);
   });
@@ -145,7 +140,7 @@ describe('SoLuongPhong can never drop below the rooms already booked for that ni
     expect(res.status).toBe(200);
     expect((await stockOn(rt, 2)).TrangThai).toBe(ROOM_RATE_STATUS.CLOSED);
     expect((await prisma().dAT_PHONG.findUniqueOrThrow({ where: { MaDatPhong: bookingId } })).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
-    expect((await putRates(rt, [{ d: 2, qty: 1, status: ROOM_RATE_STATUS.CLOSED }])).status).toBe(409); // closing does not excuse a reduction
+    expect((await putRates(rt, [{ d: 2, qty: 1, status: ROOM_RATE_STATUS.CLOSED }])).status).toBe(409);
   });
 });
 
@@ -205,10 +200,7 @@ describe('switching a hotel or room type off only stops NEW bookings (a hotel on
   const book = (roomTypeId: number) =>
     request(app).post(`/api/hotels/${hotelId}/bookings`).set('Authorization', `Bearer ${customerToken}`).send({ checkIn: day(3), checkOut: day(4), rooms: [{ maLoaiPhong: roomTypeId, soLuong: 1 }] });
 
-  /**
-   * The hotel shared by the other tests in this file keeps bookings from earlier cases, which would (rightly)
-   * block deactivation — so each case here gets a hotel of its own, removed with its bookings afterwards.
-   */
+  /** Mỗi ca dùng khách sạn riêng */
   const withOwnHotel = async (run: (h: { id: number; roomTypeId: number; occupy: (rooms: number, from: number, to: number, status: string) => Promise<number> }) => Promise<void>) => {
     const id = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
     const roomType = await createTestRoomType(id);
@@ -251,7 +243,7 @@ describe('switching a hotel or room type off only stops NEW bookings (a hotel on
         .post(`/api/hotels/${h.id}/bookings`)
         .set('Authorization', `Bearer ${customerToken}`)
         .send({ checkIn: day(3), checkOut: day(4), rooms: [{ maLoaiPhong: h.roomTypeId, soLuong: 1 }] });
-      expect(newBooking.status).toBe(404); // no NEW booking at a hotel that is switched off
+      expect(newBooking.status).toBe(404);
     });
   });
 
@@ -304,7 +296,7 @@ describe('a booking and a reduction racing for the same night cannot leave it ov
   it('whichever wins, the final stock is never below the rooms booked (4 rounds)', async () => {
     for (let round = 0; round < 4; round++) {
       const rt = await roomTypeWithStock(4);
-      await occupy(rt, 1, 3, 4); // 1 room already booked on day3
+      await occupy(rt, 1, 3, 4);
       const bookOne = () =>
         request(app).post(`/api/hotels/${hotelId}/bookings`).set('Authorization', `Bearer ${customerToken}`).send({ checkIn: day(3), checkOut: day(4), rooms: [{ maLoaiPhong: rt, soLuong: 1 }] });
 

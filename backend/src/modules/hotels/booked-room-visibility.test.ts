@@ -18,11 +18,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * What a SECOND guest sees for dates that overlap an existing booking: the rooms list, the quote, the booking itself
- * and the hotel search. Real SQL Server, through the HTTP API. A stay is the half-open interval [checkIn, checkOut):
- * the night of the checkout date is free, so a guest may arrive the day another leaves.
- */
+/** Khách thứ hai thấy gì khi ngày trùng một đơn đã có */
 
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const at = (n: number) => new Date(`${day(n)}T00:00:00Z`);
@@ -43,7 +39,7 @@ let guestBToken = '';
 const login = async (email: string, password: string) =>
   (await request(app).post('/api/auth/login').send({ identifier: email, MatKhau: password })).body.data.accessToken as string;
 
-/** A room type with a price and `stock` rooms on each of days 0..29. */
+/** Loại phòng có giá và tồn kho mỗi ngày */
 const newRoom = async (hotel: number, stock: number, price = 500_000) => {
   const room = (await createTestRoomType(hotel)).MaLoaiPhong;
   await prisma().qUY_PHONG_GIA.createMany({
@@ -52,7 +48,7 @@ const newRoom = async (hotel: number, stock: number, price = 500_000) => {
   return room;
 };
 
-/** Someone else's booking, written straight to the database so every status and age can be set exactly. */
+/** Đơn của người khác ghi thẳng vào CSDL */
 const occupy = async (room: number, from: number, to: number, qty = 1, status: string = BOOKING_STATUS.CONFIRMED, hotel = hotelId, createdMinutesAgo = 0) => {
   const booking = await createTestBookingDirect(guestAId, hotel, policyId, at(from), at(to), {
     trangThai: status,
@@ -122,7 +118,7 @@ describe('a booked room is still LISTED, but marked sold out for the overlapping
     const entry = list.find((r) => r.MaLoaiPhong === room);
     expect(entry).toBeDefined();
     expect(entry).toMatchObject({ ConHang: false, SoPhongConLai: 0 });
-    expect(entry!.GiaTheoDem).toBe(500_000); // still priced: the guest sees what it would cost, and that it is gone
+    expect(entry!.GiaTheoDem).toBe(500_000);
   });
 });
 
@@ -219,7 +215,7 @@ describe('several rooms of one type: the count left, and the night with the leas
     expect(tooMany.ChiTietPhong[0]).toMatchObject({ SoPhongConLai: 1, DuPhong: false });
     expect((await book(room, 5, 7, 2)).status).toBe(409);
     expect((await book(room, 5, 7, 1)).status).toBe(201);
-    expect(await roomFor(room, 5, 7)).toMatchObject({ ConHang: false, SoPhongConLai: 0 }); // that was the last one
+    expect(await roomFor(room, 5, 7)).toMatchObject({ ConHang: false, SoPhongConLai: 0 });
   });
 
   it('one booking line of 2 rooms plus another booking of 1 room add up per night', async () => {
@@ -227,18 +223,18 @@ describe('several rooms of one type: the count left, and the night with the leas
     await occupy(room, 5, 7, 2);
     await occupy(room, 6, 8, 1);
 
-    expect((await roomFor(room, 5, 6)).SoPhongConLai).toBe(1); // night 5: 2 taken
-    expect((await roomFor(room, 6, 7)).SoPhongConLai).toBe(0); // night 6: 2 + 1 taken
-    expect((await roomFor(room, 7, 8)).SoPhongConLai).toBe(2); // night 7: 1 taken
+    expect((await roomFor(room, 5, 6)).SoPhongConLai).toBe(1);
+    expect((await roomFor(room, 6, 7)).SoPhongConLai).toBe(0);
+    expect((await roomFor(room, 7, 8)).SoPhongConLai).toBe(2);
   });
 
   it('a multi-night stay can only have as many rooms as its busiest night leaves (stock 2: one night fully taken)', async () => {
     const room = await newRoom(hotelId, 2);
-    await occupy(room, 6, 7, 2); // night 6 only, both rooms
+    await occupy(room, 6, 7, 2);
 
     expect(await roomFor(room, 5, 8)).toMatchObject({ ConHang: false, SoPhongConLai: 0 });
     expect((await book(room, 5, 8)).status).toBe(409);
-    expect(await roomFor(room, 7, 9)).toMatchObject({ ConHang: true, SoPhongConLai: 2 }); // avoiding that night is fine
+    expect(await roomFor(room, 7, 9)).toMatchObject({ ConHang: true, SoPhongConLai: 2 });
   });
 
   it('two partially overlapping bookings: each night is counted separately', async () => {
@@ -263,7 +259,7 @@ describe('a second customer through the real booking API', () => {
     expect(await roomFor(room, 10, 12)).toMatchObject({ ConHang: false, SoPhongConLai: 0 });
     expect((await quote(room, 11, 13)).body.data.KhaDung).toBe(false);
     expect((await book(room, 11, 13)).status).toBe(409);
-    expect((await book(room, 12, 14)).status).toBe(201); // starts on A's check-out day
+    expect((await book(room, 12, 14)).status).toBe(201);
   });
 
   it('when A cancels, the room comes back for B at once', async () => {
@@ -289,7 +285,7 @@ describe('hotel search for the overlapping dates', () => {
     const item = (await search(5, 7)).find((h) => h.MaKhachSan === hotel);
     expect(item).toBeDefined();
     expect(item).toMatchObject({ ConPhong: false, GiaTuDauTu: null });
-    expect((await search(7, 9)).find((h) => h.MaKhachSan === hotel)).toMatchObject({ ConPhong: true, GiaTuDauTu: 500_000 }); // free again from the check-out day
+    expect((await search(7, 9)).find((h) => h.MaKhachSan === hotel)).toMatchObject({ ConPhong: true, GiaTuDauTu: 500_000 });
   });
 
   it('with one room taken and another free, "from" price is the cheapest room that is still FREE', async () => {
@@ -306,12 +302,12 @@ describe('hotel search for the overlapping dates', () => {
   it('counts the party against the rooms still free: listed as sold out when too few remain, not listed when it could never fit', async () => {
     const hotel = (await createTestHotel(ownerId, diaPhuongId)).MaKhachSan;
     hotelIds.push(hotel);
-    const room = await newRoom(hotel, 2); // 2 rooms x 2 guests = 4 in stock
-    await occupy(room, 5, 7, 1, BOOKING_STATUS.CONFIRMED, hotel); // 1 room x 2 guests still free
+    const room = await newRoom(hotel, 2);
+    await occupy(room, 5, 7, 1, BOOKING_STATUS.CONFIRMED, hotel);
 
     const find = async (guests: number) => (await search(5, 7, guests)).find((h) => h.MaKhachSan === hotel);
     expect(await find(2)).toMatchObject({ ConPhong: true });
-    expect(await find(3)).toMatchObject({ ConPhong: false }); // fits the hotel in principle, not the rooms left
-    expect(await find(5)).toBeUndefined(); // could never fit, free or not
+    expect(await find(3)).toMatchObject({ ConPhong: false });
+    expect(await find(5)).toBeUndefined();
   });
 });

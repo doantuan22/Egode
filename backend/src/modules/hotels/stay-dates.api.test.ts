@@ -15,10 +15,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday, STAY_DATE_MESSAGES } from '../../common/utils/stay-dates';
 
-/**
- * Bug #3 — the same stay-date rule on every endpoint that takes a stay: hotel search, room availability,
- * quote and booking. The matrix is run against all four so the rule cannot drift between them.
- */
+/** Cùng quy tắc ngày lưu trú cho mọi endpoint */
 const day = (offset: number) => addDaysToDateKey(businessToday(), offset);
 
 const accountIds: number[] = [];
@@ -37,7 +34,7 @@ beforeAll(async () => {
   hotelId = (await createTestHotel(owner.account.MaTaiKhoan, diaPhuongId)).MaKhachSan;
   roomTypeId = (await createTestRoomType(hotelId)).MaLoaiPhong;
 
-  // Sellable from today for two nights, so one real booking can go all the way through.
+  // Bán từ hôm nay trong hai đêm
   const prisma = getPrismaClient();
   for (let i = 0; i < 2; i++) {
     await prisma.qUY_PHONG_GIA.create({
@@ -58,7 +55,7 @@ afterAll(async () => {
 interface Endpoint {
   name: string;
   call: (checkIn: string, checkOut: string) => Promise<{ status: number; body: { details?: Array<{ field: string; message: string }> } }>;
-  /** What an accepted stay answers; booking may legitimately answer 409 (no stock/prices) once validation passed. */
+  /** Kết quả của kỳ lưu trú hợp lệ */
   accepted: (status: number) => boolean;
 }
 
@@ -85,7 +82,7 @@ const endpoints: Endpoint[] = [
         .post(`/api/hotels/${hotelId}/bookings`)
         .set('Authorization', `Bearer ${customerToken}`)
         .send({ checkIn, checkOut, rooms: [{ maLoaiPhong: roomTypeId, soLuong: 1 }] }),
-    // Past validation the booking either succeeds (201) or reports missing stock/prices (409) — never 400/500.
+    // Qua kiểm tra ngày thì đặt phòng thành công hoặc báo thiếu tồn kho
     accepted: (status) => status === 201 || status === 409,
   },
 ];
@@ -128,7 +125,7 @@ describe.each(endpoints)('stay-date rule on $name', (endpoint) => {
 describe('booking with a check-in of today is really created', () => {
   it('201 and persisted with today as NgayNhanPhong', async () => {
     const res = await endpoints[3].call(day(0), day(1));
-    // The previous matrix run may already hold the room; either way no date rule fired.
+    // Lần chạy trước có thể đã giữ phòng
     expect([201, 409]).toContain(res.status);
     if (res.status === 201) {
       expect(res.body).toMatchObject({ data: { NgayNhanPhong: day(0), NgayTraPhong: day(1), SoDem: 1 } });

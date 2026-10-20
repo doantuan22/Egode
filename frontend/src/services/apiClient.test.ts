@@ -122,7 +122,7 @@ describe('apiClient refreshes the access token for protected /auth endpoints (ch
 
     await expect(apiClient('/auth/change-password', { method: 'POST', body: '{}' })).rejects.toMatchObject({ statusCode: 401 });
 
-    expect(fetchMock).toHaveBeenCalledTimes(2); // the request, then the refresh — nothing more
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(useAuthStore.getState().sessionExpired).toBe(true);
   });
 
@@ -159,7 +159,7 @@ describe('apiClient always sends the session cookie (cross-site deployments need
 
     await apiClient('/bookings');
 
-    expect(calls).toHaveLength(3); // request, refresh, retry
+    expect(calls).toHaveLength(3);
     for (const init of calls) expect(init?.credentials).toBe('include');
     expect(calls[1]?.method).toBe('POST');
   });

@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
-/** Builds an unsigned-looking JWT for tests — decodeAccessToken() never verifies signatures. */
+/** Tạo JWT cho test */
 export function makeFakeAccessToken(payload: Record<string, unknown>): string {
   const toBase64Url = (obj: unknown) => {
     const json = JSON.stringify(obj);

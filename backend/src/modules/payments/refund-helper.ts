@@ -1,9 +1,4 @@
-/**
- * Shared by bookings.service (cancel → refund) and payments.service (a
- * late payment-success callback arriving after the booking already expired
- * — see payments.service.ts `handleCallback`) so both go through the exact
- * same "never fake success" gateway call.
- */
+/** Gọi cổng hoàn tiền dùng chung cho hủy đơn và callback trễ */
 import type { RefundGateway, RefundResult } from './refund-gateway';
 import { decodeGatewayRef } from './vnpay';
 

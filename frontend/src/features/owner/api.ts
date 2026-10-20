@@ -13,7 +13,7 @@ import type {
   OwnerBookingsFilters,
 } from './types';
 
-// ---- Hotels ----
+// Khách sạn
 
 export const listMyHotels = async (): Promise<OwnerHotel[]> => {
   const res = await apiClient<OwnerHotel[]>('/owner/hotels');
@@ -63,7 +63,7 @@ export const setPrimaryHotelImage = async (id: number, imageId: number): Promise
   return res.data as OwnerHotel;
 };
 
-// ---- Room types ----
+// Loại phòng
 
 export const listRoomTypes = async (hotelId: number): Promise<OwnerRoomType[]> => {
   const res = await apiClient<OwnerRoomType[]>(`/owner/hotels/${hotelId}/room-types`);
@@ -124,7 +124,7 @@ export const setPrimaryRoomTypeImage = async (id: number, imageId: number): Prom
   return res.data as OwnerRoomType;
 };
 
-// ---- Rates (inventory/pricing) ----
+// Giá và tồn kho
 
 export const listRates = async (roomTypeId: number, from: string, to: string): Promise<RateRow[]> => {
   const q = new URLSearchParams({ from, to });
@@ -140,7 +140,7 @@ export const bulkUpsertRates = async (roomTypeId: number, rates: RateItemInput[]
   return res.data ?? [];
 };
 
-// ---- Reviews of an owned hotel (read-only) ----
+// Đánh giá của khách sạn
 
 export interface OwnerReviewsPage {
   items: OwnerHotelReview[];

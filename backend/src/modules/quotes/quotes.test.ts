@@ -18,7 +18,7 @@ import { ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-s
 import { DISCOUNT_TYPE } from '../../common/constants/commercial';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+// Hôm nay theo múi giờ nghiệp vụ
 const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -29,9 +29,9 @@ const promotionIds: number[] = [];
 
 let hotelId: number;
 let customerId: number;
-let roomA: number; // priced every night, plenty of stock
-let roomB: number; // will be made sold-out over a specific range
-let roomC: number; // deliberately missing a QUY_PHONG_GIA row (unpriced) mid-range
+let roomA: number;
+let roomB: number;
+let roomC: number;
 
 beforeAll(async () => {
   const { account } = await createTestAccount({ role: ROLE_NAMES.PARTNER });
@@ -55,20 +55,20 @@ beforeAll(async () => {
 
   const prisma = getPrismaClient();
 
-  // Room A: fully priced for the next 10 days, generous stock (5 rooms).
+  // Phòng A đủ giá 10 ngày và tồn kho dồi dào
   for (let i = 0; i < 10; i++) {
     await prisma.qUY_PHONG_GIA.create({
       data: { MaLoaiPhong: roomA, NgayApDung: addDays(i), GiaPhong: 500000, SoLuongPhong: 5, TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE },
     });
   }
 
-  // Room B: priced for the next 10 days, only 2 rooms of stock (used for sold-out test).
+  // Phòng B có giá 10 ngày nhưng chỉ 2 phòng
   for (let i = 0; i < 10; i++) {
     await prisma.qUY_PHONG_GIA.create({
       data: { MaLoaiPhong: roomB, NgayApDung: addDays(i), GiaPhong: 800000, SoLuongPhong: 2, TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE },
     });
   }
-  // A confirmed booking eats both Room B rooms on day 5-6 (1 night).
+  // Đơn xác nhận chiếm hết 2 phòng B
   const policy = await prisma.cHINH_SACH_HUY.findFirst();
   const booking = await prisma.dAT_PHONG.create({
     data: {
@@ -88,7 +88,7 @@ beforeAll(async () => {
   });
   await prisma.cHI_TIET_DAT_PHONG.create({ data: { MaDatPhong: booking.MaDatPhong, MaLoaiPhong: roomB, SoLuongPhong: 2 } });
 
-  // Room C: priced for days 0-3 and 5-9, but MISSING day 4 entirely (unpriced gap).
+  // Phòng C thiếu giá ngày 4
   for (let i = 0; i < 10; i++) {
     if (i === 4) continue;
     await prisma.qUY_PHONG_GIA.create({
@@ -99,8 +99,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   const prisma = getPrismaClient();
-  // Delete bookings created directly in this file before the cascading
-  // deleteTestHotel cleanup (which does not know about ad-hoc DAT_PHONG rows).
+  // Xóa đơn tạo trực tiếp trước khi dọn khách sạn
   await prisma.cHI_TIET_DAT_PHONG.deleteMany({ where: { MaLoaiPhong: { in: [roomA, roomB, roomC] } } });
   await prisma.dAT_PHONG.deleteMany({ where: { MaKhachSan: hotelId } });
 
@@ -118,7 +117,7 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.SoDem).toBe(3);
-    expect(res.body.data.ChiTietPhong[0].ThanhTien).toBe(1_500_000); // 500k x 3 nights x 1 room
+    expect(res.body.data.ChiTietPhong[0].ThanhTien).toBe(1_500_000);
     expect(res.body.data.TongTienPhong).toBe(1_500_000);
     expect(res.body.data.KhaDung).toBe(true);
   });
@@ -130,8 +129,8 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
         checkIn: iso(addDays(0)),
         checkOut: iso(addDays(2)),
         rooms: [
-          { maLoaiPhong: roomA, soLuong: 2 }, // 500k * 2 nights * 2 rooms = 2,000,000
-          { maLoaiPhong: roomB, soLuong: 1 }, // 800k * 2 nights * 1 room = 1,600,000
+          { maLoaiPhong: roomA, soLuong: 2 },
+          { maLoaiPhong: roomB, soLuong: 1 },
         ],
       });
 
@@ -145,13 +144,13 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
       .post(`/api/hotels/${hotelId}/quote`)
       .send({ checkIn: iso(addDays(0)), checkOut: iso(addDays(1)), rooms: [{ maLoaiPhong: roomA, soLuong: 1 }] });
     expect(res1.body.data.SoDem).toBe(1);
-    expect(res1.body.data.ChiTietPhong[0].ThanhTien).toBe(500_000); // exactly 1 night, not 2
+    expect(res1.body.data.ChiTietPhong[0].ThanhTien).toBe(500_000);
 
     const res2 = await request(app)
       .post(`/api/hotels/${hotelId}/quote`)
       .send({ checkIn: iso(addDays(0)), checkOut: iso(addDays(4)), rooms: [{ maLoaiPhong: roomA, soLuong: 1 }] });
     expect(res2.body.data.SoDem).toBe(4);
-    expect(res2.body.data.ChiTietPhong[0].ThanhTien).toBe(2_000_000); // 4 nights, checkout day excluded
+    expect(res2.body.data.ChiTietPhong[0].ThanhTien).toBe(2_000_000);
   });
 
   it('flags a room type with a missing QUY_PHONG_GIA day as unpriceable, without crashing the rest of the quote', async () => {
@@ -159,7 +158,7 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
       .post(`/api/hotels/${hotelId}/quote`)
       .send({
         checkIn: iso(addDays(3)),
-        checkOut: iso(addDays(6)), // spans the missing day 4 for roomC
+        checkOut: iso(addDays(6)),
         rooms: [{ maLoaiPhong: roomC, soLuong: 1 }],
       });
 
@@ -177,10 +176,10 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
 
     expect(res.status).toBe(200);
     const line = res.body.data.ChiTietPhong[0];
-    expect(line.SoPhongConLai).toBe(0); // both rooms taken by the seeded booking
+    expect(line.SoPhongConLai).toBe(0);
     expect(line.DuPhong).toBe(false);
     expect(res.body.data.KhaDung).toBe(false);
-    // Still priced (CoGiaDayDu true) — sold-out and unpriced are distinct states.
+    // Vẫn có giá đầy đủ
     expect(line.CoGiaDayDu).toBe(true);
   });
 
@@ -205,11 +204,11 @@ describe('POST /api/hotels/:id/quote — room pricing & availability', () => {
         checkIn: iso(addDays(0)),
         checkOut: iso(addDays(1)),
         rooms: [{ maLoaiPhong: roomA, soLuong: 1 }],
-        TongTienThanhToan: 1, // attacker-supplied — must be silently ignored
+        TongTienThanhToan: 1,
         SoTienGiam: 999999999,
       });
     expect(res.status).toBe(200);
-    expect(res.body.data.TongTienThanhToan).toBe(500_000); // server-computed, not 1
+    expect(res.body.data.TongTienThanhToan).toBe(500_000);
     expect(res.body.data.SoTienGiam).toBe(0);
   });
 
@@ -235,7 +234,7 @@ describe('POST /api/hotels/:id/quote — promotions', () => {
     expect(res.status).toBe(200);
     expect(res.body.data.PromoHopLe).toBe(true);
     expect(res.body.data.TongTienPhong).toBe(1_000_000);
-    expect(res.body.data.SoTienGiam).toBe(100_000); // 10%
+    expect(res.body.data.SoTienGiam).toBe(100_000);
     expect(res.body.data.TongTienThanhToan).toBe(900_000);
   });
 
@@ -247,7 +246,7 @@ describe('POST /api/hotels/:id/quote — promotions', () => {
       .post(`/api/hotels/${hotelId}/quote`)
       .send({ checkIn: iso(addDays(0)), checkOut: iso(addDays(2)), rooms: [{ maLoaiPhong: roomA, soLuong: 1 }], promoCode: promo.MaCode });
 
-    // Subtotal 1,000,000 * 50% = 500,000, but capped at 100,000.
+    // Giảm 50% nhưng bị giới hạn ở 100.000
     expect(res.body.data.SoTienGiam).toBe(100_000);
     expect(res.body.data.TongTienThanhToan).toBe(900_000);
   });
@@ -276,7 +275,7 @@ describe('POST /api/hotels/:id/quote — promotions', () => {
     expect(res.body.data.PromoHopLe).toBe(false);
     expect(res.body.data.PromoThongBao).toMatch(/chưa bắt đầu/i);
     expect(res.body.data.SoTienGiam).toBe(0);
-    expect(res.body.data.TongTienThanhToan).toBe(res.body.data.TongTienPhong); // no discount applied
+    expect(res.body.data.TongTienThanhToan).toBe(res.body.data.TongTienPhong);
   });
 
   it('rejects an expired promo', async () => {
@@ -320,7 +319,7 @@ describe('POST /api/hotels/:id/quote — promotions', () => {
     const prisma = getPrismaClient();
     const policy = await prisma.cHINH_SACH_HUY.findFirst();
 
-    // Simulate 1 prior (non-cancelled) booking already used this code.
+    // Giả lập một đơn chưa hủy đã dùng mã
     const booking = await prisma.dAT_PHONG.create({
       data: {
         MaXacNhanDatPhong: `QUOTE-PROMO-USED-${Date.now()}`,
@@ -377,7 +376,7 @@ describe('POST /api/hotels/:id/quote — promotions', () => {
       .post(`/api/hotels/${hotelId}/quote`)
       .send({ checkIn: iso(addDays(0)), checkOut: iso(addDays(2)), rooms: [{ maLoaiPhong: roomA, soLuong: 1 }], promoCode: promo.MaCode });
 
-    expect(res.body.data.PromoHopLe).toBe(true); // still usable — the cancelled booking doesn't count
+    expect(res.body.data.PromoHopLe).toBe(true);
 
     await prisma.dAT_PHONG.delete({ where: { MaDatPhong: booking.MaDatPhong } });
   });

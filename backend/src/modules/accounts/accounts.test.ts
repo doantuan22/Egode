@@ -157,7 +157,6 @@ describe('DELETE /api/admin/accounts/:id (safe delete)', () => {
     const prisma = getPrismaClient();
     const row = await prisma.tAI_KHOAN.findUnique({ where: { MaTaiKhoan: account.MaTaiKhoan } });
     expect(row).toBeNull();
-    // Not pushed to createdAccountIds — it no longer exists, nothing to clean up.
   });
 
   it('locks instead of hard-deleting an account that has related history (G0-10)', async () => {
@@ -223,11 +222,11 @@ describe('SoDienThoai validation on admin create/update uses the shared phone ru
   const INVALID = [
     'abcdefgh',
     '09012abc567',
-    '1234567', // 7 digits
-    '123456', // far below 8
-    '1234567890123456', // 18 digits
-    '+' + '1'.repeat(16), // 16 digits after +
-    '090 123 4567', // inner spaces
+    '1234567',
+    '123456',
+    '1234567890123456',
+    '+' + '1'.repeat(16),
+    '090 123 4567',
     '',
     '   ',
   ];
@@ -280,7 +279,7 @@ describe('SoDienThoai validation on admin create/update uses the shared phone ru
       const res = await adminCreate(token, phone);
       expect(res.status, JSON.stringify(phone)).toBe(400);
     }
-    expect((await adminCreate(token, 901234567)).status).toBe(400); // non-string
+    expect((await adminCreate(token, 901234567)).status).toBe(400);
     expect(await prisma.tAI_KHOAN.count()).toBe(before);
   });
 
@@ -308,7 +307,7 @@ describe('SoDienThoai validation on admin create/update uses the shared phone ru
     const before = await storedPhone(account.MaTaiKhoan);
 
     for (const phone of INVALID) {
-      // HoTen rides along: a rejected request must not apply ANY of its fields.
+      // Yêu cầu bị từ chối thì không áp dụng trường nào
       const res = await adminUpdate(token, account.MaTaiKhoan, { SoDienThoai: phone, HoTen: 'Should Not Be Saved' });
       expect(res.status, JSON.stringify(phone)).toBe(400);
     }

@@ -3,12 +3,12 @@ import { useLocation } from 'react-router-dom';
 
 type Phase = 'idle' | 'loading' | 'done';
 
-/** A click on a link this long without the new page being ready is worth a progress bar; quicker ones show nothing. */
+/** Click liên kết lâu hơn mức này mới hiện thanh tiến trình */
 const SHOW_AFTER_MS = 160;
-/** Safety net: never leave the bar crawling if a navigation never lands. */
+/** Chặn thanh chạy mãi khi điều hướng không hoàn tất */
 const GIVE_UP_MS = 12_000;
 
-/** The internal path a plain left click on `link` would navigate to, or null when the click is not a navigation. */
+/** Đường dẫn nội bộ mà click trái vào liên kết sẽ tới, hoặc null */
 function targetOf(event: MouseEvent, link: HTMLAnchorElement | null): string | null {
   if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return null;
   if (link.target && link.target !== '_self') return null;
@@ -18,10 +18,7 @@ function targetOf(event: MouseEvent, link: HTMLAnchorElement | null): string | n
   return url.pathname + url.search;
 }
 
-/**
- * A slim bar under the top edge for navigations that take a moment. The old page stays on screen until the next one is
- * ready (no blank in between), and this bar is what tells the visitor that the click was heard.
- */
+/** Thanh mảnh báo trang đang tải khi điều hướng chậm */
 export function NavigationProgress() {
   const { pathname, search } = useLocation();
   const [phase, setPhase] = useState<Phase>('idle');

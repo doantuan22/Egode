@@ -5,15 +5,14 @@ import { getPrismaClient } from '../../config/prisma';
 import { seedDiscovery } from '../../../prisma/seed-discovery';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+// Hôm nay theo múi giờ nghiệp vụ
 const addDays = (days: number): string => addDaysToDateKey(businessToday(), days);
 
 let grandSaigonId: number;
 let danangResortId: number;
 
 beforeAll(async () => {
-  // These assertions intentionally exercise the date-relative demo fixtures.
-  // Re-anchor them through the production seed function before reading them.
+  // Neo lại dữ liệu demo theo ngày hiện tại
   await seedDiscovery();
   const prisma = getPrismaClient();
   const grandSaigon = await prisma.kHACH_SAN.findFirstOrThrow({ where: { TenKhachSan: 'Grand Saigon Hotel' } });
@@ -68,14 +67,14 @@ describe('GET /api/hotels (search/filter/pagination)', () => {
     const res = await request(app)
       .get('/api/hotels')
       .query({ location: 'Đà Nẵng', checkIn: addDays(20), checkOut: addDays(22), guests: 4 });
-    // 4 guests fit in one Suite (SucChua 4) — or in two 2-person rooms; still returned.
+    // 4 khách vừa một phòng Suite
     const names = res.body.data.map((h: { TenKhachSan: string }) => h.TenKhachSan);
     expect(names).toContain('Da Nang Beach Resort');
 
     const tooMany = await request(app)
       .get('/api/hotels')
       .query({ location: 'Đà Nẵng', checkIn: addDays(20), checkOut: addDays(22), guests: 50 });
-    // 50 guests exceed everything Da Nang Beach Resort has in stock (all its rooms together), so it is not offered.
+    // 50 khách vượt quá tổng sức chứa nên không được gợi ý
     expect(tooMany.body.data.map((h: { TenKhachSan: string }) => h.TenKhachSan)).not.toContain('Da Nang Beach Resort');
   });
 
@@ -124,7 +123,7 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
     expect(res.status).toBe(200);
     const standard = res.body.data.find((r: { TenLoaiPhong: string }) => r.TenLoaiPhong === 'Standard');
     expect(standard).toBeDefined();
-    expect(standard.SoPhongConLai).toBe(6); // full inventory, no booking in this range
+    expect(standard.SoPhongConLai).toBe(6);
     expect(standard.ConHang).toBe(true);
     expect(standard.GiaTheoDem).toBeGreaterThan(0);
     expect(standard.TongTien).toBe(standard.GiaTheoDem === null ? null : standard.TongTien);
@@ -133,16 +132,15 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
   it('availability có booking: subtracts booked rooms for the overlapping range', async () => {
     const res = await request(app)
       .get(`/api/hotels/${grandSaigonId}/rooms`)
-      .query({ checkIn: addDays(5), checkOut: addDays(7) }); // SEED-BOOK-001 takes 4/6 Standard here
+      .query({ checkIn: addDays(5), checkOut: addDays(7) });
 
     const standard = res.body.data.find((r: { TenLoaiPhong: string }) => r.TenLoaiPhong === 'Standard');
-    expect(standard.SoPhongConLai).toBe(2); // 6 - 4
+    expect(standard.SoPhongConLai).toBe(2);
     expect(standard.ConHang).toBe(true);
   });
 
   it('checkout date của booking không được tính là một đêm bị chiếm', async () => {
-    // SEED-BOOK-001 stays [day+5, day+7). Querying [day+7, day+8) must NOT
-    // see the checkout day as occupied — full inventory again.
+    // Ngày trả phòng không bị tính là đã có người ở
     const res = await request(app)
       .get(`/api/hotels/${grandSaigonId}/rooms`)
       .query({ checkIn: addDays(7), checkOut: addDays(8) });
@@ -154,7 +152,7 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
   it('sold out: fully booked room type shows 0 remaining and ConHang=false', async () => {
     const res = await request(app)
       .get(`/api/hotels/${danangResortId}/rooms`)
-      .query({ checkIn: addDays(10), checkOut: addDays(12) }); // SEED-BOOK-002 takes all 2 Suite rooms
+      .query({ checkIn: addDays(10), checkOut: addDays(12) });
 
     const suite = res.body.data.find((r: { TenLoaiPhong: string }) => r.TenLoaiPhong === 'Suite');
     expect(suite.SoPhongConLai).toBe(0);
@@ -162,9 +160,7 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
   });
 
   it('không overcount booking đã hủy: cancelled booking never reduces availability', async () => {
-    // SEED-BOOK-003 (CANCELLED) "books" all 5 Deluxe rooms for the same
-    // [day+10, day+12) range as the sold-out Suite test above — Deluxe must
-    // still show full availability.
+    // Đơn đã hủy không làm giảm số phòng Deluxe
     const res = await request(app)
       .get(`/api/hotels/${danangResortId}/rooms`)
       .query({ checkIn: addDays(10), checkOut: addDays(12) });
@@ -186,8 +182,8 @@ describe('GET /api/hotels/:id/rooms (room list + price + availability)', () => {
       .get(`/api/hotels/${grandSaigonId}/rooms`)
       .query({ checkIn: addDays(20), checkOut: addDays(22), guests: 4 });
     const names = res.body.data.map((r: { TenLoaiPhong: string }) => r.TenLoaiPhong);
-    expect(names).toContain('Suite'); // SucChua 4
-    expect(names).toContain('Standard'); // SucChua 2: two of them hold four guests
+    expect(names).toContain('Suite');
+    expect(names).toContain('Standard');
     const standard = res.body.data.find((r: { TenLoaiPhong: string }) => r.TenLoaiPhong === 'Standard');
     expect(standard.SucChua).toBe(2);
   });

@@ -70,7 +70,7 @@ describe('MainLayout', () => {
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent('Đã xảy ra lỗi');
-    expect(screen.getByRole('link', { name: 'Trang chủ' })).toBeInTheDocument(); // navbar survived
+    expect(screen.getByRole('link', { name: 'Trang chủ' })).toBeInTheDocument();
 
     shouldThrow = false;
     await userEvent.setup().click(screen.getByRole('link', { name: 'Trang chủ' }));

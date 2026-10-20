@@ -24,7 +24,7 @@ export const disconnectPrisma = async (): Promise<void> => {
   }
 };
 
-// Export lazy getter proxy for convenience
+// Xuất proxy tải chậm cho tiện dùng
 export const prisma = new Proxy({} as PrismaClient, {
   get(_target, prop: keyof PrismaClient) {
     const client = getPrismaClient();

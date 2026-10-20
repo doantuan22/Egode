@@ -2,7 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
 import { BOOKING_STATUS, HOTEL_STATUS } from '../../common/constants/hotel-status';
 
-/** Bookings that still have something to happen: waiting for payment, or paid and the stay is not over. */
+/** Đơn còn đang xử lý */
 const OPEN_BOOKING_STATUSES = [BOOKING_STATUS.PENDING_PAYMENT, BOOKING_STATUS.CONFIRMED];
 
 export class OwnerHotelsRepository {
@@ -50,7 +50,7 @@ export class OwnerHotelsRepository {
     return prisma.kHACH_SAN.update({ where: { MaKhachSan: maKhachSan }, data });
   }
 
-  /** Atomic compare-and-set on TrangThai; false when the hotel is no longer in the expected state. */
+  /** Đổi trạng thái có điều kiện, false nếu trạng thái đã khác */
   async changeStatus(maKhachSan: number, from: string, to: string, now: Date): Promise<boolean> {
     const prisma = getPrismaClient();
     const result = await prisma.kHACH_SAN.updateMany({
@@ -60,17 +60,13 @@ export class OwnerHotelsRepository {
     return result.count === 1;
   }
 
-  /** How many of this hotel's bookings are still open ("Chờ thanh toán" or "Đã xác nhận", stay not finished). */
+  /** Số đơn còn mở của khách sạn */
   async countOpenBookings(maKhachSan: number): Promise<number> {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.count({ where: { MaKhachSan: maKhachSan, TrangThai: { in: OPEN_BOOKING_STATUSES } } });
   }
 
-  /**
-   * Hoạt động → Ngừng hoạt động in ONE statement that also requires no open booking, so a booking that lands
-   * between a separate count and the update cannot be left on a hotel that was switched off. False when the
-   * hotel is no longer active or has an open booking.
-   */
+  /** Ngừng hoạt động chỉ khi không còn đơn mở */
   async deactivateWhenNoOpenBookings(maKhachSan: number, now: Date): Promise<boolean> {
     const prisma = getPrismaClient();
     const result = await prisma.kHACH_SAN.updateMany({

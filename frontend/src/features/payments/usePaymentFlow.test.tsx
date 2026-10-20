@@ -10,7 +10,7 @@ import { renderWithProviders } from '../../test/testUtils';
 
 vi.mock('./api');
 vi.mock('./hooks');
-// The server answers at once; the screen keeps the animation for a moment. Tests do not wait for that moment.
+// Server trả ngay, màn hình giữ hiệu ứng thêm một lúc
 vi.mock('../../lib/simulation', () => ({ SIMULATION_DELAY_MS: 0, withMinimumDelay: <T,>(work: Promise<T>) => work }));
 
 const result = { maThanhToan: 9, maGiaoDichDoiTac: 'PAYABC123', maDatPhong: 5, maXacNhanDatPhong: 'EGD-5', soTien: 1_250_000, trangThaiThanhToan: 'Thành công', trangThaiDatPhong: 'Đã xác nhận', thoiGianThanhToan: '2030-01-01T00:00:00.000Z' };
@@ -63,8 +63,8 @@ describe('usePaymentFlow — simulated payment', () => {
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('Đang xử lý thanh toán');
     expect(screen.getByRole('status')).toHaveTextContent('Đang kết nối cổng thanh toán');
-    expect(screen.queryByRole('button', { name: 'Xem kết quả' })).not.toBeInTheDocument(); // cannot be dismissed mid-way
-    expect(redirectMutate).not.toHaveBeenCalled(); // no gateway redirect in this mode
+    expect(screen.queryByRole('button', { name: 'Xem kết quả' })).not.toBeInTheDocument();
+    expect(redirectMutate).not.toHaveBeenCalled();
 
     await act(async () => finish(result));
 

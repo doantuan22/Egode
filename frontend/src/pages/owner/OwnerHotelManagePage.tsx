@@ -90,7 +90,7 @@ export default function OwnerHotelManagePage() {
     try {
       await uploadImageMutation.mutateAsync(await fileToDataUrl(file));
     } catch {
-      // handled
+      // Đã xử lý
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }

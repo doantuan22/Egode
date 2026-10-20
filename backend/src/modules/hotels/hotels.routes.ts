@@ -6,7 +6,7 @@ import { searchHotelsQuerySchema, hotelIdParamSchema, hotelRoomsQuerySchema } fr
 const router = Router();
 const controller = new HotelsController();
 
-// All public — no authentication. M2 is read-only discovery (BE-2 + BE-4).
+// Tất cả công khai, không cần đăng nhập
 router.get('/', validateRequest({ query: searchHotelsQuerySchema }), controller.search);
 router.get('/:id', validateRequest({ params: hotelIdParamSchema }), controller.getDetail);
 router.get(

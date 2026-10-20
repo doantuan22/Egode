@@ -15,14 +15,14 @@ const newUser = { MaTaiKhoan: 2, HoTen: 'Người dùng mới' } as Account;
 
 function setup<T>(useHook: () => T) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  // Data that belongs to the previous signed-in user, across several feature areas.
+  // Dữ liệu của người dùng trước
   queryClient.setQueryData(meQueryKey, oldUser);
   queryClient.setQueryData(['bookings'], [{ MaDatPhong: 1 }]);
   queryClient.setQueryData(['bookings', 1], { MaDatPhong: 1 });
   queryClient.setQueryData(['support', 'mine'], [{ MaYeuCau: 1 }]);
   queryClient.setQueryData(['admin', 'accounts'], { items: [] });
   queryClient.setQueryData(['payment-status', 1], { MaDatPhong: 1 });
-  // Public, identical for everyone: must survive a change of user.
+  // Dữ liệu công khai phải được giữ lại
   queryClient.setQueryData(['hotels', 'search', { page: 1 }], { items: [] });
   queryClient.setQueryData(['locations'], []);
   queryClient.setQueryData(['amenities'], []);

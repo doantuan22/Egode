@@ -1,4 +1,4 @@
-// Mirrors backend/src/common/constants/roles.ts — VAI_TRO.TenVaiTro values.
+// Tên các vai trò, khớp với backend
 export const ROLE_NAMES = {
   CUSTOMER: 'Khách hàng',
   PARTNER: 'Chủ khách sạn',
@@ -7,14 +7,14 @@ export const ROLE_NAMES = {
 
 export type RoleName = (typeof ROLE_NAMES)[keyof typeof ROLE_NAMES];
 
-/** Where each role lands after signing in (or when an already signed-in user opens a guest-only page). */
+/** Trang đích của từng vai trò sau khi đăng nhập */
 export const ROLE_HOME: Record<string, string> = {
   [ROLE_NAMES.ADMIN]: '/admin',
   [ROLE_NAMES.PARTNER]: '/owner',
   [ROLE_NAMES.CUSTOMER]: '/',
 };
 
-/** Each role's own profile page: inside their area, so admins and owners stay in their dashboard. */
+/** Trang hồ sơ riêng của từng vai trò */
 export const PROFILE_PATH: Record<string, string> = {
   [ROLE_NAMES.ADMIN]: '/admin/profile',
   [ROLE_NAMES.PARTNER]: '/owner/profile',

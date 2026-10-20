@@ -7,7 +7,7 @@ export interface FilterChipProps {
   children: ReactNode;
 }
 
-/** A toggle pill for a quick filter or a view switch; the pressed state is exposed as `aria-pressed`. */
+/** Nút bật tắt cho bộ lọc nhanh */
 export function FilterChip({ pressed, onClick, children }: FilterChipProps) {
   return (
     <button

@@ -12,7 +12,7 @@ import { ROLE_NAMES } from '../lib/roles';
 const routesOf = (fragment: ReactElement) => createRoutesFromChildren(fragment);
 const pathsOf = (nodes: RouteObject[]): string[] => nodes.flatMap((node) => [...(node.path ? [node.path] : []), ...pathsOf(node.children ?? [])]);
 
-/** The guard that wraps a route group: its component and (for ProtectedRoute) the roles it allows. */
+/** Lớp bảo vệ bao nhóm route */
 const guardOf = (node: RouteObject) => {
   const element = node.element;
   if (!isValidElement(element)) return null;

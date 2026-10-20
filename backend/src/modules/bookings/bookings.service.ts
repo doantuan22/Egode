@@ -21,7 +21,7 @@ const toNumber = (value: unknown): number => Number(value);
 const generateConfirmationCode = (): string => {
   const stamp = Date.now().toString(36).toUpperCase();
   const rand = randomBytes(3).toString('hex').toUpperCase();
-  return `BK${stamp}${rand}`; // well under DAT_PHONG.MaXacNhanDatPhong VARCHAR(20)
+  return `BK${stamp}${rand}`;
 };
 
 export interface BookingRoomLine {
@@ -53,9 +53,9 @@ export interface BookingResponse {
     ChiTiet: Array<{ SoGioTruocNhanPhong: number; TyLeHoanTien: number }>;
   };
   NgayTao: string;
-  /** When a "Chờ thanh toán" booking is auto-cancelled (NgayTao + PAYMENT_TIMEOUT_MINUTES); null once it is no longer waiting for payment. */
+  /** Hạn thanh toán của đơn đang chờ */
   HanThanhToan: string | null;
-  /** Seconds until HanThanhToan by the server clock (rounded up, at least 0); null when HanThanhToan is null. */
+  /** Số giây còn lại đến hạn thanh toán */
   SoGiayConLai: number | null;
 }
 
@@ -90,10 +90,10 @@ export interface PaymentSummary {
 
 export interface BookingDetail extends Omit<BookingResponse, 'ChiTietPhong'> {
   ChiTietPhong: BookingRoomLine[];
-  /** Hotel check-in / check-out wall-clock times (Vietnam time), "HH:mm". */
+  /** Giờ nhận và trả phòng của khách sạn */
   GioNhanPhong: string;
   GioTraPhong: string;
-  /** The instants (ISO, UTC) cancellation is measured to and the stay ends at. */
+  /** Thời điểm tính hủy và kết thúc lưu trú */
   ThoiDiemNhanPhong: string;
   ThoiDiemTraPhong: string;
   TenKhachSan: string;
@@ -109,7 +109,7 @@ export class BookingsService {
     refundGateway: RefundGateway = new ConfiguredRefundGateway(),
     private readonly refunds: RefundsRepository = new RefundsRepository(),
     private readonly refundProcessor: RefundProcessor = new RefundProcessor(refundGateway, refunds),
-    /** The moment the cancellation cut-off is measured from (hours until check-in); only tests replace it. */
+    /** Mốc tính giờ trước nhận phòng, chỉ test được thay */
     private readonly clock: () => Date = () => new Date()
   ) {}
 
@@ -133,27 +133,20 @@ export class BookingsService {
       );
     }
 
-    // Fail fast, before any lock is taken: the rooms must be able to hold the party.
+    // Kiểm tra sức chứa trước khi khóa
     assertCapacity(
       input.guests,
       input.rooms.map((line) => ({ sucChua: roomTypes.find((rt) => rt.MaLoaiPhong === line.maLoaiPhong)!.SucChua, soLuong: line.soLuong }))
     );
 
     return this.repository.runInTransaction(async (tx) => {
-      // Free up anything abandoned in "Chờ thanh toán" past the timeout
-      // BEFORE reading booked quantities below, so an expired hold never
-      // blocks this request from seeing the room as available (M6 §2).
+      // Giải phóng đơn quá hạn trước khi đọc số phòng đã đặt
       await expireStalePendingBookings(tx);
 
-      // BUG-001 lock order: KHUYEN_MAI -> QUY_PHONG_GIA -> INSERT. The promo row
-      // is locked (and its usage limit enforced) BEFORE the inventory lock, so
-      // bookings that share a promo but not a room type still queue on it.
-      // Bookings without a promo skip this step; the order is never inverted.
+      // Thứ tự khóa: khuyến mãi, quỹ phòng, rồi ghi dữ liệu
       const lockedPromo = input.promoCode ? await this.repository.lockPromotionForBooking(tx, input.promoCode) : null;
 
-      // Everything below is computed fresh from the DB, inside the locked
-      // transaction — the client's prior quote (if any) is never trusted.
-      // The last word on capacity, read again under the same transaction (an owner may have changed SucChua since).
+      // Tính lại mọi thứ từ CSDL trong giao dịch
       const capacities = new Map((await this.repository.findCapacities(tx, maKhachSan, requestedIds)).map((r) => [r.MaLoaiPhong, r.SucChua]));
       assertCapacity(input.guests, input.rooms.map((line) => ({ sucChua: capacities.get(line.maLoaiPhong) ?? 0, soLuong: line.soLuong })));
 
@@ -227,9 +220,7 @@ export class BookingsService {
           usedCount
         );
 
-        // Unlike Quote's soft-fail (which just informs the caller), Booking
-        // rejects outright: silently completing at a different total than a
-        // promo code the customer explicitly typed would be a surprise charge.
+        // Đặt phòng từ chối khi mã khuyến mãi không áp dụng được
         if (!evalResult.valid) {
           throw AppError.badRequest(evalResult.reason ?? 'Mã khuyến mãi không hợp lệ');
         }
@@ -245,10 +236,7 @@ export class BookingsService {
 
       const tongTienThanhToan = tongTienPhong - soTienGiam;
 
-      // Nothing to pay (a promotion — or a free rate — brought the total to 0): the booking is confirmed
-      // right away. It never enters "Chờ thanh toán", so it holds no payment timeout, and no THANH_TOAN
-      // row (SoTien > 0) or gateway call is made for it. A promotion on it counts as used, like any other
-      // non-cancelled booking, from this moment on.
+      // Tổng bằng 0 thì xác nhận đơn ngay
       const trangThai = tongTienThanhToan === 0 ? BOOKING_STATUS.CONFIRMED : BOOKING_STATUS.PENDING_PAYMENT;
 
       const policy = await this.repository.findActiveCancellationPolicy(tx);
@@ -359,10 +347,8 @@ export class BookingsService {
       throw AppError.badRequest(`Không thể hủy đặt phòng ở trạng thái "${booking.TrangThai}"`);
     }
 
-    const now = new Date(); // timestamps written to the database are always real time
-    // The cut-off is measured to the moment guests may check in: the stay's date at the hotel's check-in time,
-    // in Vietnam time. The booking detail exposes that same instant (ThoiDiemNhanPhong) for the refund preview,
-    // so the number shown before confirming is the one that is charged.
+    const now = new Date();
+    // Thời điểm nhận phòng dùng để tính mức hoàn tiền
     const hoursBeforeCheckIn = hoursUntil(checkInInstant(booking.NgayNhanPhong, booking.KHACH_SAN.GioNhanPhong), this.clock());
     const tiers = booking.CHINH_SACH_HUY.CHI_TIET_CHINH_SACH_HUY.map((c) => ({
       soGioTruocNhanPhong: c.SoGioTruocNhanPhong,
@@ -371,21 +357,19 @@ export class BookingsService {
     const refundPercent = selectRefundPercent(tiers, hoursBeforeCheckIn);
     const note = input.ghiChu ? `Khách hủy đặt phòng: ${input.ghiChu}` : 'Khách hủy đặt phòng';
 
-    // Phase 1 — one short transaction that decides everything and writes it: the booking becomes "Đã hủy" and,
-    // when money is owed back, the single HOAN_TIEN "Chờ xử lý" for the paid amount. No gateway call in here.
+    // Giai đoạn 1: hủy đơn và tạo yêu cầu hoàn tiền trong một giao dịch
     const pendingRefund = await this.repository.runInTransaction(async (tx) => {
       const affected = await this.repository.cancelBooking(tx, maDatPhong, note, now);
       if (affected === 0) {
         throw AppError.conflict('Đặt phòng đã đổi trạng thái trước đó (có thể đã bị hủy hoặc hết hạn) — vui lòng tải lại');
       }
 
-      // No successful payment (never paid, or a 0đ booking) → nothing to refund. Never fabricate a HOAN_TIEN
-      // for money that was never actually captured (M6 §4).
+      // Không có thanh toán thành công thì không hoàn tiền
       const successPayment = await this.refunds.lockSuccessfulPayment(tx, maDatPhong);
       if (!successPayment) return null;
 
       const refundAmount = computeRefundAmount(toNumber(successPayment.SoTien), refundPercent);
-      if (refundAmount <= 0) return null; // eligible for cancellation, not for any refund (0% tier)
+      if (refundAmount <= 0) return null;
 
       return this.refunds.openPendingRefund(
         tx,
@@ -396,8 +380,7 @@ export class BookingsService {
       );
     });
 
-    // Phase 2 — the transaction has committed and holds no lock; only now is the gateway asked. The refund is
-    // then settled on its own, and a refund that fails never undoes the cancellation.
+    // Giai đoạn 2: gọi cổng hoàn tiền sau khi giao dịch đã commit
     if (pendingRefund) await this.refundProcessor.process(pendingRefund, ipAddr);
 
     return this.getBookingDetail(maDatPhong, requesterId);

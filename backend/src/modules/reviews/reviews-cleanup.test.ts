@@ -19,14 +19,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 
-/**
- * BUG-005 — images are uploaded to Cloudinary BEFORE the review row exists, so
- * every failure between the first upload and the DB commit used to orphan
- * them. These tests drive ReviewsService against the real DB (so the real
- * UQ_DANH_GIA_MaDatPhong produces the real P2002) with a fake Cloudinary whose
- * publicId encodes which image it was, so we can assert exactly which ones were
- * deleted.
- */
+/** Dọn ảnh Cloudinary mồ côi khi tạo đánh giá thất bại */
 vi.mock('../../integrations/cloudinary.integration', () => ({
   CloudinaryIntegration: { uploadImage: vi.fn(), deleteImage: vi.fn() },
 }));
@@ -35,14 +28,14 @@ const upload = vi.mocked(CloudinaryIntegration.uploadImage);
 const remove = vi.mocked(CloudinaryIntegration.deleteImage);
 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-/** A data URI that passes validateReviewImages and carries a tag identifying it. */
+/** Data URI hợp lệ kèm nhãn nhận dạng */
 const png = (tag: string) => `data:image/png;base64,${Buffer.concat([PNG_SIGNATURE, Buffer.from(tag)]).toString('base64')}`;
 const tagOf = (dataUri: string) => Buffer.from(dataUri.split(',')[1], 'base64').subarray(PNG_SIGNATURE.length).toString();
 const publicIdOf = (tag: string) => `hotel-booking/reviews/${tag}`;
 const urlOf = (tag: string) => `https://res.cloudinary.com/demo/image/upload/v1/hotel-booking/reviews/${tag}.jpg`;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-/** Fake upload: succeeds with publicId/url derived from the tag, after `delayMs`; throws for tags in `failTags`. */
+/** Giả lập upload thành công hoặc lỗi theo nhãn */
 const fakeUpload = (opts: { delayMs?: number; failTags?: string[] } = {}) =>
   upload.mockImplementation(async (dataUri: string) => {
     if (opts.delayMs) await sleep(opts.delayMs);
@@ -73,7 +66,7 @@ const newBooking = async () =>
 
 const reviewCount = (maDatPhong: number) => getPrismaClient().dANH_GIA.count({ where: { MaDatPhong: maDatPhong } });
 
-let run: string; // unique per test, keeps tags/publicIds from colliding
+let run: string;
 const service = new ReviewsService();
 
 beforeAll(async () => {
@@ -124,8 +117,7 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
       upload.mockReset();
       remove.mockReset();
       remove.mockResolvedValue(true);
-      // The delay keeps both requests inside the upload step until both have already
-      // passed the findByBookingId pre-check, so only UQ_DANH_GIA_MaDatPhong can stop the loser.
+      // Độ trễ giữ hai request cùng ở bước upload
       fakeUpload({ delayMs: 150 });
 
       const maDatPhong = await newBooking();
@@ -151,10 +143,10 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
       const winnerIsA = resA.status === 'fulfilled';
       const winnerTags = winnerIsA ? tagsA : tagsB;
       const loserTags = winnerIsA ? tagsB : tagsA;
-      expect(deletedPublicIds(), context).toEqual(loserTags.map(publicIdOf).sort()); // every loser image, nothing else
+      expect(deletedPublicIds(), context).toEqual(loserTags.map(publicIdOf).sort());
 
       const stored = await getPrismaClient().hINH_ANH_DANH_GIA.findMany({ where: { DANH_GIA: { MaDatPhong: maDatPhong } } });
-      expect(stored.map((s) => s.URL).sort(), context).toEqual(winnerTags.map(urlOf).sort()); // winner's images persisted, not deleted
+      expect(stored.map((s) => s.URL).sort(), context).toEqual(winnerTags.map(urlOf).sort());
     }
   }, 60_000);
 
@@ -193,15 +185,14 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
 
     const outcome = await service.createReview(maDatPhong, customerId, { diemDanhGia: 5, hinhAnh: tags.map(png) }).catch((e: unknown) => e);
 
-    expect(outcome).toBe(dbError); // the very same error object, not wrapped or replaced
+    expect(outcome).toBe(dbError);
     expect(deletedPublicIds()).toEqual(tags.map(publicIdOf).sort());
     expect(await reviewCount(maDatPhong)).toBe(0);
   });
 
   it('C2. a REAL DB failure after the review row is written leaves no half-written review (repository.create is atomic) and no orphan images', async () => {
     const [t1, t2] = [`${run}1`, `${run}2`];
-    // HINH_ANH_DANH_GIA.URL is NVARCHAR(500): an over-long URL makes the image insert fail
-    // AFTER the DANH_GIA insert inside the same nested write.
+    // URL quá dài làm chèn ảnh thất bại
     upload.mockImplementation(async (dataUri: string) => {
       const tag = tagOf(dataUri);
       return { url: `${urlOf(tag)}?pad=${'x'.repeat(600)}`, publicId: publicIdOf(tag) };
@@ -211,8 +202,8 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
     const outcome = await service.createReview(maDatPhong, customerId, { diemDanhGia: 5, hinhAnh: [t1, t2].map(png) }).catch((e: unknown) => e);
 
     expect(outcome).toBeInstanceOf(Error);
-    expect(outcome).not.toBeInstanceOf(AppError); // a genuine DB error, passed through
-    expect(await reviewCount(maDatPhong)).toBe(0); // DANH_GIA rolled back together with the image rows
+    expect(outcome).not.toBeInstanceOf(AppError);
+    expect(await reviewCount(maDatPhong)).toBe(0);
     expect(await getPrismaClient().hINH_ANH_DANH_GIA.count({ where: { DANH_GIA: { MaDatPhong: maDatPhong } } })).toBe(0);
     expect(deletedPublicIds()).toEqual([publicIdOf(t1), publicIdOf(t2)].sort());
   });
@@ -230,11 +221,11 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
 
     const outcome = await service.createReview(maDatPhong, customerId, { diemDanhGia: 5, hinhAnh: tags.map(png) }).catch((e: unknown) => e);
 
-    expect(outcome).toBe(dbError); // the DB error wins; the cleanup failure never replaces it
-    expect(deletedPublicIds()).toEqual(tags.map(publicIdOf).sort()); // all three attempted despite the middle one rejecting
+    expect(outcome).toBe(dbError);
+    expect(deletedPublicIds()).toEqual(tags.map(publicIdOf).sort());
     expect(errorLog).toHaveBeenCalledTimes(1);
     expect(errorLog).toHaveBeenCalledWith('Review image cleanup failed', { publicId: publicIdOf(tags[1]), errorType: 'Error' });
-    // Nothing sensitive in the log: no image data, no URL.
+    // Log không chứa dữ liệu nhạy cảm
     const logged = JSON.stringify(errorLog.mock.calls);
     expect(logged).not.toContain('base64');
     expect(logged).not.toContain('res.cloudinary.com');
@@ -276,7 +267,7 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
     const [t1, t2] = [`${run}1`, `${run}2`];
     fakeUpload();
     const maDatPhong = await newBooking();
-    // Make the pre-check miss a review that is already committed.
+    // Làm bước kiểm tra trước bỏ sót đánh giá đã có
     vi.spyOn(ReviewsRepository.prototype, 'findByBookingId').mockResolvedValueOnce(null);
     await getPrismaClient().dANH_GIA.create({
       data: { MaDatPhong: maDatPhong, MaKhachHang: customerId, MaKhachSan: hotelId, DiemDanhGia: 3, TrangThai: 'Chờ duyệt' },
@@ -287,7 +278,7 @@ describe('createReview — Cloudinary cleanup (BUG-005)', () => {
     expect(outcome).toBeInstanceOf(AppError);
     expect((outcome as AppError).statusCode).toBe(409);
     expect(deletedPublicIds()).toEqual([publicIdOf(t1), publicIdOf(t2)].sort());
-    expect(await reviewCount(maDatPhong)).toBe(1); // only the pre-existing one
+    expect(await reviewCount(maDatPhong)).toBe(1);
   });
 
   it('E. success path: URLs are persisted, deleteImage is never called', async () => {

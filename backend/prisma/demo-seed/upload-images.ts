@@ -1,14 +1,4 @@
-/**
- * Uploads the curated demo images (database/seed/demo/image-sources.json) to
- * Cloudinary through the SAME configured client and folders the API uses for
- * owner/review uploads, then writes database/seed/demo/images.lock.json — the
- * secure URLs that 002_demo_data.sql stores in the DB (URL in DB, file in cloud).
- *
- * Idempotent: every asset has a fixed public_id and overwrite:false, so a
- * re-run returns the existing asset instead of uploading a duplicate.
- *
- * Run from backend/: npm run seed:demo:images
- */
+/** Tải ảnh demo lên Cloudinary và ghi URL vào images.lock.json */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import cloudinary from '../../src/config/cloudinary';
@@ -35,11 +25,11 @@ const SOURCES = path.join(DEMO_DIR, 'image-sources.json');
 const LOCK = path.join(DEMO_DIR, 'images.lock.json');
 const ATTRIBUTION = path.join(DEMO_DIR, 'ATTRIBUTION.md');
 
-// Same folders as owner-hotels.service / owner-room-types.service / reviews.service.
+// Thư mục Cloudinary giống các service upload của API
 const folderFor = (group: Source['group']) =>
   group === 'room' ? 'hotel-booking/room-types' : group === 'review' ? 'hotel-booking/reviews' : 'hotel-booking/hotels';
 
-// Wikimedia rejects requests without a descriptive User-Agent.
+// Wikimedia yêu cầu User-Agent mô tả rõ
 const USER_AGENT = 'HotelBookingDemoSeed/1.0 (demo data loader)';
 
 async function toDataUri(url: string): Promise<string> {
@@ -60,7 +50,7 @@ async function uploadOne(src: Source): Promise<Locked> {
     public_id: publicId,
     overwrite: false,
     resource_type: 'image',
-    // Cap stored size: hotel galleries never render wider than this.
+    // Giới hạn kích thước ảnh lưu trữ
     transformation: [{ width: 1600, crop: 'limit' }],
     timeout: 60_000,
   });

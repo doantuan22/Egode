@@ -2,12 +2,7 @@ import { Icon } from '../common/Icon';
 import { useCountdown } from '../../hooks/useCountdown';
 import { formatCountdown, formatDateTimeVi } from '../../lib/utils';
 
-/**
- * Tells the customer that a booking is created but NOT yet paid, until when the room is held and how long
- * is left. `secondsLeft` (server clock) and `deadline` come from the booking; `startedAt` is when that data
- * arrived. At 0 it calls `onExpire` so the page can fetch the real status (the server cancels an unpaid booking
- * when it is next read).
- */
+/** Thông báo đơn chưa thanh toán, thời hạn giữ phòng và thời gian còn lại */
 export function PaymentHoldNotice({ deadline, secondsLeft, startedAt, justBooked = false, onExpire }: {
   deadline: string;
   secondsLeft: number;

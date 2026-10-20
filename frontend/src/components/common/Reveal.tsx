@@ -5,14 +5,11 @@ interface RevealProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
 }
 
-/**
- * Fades a block in the first time it scrolls into view (motion.css, `[data-reveal]`). Without IntersectionObserver the
- * block is simply shown, and reduced-motion users get no movement at all (the CSS only applies under no-preference).
- */
+/** Hiện dần khối khi cuộn tới lần đầu */
 export function Reveal({ as: Tag = 'div', children, ...rest }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
-  // A block already on screen when the page appears is simply there: no second fade on top of the page's own.
+  // Khối đã hiện sẵn thì không hiệu ứng
   const [instant, setInstant] = useState(false);
 
   useLayoutEffect(() => {

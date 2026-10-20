@@ -7,18 +7,18 @@ export interface Account {
   Email: string;
   HoTen: string;
   SoDienThoai: string;
-  // DDI-01 (resolved): nullable in the baseline — not collected at registration.
+  // Số điện thoại không bắt buộc khi đăng ký
   NgaySinh: string | null;
   GioiTinh: Gender | null;
   AnhDaiDien: string | null;
   TrangThai: string;
   NgayTao: string;
   NgayCapNhat: string;
-  /** Present on admin account responses. */
+  /** Có trong phản hồi tài khoản của admin */
   VAI_TRO?: { TenVaiTro: string };
-  /** On login/register/me: true while a partner application is awaiting admin review. */
+  /** Có hồ sơ đối tác đang chờ admin duyệt */
   DangChoDuyetDoiTac?: boolean;
-  /** True when the latest partner application was rejected: show the re-apply button. */
+  /** Hồ sơ đối tác gần nhất bị từ chối */
   HoSoDoiTacBiTuChoi?: boolean;
 }
 

@@ -6,7 +6,7 @@ import { getPrismaClient } from '../../config/prisma';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/** `keyword` is the free-text box of the filter bar: hotel name, address, city or province — and it narrows, never widens. */
+/** Từ khóa chỉ thu hẹp kết quả */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const prisma = () => getPrismaClient();
 let ownerId = 0;

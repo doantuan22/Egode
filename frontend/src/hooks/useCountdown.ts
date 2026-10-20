@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Seconds left of a hold, counting down once a second.
- *
- * `secondsLeft` is what the SERVER reported when the data was fetched and `startedAt` is the moment
- * (ms, e.g. React Query's `dataUpdatedAt`) it arrived on this device. Time already spent since then is
- * subtracted, so the result does not depend on the device clock being set correctly. Null while there is
- * no hold. `onEnd` is called once when it reaches 0 and again only for a newer report that also ends.
- */
+/** Đếm ngược số giây còn lại của lượt giữ chỗ */
 export function useCountdown(secondsLeft: number | null, startedAt: number, onEnd: () => void): number | null {
   const [now, setNow] = useState(() => Date.now());
   const endedFor = useRef<string | null>(null);

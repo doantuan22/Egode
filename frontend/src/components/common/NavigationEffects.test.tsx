@@ -21,7 +21,7 @@ function setup(initial: string, to: string) {
 }
 
 beforeEach(() => {
-  // NavigationEffects skips scrolling in test mode; pretend to be a real build.
+  // Giả lập bản build thật vì chế độ test bỏ qua cuộn trang
   vi.stubEnv('MODE', 'development');
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 });

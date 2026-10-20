@@ -19,10 +19,7 @@ import { BOOKING_STATUS, HOTEL_STATUS } from '../../common/constants/hotel-statu
 import { PAYMENT_STATUS } from '../../common/constants/payment';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * UC35 — suspending a hotel settles its open bookings: stays already under way become "Hoàn tất", bookings not
- * yet checked in are cancelled, and what was paid for those is refunded in full.
- */
+/** Đình chỉ khách sạn xử lý các đơn đang mở và hoàn tiền đầy đủ */
 const day = (n: number) => new Date(`${addDaysToDateKey(businessToday(), n)}T00:00:00Z`);
 const prisma = () => getPrismaClient();
 
@@ -76,7 +73,7 @@ const statusOf = async (maDatPhong: number) => (await prisma().dAT_PHONG.findUni
 describe('admin suspends a hotel that still has bookings', () => {
   it('completes the stay under way, cancels the one not yet checked in and refunds it in full', async () => {
     const hotelId = await newHotel();
-    const underway = await booking(hotelId, -1, 2, BOOKING_STATUS.CONFIRMED); // checked in yesterday
+    const underway = await booking(hotelId, -1, 2, BOOKING_STATUS.CONFIRMED);
     const upcoming = await booking(hotelId, 5, 7, BOOKING_STATUS.CONFIRMED, 2_000_000);
     await createTestPayment(upcoming.MaDatPhong, 2_000_000, PAYMENT_STATUS.SUCCESS);
 
@@ -90,7 +87,7 @@ describe('admin suspends a hotel that still has bookings', () => {
 
     const refunds = await prisma().hOAN_TIEN.findMany({ where: { THANH_TOAN: { MaDatPhong: upcoming.MaDatPhong } } });
     expect(refunds).toHaveLength(1);
-    expect(Number(refunds[0].SoTienHoan)).toBe(2_000_000); // 100%, not the policy's 50%
+    expect(Number(refunds[0].SoTienHoan)).toBe(2_000_000);
     expect(await prisma().hOAN_TIEN.count({ where: { THANH_TOAN: { MaDatPhong: underway.MaDatPhong } } })).toBe(0);
 
     const hotel = await prisma().kHACH_SAN.findUniqueOrThrow({ where: { MaKhachSan: hotelId } });

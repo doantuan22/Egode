@@ -17,22 +17,13 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_RATE_STATUS, BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * BUG-001 — a promo's SoLuongGioiHan must hold under concurrent bookings.
- *
- * Every request in a burst books a DIFFERENT room type, on purpose: bookings of
- * one room type are already serialised by the QUY_PHONG_GIA lock, which would
- * hide the promo race. Distinct room types leave the KHUYEN_MAI row lock
- * (usp_KhoaKhuyenMaiChoDatPhong) as the only thing keeping the count honest.
- * Each burst uses a fresh promo and is repeated ROUNDS times, because a race
- * that fails 1 run in 20 must not slip through a single lucky pass.
- */
+/** Số lượt dùng khuyến mãi phải đúng khi đặt đồng thời */
 
 const ROUNDS = 8;
 const MAX_BURST = 20;
-const STOCK_PER_ROOM = 200; // never the limiting factor — only the promo limit may reject
+const STOCK_PER_ROOM = 200;
 
-// "Today" is the business-time-zone day (Asia/Ho_Chi_Minh) — the same day the API validates stay dates against.
+// Hôm nay theo múi giờ nghiệp vụ
 const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -43,7 +34,7 @@ const promotionIds: number[] = [];
 
 let hotelId: number;
 let customerToken: string;
-let roomIds: number[] = []; // MAX_BURST room types, one per concurrent request
+let roomIds: number[] = [];
 
 const post = (roomId: number, promoCode?: string) =>
   request(app)
@@ -62,7 +53,7 @@ const newPromo = async (soLuongGioiHan: number) => {
   return promo;
 };
 
-/** The invariant under test: valid (non-cancelled) bookings using the promo. */
+/** Số đơn hợp lệ dùng khuyến mãi */
 const validPromoBookings = (maKhuyenMai: number) =>
   getPrismaClient().dAT_PHONG.count({ where: { MaKhuyenMai: maKhuyenMai, TrangThai: { not: BOOKING_STATUS.CANCELLED } } });
 
@@ -126,11 +117,11 @@ describe('POST /api/hotels/:id/bookings — promo usage limit under concurrency 
         const counts = countByStatus(responses);
         const context = `round ${round}: used=${used} statuses=${JSON.stringify(counts)}`;
 
-        expect(used, context).toBeLessThanOrEqual(limit); // the invariant
-        expect(responses.filter((r) => r.status === 201).length, context).toBe(used); // every 201 is a persisted booking
-        // Nothing but a clean accept or a clean "promo exhausted" reject: no 409/500/timeouts.
+        expect(used, context).toBeLessThanOrEqual(limit);
+        expect(responses.filter((r) => r.status === 201).length, context).toBe(used);
+        // Chỉ chấp nhận hoặc từ chối vì hết lượt khuyến mãi
         expect(responses.every((r) => r.status === 201 || r.status === 400), context).toBe(true);
-        // Not over-restrictive either: with ample stock exactly `limit` requests win.
+        // Có đủ phòng thì đúng số lượt giới hạn được chấp nhận
         expect(used, context).toBe(limit);
         for (const r of responses.filter((x) => x.status === 400)) {
           expect(r.body.message).toMatch(/hết lượt/);
@@ -152,7 +143,7 @@ describe('POST /api/hotels/:id/bookings — promo usage limit under concurrency 
 
     expect(await prisma.dAT_PHONG.count({ where: { MaKhachSan: hotelId } })).toBe(bookingsBefore + accepted);
     expect(await prisma.cHI_TIET_DAT_PHONG.count({ where: { MaLoaiPhong: { in: roomIds } } })).toBe(linesBefore + accepted);
-    // Every booking of this promo has its detail line (no header without lines).
+    // Mọi đơn đều có dòng chi tiết
     const orphans = await prisma.dAT_PHONG.count({ where: { MaKhuyenMai: promo.MaKhuyenMai, CHI_TIET_DAT_PHONG: { none: {} } } });
     expect(orphans).toBe(0);
   }, 120_000);
@@ -197,12 +188,12 @@ describe('POST /api/hotels/:id/bookings — promo usage limit under concurrency 
 
     const first = await post(roomIds[0], promo.MaCode);
     expect(first.status).toBe(201);
-    expect((await post(roomIds[1], promo.MaCode)).status).toBe(400); // limit reached
+    expect((await post(roomIds[1], promo.MaCode)).status).toBe(400);
 
     await prisma.dAT_PHONG.update({ where: { MaDatPhong: first.body.data.MaDatPhong }, data: { TrangThai: BOOKING_STATUS.CANCELLED } });
 
     const responses = await Promise.all(roomIds.slice(2, 8).map((roomId) => post(roomId, promo.MaCode)));
     expect(responses.filter((r) => r.status === 201)).toHaveLength(1);
-    expect(await validPromoBookings(promo.MaKhuyenMai)).toBe(1); // cancelled one excluded, new one counted
+    expect(await validPromoBookings(promo.MaKhuyenMai)).toBe(1);
   }, 120_000);
 });

@@ -18,8 +18,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { REVIEW_STATUS } from '../../common/constants/review';
 
-// No real Cloudinary credentials in this environment (see .env) — mocked the
-// same way M3's owner-hotels.test.ts mocks it, per M7 §2 instructions.
+// Giả lập Cloudinary vì không có thông tin xác thực thật
 vi.mock('../../integrations/cloudinary.integration', () => ({
   CloudinaryIntegration: {
     uploadImage: vi.fn().mockResolvedValue({
@@ -185,7 +184,7 @@ describe('POST /bookings/:id/review', () => {
     const prisma = getPrismaClient();
     const row = await prisma.dANH_GIA.findUnique({ where: { MaDatPhong: booking.MaDatPhong } });
     expect(row?.MaKhachHang).toBe(customerId);
-    expect(row?.MaKhachSan).toBe(hotelId); // derived server-side from the booking, not from the client
+    expect(row?.MaKhachSan).toBe(hotelId);
   });
 
   it('a new review shows on the public hotel page and in its average straight away, without any admin action', async () => {
@@ -361,7 +360,7 @@ describe('UC37 safe removal of a violation review', () => {
     const otherId = other.body.data.MaDanhGia as number;
     await request(app).patch(`/api/admin/reviews/${otherId}/moderate`).set('Authorization', `Bearer ${adminToken}`).send({ trangThai: REVIEW_STATUS.VISIBLE });
 
-    // The body is ignored: this endpoint always decides the safe final status.
+    // Body bị bỏ qua
     const removed = await request(app).delete(`/api/admin/reviews/${targetId}`).set('Authorization', `Bearer ${adminToken}`).send({ trangThai: REVIEW_STATUS.VISIBLE });
     expect(removed.status).toBe(200); expect(removed.body.data.TrangThai).toBe(REVIEW_STATUS.HIDDEN);
     const prisma = getPrismaClient();
@@ -371,7 +370,7 @@ describe('UC37 safe removal of a violation review', () => {
 
     const publicDetail = await request(app).get(`/api/hotels/${hotelId}`);
     expect(publicDetail.status).toBe(200); expect(JSON.stringify(publicDetail.body.data)).not.toContain('UC37 removed content');
-    // The current public hotel read model exposes neither a review list nor a rating summary.
+    // Dữ liệu khách sạn công khai hiện chưa có đánh giá
     expect(publicDetail.body.data).not.toHaveProperty('DANH_GIA');
 
     const repeated = await request(app).delete(`/api/admin/reviews/${targetId}`).set('Authorization', `Bearer ${adminToken}`);

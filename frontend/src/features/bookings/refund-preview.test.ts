@@ -7,7 +7,7 @@ const tiers = [
 ];
 
 describe('hoursBeforeCheckIn measures to the instant the server sends (check-in date + hotel time, Vietnam)', () => {
-  // Check-in 15 June 2030 at 14:00 Vietnam time = 07:00 UTC.
+  // Nhận phòng 15/6/2030 lúc 14:00 giờ Việt Nam là 07:00 UTC
   const checkIn = '2030-06-15T07:00:00.000Z';
 
   it('is exact to the minute, regardless of the browser time zone', () => {

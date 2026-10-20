@@ -6,11 +6,11 @@ import { cn } from '../../../lib/utils';
 interface HotelGalleryProps {
   images: HotelDetail['HinhAnh'];
   hotelName: string;
-  /** Opens the full-screen viewer on the image at `index`. */
+  /** Mở trình xem ảnh tại vị trí index */
   onOpen: (index: number) => void;
 }
 
-/** One large photo plus up to four small ones; the last small one carries "Xem tất cả N ảnh" when there are more. */
+/** Một ảnh lớn và tối đa bốn ảnh nhỏ */
 export function HotelGallery({ images, hotelName, onOpen }: HotelGalleryProps) {
   return (
     <section className="py-4 bg-surface">
@@ -60,7 +60,7 @@ export function HotelGallery({ images, hotelName, onOpen }: HotelGalleryProps) {
               })}
             </div>
             {images.length > 1 && (
-              // Wrapper carries `md:hidden`: component classes (.btn) are unlayered and would beat that utility.
+              // Lớp bọc ẩn trên màn hình lớn
               <div className="absolute bottom-3 right-3 md:hidden">
                 <Button type="button" variant="secondary" size="sm" onClick={() => onOpen(0)}>
                   <Icon name="squares-four" /> Xem {images.length} ảnh

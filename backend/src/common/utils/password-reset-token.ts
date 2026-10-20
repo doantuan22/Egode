@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
 import { FINGERPRINT_PATTERN, passwordFingerprint } from './password-fingerprint';
 
-// Re-exported so existing callers keep importing it from here.
+// Xuất lại để nơi khác import từ đây
 export { matchesPasswordFingerprint } from './password-fingerprint';
 
 export const PASSWORD_RESET_TOKEN_TTL_MINUTES = 15;
@@ -11,19 +11,12 @@ const RESET_TOKEN_ISSUER = 'hotel-booking-api';
 const RESET_TOKEN_AUDIENCE = 'hotel-booking-password-reset';
 
 interface ResetTokenPayload {
-  sub: string; // MaTaiKhoan
+  sub: string;
   typ: 'pwd_reset';
-  fp: string; // fingerprint derived from the current password hash
+  fp: string;
 }
 
-/**
- * Stateless password-reset token: no REFRESH_TOKEN/RESET_TOKEN table exists
- * (Gate 0 / M1 forbid adding one without a Change Gate), so the token embeds
- * a fingerprint of the account's CURRENT password hash. Once the password is
- * changed (by this reset or any other means), the fingerprint no longer
- * matches and the token is rejected — giving effectively single-use,
- * self-expiring tokens without any new persistence.
- */
+/** Token đặt lại mật khẩu không lưu trạng thái, gắn với mật khẩu hiện tại */
 export const signPasswordResetToken = (maTaiKhoan: number, currentPasswordHash: string): string => {
   const payload: ResetTokenPayload = {
     sub: String(maTaiKhoan),
@@ -38,11 +31,7 @@ export const signPasswordResetToken = (maTaiKhoan: number, currentPasswordHash: 
   });
 };
 
-/**
- * Verifies signature + expiry only (does not require knowing the account's
- * current password hash yet). Throws if the token is malformed, expired, or
- * not a password-reset token.
- */
+/** Kiểm tra chữ ký và hạn của token đặt lại mật khẩu */
 export const decodePasswordResetToken = (token: string): { maTaiKhoan: number; fp: string } => {
   const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
     algorithms: ['HS256'], issuer: RESET_TOKEN_ISSUER, audience: RESET_TOKEN_AUDIENCE,
@@ -54,5 +43,3 @@ export const decodePasswordResetToken = (token: string): { maTaiKhoan: number; f
   return { maTaiKhoan: accountId, fp: decoded.fp };
 };
 
-// matchesPasswordFingerprint (re-exported above) must be called after
-// decodePasswordResetToken() to confirm the token is still current.

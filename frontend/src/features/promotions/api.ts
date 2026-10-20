@@ -44,7 +44,7 @@ export const deactivatePromotion = async (id: number): Promise<Promotion> => {
   return res.data as Promotion;
 };
 
-/** Public: the codes that can be used right now (active, today inside their window, uses left). */
+/** Mã dùng được ngay bây giờ */
 export const listAvailablePromotions = async (): Promise<AvailablePromotion[]> => {
   const res = await apiClient<AvailablePromotion[]>('/promotions/available');
   return res.data ?? [];

@@ -1,34 +1,19 @@
-/**
- * Emits database/seed/002_demo_data.sql — a mid-sized, internally consistent
- * demo/test dataset covering every table and every actor flow.
- *
- * Design rules the generated SQL follows:
- * - Every date is relative to the day the SQL RUNS (SYSUTCDATETIME), so the data
- *   never drifts out of the "today" window the app and its tests reason about.
- * - Every money value is derived INSIDE SQL from QUY_PHONG_GIA + KHUYEN_MAI +
- *   CHI_TIET_CHINH_SACH_HUY, exactly like the booking/cancel services do — the
- *   generator only decides *who books what, when*; it never writes a total.
- * - Idempotent: each insert is guarded by a natural key, so re-running is safe
- *   (and extends the rate calendar forward instead of duplicating rows).
- * - Image URLs come from database/seed/demo/images.lock.json (Cloudinary).
- *
- * Run from backend/: npm run seed:demo:sql  (then load the SQL with sqlcmd — see its header)
- */
+/** Sinh file database/seed/002_demo_data.sql chứa dữ liệu demo đầy đủ cho mọi bảng */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const OUT = path.resolve(__dirname, '../../../database/seed/002_demo_data.sql');
 const LOCK = path.resolve(__dirname, '../../../database/seed/demo/images.lock.json');
 
-// bcrypt(cost 12, same as common/utils/password.ts) of "Demo@123" — every demo account's password.
+// Mã băm bcrypt của mật khẩu "Demo@123" dùng cho mọi tài khoản demo
 const DEMO_PASSWORD_HASH = '$2b$12$MAlf8CruNa5GKGgHh1UNreiwyEJtsUmHp8T8YU7rEVU4TT7RyxRpu';
 
-// ---------------------------------------------------------------- helpers
+// Hàm tiện ích
 const q = (v: string | null | undefined) => (v === null || v === undefined ? 'NULL' : `N'${v.replace(/'/g, "''")}'`);
 const n = (v: number | null | undefined) => (v === null || v === undefined ? 'NULL' : String(v));
 const rows = (list: string[][]) => list.map((r) => `    (${r.join(', ')})`).join(',\n');
 
-/** Deterministic PRNG so the generated SQL is stable between runs of this script. */
+/** Bộ sinh số ngẫu nhiên cố định để SQL sinh ra ổn định giữa các lần chạy */
 function mulberry32(seed: number) {
   return () => {
     seed |= 0;
@@ -42,7 +27,7 @@ const rand = mulberry32(20260927);
 const pick = <T>(list: readonly T[]) => list[Math.floor(rand() * list.length)];
 const between = (lo: number, hi: number) => lo + Math.floor(rand() * (hi - lo + 1));
 
-// ---------------------------------------------------------------- images
+// Ảnh
 interface LockedImage { key: string; group: string; url: string }
 const images: LockedImage[] = JSON.parse(readFileSync(LOCK, 'utf8'));
 const byGroup = (g: string) => images.filter((i) => i.group === g).map((i) => i.url);
@@ -62,7 +47,7 @@ const nextImage = (g: keyof typeof pools) => {
   return pools[g][i % pools[g].length];
 };
 
-// ---------------------------------------------------------------- reference data
+// Dữ liệu tham chiếu
 const CITIES = [
   ['Hồ Chí Minh', 'Hồ Chí Minh'], ['Hà Nội', 'Hà Nội'], ['Đà Nẵng', 'Đà Nẵng'],
   ['Nha Trang', 'Khánh Hòa'], ['Đà Lạt', 'Lâm Đồng'], ['Hội An', 'Quảng Nam'],
@@ -98,7 +83,7 @@ const ACCOUNTS: Account[] = [
     ['demo_kh_trang', 'Phan Huyền Trang', 'Nữ'], ['demo_kh_tuan', 'Cao Anh Tuấn', 'Nam'],
   ] as const).map(([user, name, gender], i): Account => ({
     user, name, role: 'Khách hàng', gender,
-    // A few customers never filled in the optional profile fields (DDI-01).
+    // Một số khách hàng không điền thông tin hồ sơ tùy chọn
     born: i % 6 === 5 ? undefined : `${1975 + ((i * 7) % 26)}-${String(1 + ((i * 5) % 12)).padStart(2, '0')}-${String(1 + ((i * 11) % 27)).padStart(2, '0')}`,
     ageDays: 480 - i * 20,
   })),
@@ -107,7 +92,7 @@ const ACCOUNTS: Account[] = [
 const CUSTOMERS = ACCOUNTS.filter((a) => a.role === 'Khách hàng' && !a.status).map((a) => a.user);
 const phoneOf = (i: number) => `09${String(10_000_000 + ((i * 7_919_117) % 89_999_999)).slice(0, 8)}`;
 
-// Partner applications: approved (all owners) + the customer-side pipeline.
+// Hồ sơ đối tác: đã duyệt và các trạng thái của khách
 const APPLICATIONS = [
   ...ACCOUNTS.filter((a) => a.role === 'Chủ khách sạn').map((a) => ({ user: a.user, status: 'Đã duyệt', reason: null as string | null })),
   { user: 'demo_kh_ngoc', status: 'Chờ duyệt', reason: null },
@@ -116,7 +101,7 @@ const APPLICATIONS = [
   { user: 'demo_kh_long', status: 'Từ chối', reason: 'Giấy phép kinh doanh đã hết hạn và mã số thuế không khớp với thông tin đăng ký. Vui lòng bổ sung bản cập nhật.' },
 ];
 
-// ---------------------------------------------------------------- hotels & rooms
+// Khách sạn và loại phòng
 type RoomTpl = 'superior' | 'twin' | 'deluxe' | 'family' | 'suite' | 'villa';
 const ROOM_TPL: Record<RoomTpl, { name: string; beds: number; cap: number; area: number; bed: string; mult: number; inv: number; amen: string[]; desc: string }> = {
   superior: { name: 'Phòng Superior', beds: 1, cap: 2, area: 24, bed: 'Giường đôi', mult: 1, inv: 10, amen: ['Wi-Fi miễn phí', 'Điều hòa nhiệt độ', 'TV màn hình phẳng', 'Máy sấy tóc'], desc: 'Phòng tiêu chuẩn ấm cúng với giường đôi, bàn làm việc và phòng tắm vòi sen.' },
@@ -175,18 +160,18 @@ for (const h of HOTELS) {
     });
   });
 }
-// A room type the owner stopped selling (UC23) — hidden from public search/quote/booking.
+// Loại phòng đã ngừng bán
 ROOMS.find((r) => r.key === 'H04-R4')!.status = 'Ngừng bán';
-// Deliberately tight inventory for the sold-out scenario.
-const SOLD_OUT_ROOM = ROOMS.find((r) => r.key === 'H07-R3')!; // Suite at Mỹ Khê
+// Tồn kho thấp cho kịch bản hết phòng
+const SOLD_OUT_ROOM = ROOMS.find((r) => r.key === 'H07-R3')!;
 SOLD_OUT_ROOM.inv = 2;
-// A maintenance window where the owner closed a room type for sale.
+// Giai đoạn bảo trì đóng bán loại phòng
 const CLOSED = { room: 'H05-R1', from: 40, to: 44 };
 
 const RATE_FROM = -120;
 const RATE_TO = 150;
 
-// ---------------------------------------------------------------- promotions
+// Khuyến mãi
 const PROMOS = [
   ['CHAOMUNG10', 'Phần trăm', 10, 0, 500_000, 0, -160, 180, 'Hoạt động'],
   ['GIAM200K', 'Số tiền cố định', 200_000, 1_500_000, 0, 200, -60, 120, 'Hoạt động'],
@@ -198,7 +183,7 @@ const PROMOS = [
   ['TAMNGUNG', 'Phần trăm', 12, 0, 600_000, 0, -30, 60, 'Ngừng'],
 ] as const;
 
-// ---------------------------------------------------------------- bookings
+// Đặt phòng
 type Scenario = 'completed' | 'current' | 'future' | 'cancel_refund' | 'cancel_unpaid' | 'expired' | 'expired_failed' | 'pending';
 interface Booking {
   code: string; customer: string; room: Room; qty: number; checkIn: number; nights: number; scenario: Scenario;
@@ -252,14 +237,13 @@ function addBooking(spec: Partial<Booking> & { scenario: Scenario; checkIn: numb
   throw new Error(`Could not place a ${spec.scenario} booking`);
 }
 
-// Fixed scenarios first so random placement never takes their inventory.
+// Các kịch bản cố định được xếp trước
 addBooking({ scenario: 'future', checkIn: 20, nights: 3, customer: 'demo_kh_an', createdDay: -6, note: 'Tuần trăng mật, cần phòng tầng cao.' }, SOLD_OUT_ROOM, 1);
 addBooking({ scenario: 'future', checkIn: 21, nights: 2, customer: 'demo_kh_giang', createdDay: -4 }, SOLD_OUT_ROOM, 1);
-// HETLUOT has SoLuongGioiHan = 3 → these three non-cancelled uses exhaust it.
+// Mã hết lượt dùng sau ba lượt sử dụng
 for (const c of ['demo_kh_binh', 'demo_kh_hai', 'demo_kh_mai']) addBooking({ scenario: 'completed', checkIn: -between(20, 80), nights: 2, customer: c, promo: 'HETLUOT' });
 
-// Stays that happened before the owner deactivated (UC19) / the admin suspended (UC34)
-// these hotels — their history must stay visible in owner analytics and admin reports.
+// Lượt lưu trú tại khách sạn đã ngừng hoạt động hoặc bị đình chỉ
 for (const key of ['H17-R1', 'H17-R2', 'H20-R1', 'H20-R2']) {
   const room = ROOMS.find((r) => r.key === key)!;
   addBooking({ scenario: 'completed', checkIn: -between(40, 100), nights: 2 }, room, 1);
@@ -276,10 +260,9 @@ for (let i = 0; i < 20; i++) {
   const checkIn = between(2, 110);
   addBooking({ scenario: 'future', checkIn, nights: between(1, 5), promo: promoOrNull(), createdDay: -between(1, 30) });
 }
-// Cancelled after payment: one per refund tier (≥48h → 100%, ≥24h → 50%, <24h → 0%, no HOAN_TIEN row).
-// The cancel instant (check-in midnight − hours) must already be in the past.
+// Đơn hủy sau khi thanh toán, mỗi mức hoàn tiền một đơn
 const cancelled: Array<[number, number, number, boolean]> = [
-  // [checkInOffset, nights, hoursBeforeCheckIn, refundGatewayFails]
+  // Cấu hình: ngày nhận, số đêm, giờ trước nhận phòng, cổng hoàn tiền lỗi
   [45, 3, 24 * 50, false], [30, 2, 24 * 35, false], [-15, 2, 24 * 6, false], [-40, 3, 72, true],
   [-25, 2, 30, false], [-8, 1, 36, false], [-50, 2, 10, false],
 ];
@@ -296,11 +279,11 @@ for (let i = 0; i < 2; i++) {
   addBooking({ scenario: 'expired', checkIn, nights: between(1, 3), createdDay: Math.min(-1, checkIn - between(3, 15)) });
 }
 addBooking({ scenario: 'expired_failed', checkIn: between(10, 50), nights: 2, createdDay: -3 });
-// Fresh "Chờ thanh toán" — lazily auto-cancelled once PAYMENT_TIMEOUT_MINUTES passes (booking-expiry.ts).
+// Đơn chờ thanh toán sẽ tự hủy khi quá hạn
 addBooking({ scenario: 'pending', checkIn: 14, nights: 2, customer: 'demo_kh_an', createdDay: 0 });
 addBooking({ scenario: 'pending', checkIn: 30, nights: 3, customer: 'demo_kh_trang', createdDay: 0 });
 
-// ---------------------------------------------------------------- reviews
+// Đánh giá
 const REVIEW_TEXT: Record<number, string[]> = {
   5: ['Phòng sạch sẽ, view đẹp, nhân viên rất nhiệt tình. Chắc chắn sẽ quay lại!', 'Kỳ nghỉ tuyệt vời, bữa sáng phong phú và hồ bơi rất đẹp.', 'Vị trí thuận tiện, check-in nhanh, phòng rộng hơn mong đợi.', 'Dịch vụ chu đáo, được nâng hạng phòng miễn phí. Rất hài lòng.'],
   4: ['Khách sạn tốt so với giá tiền, chỉ có thang máy hơi chậm giờ cao điểm.', 'Phòng đẹp, giường êm. Wi-Fi đôi lúc chập chờn.', 'Nhân viên thân thiện, bữa sáng ổn nhưng chưa đa dạng lắm.'],
@@ -320,15 +303,15 @@ completed.forEach((b, i) => {
   let text: string | null = pick(REVIEW_TEXT[score]);
   if (i === 8 || i === 17) { status = 'Vi phạm'; text = SPAM; }
   if (i === 14) status = 'Ẩn';
-  if (i === 20) text = null; // score-only review
+  if (i === 20) text = null;
   REVIEWS.push({ booking: b, score, text, status, images: [] });
 });
-// Guest photos on a handful of reviews (reviews folder, never shared with hotel galleries).
+// Ảnh của khách trong một số đánh giá
 REVIEWS.filter((r) => r.status === 'Hiển thị').slice(0, 7).forEach((r, i) => {
   r.images = i % 3 === 0 ? [nextImage('review'), nextImage('review')] : [nextImage('review')];
 });
 
-// ---------------------------------------------------------------- support tickets
+// Yêu cầu hỗ trợ
 const bookingOf = (user: string) => BOOKINGS.find((b) => b.customer === user && b.scenario !== 'pending');
 const SUPPORT = [
   ['demo_kh_an', 'Hỗ trợ', 'Xuất hóa đơn VAT cho đặt phòng', 'Công ty mình cần hóa đơn VAT cho kỳ lưu trú này, thông tin: Công ty TNHH ABC, MST 0312345678.', 'Mới', true, -2],
@@ -354,7 +337,7 @@ const RESOLUTIONS: Record<string, string> = {
   'Khuyến mãi không áp dụng được': 'Mã CUOITUAN15 yêu cầu tổng tiền phòng trước giảm giá từ 2.000.000đ; đơn của quý khách chưa đạt ngưỡng nên hệ thống từ chối đúng quy định.',
 };
 
-// ---------------------------------------------------------------- SQL emission
+// Sinh câu lệnh SQL
 const hotelImages: string[][] = [];
 for (const h of HOTELS) {
   const gallery = [nextImage('exterior'), nextImage('lobby'), h.resort || h.amenities.includes('Hồ bơi') ? nextImage('pool') : nextImage('exterior'), nextImage('restaurant')];
@@ -362,7 +345,7 @@ for (const h of HOTELS) {
 }
 const roomImages: string[][] = [];
 for (const r of ROOMS) [nextImage('room'), nextImage('room')].forEach((url, i) => roomImages.push([q(r.key), q(url), i === 0 ? '1' : '0']));
-// Replacement images for the older discovery seed (placeholder picsum URLs → Cloudinary).
+// Thay ảnh placeholder của seed cũ bằng ảnh Cloudinary
 const legacyHotelImages = Array.from({ length: 20 }, () => q(nextImage('exterior')));
 const legacyRoomImages = Array.from({ length: 30 }, () => q(nextImage('room')));
 

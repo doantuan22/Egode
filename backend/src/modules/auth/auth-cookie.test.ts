@@ -8,13 +8,7 @@ import { createTestAccount, deleteTestAccount } from '../../test/factories';
 import { REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_MAX_AGE_MS } from '../../common/utils/jwt';
 import type { AuthService } from './auth.service';
 
-/**
- * BUG-006 — logout cleared the refresh cookie with `{ path }` only, while login set it with
- * httpOnly/secure/sameSite/path/maxAge. A browser identifies a cookie by name+domain+path, so the
- * old clear still removed it (see the lifecycle test) — the defect was a *consistency* one: the
- * set and clear options were written twice and could drift. Set and clear now share one base
- * option object; these tests pin that, header by header, and prove the cookie really goes away.
- */
+/** Cookie refresh khi đặt và khi xóa phải dùng cùng thuộc tính */
 
 interface ParsedCookie {
   name: string;
@@ -22,7 +16,7 @@ interface ParsedCookie {
   attrs: Map<string, string | true>;
 }
 
-/** Minimal Set-Cookie parser: attribute names lower-cased, flag attributes (HttpOnly/Secure) → true. */
+/** Trình phân tích Set-Cookie tối giản */
 const parseSetCookie = (header: string): ParsedCookie => {
   const [pair, ...rest] = header.split(';').map((part) => part.trim());
   const eq = pair.indexOf('=');
@@ -42,7 +36,7 @@ const refreshCookieFrom = (headers: Record<string, unknown>): ParsedCookie => {
   return found;
 };
 
-/** The attributes that define where/how a cookie lives — set and clear must agree on every one. */
+/** Các thuộc tính xác định cookie */
 const SCOPE_ATTRS = ['path', 'domain', 'httponly', 'secure', 'samesite'] as const;
 const scopeOf = (cookie: ParsedCookie) => Object.fromEntries(SCOPE_ATTRS.map((key) => [key, cookie.attrs.get(key)]));
 
@@ -70,7 +64,7 @@ describe('refresh_token cookie — real app, test/dev environment (not productio
     expect(set.attrs.get('httponly')).toBe(true);
     expect(set.attrs.get('samesite')).toBe('Lax');
     expect(set.attrs.get('path')).toBe('/api/auth');
-    expect(set.attrs.has('secure')).toBe(false); // NODE_ENV !== 'production'
+    expect(set.attrs.has('secure')).toBe(false);
     expect(set.attrs.has('domain')).toBe(false);
     expect(set.attrs.get('max-age')).toBe(MAX_AGE_SECONDS);
   });
@@ -84,11 +78,11 @@ describe('refresh_token cookie — real app, test/dev environment (not productio
     const clear = refreshCookieFrom(logout.headers);
     expect(clear.value).toBe('');
     expect(clear.attrs.get('expires')).toBe(EPOCH);
-    expect(clear.attrs.get('max-age')).not.toBe(MAX_AGE_SECONDS); // never re-advertises the 7 days
+    expect(clear.attrs.get('max-age')).not.toBe(MAX_AGE_SECONDS);
     expect(clear.attrs.get('httponly')).toBe(true);
     expect(clear.attrs.get('samesite')).toBe('Lax');
     expect(clear.attrs.get('path')).toBe('/api/auth');
-    expect(scopeOf(clear)).toEqual(scopeOf(set)); // one source of truth: nothing can drift
+    expect(scopeOf(clear)).toEqual(scopeOf(set));
   });
 
   it('register and refresh set the cookie with the same attributes as login', async () => {
@@ -128,12 +122,12 @@ describe('refresh_token cookie — logout lifecycle with a real cookie jar', () 
 
     expect((await agent.post('/api/auth/login').send({ identifier: account.Email, MatKhau: plainPassword })).status).toBe(200);
     expect(stored()).toContain(REFRESH_TOKEN_COOKIE_NAME);
-    expect((await agent.post('/api/auth/refresh')).status).toBe(200); // works before logout
+    expect((await agent.post('/api/auth/refresh')).status).toBe(200);
 
     const logout = await agent.post('/api/auth/logout');
     expect(logout.status).toBe(200);
-    expect(logout.body).toEqual({ success: true, message: 'Đăng xuất thành công' }); // response contract unchanged
-    expect(stored()).not.toContain(REFRESH_TOKEN_COOKIE_NAME); // really gone
+    expect(logout.body).toEqual({ success: true, message: 'Đăng xuất thành công' });
+    expect(stored()).not.toContain(REFRESH_TOKEN_COOKIE_NAME);
 
     const afterLogout = await agent.post('/api/auth/refresh');
     expect(afterLogout.status).toBe(401);
@@ -157,11 +151,7 @@ describe('refresh_token cookie — logout lifecycle with a real cookie jar', () 
   });
 });
 
-/**
- * REFRESH_COOKIE_* are read from env.NODE_ENV once, when the controller module loads. To see another
- * environment we re-import the controller with a mocked env and drive it through a tiny express app
- * with a stub AuthService (no DB involved).
- */
+/** Nạp lại controller với env giả để kiểm tra môi trường khác */
 const loadControllerFor = async (nodeEnv: 'development' | 'production') => {
   vi.resetModules();
   vi.doMock('../../config/env', async () => {
@@ -209,7 +199,7 @@ describe.each([
       expect(cookie.attrs.get('httponly')).toBe(true);
       expect(cookie.attrs.get('samesite')).toBe('Lax');
       expect(cookie.attrs.get('path')).toBe('/api/auth');
-      expect(cookie.attrs.has('secure')).toBe(secure); // Secure in production — on set AND on clear
+      expect(cookie.attrs.has('secure')).toBe(secure);
     }
     expect(set.attrs.get('max-age')).toBe(MAX_AGE_SECONDS);
     expect(clear.value).toBe('');

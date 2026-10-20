@@ -35,7 +35,7 @@ describe('GET /api/profile/me', () => {
       MatKhau: 'Test@12345',
       HoTen: 'Null Profile Fields',
       SoDienThoai: '0900000099',
-      // NgaySinh/GioiTinh intentionally omitted
+      // Cố ý bỏ NgaySinh và GioiTinh
     });
     expect(reg.status).toBe(201);
     createdAccountIds.push(reg.body.data.account.MaTaiKhoan);
@@ -82,8 +82,7 @@ describe('PATCH /api/profile/me', () => {
         NgayTao: '2000-01-01',
       });
 
-    // Zod strips unknown/non-whitelisted keys by default, so the request
-    // succeeds but the forbidden fields are silently ignored, not applied.
+    // Trường không được phép bị bỏ qua, không bị áp dụng
     expect(res.status).toBe(200);
     expect(res.body.data.MaVaiTro).toBe(account.MaVaiTro);
     expect(res.body.data.TrangThai).toBe(account.TrangThai);
@@ -124,20 +123,20 @@ describe('SoDienThoai validation is the same for register and PATCH /api/profile
   const VALID: Array<[string, string]> = [
     ['0901234567', '0901234567'],
     ['+84901234567', '+84901234567'],
-    [' 0901234567 ', '0901234567'], // trimmed, then stored
-    ['12345678', '12345678'], // 8 digits: lower bound
-    ['123456789012345', '123456789012345'], // 15 digits: upper bound
+    [' 0901234567 ', '0901234567'],
+    ['12345678', '12345678'],
+    ['123456789012345', '123456789012345'],
   ];
   const INVALID = [
     'abcdefgh',
     'not-a-phone-number',
     '09012abc567',
-    '1234567', // 7 digits
-    '1234567890123456', // 18 digits
-    '+' + '1'.repeat(16), // 16 digits after +
-    '090 123 4567', // inner spaces
+    '1234567',
+    '1234567890123456',
+    '+' + '1'.repeat(16),
+    '090 123 4567',
     '++84901234567',
-    '84+901234567', // + not at the start
+    '84+901234567',
     '',
     '   ',
   ];

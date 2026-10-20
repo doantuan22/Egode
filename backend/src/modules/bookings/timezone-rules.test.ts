@@ -23,13 +23,7 @@ import { completeFinishedBookings } from './booking-completion';
 import { checkInInstant } from '../../common/utils/business-time';
 import { encodeGatewayRef } from '../payments/vnpay';
 
-/**
- * Bug #13 — every business rule reads the database's dates and times in ONE zone, Asia/Ho_Chi_Minh (UTC+7):
- *   cancellation cut-off  → measured to the check-in INSTANT (date + hotel check-in time), not 00:00 UTC
- *   booking completion    → once the check-out INSTANT has passed
- *   report / payment date filters → calendar days of Vietnam
- * (promotion windows are covered in promotion-pricing.test.ts, the pure helpers in business-time.test.ts)
- */
+/** Mọi quy tắc nghiệp vụ đọc ngày giờ theo múi giờ Việt Nam */
 const IP = '127.0.0.1';
 const accountIds: number[] = [];
 let diaPhuongId = 0;
@@ -82,7 +76,7 @@ afterAll(async () => {
 });
 
 describe('cancellation tiers are measured to the check-in instant (date + hotel check-in time, Vietnam time)', () => {
-  // Check-in 2030-06-15 at 14:00 Vietnam time = 2030-06-15T07:00:00Z. Tiers: >= 72 h → 100 %, >= 24 h → 50 %, else 0 %.
+  // Nhận phòng 14:00 giờ Việt Nam là 07:00 UTC
   const STAY = '2030-06-15';
   const refundPercentAt = async (now: Date, gioNhan = '14:00') => {
     await setHotelTimes(gioNhan, '12:00');
@@ -94,13 +88,13 @@ describe('cancellation tiers are measured to the check-in instant (date + hotel 
     const refunded = result.ThanhToan[0].HoanTien[0]?.SoTienHoan ?? 0;
     return (refunded / 1_000_000) * 100;
   };
-  const checkIn = checkInInstant(date(STAY), time('14:00')); // 2030-06-15T07:00:00Z
+  const checkIn = checkInInstant(date(STAY), time('14:00'));
   const before = (hours: number, minutes = 0) => new Date(checkIn.getTime() - hours * 3_600_000 - minutes * 60_000);
 
   it('the 72 h line sits at 07:00 UTC three days earlier: one minute either side flips 100 % ↔ 50 %', async () => {
     expect(before(72).toISOString()).toBe('2030-06-12T07:00:00.000Z');
-    expect(await refundPercentAt(before(72, 1))).toBe(100); // 72 h 01 min before check-in
-    expect(await refundPercentAt(before(72).getTime() === 0 ? before(72) : new Date(before(72).getTime() + 60_000))).toBe(50); // 71 h 59 min
+    expect(await refundPercentAt(before(72, 1))).toBe(100);
+    expect(await refundPercentAt(before(72).getTime() === 0 ? before(72) : new Date(before(72).getTime() + 60_000))).toBe(50);
   });
 
   it('the 24 h line: one minute either side flips 50 % ↔ 0 % (no refund row at all)', async () => {
@@ -114,14 +108,14 @@ describe('cancellation tiers are measured to the check-in instant (date + hotel 
   });
 
   it('is NOT measured to 00:00 UTC of the stay date: 3 days before, at 06:00 UTC, the cut-off (07:00 UTC) is still ahead', async () => {
-    // Old reading (check-in = 2030-06-15T00:00Z): 72 h line = 2030-06-12T00:00Z, so 06:00Z would already be 66 h → 50 %.
+    // Cách đọc cũ cho kết quả sai
     expect(await refundPercentAt(new Date('2030-06-12T06:00:00Z'))).toBe(100);
   });
 
   it("follows the hotel's own check-in time: with check-in at 22:00 the same moment is 8 h earlier relative to it", async () => {
-    const now = before(68); // 68 h before a 14:00 check-in
+    const now = before(68);
     expect(await refundPercentAt(now, '14:00')).toBe(50);
-    expect(await refundPercentAt(now, '22:00')).toBe(100); // 76 h before a 22:00 check-in
+    expect(await refundPercentAt(now, '22:00')).toBe(100);
     await setHotelTimes('14:00', '12:00');
   });
 });
@@ -137,16 +131,15 @@ describe('the booking detail exposes the same instants the server measures to', 
     expect(res.body.data).toMatchObject({
       GioNhanPhong: '15:30',
       GioTraPhong: '11:00',
-      ThoiDiemNhanPhong: '2031-02-10T08:30:00.000Z', // 15:30 Vietnam time
-      ThoiDiemTraPhong: '2031-02-12T04:00:00.000Z', // 11:00 Vietnam time
+      ThoiDiemNhanPhong: '2031-02-10T08:30:00.000Z',
+      ThoiDiemTraPhong: '2031-02-12T04:00:00.000Z',
     });
     await setHotelTimes('14:00', '12:00');
   });
 });
 
 describe('a stay is completed once the check-out INSTANT has passed (not at 00:00 UTC of the check-out date)', () => {
-  // 2020 is far enough back that no other row in the shared database is touched by this sweep (bookings are
-  // created in 2019 so NgayCapNhat = the sweep time stays after NgayTao).
+  // Dùng năm 2020 để không đụng dữ liệu khác
   const completes = async (gioTra: string, now: string) => {
     await setHotelTimes('14:00', gioTra);
     const booking = await createTestBookingDirect(customerId, hotelId, policyId, date('2020-01-01'), date('2020-01-02'), { trangThai: BOOKING_STATUS.CONFIRMED, ngayTao: new Date('2019-12-01T00:00:00Z') });
@@ -177,9 +170,7 @@ describe('a stay is completed once the check-out INSTANT has passed (not at 00:0
 });
 
 describe('report and payment date filters are calendar days of Vietnam', () => {
-  // Four instants around two Vietnam midnights:
-  //   A 2026-03-09T16:59:59Z = 23:59:59 on 9 March   B 2026-03-09T17:00:00Z = 00:00:00 on 10 March
-  //   C 2026-03-10T16:59:59Z = 23:59:59 on 10 March  D 2026-03-10T17:00:00Z = 00:00:00 on 11 March
+  // Bốn thời điểm quanh hai nửa đêm giờ Việt Nam
   const instants = { A: '2026-03-09T16:59:59Z', B: '2026-03-09T17:00:00Z', C: '2026-03-10T16:59:59Z', D: '2026-03-10T17:00:00Z' } as const;
   const amounts = { A: 100_000, B: 200_000, C: 300_000, D: 400_000 } as const;
   const paymentIds: Record<string, number> = {};
@@ -220,7 +211,7 @@ describe('report and payment date filters are calendar days of Vietnam', () => {
   it('admin analytics uses the same day boundaries', async () => {
     const res = await request(app).get('/api/admin/analytics').query({ from: '2026-03-10', to: '2026-03-10' }).set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
-    // The shared database may hold other payments on that day; ours (B + C) must be inside, A and D must not add to it.
+    // Thanh toán trong ngày phải gồm B và C, không gồm A và D
     const withoutOurs = res.body.data.DoanhThuHeThong - (amounts.B + amounts.C);
     const day9 = await request(app).get('/api/admin/analytics').query({ from: '2026-03-09', to: '2026-03-09' }).set('Authorization', `Bearer ${adminToken}`);
     expect(withoutOurs).toBeGreaterThanOrEqual(0);
@@ -232,7 +223,7 @@ describe('report and payment date filters are calendar days of Vietnam', () => {
     expect(res.status).toBe(200);
     const ids = res.body.data.map((p: { MaThanhToan: number }) => p.MaThanhToan);
     expect(ids).toContain(paymentIds.B);
-    expect(ids).toContain(paymentIds.C); // 23:59:59 on the last day is still "to"
+    expect(ids).toContain(paymentIds.C);
     expect(ids).not.toContain(paymentIds.A);
     expect(ids).not.toContain(paymentIds.D);
   });

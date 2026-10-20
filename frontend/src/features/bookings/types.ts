@@ -36,23 +36,23 @@ export interface Booking {
   GhiChu: string | null;
   ChinhSachHuy: BookingCancellationPolicy;
   NgayTao: string;
-  /** While "Chờ thanh toán": when the booking is auto-cancelled (ISO). Null in any other status. */
+  /** Hạn tự hủy khi chờ thanh toán */
   HanThanhToan: string | null;
-  /** Seconds until HanThanhToan by the SERVER clock at the time of the response; null when there is no hold. */
+  /** Số giây còn lại đến hạn theo đồng hồ máy chủ */
   SoGiayConLai: number | null;
 }
 
 export interface CreateBookingRequest {
   checkIn: string;
   checkOut: string;
-  /** Party size (not stored): the server re-checks it against the capacity of the chosen rooms. */
+  /** Số khách, máy chủ kiểm tra lại theo sức chứa */
   guests: number;
   rooms: Array<{ maLoaiPhong: number; soLuong: number }>;
   promoCode?: string;
   ghiChu?: string;
 }
 
-/** One row of GET /bookings (own history, newest first). */
+/** Một dòng lịch sử đặt phòng */
 export interface BookingSummary {
   MaDatPhong: number;
   MaXacNhanDatPhong: string;
@@ -84,20 +84,13 @@ export interface PaymentView {
   HoanTien: RefundView[];
 }
 
-/**
- * GET /bookings/:id — ChiTietPhong.GiaTheoDem/ThanhTien are always null here
- * (unlike the just-created Booking above): CHI_TIET_DAT_PHONG only stores
- * MaLoaiPhong + SoLuongPhong, no per-line historical price snapshot (Gate 0
- * — no CHI_TIET_GIA_DAT_PHONG table), so only the DAT_PHONG-level totals
- * (TongTienPhong/SoTienGiam/TongTienThanhToan) are ever reconstructable
- * later. Render room lines as "name × qty" only, never a per-line price.
- */
+/** Chi tiết đơn không có giá từng dòng phòng */
 export interface BookingDetail extends Omit<Booking, 'ChiTietPhong'> {
   ChiTietPhong: BookingRoomLine[];
-  /** Hotel check-in / check-out wall-clock times in Vietnam time, "HH:mm". */
+  /** Giờ nhận và trả phòng HH:mm */
   GioNhanPhong: string;
   GioTraPhong: string;
-  /** The instants (ISO, UTC) the cancellation tiers are measured to and the stay ends at. */
+  /** Thời điểm tính hủy và kết thúc lưu trú */
   ThoiDiemNhanPhong: string;
   ThoiDiemTraPhong: string;
   TenKhachSan: string;

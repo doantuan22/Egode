@@ -7,15 +7,7 @@ const positiveInt = (raw: string | null) => {
   return Number.isFinite(value) && value >= 1 ? value : 1;
 };
 
-/**
- * Filters and paging of a list page kept in the URL (?status=…&page=2), so a refresh, a shared link
- * and the Back button keep the same view. A key equal to its default is left out of the URL.
- *
- * `setSearchParams` computes from the params of the last render, so two calls in one event
- * (`setValue(…)` then `setPage(1)`) would overwrite each other. Every setter here builds on the
- * latest params instead, which is also why they can be called back to back.
- * Filters replace the current history entry; moving to a later page adds one.
- */
+/** Giữ bộ lọc và trang của danh sách trên URL */
 export function useListParams<K extends string>(defaults: Record<K, string>) {
   const [searchParams, setSearchParams] = useSearchParams();
   const latest = useRef(searchParams);
@@ -60,11 +52,7 @@ export function useListParams<K extends string>(defaults: Record<K, string>) {
   return { values, page: positiveInt(searchParams.get('page')), setValue, setPage, reset };
 }
 
-/**
- * A search box whose (trimmed) text reaches the URL only after the user pauses, and that follows the
- * URL when it changes from outside (Back/Forward). Clearing the box updates the URL at once.
- * `urlValue` is the current URL value, `commit` writes a new one.
- */
+/** Ô tìm kiếm ghi lên URL sau khi người dùng dừng gõ */
 export function useUrlSearchInput(urlValue: string, commit: (value: string) => void, delayMs = 350) {
   const [input, setInput] = useState(urlValue);
   const debounced = useDebouncedValue(input.trim(), delayMs);
@@ -72,15 +60,14 @@ export function useUrlSearchInput(urlValue: string, commit: (value: string) => v
   const commitRef = useRef(commit);
   commitRef.current = commit;
 
-  // typed text -> URL
+  // Văn bản đã gõ sang URL
   useEffect(() => {
     if (debounced === lastCommitted.current) return;
     lastCommitted.current = debounced;
     commitRef.current(debounced);
   }, [debounced]);
 
-  // URL changed by something else (Back/Forward, a link) -> text box. Our own commits are skipped so
-  // characters typed after a commit are not overwritten.
+  // URL đổi từ bên ngoài thì cập nhật ô nhập, bỏ qua lần ghi của chính nó
   useEffect(() => {
     if (urlValue === lastCommitted.current) return;
     lastCommitted.current = urlValue;

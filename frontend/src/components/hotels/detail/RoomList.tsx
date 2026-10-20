@@ -12,12 +12,12 @@ interface RoomListProps {
   search: TravelSearchCriteria;
   onSearch: (values: TravelSearchCriteria) => void;
   roomsQuery: UseQueryResult<RoomTypeWithAvailability[]>;
-  /** Rooms chosen so far: room type id -> quantity. */
+  /** Phòng đã chọn: mã loại phòng sang số lượng */
   selectedRooms: Record<number, number>;
   onQuantityChange: (roomTypeId: number, quantity: number, available: number) => void;
 }
 
-/** "Loại phòng & Giá": the stay editor and one offer per room type. */
+/** Phần Loại phòng và Giá */
 export function RoomList({ search, onSearch, roomsQuery, selectedRooms, onQuantityChange }: RoomListProps) {
   return (
     <section id="loai-phong" className="pt-2 scroll-mt-36">

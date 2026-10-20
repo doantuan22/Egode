@@ -51,7 +51,7 @@ async function backupAssets() {
   writeFileSync(backupPath, JSON.stringify(allAssets, null, 2) + '\n', 'utf8');
   console.log(`Backup saved to ${backupPath}`);
 
-  // Summary breakdown
+  // Thống kê tổng hợp
   const byFolder: Record<string, number> = {};
   for (const a of allAssets) {
     byFolder[a.folder] = (byFolder[a.folder] || 0) + 1;

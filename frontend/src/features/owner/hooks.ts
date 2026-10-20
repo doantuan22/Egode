@@ -150,7 +150,7 @@ export function useBulkUpsertRates(roomTypeId: number) {
   });
 }
 
-/** The moderated reviews of one of the owner's hotels, a page at a time, optionally one star level. */
+/** Đánh giá đã kiểm duyệt của một khách sạn */
 export function useOwnerHotelReviews(hotelId: number, page: number, limit: number, rating?: number) {
   return useQuery({
     queryKey: ['owner', 'hotels', hotelId, 'reviews', page, limit, rating ?? 'all'] as const,

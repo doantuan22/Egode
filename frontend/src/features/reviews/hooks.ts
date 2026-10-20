@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tansta
 import { adminGetReview, adminListReviews, createReview, getHotelReviews, getMyReview, moderateReview, removeViolationReview } from './api';
 import type { AdminReviewListQuery, CreateReviewRequest } from './types';
 
-/** Public reviews of a hotel (no sign-in needed). Keyed under "hotels" so they stay cached across sessions like the rest of the catalogue. */
+/** Đánh giá công khai của khách sạn */
 export function useHotelReviews(hotelId: number, page: number, limit: number) {
   return useQuery({
     queryKey: ['hotels', 'reviews', hotelId, page, limit],

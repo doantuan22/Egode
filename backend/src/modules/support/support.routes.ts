@@ -7,7 +7,7 @@ import { supportIdParamSchema, createSupportSchema, adminUpdateSupportSchema, ad
 
 const controller = new SupportController();
 
-/** Mounted at `/support` — a customer's own requests only. */
+/** Yêu cầu hỗ trợ của chính khách */
 export const supportRoutes = Router();
 
 supportRoutes.post('/', authenticate, requireRole(ROLE_NAMES.CUSTOMER), validateRequest({ body: createSupportSchema }), controller.create);
@@ -20,7 +20,7 @@ supportRoutes.get(
   controller.getMine
 );
 
-/** Mounted at `/admin/support` — never reachable by a customer. */
+/** Dành riêng cho admin */
 export const adminSupportRoutes = Router();
 adminSupportRoutes.use(authenticate, requireAdmin);
 

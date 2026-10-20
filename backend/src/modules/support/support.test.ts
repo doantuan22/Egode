@@ -201,7 +201,7 @@ describe('Admin support handling', () => {
     const detail = await request(app).get(`/api/admin/support/${id}`).set('Authorization', `Bearer ${adminToken}`);
     expect(detail.status).toBe(200);
 
-    // "Tiếp nhận" — claim, MaTaiKhoanXuLy comes from the authenticated admin, never the body.
+    // Tiếp nhận: người xử lý lấy từ admin đã đăng nhập
     const claim = await request(app)
       .patch(`/api/admin/support/${id}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -214,9 +214,9 @@ describe('Admin support handling', () => {
 
     const prisma = getPrismaClient();
     const afterClaim = await prisma.yEU_CAU_HO_TRO.findUnique({ where: { MaYeuCauHoTro: id } });
-    expect(afterClaim?.MaTaiKhoanXuLy).toBe(adminId); // ignored the spoofed 999999
+    expect(afterClaim?.MaTaiKhoanXuLy).toBe(adminId);
 
-    // "Xử lý" — requires KetQuaXuLy.
+    // Xử lý cần có kết quả xử lý
     const resolveWithoutResult = await request(app)
       .patch(`/api/admin/support/${id}`)
       .set('Authorization', `Bearer ${adminToken}`)
@@ -235,14 +235,14 @@ describe('Admin support handling', () => {
     expect(resolve.body.data.TAI_KHOAN_YEU_CAU_HO_TRO_MaTaiKhoanXuLyToTAI_KHOAN).toEqual(claim.body.data.TAI_KHOAN_YEU_CAU_HO_TRO_MaTaiKhoanXuLyToTAI_KHOAN);
     expect(resolve.body.data.DAT_PHONG).toEqual(detail.body.data.DAT_PHONG);
 
-    // Immutable once resolved.
+    // Không sửa được sau khi đã xử lý
     const reopenAttempt = await request(app)
       .patch(`/api/admin/support/${id}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ trangThai: SUPPORT_STATUS.IN_PROGRESS });
     expect(reopenAttempt.status).toBe(400);
 
-    // The customer can now see the result.
+    // Khách xem được kết quả
     const mineAfter = await request(app).get(`/api/support/${id}`).set('Authorization', `Bearer ${customerToken}`);
     expect(mineAfter.body.data.KetQuaXuLy).toBe('Đã hoàn tiền cho khách.');
   });

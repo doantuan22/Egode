@@ -18,7 +18,7 @@ export default function BookingsPage() {
   return (
     <div className="page-container booking-history-page">
       <CustomerCenterNavigation />
-      {/* The tab above already names the page, so the heading is for screen readers only. */}
+      {/* Tiêu đề chỉ dành cho trình đọc màn hình */}
       <h1 className="sr-only">Đơn đặt phòng của tôi</h1>
 
       <div role="group" aria-label="Lọc đặt phòng theo trạng thái" className="pill-tabs mb-5">

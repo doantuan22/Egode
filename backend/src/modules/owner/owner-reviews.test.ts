@@ -18,7 +18,7 @@ import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 import { REVIEW_STATUS } from '../../common/constants/review';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/** GET /api/owner/hotels/:id/reviews — an owner reads the moderated reviews of their own hotels, and only theirs. */
+/** Chủ khách sạn đọc đánh giá của khách sạn mình */
 
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const prisma = () => getPrismaClient();
@@ -114,7 +114,7 @@ describe('GET /api/owner/hotels/:id/reviews', () => {
     expect(first.HinhAnh).toEqual(['https://img.test/a.jpg']);
     expect(first.NgayNhanPhong).toBe(day(-5));
     expect(first.NgayTraPhong).toBe(day(-3));
-    // Nothing that identifies the guest beyond the abbreviation.
+    // Không lộ thông tin khách ngoài tên viết tắt
     expect(first).not.toHaveProperty('TAI_KHOAN');
     expect(first).not.toHaveProperty('Email');
     expect(first).not.toHaveProperty('MaKhachHang');
@@ -124,7 +124,7 @@ describe('GET /api/owner/hotels/:id/reviews', () => {
     const res = await asOwner(`/api/owner/hotels/${hotelId}/reviews`);
 
     expect(res.body.summary.SoLuongDanhGia).toBe(3);
-    expect(res.body.summary.DiemTrungBinh).toBe(4.3); // (5 + 5 + 3) / 3
+    expect(res.body.summary.DiemTrungBinh).toBe(4.3);
     expect(res.body.summary.PhanBoDiem).toEqual({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 2 });
     expect(res.body.pagination).toMatchObject({ page: 1, total: 3, totalPages: 1 });
   });

@@ -2,8 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import { Prisma } from '../../generated/prisma/client';
 import type { ListAccountsQuery } from './accounts.schemas';
 
-// Role name travels with the account so clients never have to map MaVaiTro
-// (an IDENTITY value that differs between databases) back to a name.
+// Tên vai trò đi kèm tài khoản
 const withRole = { VAI_TRO: { select: { TenVaiTro: true } } } as const;
 
 export class AccountsRepository {
@@ -61,11 +60,7 @@ export class AccountsRepository {
     return getPrismaClient().$transaction(fn);
   }
 
-  /**
-   * Locks (U + HOLDLOCK, so the whole key range) every account holding the administrator role until the
-   * transaction ends. Two admins acting on administrator accounts at the same moment queue here; whoever
-   * comes second then counts the admins that are really left.
-   */
+  /** Khóa các tài khoản admin đến hết giao dịch */
   async lockAdministrators(tx: Prisma.TransactionClient, adminRoleId: number): Promise<void> {
     await tx.$queryRaw(Prisma.sql`
       SELECT MaTaiKhoan FROM TAI_KHOAN WITH (UPDLOCK, HOLDLOCK, ROWLOCK) WHERE MaVaiTro = ${adminRoleId}
@@ -94,7 +89,7 @@ export class AccountsRepository {
     });
   }
 
-  /** G0-10: never hard-delete an account that has related history. */
+  /** Không xóa cứng tài khoản đã có lịch sử liên quan */
   async hasDependentRecords(maTaiKhoan: number, db: Prisma.TransactionClient = getPrismaClient()): Promise<boolean> {
     const counts = await db.tAI_KHOAN.findUnique({
       where: { MaTaiKhoan: maTaiKhoan },

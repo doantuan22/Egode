@@ -1,14 +1,4 @@
-/**
- * Every error response of the API has this shape:
- *
- *   { success: false, message: string, code: ErrorCode, details?: ErrorDetail[] }
- *
- *  - message  human-readable (Vietnamese), safe to show to the user
- *  - code     stable machine-readable identifier; clients branch on this, never on the message
- *  - details  only for errors that have parts. For VALIDATION_ERROR (and conflicts that name several rows):
- *             [{ field, message }] where `field` is the request field (`a.b` for nested ones)
- * Stack traces, SQL text and internal objects are never part of it.
- */
+/** Dạng chung của mọi phản hồi lỗi từ API */
 export const ERROR_CODES = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   INVALID_JSON: 'INVALID_JSON',
@@ -18,7 +8,7 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
-  /** The rooms chosen cannot hold the number of guests (quote / booking). */
+  /** Phòng đã chọn không đủ sức chứa số khách */
   CAPACITY_EXCEEDED: 'CAPACITY_EXCEEDED',
   TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
@@ -39,7 +29,7 @@ export interface ErrorBody {
   details?: unknown;
 }
 
-/** The default code of an HTTP status, for errors that do not name a more specific one. */
+/** Mã lỗi mặc định theo mã HTTP */
 export const codeForStatus = (statusCode: number): ErrorCode => {
   switch (statusCode) {
     case 400: return ERROR_CODES.BAD_REQUEST;

@@ -6,11 +6,7 @@ interface GalleryImage {
   URL: string;
 }
 
-/**
- * Full photo list of a hotel in a native modal <dialog> (focus trap, Esc to close and
- * inert background come from the browser). It is open while `startIndex` is a number,
- * and scrolls that photo into view; `onClose` fires however it was closed.
- */
+/** Hộp thoại xem toàn bộ ảnh khách sạn */
 export function HotelGalleryDialog({ hotelName, images, startIndex, onClose }: {
   hotelName: string;
   images: GalleryImage[];
@@ -42,7 +38,7 @@ export function HotelGalleryDialog({ hotelName, images, startIndex, onClose }: {
 
   const requestClose = () => {
     const dialog = dialogRef.current;
-    if (dialog && typeof dialog.close === 'function') dialog.close(); // fires the native 'close' event -> onClose
+    if (dialog && typeof dialog.close === 'function') dialog.close();
     else {
       dialog?.removeAttribute('open');
       onClose();

@@ -2,7 +2,7 @@ import type { HotelDetail } from '../../../features/hotels/types';
 import { Card } from '../../common/Card';
 import { Icon } from '../../common/Icon';
 
-/** "Tổng quan": the description and the first few amenities. */
+/** Phần Tổng quan gồm mô tả và vài tiện nghi đầu */
 export function HotelOverview({ hotel }: { hotel: HotelDetail }) {
   return (
     <section id="tong-quan" className="pt-2 scroll-mt-36">
@@ -27,7 +27,7 @@ export function HotelOverview({ hotel }: { hotel: HotelDetail }) {
   );
 }
 
-/** "Tiện nghi & Dịch vụ": every amenity the hotel lists. */
+/** Phần Tiện nghi và Dịch vụ */
 export function HotelAmenities({ hotel }: { hotel: HotelDetail }) {
   return (
     <section id="tien-nghi" className="pt-2 scroll-mt-36">

@@ -25,7 +25,7 @@ describe('MainLayout footer', () => {
     const hrefs = within(footer).getAllByRole('link').map((link) => link.getAttribute('href'));
 
     expect(hrefs.length).toBeGreaterThan(0);
-    // No "#" placeholders and no link that just points back at the home page.
+    // Không có liên kết # hay liên kết quay về trang chủ
     expect(hrefs.every((href) => ['/support', '/partner/apply', '/login'].includes(href ?? ''))).toBe(true);
   });
 

@@ -4,12 +4,9 @@ import { Button } from './Button';
 
 interface Props {
   children: ReactNode;
-  /**
-   * Per-page boundary rendered inside a layout: the layout (navbar, sidebar) stays usable and no
-   * extra <main> landmark is added. Without it this is the last-resort, full-screen boundary.
-   */
+  /** Chặn lỗi theo từng trang hoặc toàn màn hình */
   inline?: boolean;
-  /** When this value changes (e.g. the pathname) a shown error is cleared, so navigating away recovers. */
+  /** Đổi giá trị này thì lỗi đang hiện được xóa */
   resetKey?: string;
 }
 interface State { hasError: boolean }
@@ -22,7 +19,7 @@ export class AppErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Keep details out of the UI; this remains available to observability/devtools.
+    // Giữ chi tiết lỗi ngoài giao diện
     console.error('Unhandled UI error', error, info.componentStack);
   }
 

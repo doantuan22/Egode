@@ -67,7 +67,7 @@ export default function AdminAnalyticsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* KPI 1 */}
+            {/* Chỉ số 1 */}
             <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng tài khoản</p>
@@ -78,7 +78,7 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            {/* KPI 2 */}
+            {/* Chỉ số 2 */}
             <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng khách sạn</p>
@@ -89,7 +89,7 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            {/* KPI 3 */}
+            {/* Chỉ số 3 */}
             <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng lượt booking</p>
@@ -100,7 +100,7 @@ export default function AdminAnalyticsPage() {
               </div>
             </div>
 
-            {/* KPI 4 */}
+            {/* Chỉ số 4 */}
             <div className="admin-analytics__metric bg-white p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Tổng giao dịch</p>

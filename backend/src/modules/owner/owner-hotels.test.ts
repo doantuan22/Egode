@@ -15,10 +15,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 import { CloudinaryIntegration } from '../../integrations/cloudinary.integration';
 
-// Cloudinary is a paid third-party SaaS with no real credentials in this
-// environment (backend/.env has placeholder values) — mocking it is
-// standard practice for an external dependency, distinct from mocking the
-// app's own Express/Prisma layer under test.
+// Giả lập Cloudinary vì là dịch vụ bên ngoài
 vi.mock('../../integrations/cloudinary.integration', () => ({
   CloudinaryIntegration: {
     uploadImage: vi.fn().mockResolvedValue({ url: 'https://res.cloudinary.com/demo/image/upload/v1/hotel-booking/hotels/fake123.jpg', publicId: 'hotel-booking/hotels/fake123' }),
@@ -153,7 +150,7 @@ describe('Ownership enforcement (cross-owner access)', () => {
       .send({ TenKhachSan: 'Hijacked Name' });
     expect(patchRes.status).toBe(403);
 
-    // Confirm the owner's own data was untouched.
+    // Dữ liệu của chủ sở hữu không bị thay đổi
     const ok = await request(app)
       .get(`/api/owner/hotels/${hotel.MaKhachSan}`)
       .set('Authorization', `Bearer ${ownerA.token}`);
@@ -200,7 +197,7 @@ describe('PATCH /api/owner/hotels/:id (update)', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.TenKhachSan).toBe('Updated Name');
-    expect(res.body.data.TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL); // untouched
+    expect(res.body.data.TrangThai).toBe(HOTEL_STATUS.PENDING_APPROVAL);
   });
 });
 
@@ -237,7 +234,7 @@ describe('Amenities + images', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUAg1WvHmoAAAAASUVORK5CYII=' });
     expect(uploadRes.status).toBe(201);
-    expect(uploadRes.body.data.AnhDaiDien).toBe(true); // first image becomes primary
+    expect(uploadRes.body.data.AnhDaiDien).toBe(true);
     expect(CloudinaryIntegration.uploadImage).toHaveBeenCalled();
 
     const deleteRes = await request(app)

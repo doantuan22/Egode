@@ -4,23 +4,23 @@ import { useDashboardUi } from './DashboardUiContext';
 import { SelectMenu } from './SelectMenu';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  /** Renders a `<label>` wired to the select via id/htmlFor. Omit for a standalone filter select that supplies its own `aria-label`. */
+  /** Nhãn gắn với ô chọn */
   label?: React.ReactNode;
-  /** Field-level validation error. Wires `aria-invalid`/`aria-describedby` automatically. */
+  /** Lỗi của trường */
   error?: string;
   hint?: string;
-  /** Draws the dropdown list itself (like in the dashboards) instead of the browser's native one; the real `<select>` stays underneath. */
+  /** Tự vẽ danh sách thay cho danh sách của trình duyệt */
   menu?: boolean;
 }
 
-/** Canonical select — same base style and touch-target height as {@link Input}. */
+/** Ô chọn chuẩn cùng kiểu với Input */
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, hint, menu = false, id, children, ...props }, ref) => {
     const generatedId = React.useId();
     const selectId = id ?? generatedId;
     const errorId = `${selectId}-error`;
     const hintId = `${selectId}-hint`;
-    // In the dashboards (or with `menu`) the dropdown list is drawn by SelectMenu; the native <select> stays underneath as the real control.
+    // Trong trang quản trị danh sách do SelectMenu vẽ
     const dashboardUi = useDashboardUi();
     const Control = menu || dashboardUi ? SelectMenu : 'select';
 

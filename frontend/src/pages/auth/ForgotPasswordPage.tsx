@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
       <div className="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="bg-white w-full max-w-[36.25rem] rounded-2xl shadow-lg border border-border p-6 sm:p-8 lg:p-10">
           
-          {/* Stepper */}
+          {/* Các bước */}
           <div className="flex items-center justify-between mb-8 relative">
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-border -z-10"></div>
             

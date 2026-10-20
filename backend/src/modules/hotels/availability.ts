@@ -1,18 +1,4 @@
-/**
- * Pure availability/pricing computation (BE-4, read-only).
- *
- * Business rules (M2 §4):
- * - A stay is the half-open interval [NgayNhanPhong, NgayTraPhong) — the
- *   checkout date itself is never counted as a night.
- * - available(night) = QUY_PHONG_GIA.SoLuongPhong(night) - booked(night),
- *   where booked(night) sums CHI_TIET_DAT_PHONG.SoLuongPhong for bookings
- *   whose stay covers that night and whose DAT_PHONG.TrangThai is not
- *   "Đã hủy" (cancelled bookings never occupy inventory).
- * - A room type's availability for the whole requested range is the
- *   minimum across every night in range (the bottleneck night). A night
- *   with no QUY_PHONG_GIA row at all is treated as 0 available for that
- *   night (nothing to sell without a price/inventory record).
- */
+/** Tính số phòng trống và giá theo từng đêm lưu trú */
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -21,7 +7,7 @@ const toDateOnlyUTC = (date: Date): Date =>
 
 export const toDateKey = (date: Date): string => toDateOnlyUTC(date).toISOString().slice(0, 10);
 
-/** [checkIn, checkOut) — checkout night itself is excluded. Throws if checkOut <= checkIn. */
+/** Danh sách đêm lưu trú, không gồm ngày trả phòng */
 export const enumerateNights = (checkIn: Date, checkOut: Date): string[] => {
   const start = toDateOnlyUTC(checkIn);
   const end = toDateOnlyUTC(checkOut);
@@ -35,10 +21,7 @@ export const enumerateNights = (checkIn: Date, checkOut: Date): string[] => {
   return nights;
 };
 
-/**
- * Rooms of a room type that exist on EVERY night of the stay (the smallest nightly stock), regardless of what is
- * booked; 0 if any night has no stock row at all. The ceiling on how many rooms of it one stay could use.
- */
+/** Số phòng nhỏ nhất còn tồn kho qua mọi đêm */
 export const stockForStay = (nightKeys: string[], rates: ReadonlyArray<{ NgayApDung: Date; SoLuongPhong: number }>): number => {
   if (nightKeys.length === 0) return 0;
   const byNight = new Map(rates.map((r) => [toDateKey(r.NgayApDung), r.SoLuongPhong]));
@@ -57,11 +40,11 @@ export interface NightlyRate {
 }
 
 export interface AvailabilityResult {
-  /** Available room count for the whole stay (bottleneck night). Never negative. */
+  /** Số phòng trống cho cả kỳ lưu trú */
   available: number;
-  /** Nightly price for each night that had a rate row, in stay order. */
+  /** Giá từng đêm có dòng giá */
   pricePerNight: number[];
-  /** Sum of nightly prices for one room, or null if any night is unpriced (no rate row). */
+  /** Tổng giá một phòng cho cả kỳ, null nếu thiếu giá */
   totalPrice: number | null;
   nights: number;
 }
@@ -102,23 +85,18 @@ export const computeRoomTypeAvailability = (
 };
 
 export interface RoomLinePricing {
-  /** Rooms of this type still free across the whole stay (bottleneck night). */
+  /** Số phòng còn trống qua cả kỳ lưu trú */
   available: number;
-  /** available >= the quantity requested for this line. */
+  /** Đủ số lượng yêu cầu */
   duPhong: boolean;
-  /** Every night in the stay had a QUY_PHONG_GIA row (fully priceable). */
+  /** Mọi đêm đều có giá */
   coGiaDayDu: boolean;
   giaTheoDem: number | null;
-  /** Total for `soLuong` rooms across the whole stay, or null if unpriced. */
+  /** Tổng giá cho số phòng yêu cầu */
   thanhTien: number | null;
 }
 
-/**
- * One room line's availability + price, for `soLuong` rooms. Shared by the
- * Quote (M4) and Booking (M5) flows so both always price a line identically —
- * Booking still re-fetches its own rates/booked-counts independently (inside
- * a locked transaction) rather than trusting a client-supplied quote.
- */
+/** Tính khả dụng và giá cho một dòng phòng, dùng chung cho báo giá và đặt phòng */
 export const priceRoomLine = (
   nightKeys: string[],
   ratesByDate: ReadonlyMap<string, NightlyRate>,
@@ -136,10 +114,7 @@ export const priceRoomLine = (
   };
 };
 
-/**
- * Sums, per calendar night, how many rooms of a given room type are already
- * occupied by non-cancelled bookings overlapping that night.
- */
+/** Cộng số phòng đã bị chiếm theo từng đêm */
 export const buildBookedByDate = (
   bookings: Array<{ ngayNhanPhong: Date; ngayTraPhong: Date; soLuongPhong: number }>
 ): Map<string, number> => {

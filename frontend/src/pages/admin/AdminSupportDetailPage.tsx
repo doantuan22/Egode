@@ -58,7 +58,7 @@ const resolve = () => {
       </Link>
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-warning-light text-warning-ink flex items-center justify-center font-bold text-lg">

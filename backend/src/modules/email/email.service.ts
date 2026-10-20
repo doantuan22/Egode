@@ -14,13 +14,13 @@ export interface EmailDeliveryErrorMeta {
   reason: string;
 }
 
-/** Small boundary that keeps SMTP concerns out of AuthService. */
+/** Ranh giới gửi mail tách khỏi AuthService */
 export interface EmailService {
   sendPasswordResetEmail(message: PasswordResetEmail): Promise<void>;
 }
 
 export const isSmtpConfigured = () =>
-  // Automated tests must never depend on or send to a configured SMTP server.
+  // Test tự động không gửi mail thật
   env.NODE_ENV !== 'test' && Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASSWORD && env.SMTP_FROM);
 
 export const maskEmail = (email: string): string => {
@@ -49,7 +49,7 @@ const passwordResetHtml = ({ resetUrl }: PasswordResetEmail) => `<!doctype html>
   </body>
 </html>`;
 
-/** SMTP implementation used by the running application. */
+/** Gửi mail qua SMTP */
 export class NodemailerEmailService implements EmailService {
   private readonly transporter: Transporter | null;
 
@@ -75,8 +75,7 @@ export class NodemailerEmailService implements EmailService {
   }
 
   async sendPasswordResetEmail(message: PasswordResetEmail): Promise<void> {
-    // Keeping SMTP optional locally lets contributors run the rest of the API
-    // before configuring mail. Production startup rejects this configuration.
+    // Cho phép bỏ SMTP khi chạy local
     if (!this.transporter) {
       const meta: EmailDeliveryErrorMeta = {
         toMasked: maskEmail(message.to),
@@ -107,7 +106,7 @@ export class NodemailerEmailService implements EmailService {
   }
 }
 
-/** In-memory delivery implementation for unit tests; it never uses a network. */
+/** Gửi mail trong bộ nhớ cho test */
 export class FakeEmailService implements EmailService {
   readonly messages: PasswordResetEmail[] = [];
 

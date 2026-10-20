@@ -24,7 +24,7 @@ describe('HomePage guest count', () => {
 
     expect(screen.getByRole('button', { name: /Số khách\s*2 khách/ })).toBeInTheDocument();
     expect(vi.mocked(useSearchHotels).mock.calls[0][0]).toMatchObject({ guests: 2 });
-    // the card links to the hotel twice (image and arrow): every one of them carries the guest count
+    // Thẻ liên kết tới khách sạn hai lần đều mang số khách
     const links = screen.getAllByRole('link', { name: /Xem phòng tại Khách sạn thử/ });
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) expect(link.getAttribute('href')).toMatch(/guests=2$/);

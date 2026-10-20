@@ -12,7 +12,7 @@ import type { BookingDetail } from '../../features/bookings/types';
 vi.mock('../../features/bookings/hooks');
 vi.mock('../../features/payments/hooks');
 vi.mock('../../features/reviews/hooks');
-// The server answers at once; the screen keeps the animation for a moment. Tests do not wait for that moment.
+// Server trả ngay, màn hình giữ hiệu ứng thêm một lúc
 vi.mock('../../lib/simulation', () => ({ SIMULATION_DELAY_MS: 0, withMinimumDelay: <T,>(work: Promise<T>) => work }));
 
 const booking = (TrangThai: string) =>

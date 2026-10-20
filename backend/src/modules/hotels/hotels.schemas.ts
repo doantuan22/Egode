@@ -6,7 +6,7 @@ const dateOnly = z.coerce.date();
 export const searchHotelsQuerySchema = z
   .object({
     location: z.string().trim().max(255).optional(),
-    // Free text matched against hotel name, address, city and province (the "Từ khóa" box of the filter bar).
+    // Từ khóa khớp tên, địa chỉ, thành phố hoặc tỉnh
     keyword: z.string().trim().max(100).optional(),
     checkIn: dateOnly,
     checkOut: dateOnly,
@@ -14,7 +14,7 @@ export const searchHotelsQuerySchema = z
     minPrice: z.coerce.number().min(0).optional(),
     maxPrice: z.coerce.number().min(0).optional(),
     starRating: z.coerce.number().int().min(1).max(5).optional(),
-    // Comma-separated MaTienNghi ids, e.g. "1,3,5"
+    // Danh sách mã tiện nghi cách nhau bởi dấu phẩy
     amenities: z
       .string()
       .trim()

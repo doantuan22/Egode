@@ -11,8 +11,7 @@ export const listRatesQuerySchema = z
   .refine((d) => d.to.getTime() >= d.from.getTime(), { message: '"to" phải sau hoặc bằng "from"', path: ['to'] });
 export type ListRatesQuery = z.infer<typeof listRatesQuerySchema>;
 
-// GiaPhong / SoLuongPhong may be left out to change only the sale status (or only one of the two): an omitted field
-// keeps the value already stored for that day. A day that has no row yet needs both, to be created.
+// Có thể bỏ giá hoặc số phòng để chỉ đổi trạng thái bán
 const rateItemSchema = z.object({
   NgayApDung: z.coerce.date(),
   GiaPhong: z.coerce.number().min(0, 'Giá phòng không được âm').optional(),

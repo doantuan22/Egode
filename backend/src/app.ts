@@ -16,7 +16,7 @@ app.disable('x-powered-by');
 app.set('trust proxy', env.TRUST_PROXY);
 app.set('json replacer', timeOfDayJsonReplacer);
 
-// Middlewares
+// Middleware
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,23 +31,21 @@ app.use(
 );
 app.use(securityHeaders);
 app.use(requestLogging);
-// 10mb: owner image-upload endpoints accept a base64 data URI in the JSON
-// body (reuses the existing Cloudinary integration as-is, no multer/
-// multipart parsing added) — the default 100kb limit is too small for that.
+// Giới hạn 10mb vì API upload ảnh nhận data URI base64
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(cookieParser());
 
-// Health routes (available at /health, /health/live, /health/ready for Render and cloud probes)
+// Route kiểm tra sức khỏe hệ thống
 app.use('/', healthRoutes);
 
-// API Routes
+// Route API
 app.use('/api', routes);
 
-// 404 handler
+// Xử lý 404
 app.use(notFoundHandler);
 
-// Global error handler
+// Xử lý lỗi chung
 app.use(errorHandler);
 
 export default app;

@@ -1,8 +1,7 @@
 import { getPrismaClient } from '../../config/prisma';
 import type { OwnerBookingsQuery } from './owner-bookings.schemas';
 
-// Phone + the guest's note are operational data the hotel needs to serve the
-// stay; email and every other account field stay private to the platform.
+// Chỉ lộ số điện thoại và ghi chú của khách
 const bookingInclude = {
   TAI_KHOAN: { select: { MaTaiKhoan: true, HoTen: true, SoDienThoai: true } },
   KHACH_SAN: { select: { GioNhanPhong: true, GioTraPhong: true } },

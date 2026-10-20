@@ -18,10 +18,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * UC24 — a room type can only be stopped while no open booking ("Chờ thanh toán", or "Đã xác nhận" with the stay
- * not over) includes it. Cancelled/completed bookings and expired unpaid holds never block.
- */
+/** Chỉ ngừng bán loại phòng khi không còn đơn mở */
 const at = (n: number) => new Date(`${addDaysToDateKey(businessToday(), n)}T00:00:00Z`);
 const prisma = () => getPrismaClient();
 

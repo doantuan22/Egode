@@ -2,11 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import { HOTEL_STATUS } from '../../common/constants/hotel-status';
 
 export class LocationsRepository {
-  /**
-   * Every location (the owner hotel form needs empty ones too), plus how many
-   * publicly listed hotels each has and one cover image — enough for a
-   * "popular destinations" block in a single request instead of one search per city.
-   */
+  /** Mọi địa điểm kèm số khách sạn đang niêm yết và một ảnh bìa */
   async findAll() {
     const prisma = getPrismaClient();
     const rows = await prisma.dIA_PHUONG.findMany({

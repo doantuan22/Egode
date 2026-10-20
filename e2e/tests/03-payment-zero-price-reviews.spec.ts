@@ -44,7 +44,7 @@ test.describe('Zero-price booking', () => {
 
     await expect(page).toHaveURL(/\/payment\/result\?.*status=success/);
     await expect(page.getByText(/Đặt phòng thành công/).first()).toBeVisible();
-    await expect(page.getByRole('dialog')).toHaveCount(0); // nothing to pay, so no payment animation either
+    await expect(page.getByRole('dialog')).toHaveCount(0);
 
     const row = await fx('/db/latest-booking', { customerId: customer.id });
     expect(row.TrangThai).toBe('Đã xác nhận');
@@ -69,7 +69,7 @@ test.describe('Payment (simulated)', () => {
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toContainText('Đang xử lý thanh toán');
-    await expect(page.getByRole('status').first()).toContainText('Đang kết nối cổng thanh toán'); // status lines change while it runs
+    await expect(page.getByRole('status').first()).toContainText('Đang kết nối cổng thanh toán');
     await expect(dialog).toContainText('Thanh toán thành công!');
     await expect(dialog).toContainText(money(PRICE));
     await dialog.getByRole('button', { name: 'Xem kết quả' }).click();
@@ -82,7 +82,7 @@ test.describe('Payment (simulated)', () => {
     expect(row.THANH_TOAN[0]).toMatchObject({ TrangThai: 'Thành công', PhuongThucThanhToan: 'VNPAY (mô phỏng)' });
     expect(Number(row.THANH_TOAN[0].SoTien)).toBe(Number(row.TongTienThanhToan));
 
-    // the booking page no longer offers payment
+    // Trang đơn không còn đề nghị thanh toán
     await page.goto(`/bookings/${bookingId}`);
     await expect(page.getByRole('button', { name: 'Thanh toán ngay' })).toHaveCount(0);
   });
@@ -108,15 +108,15 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     const aliceStay = await fx('/completed-booking', { customerId: alice.id, hotelId: hotel.id });
     const bobStay = await fx('/completed-booking', { customerId: bob.id, hotelId: hotel.id });
 
-    // --- Alice writes a 5-star review through the booking page
+    // Alice viết đánh giá 5 sao
     await login(page, alice);
     await page.goto(`/bookings/${aliceStay.id}`);
     await page.getByRole('button', { name: '5 sao' }).click();
     await page.locator('#review-content').fill('Tuyệt vời, sẽ quay lại.');
     await page.getByRole('button', { name: 'Gửi đánh giá' }).click();
-    await expect(page.getByText(/Cảm ơn bạn đã đánh giá/)).toBeVisible(); // the saved review, not the textarea
+    await expect(page.getByText(/Cảm ơn bạn đã đánh giá/)).toBeVisible();
 
-    // --- Bob writes a 1-star review
+    // Bob viết đánh giá 1 sao
     const bobPage = await (await browser.newContext()).newPage();
     await login(bobPage, bob);
     await bobPage.goto(`/bookings/${bobStay.id}`);
@@ -131,7 +131,7 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     expect(aliceReview).toMatchObject({ DiemDanhGia: 5, TrangThai: 'Hiển thị' });
     expect(bobReview).toMatchObject({ DiemDanhGia: 1, TrangThai: 'Hiển thị' });
 
-    // --- new reviews are public as soon as they are posted
+    // Đánh giá mới công khai ngay khi đăng
     const guest = await (await browser.newContext()).newPage();
     await guest.goto(stayUrl());
     await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toBeVisible();
@@ -139,7 +139,7 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     const initialHotel = await guest.request.get(`http://localhost:5100/api/hotels/${hotel.id}`);
     expect((await initialHotel.json()).data.DanhGia).toEqual({ DiemTrungBinh: 3, SoLuongDanhGia: 2 });
 
-    // --- an admin can hide Bob's review after publication
+    // Admin ẩn đánh giá của Bob
     const adminPage = await (await browser.newContext()).newPage();
     await login(adminPage, admin);
     await adminPage.goto(`/admin/reviews/${bobReview.MaDanhGia}`);
@@ -150,7 +150,7 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     await adminPage.getByRole('button', { name: 'Ẩn đánh giá' }).click();
     await expect.poll(states).toEqual({ [aliceReview.MaDanhGia]: 'Hiển thị', [bobReview.MaDanhGia]: 'Ẩn' });
 
-    // --- only Alice is public now, so the average/count include only her review
+    // Chỉ còn đánh giá của Alice nên trung bình chỉ tính của cô ấy
     await guest.goto(stayUrl());
     await expect(guest.getByText('Tuyệt vời, sẽ quay lại.')).toBeVisible();
     await expect(guest.getByText('Không như mong đợi.')).toHaveCount(0);
@@ -160,7 +160,7 @@ test.describe('Reviews after a finished stay, moderation, and what the public se
     const found = (await list.json()).data.find((h: { MaKhachSan: number }) => h.MaKhachSan === hotel.id);
     expect(found).toMatchObject({ DiemTrungBinh: 5, SoLuongDanhGia: 1 });
 
-    // --- restoring the review makes it public and restores the aggregate
+    // Khôi phục đánh giá thì số liệu trở lại
     await adminPage.goto(`/admin/reviews/${bobReview.MaDanhGia}`);
     await adminPage.getByRole('button', { name: 'Hiển thị lại' }).click();
     await expect.poll(states).toEqual({ [aliceReview.MaDanhGia]: 'Hiển thị', [bobReview.MaDanhGia]: 'Hiển thị' });

@@ -46,13 +46,13 @@ export class PromotionsRepository {
     return prisma.kHUYEN_MAI.findUnique({ where: { MaCode: maCode } });
   }
 
-  /** How many non-cancelled bookings have actually used this code — shown to the admin, and why a code can't be freely deleted (there is no delete endpoint at all — see M8 report). */
+  /** Số đơn chưa hủy đã dùng mã này */
   async countUsage(maKhuyenMai: number): Promise<number> {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.count({ where: { MaKhuyenMai: maKhuyenMai, TrangThai: { not: BOOKING_STATUS.CANCELLED } } });
   }
 
-  /** Non-cancelled bookings per promotion, for several promotions in one query. */
+  /** Số đơn chưa hủy theo từng khuyến mãi */
   async countUsageByIds(maKhuyenMais: number[]): Promise<Map<number, number>> {
     if (maKhuyenMais.length === 0) return new Map();
     const prisma = getPrismaClient();
@@ -64,7 +64,7 @@ export class PromotionsRepository {
     return new Map(rows.flatMap((row) => (row.MaKhuyenMai === null ? [] : [[row.MaKhuyenMai, row._count._all] as const])));
   }
 
-  /** Active promotions whose date window contains the given calendar day (a `YYYY-MM-DD` key, read as a DATE). */
+  /** Khuyến mãi hoạt động có khoảng ngày chứa ngày cho trước */
   async findActiveOnDay(dayKey: string, activeStatus: string) {
     const prisma = getPrismaClient();
     const day = new Date(`${dayKey}T00:00:00.000Z`);

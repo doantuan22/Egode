@@ -6,10 +6,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { ACCOUNT_STATUS, PARTNER_APPLICATION_STATUS } from '../../common/constants/account-status';
 import { getPrismaClient } from '../../config/prisma';
 
-/**
- * End-to-end partner registration flow over HTTP: register -> apply -> (pending limits) -> approve / reject
- * -> re-apply, plus the guards around it. Complements partners.test.ts (which covers each endpoint alone).
- */
+/** Luồng đăng ký đối tác từ đầu đến cuối */
 
 const created: number[] = [];
 afterAll(async () => {
@@ -50,7 +47,7 @@ const apply = (token: string, body: object = application()) =>
 
 const me = async (token: string) => (await request(app).get('/api/profile/me').set(auth(token))).body.data;
 
-/** The customer-only features an account in review (or a partner) must not reach. */
+/** Tính năng chỉ dành cho khách mà tài khoản đang xét duyệt không được dùng */
 const customerOnlyCalls = (token: string) => [
   request(app).get('/api/bookings').set(auth(token)),
   request(app).get('/api/support').set(auth(token)),
@@ -134,7 +131,7 @@ describe('while the application is pending', () => {
       expect((await call).status).toBe(403);
     }
 
-    // Still allowed: browsing, own application, own profile.
+    // Vẫn được xem, xem hồ sơ của mình
     const day = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
     expect((await request(app).get(`/api/hotels?checkIn=${day(30)}&checkOut=${day(31)}&guests=1`)).status).toBe(200);
     const mine = await request(app).get('/api/partners/me').set(auth(token));
@@ -181,7 +178,7 @@ describe('admin decision', () => {
     const approved = await request(app).post(`/api/admin/partner-applications/${id}/approve`).set(auth(adm.token));
     expect(approved.status).toBe(200);
 
-    // The role is read from the DB on each request, so the old token already acts as a partner.
+    // Vai trò đọc từ CSDL nên token cũ đã là đối tác
     const profile = await me(applicant.token);
     expect(profile.DangChoDuyetDoiTac).toBe(false);
     expect(profile.HoSoDoiTacBiTuChoi).toBe(false);

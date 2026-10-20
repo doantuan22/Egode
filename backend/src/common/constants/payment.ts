@@ -1,7 +1,4 @@
-/**
- * THANH_TOAN.TrangThai — open domain (no CK constraint, same modeling style as
- * BOOKING_STATUS/CANCELLATION_POLICY_STATUS — see hotel-status.ts/commercial.ts).
- */
+/** Trạng thái thanh toán */
 export const PAYMENT_STATUS = {
   PENDING: 'Chờ xử lý',
   SUCCESS: 'Thành công',
@@ -10,14 +7,14 @@ export const PAYMENT_STATUS = {
 
 export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
 
-/** THANH_TOAN.PhuongThucThanhToan — open domain. VNPAY, or its simulated twin. */
+/** Phương thức thanh toán */
 export const PAYMENT_METHOD = {
   VNPAY: 'VNPAY',
-  /** Simulated payment (PAYMENT_PROVIDER=simulated): recorded like a VNPAY payment, but no gateway was involved. */
+  /** Thanh toán giả lập, không qua cổng thật */
   VNPAY_SIMULATED: 'VNPAY (mô phỏng)',
 } as const;
 
-/** HOAN_TIEN.TrangThai — open domain (no CK constraint). */
+/** Trạng thái hoàn tiền */
 export const REFUND_STATUS = {
   PENDING: 'Chờ xử lý',
   SUCCESS: 'Thành công',

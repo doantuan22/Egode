@@ -6,16 +6,13 @@ import { getPrismaClient } from '../../config/prisma';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * Bug #20 — `starRating=N` is a MINIMUM: hotels with HangSao >= N. The UI says "Từ N sao trở lên"; these tests pin the
- * API behaviour that wording promises (3 → 3,4,5 · 4 → 4,5 · 5 → only 5), so the label and the data cannot drift apart.
- */
+/** Lọc sao là mức tối thiểu */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const prisma = () => getPrismaClient();
 let ownerId = 0;
 let diaPhuongId = 0;
 let cityName = '';
-const hotelByStars = new Map<number, number>(); // HangSao → MaKhachSan
+const hotelByStars = new Map<number, number>();
 
 beforeAll(async () => {
   const owner = await createTestAccount({ role: ROLE_NAMES.PARTNER });
@@ -38,7 +35,7 @@ afterAll(async () => {
   await deleteTestDiaPhuong(diaPhuongId);
 });
 
-/** The star ratings of the test city's hotels that the search returns. */
+/** Hạng sao các khách sạn của thành phố test */
 const starsFor = async (starRating?: number | string) => {
   const res = await request(app).get('/api/hotels').query({ location: cityName, checkIn: day(1), checkOut: day(2), guests: 1, ...(starRating === undefined ? {} : { starRating }) });
   expect(res.status).toBe(200);

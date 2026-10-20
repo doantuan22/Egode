@@ -38,10 +38,10 @@ export default function PaymentResultPage() {
   const latestPayment = booking?.ThanhToan[0];
   const result = booking ? resolvePaymentResult(booking) : null;
   const isConfirmed = result?.kind === 'confirmed';
-  // Confirmed without a single payment row: the booking had nothing to pay (total 0).
+  // Đơn được xác nhận không có thanh toán vì tổng bằng 0
   const isFreeBooking = isConfirmed && booking?.ThanhToan.length === 0;
   const isFailed = result?.kind === 'failed';
-  // A failed attempt can be retried only while the booking still holds the rooms.
+  // Chỉ thử lại được khi đơn còn giữ phòng
   const canRetryPayment = isFailed && booking?.TrangThaiDatPhong === BOOKING_STATUS.PENDING_PAYMENT;
   const paymentFlow = usePaymentFlow(hasBookingId ? bookingId : 0);
   const retryPayment = paymentFlow.start;
@@ -53,7 +53,7 @@ export default function PaymentResultPage() {
 
   let outcome: ReactNode;
   if (!hasBookingId) {
-    // The gateway redirect carried no booking (unknown callback / invalid signature): nothing to look up, and no outcome to claim.
+    // Callback không kèm đơn nên không tra cứu gì
     outcome = (
       <ResultBanner
         tone="error"

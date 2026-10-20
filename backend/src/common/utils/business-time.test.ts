@@ -11,7 +11,7 @@ import {
   timeOfDayOf,
 } from './business-time';
 
-/** Date/time columns as Prisma returns them: DATE → UTC midnight of the day, TIME → 1970-01-01T<HH:mm>Z. */
+/** Giá trị cột ngày giờ như Prisma trả về */
 const dateColumn = (key: string) => new Date(`${key}T00:00:00Z`);
 const timeColumn = (hhmm: string) => new Date(`1970-01-01T${hhmm}:00Z`);
 

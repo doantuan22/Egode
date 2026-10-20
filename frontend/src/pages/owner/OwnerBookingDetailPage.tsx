@@ -40,7 +40,7 @@ export default function OwnerBookingDetailPage() {
       <OwnerHotelContextSelector hotels={scope.hotels} hotelId={scope.hotelId} onChange={scope.selectHotel} />
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold">
@@ -59,7 +59,7 @@ export default function OwnerBookingDetailPage() {
           </Button>
         </div>
 
-        {/* Auto Confirm Notification Banner */}
+        {/* Banner thông báo tự xác nhận */}
         {(b.TrangThai === BOOKING_STATUS.CONFIRMED || b.TrangThai === BOOKING_STATUS.COMPLETED) && (
           <div className="bg-primary-50/80 px-6 py-3 border-b border-primary-100 flex items-start gap-2.5">
             <i className="ph-fill ph-info text-primary mt-0.5"></i>
@@ -70,7 +70,7 @@ export default function OwnerBookingDetailPage() {
         )}
 
         <div className="p-6 space-y-6">
-          {/* 1. Thông tin khách hàng */}
+          {/* Thông tin khách hàng */}
           <div className="bg-white border border-border rounded-2xl p-4.5 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
@@ -89,7 +89,7 @@ export default function OwnerBookingDetailPage() {
             </div>
           </div>
 
-          {/* 2. Thông tin phòng & Lịch lưu trú */}
+          {/* Thông tin phòng và lịch lưu trú */}
           <div className="bg-white border border-border rounded-2xl p-4.5 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
@@ -123,7 +123,7 @@ export default function OwnerBookingDetailPage() {
             </div>
           </div>
 
-          {/* 3. Ghi chú (nếu có) */}
+          {/* Ghi chú */}
           {b.GhiChu && (
             <div className="bg-white border border-border rounded-2xl p-4.5 shadow-sm space-y-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
@@ -135,7 +135,7 @@ export default function OwnerBookingDetailPage() {
             </div>
           )}
 
-          {/* 4. Hóa đơn & Trạng thái thanh toán */}
+          {/* Hóa đơn và trạng thái thanh toán */}
           <div className="bg-white border border-border rounded-2xl p-4.5 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">

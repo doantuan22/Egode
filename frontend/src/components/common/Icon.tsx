@@ -4,17 +4,17 @@ import { cn } from '../../lib/utils';
 const WEIGHT_CLASS = { regular: 'ph', fill: 'ph-fill', bold: 'ph-bold', duotone: 'ph-duotone' } as const;
 
 export interface IconProps {
-  /** Phosphor icon name without the `ph-` prefix, e.g. `magnifying-glass`. */
+  /** Tên biểu tượng Phosphor không có tiền tố ph- */
   name: string;
   weight?: keyof typeof WEIGHT_CLASS;
-  /** Pixel size. Omit to inherit the font size of the parent. */
+  /** Kích thước điểm ảnh */
   size?: number;
   className?: string;
-  /** Pass a label only when the icon is the sole content of its control; icons are decorative otherwise. */
+  /** Chỉ đặt nhãn khi biểu tượng là nội dung duy nhất */
   label?: string;
 }
 
-/** The one icon set (Phosphor, loaded as a font in main.tsx). Decorative by default. */
+/** Bộ biểu tượng duy nhất của ứng dụng */
 export function Icon({ name, weight = 'regular', size, className, label }: IconProps) {
   const style: CSSProperties | undefined = size ? { fontSize: size } : undefined;
   return (

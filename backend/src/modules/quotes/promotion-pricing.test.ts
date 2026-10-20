@@ -21,14 +21,14 @@ describe('evaluatePromotion', () => {
   it('applies a percentage discount uncapped when MucGiamToiDa = 0', () => {
     const result = evaluatePromotion(basePromo, 1_000_000, d('2026-06-01'), 0);
     expect(result.valid).toBe(true);
-    expect(result.discount).toBe(100_000); // 10%
+    expect(result.discount).toBe(100_000);
   });
 
   it('caps a percentage discount at MucGiamToiDa when set', () => {
     const promo = { ...basePromo, MucGiamToiDa: 50_000 };
     const result = evaluatePromotion(promo, 1_000_000, d('2026-06-01'), 0);
     expect(result.valid).toBe(true);
-    expect(result.discount).toBe(50_000); // capped, not 100_000
+    expect(result.discount).toBe(50_000);
   });
 
   it('applies a fixed-amount discount regardless of MucGiamToiDa', () => {
@@ -36,7 +36,7 @@ describe('evaluatePromotion', () => {
       ...basePromo,
       LoaiGiamGia: DISCOUNT_TYPE.FIXED_AMOUNT,
       GiaTriGiam: 200_000,
-      MucGiamToiDa: 50_000, // irrelevant for fixed-amount per Chương 6
+      MucGiamToiDa: 50_000,
     };
     const result = evaluatePromotion(promo, 1_000_000, d('2026-06-01'), 0);
     expect(result.valid).toBe(true);
@@ -47,7 +47,7 @@ describe('evaluatePromotion', () => {
     const promo: PromotionRecord = { ...basePromo, LoaiGiamGia: DISCOUNT_TYPE.FIXED_AMOUNT, GiaTriGiam: 900_000 };
     const result = evaluatePromotion(promo, 500_000, d('2026-06-01'), 0);
     expect(result.valid).toBe(true);
-    expect(result.discount).toBe(500_000); // clamped to subtotal
+    expect(result.discount).toBe(500_000);
   });
 
   it('rejects a promotion that has not started yet', () => {

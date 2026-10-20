@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InventoryCalendar } from './InventoryCalendar';
 
-const month = new Date(2099, 4, 1); // May 2099, a Friday-start month
+const month = new Date(2099, 4, 1);
 const cells = { '2099-05-02': { price: 700000, available: 5, closed: false }, '2099-05-03': { price: 0, available: 0, closed: true } };
 const fmt = (v: number) => `${v} đ`;
 const day = (d: number) => screen.getByRole('button', { name: new RegExp(`^${String(d).padStart(2, '0')}/05/2099`) });

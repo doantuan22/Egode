@@ -112,8 +112,8 @@ describe('useUrlSearchInput', () => {
     const { result } = setupSearch();
 
     act(() => result.current.setInput('ha'));
-    act(() => { vi.advanceTimersByTime(400); }); // 'ha' is committed to the URL
-    act(() => result.current.setInput('han')); // the user keeps typing
+    act(() => { vi.advanceTimersByTime(400); });
+    act(() => result.current.setInput('han'));
     act(() => { vi.advanceTimersByTime(10); });
 
     expect(result.current.input).toBe('han');

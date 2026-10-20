@@ -18,7 +18,7 @@ const account = (MaTaiKhoan: number, TrangThai = 'Hoạt động') => ({
 });
 const idle = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, isError: false, error: null, isSuccess: false, data: undefined };
 
-/** A mutation whose `mutate` finishes at once with `outcome`, the way react-query calls the per-call callbacks. */
+/** Mutation hoàn tất ngay với kết quả cho trước */
 const finishing = (outcome: { error: Error } | { data: unknown }) => ({
   ...idle,
   mutate: vi.fn((_vars: unknown, options?: { onSuccess?: (data: unknown) => void; onError?: (error: Error) => void }) => {

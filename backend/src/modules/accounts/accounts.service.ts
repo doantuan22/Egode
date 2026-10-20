@@ -72,11 +72,7 @@ export class AccountsService {
     return toSafeAccount(account);
   }
 
-  /**
-   * The system must always keep at least one active administrator, and nobody may take their own admin
-   * powers away. Run inside the caller's transaction, after lockAdministrators: the check and the change that
-   * follows it are then one atomic step, so two admins cannot both remove "the other" admin.
-   */
+  /** Đảm bảo luôn còn ít nhất một admin hoạt động */
   private async assertAdminCanBeReduced(
     tx: Prisma.TransactionClient,
     actorId: number,
@@ -92,7 +88,7 @@ export class AccountsService {
     await this.accountsRepository.lockAdministrators(tx, adminRole.MaVaiTro);
     const target = await this.accountsRepository.findByIdIn(tx, targetId);
     if (!target) throw AppError.notFound('Tài khoản không tồn tại');
-    if (target.MaVaiTro !== adminRole.MaVaiTro || target.TrangThai !== ACCOUNT_STATUS.ACTIVE) return; // not an active admin: nothing is lost
+    if (target.MaVaiTro !== adminRole.MaVaiTro || target.TrangThai !== ACCOUNT_STATUS.ACTIVE) return;
     const others = await this.accountsRepository.countActiveAdministratorsExcept(tx, adminRole.MaVaiTro, targetId, ACCOUNT_STATUS.ACTIVE);
     if (others === 0) {
       throw AppError.conflict(`Không thể ${verb} quản trị viên cuối cùng — hệ thống phải còn ít nhất một quản trị viên đang hoạt động`);
@@ -122,7 +118,7 @@ export class AccountsService {
       return toSafeAccount(await this.accountsRepository.update(maTaiKhoan, data));
     }
 
-    // Changing a role may take admin powers away (this account's own, or somebody else's): guarded.
+    // Đổi vai trò có thể làm mất quyền admin nên cần kiểm tra
     const updated = await this.accountsRepository.runInTransaction(async (tx) => {
       await this.assertAdminCanBeReduced(tx, actorId, maTaiKhoan, 'demote');
       return this.accountsRepository.update(maTaiKhoan, data, tx);
@@ -147,17 +143,13 @@ export class AccountsService {
     return toSafeAccount(updated);
   }
 
-  /**
-   * G0-10 delete-safe: hard-delete only when the account has no related
-   * history (booking, review, support request, hotel ownership, partner
-   * application). Otherwise lock it instead of destroying data lineage.
-   */
+  /** Chỉ xóa cứng khi chưa có lịch sử liên quan, nếu không thì khóa tài khoản */
   async safeDelete(maTaiKhoan: number, actorId: number): Promise<{ hardDeleted: boolean }> {
     const existing = await this.accountsRepository.findById(maTaiKhoan);
     if (!existing) throw AppError.notFound('Tài khoản không tồn tại');
 
     return this.accountsRepository.runInTransaction(async (tx) => {
-      // Deleting — or locking in its place — removes the account from the active administrators.
+      // Xóa hoặc khóa tài khoản làm giảm số admin hoạt động
       await this.assertAdminCanBeReduced(tx, actorId, maTaiKhoan, 'delete');
 
       const hasHistory = await this.accountsRepository.hasDependentRecords(maTaiKhoan, tx);

@@ -56,7 +56,7 @@ export function useSetPromotionStatus() {
   });
 }
 
-/** Codes the guest can pick in the booking panel. Short-lived: a code can run out or expire while the page is open. */
+/** Mã khách chọn trong khung đặt phòng */
 export function useAvailablePromotions(enabled = true) {
   return useQuery({
     queryKey: ['promotions', 'available'],

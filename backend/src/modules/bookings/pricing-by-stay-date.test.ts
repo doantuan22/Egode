@@ -15,18 +15,14 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 
-/**
- * The bill must be built from the price of each night the guest STAYS (QUY_PHONG_GIA.NgayApDung in
- * [checkIn, checkOut)), never from today's price, the price on the booking date, or the checkout night.
- * Real SQL Server, through the HTTP API. Every price below is distinct so a wrong date shows up in the total.
- */
+/** Hóa đơn tính theo giá từng đêm lưu trú */
 
 const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-const TODAY_PRICE = 111_000; // decoy: the price on the day the booking is made
-const BEFORE_PRICE = 999_000; // decoy: the night before check-in
-const CHECKOUT_PRICE = 777_000; // decoy: the checkout date itself is not a night
+const TODAY_PRICE = 111_000;
+const BEFORE_PRICE = 999_000;
+const CHECKOUT_PRICE = 777_000;
 
 const accountIds: number[] = [];
 const diaPhuongIds: number[] = [];
@@ -59,7 +55,7 @@ const book = (checkInDay: number, checkOutDay: number, rooms: Array<{ maLoaiPhon
     .set('Authorization', `Bearer ${customerToken}`)
     .send({ checkIn: iso(addDays(checkInDay)), checkOut: iso(addDays(checkOutDay)), rooms });
 
-/** Stay = days 3,4,5 (checkout day 6). Day 0 = today, day 2 = the night before, day 6 = checkout night. */
+/** Lưu trú ngày 3 đến 5, trả phòng ngày 6 */
 const priceStayRoom = async (nightly: [number, number, number]) => {
   const room = await newRoomType();
   await setRate(room, 0, TODAY_PRICE);
@@ -105,8 +101,8 @@ describe('quote prices each stayed night with that date\'s own rate', () => {
     expect(res.status).toBe(200);
     const line = res.body.data.ChiTietPhong[0];
     expect(res.body.data.SoDem).toBe(3);
-    expect(line.ThanhTien).toBe(12_000_000); // (1M + 2M + 3M) x 2 rooms
-    expect(line.GiaTheoDem).toBe(2_000_000); // display average only
+    expect(line.ThanhTien).toBe(12_000_000);
+    expect(line.GiaTheoDem).toBe(2_000_000);
     expect(res.body.data.TongTienThanhToan).toBe(12_000_000);
   });
 
@@ -120,7 +116,7 @@ describe('quote prices each stayed night with that date\'s own rate', () => {
     expect(before.status).toBe(200);
     expect(before.body.data.TongTienPhong).toBe(4_200_000);
 
-    await setRate(room, 0, 1); // changing today's price must change nothing for a stay on day 40
+    await setRate(room, 0, 1);
     const after = await quote(40, 41, [{ maLoaiPhong: room, soLuong: 1 }]);
     expect(after.body.data.TongTienPhong).toBe(4_200_000);
   });
@@ -132,8 +128,8 @@ describe('quote prices each stayed night with that date\'s own rate', () => {
     const res = await quote(3, 6, [{ maLoaiPhong: room, soLuong: 1 }]);
     expect(res.body.data.TongTienPhong).toBe(6_500_000);
 
-    await setRate(room, 6, 50_000_000); // the checkout night is not billed
-    await setRate(room, 2, 50_000_000); // neither is the night before check-in
+    await setRate(room, 6, 50_000_000);
+    await setRate(room, 2, 50_000_000);
     const unchanged = await quote(3, 6, [{ maLoaiPhong: room, soLuong: 1 }]);
     expect(unchanged.body.data.TongTienPhong).toBe(6_500_000);
   });
@@ -152,7 +148,7 @@ describe('creating a booking bills the stayed nights and stores the total', () =
     expect(Number(row.TongTienPhong)).toBe(12_000_000);
     expect(Number(row.TongTienThanhToan)).toBe(12_000_000);
 
-    // The owner reprices every night (and today) after the booking exists.
+    // Chủ khách sạn đổi giá sau khi đã đặt
     await setRate(room, 0, 1);
     await setRate(room, 3, 9_000_000);
     await setRate(room, 4, 9_000_000);

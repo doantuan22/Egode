@@ -6,17 +6,15 @@ export interface DatabaseStatus {
 }
 
 export class HealthRepository {
-  /**
-   * Check database connectivity via Prisma 7 client without crashing if DB is offline.
-   */
+  /** Kiểm tra kết nối cơ sở dữ liệu */
   async checkDatabase(): Promise<DatabaseStatus> {
     try {
       const prisma = getPrismaClient();
-      // Test Prisma connectivity via $queryRaw or basic ping
+      // Thử kết nối bằng truy vấn đơn giản
       await prisma.$queryRaw`SELECT 1 as ping`;
       return { connected: true, message: 'Database connected successfully' };
     } catch (error) {
-      // Error messages from SQL drivers may include host/login details; retain only a safe category in server logs.
+      // Chỉ ghi nhóm lỗi an toàn vào log
       console.error('Database health probe failed', {
         errorType: error instanceof Error ? error.name : 'UnknownError',
       });

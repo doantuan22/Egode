@@ -4,24 +4,18 @@ import { formatCurrencyVND } from '../../lib/utils';
 import { Button } from '../common/Button';
 import { Textarea } from '../common/Textarea';
 
-/**
- * What the customer can do, by booking status (the mutations live in the page):
- *  - Chờ thanh toán: "Thanh toán ngay" and "Hủy đặt phòng này"
- *  - Đã xác nhận:    "Hủy đặt phòng này"
- *  - Hoàn tất:       nothing here (the review section lives on the page)
- *  - Đã hủy:         nothing
- */
+/** Hành động khách có thể làm theo trạng thái đơn */
 export interface BookingActionsProps {
   canPay: boolean;
   canCancel: boolean;
   onPay: () => void;
   isPaying: boolean;
   payError: unknown;
-  /** Called with the optional reason; `onDone` closes the confirmation once the cancellation went through. */
+  /** Gọi kèm lý do tùy chọn, onDone đóng hộp xác nhận */
   onCancel: (note: string | undefined, onDone: () => void) => void;
   isCancelling: boolean;
   cancelError: Error | null;
-  /** What the cancellation would refund, shown before the customer confirms. */
+  /** Số tiền sẽ được hoàn khi hủy */
   refundPreview: { paid: number; percent: number; amount: number };
 }
 

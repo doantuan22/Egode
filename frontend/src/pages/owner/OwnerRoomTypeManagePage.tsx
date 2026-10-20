@@ -102,7 +102,7 @@ export default function OwnerRoomTypeManagePage() {
     try {
       await uploadImageMutation.mutateAsync(await fileToDataUrl(file));
     } catch {
-      // handled
+      // Đã xử lý
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }

@@ -20,7 +20,7 @@ async function cleanupOldAssets() {
     'hotel-booking/reviews/',
   ];
 
-  // Double check all assets match the allowed prefix
+  // Kiểm tra lại mọi tài nguyên đều đúng tiền tố cho phép
   const toDelete = assets.filter((a) =>
     allowedPrefixes.some((p) => a.public_id.startsWith(p))
   );

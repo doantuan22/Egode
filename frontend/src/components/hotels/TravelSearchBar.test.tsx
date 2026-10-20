@@ -9,10 +9,10 @@ vi.mock('../../features/locations/hooks', () => ({
   useLocations: () => ({ data: [{ TenThanhPho: 'Hà Nội' }, { TenThanhPho: 'Đà Nẵng' }] }),
 }));
 
-// Stay dates must be today-or-later and within the booking window, so every date here is relative to Vietnam's today.
+// Ngày ở tính theo hôm nay của Việt Nam
 const today = businessToday();
 const inDays = (days: number) => addDaysToDateKey(today, days);
-/** A day of next month (always fully selectable and shown first when the calendar opens on a date of that month). */
+/** Một ngày của tháng sau */
 const dayOfNextMonth = (day: number) => {
   const [year, month] = today.split('-').map(Number);
   const next = month === 12 ? { y: year + 1, m: 1 } : { y: year, m: month + 1 };

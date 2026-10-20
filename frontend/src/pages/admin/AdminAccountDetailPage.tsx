@@ -29,7 +29,7 @@ export default function AdminAccountDetailPage() {
   const lockMutation = useLockAccount();
   const unlockMutation = useUnlockAccount();
   const deleteMutation = useDeleteAccount();
-  // The server refuses it too; an administrator is simply not offered locking or deleting their own account.
+  // Admin không được đề nghị khóa hay xóa chính mình
   const isSelf = useMe().data?.MaTaiKhoan === accountId;
 
   const { register, handleSubmit, reset, formState: { isDirty } } = useForm<UpdateAccountPayload>();
@@ -120,7 +120,7 @@ export default function AdminAccountDetailPage() {
       </Link>
 
       <div className="bg-white border border-border rounded-[16px] shadow-sm overflow-hidden">
-        {/* Header */}
+        {/* Phần đầu trang */}
         <div className="px-6 py-5 border-b border-border bg-surface-secondary flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg uppercase">

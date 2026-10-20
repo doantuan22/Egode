@@ -78,18 +78,18 @@ describe('findStayDateIssues (now = 2026-03-10 12:00 UTC → business today 2026
 
   describe('boundary around 00:00 Vietnam time (17:00 UTC)', () => {
     it('one second before Vietnam midnight, "today" is still the old day', () => {
-      const before = new Date('2026-03-10T16:59:59Z'); // 23:59:59 on 10 March in Vietnam
+      const before = new Date('2026-03-10T16:59:59Z');
       expect(issues('2026-03-10', '2026-03-11', before)).toEqual([]);
     });
 
     it('right after Vietnam midnight, the old day is already in the past — even though the UTC date is still the 10th', () => {
-      const after = new Date('2026-03-10T17:00:00Z'); // 00:00:00 on 11 March in Vietnam
+      const after = new Date('2026-03-10T17:00:00Z');
       expect(issues('2026-03-10', '2026-03-11', after)).toEqual([STAY_DATE_MESSAGES.checkInPast]);
       expect(issues('2026-03-11', '2026-03-12', after)).toEqual([]);
     });
 
     it('the 365-day horizon moves with the Vietnam day, not the UTC day', () => {
-      const lateUtc = new Date('2026-03-10T20:00:00Z'); // already 11 March in Vietnam
+      const lateUtc = new Date('2026-03-10T20:00:00Z');
       const lastAllowed = addDaysToDateKey('2026-03-11', 365);
       expect(issues(lastAllowed, addDaysToDateKey(lastAllowed, 1), lateUtc)).toEqual([]);
       const tooFar = addDaysToDateKey('2026-03-11', 366);

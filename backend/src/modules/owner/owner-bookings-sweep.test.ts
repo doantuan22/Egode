@@ -17,13 +17,7 @@ import { env } from '../../config/env';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS } from '../../common/constants/hotel-status';
 
-/**
- * BUG-008 — the owner bookings dashboard must show the SAME lifecycle state the
- * customer sees: a "Chờ thanh toán" booking past its payment hold is "Đã hủy",
- * and a "Đã xác nhận" booking whose stay has ended is "Hoàn tất". Both are lazy
- * sweeps (no cron), so every owner read has to run them — after the ownership
- * check, before the query/filter.
- */
+/** Chủ khách sạn thấy cùng trạng thái đơn như khách */
 
 const addDays = (days: number): Date => {
   const d = new Date();
@@ -48,22 +42,22 @@ let otherOwnerToken: string;
 const base = () => `/api/owner/hotels/${hotelId}/bookings`;
 const asOwner = (path: string, query: Record<string, string> = {}) => request(app).get(path).query(query).set('Authorization', `Bearer ${ownerToken}`);
 
-/** PENDING_PAYMENT whose hold ran out PAYMENT_TIMEOUT_MINUTES ago (+5 min margin). */
+/** Đơn chờ thanh toán đã quá hạn giữ chỗ */
 const makeStalePending = (forHotel = hotelId) =>
   createTestBookingDirect(customerId, forHotel, policyId, addDays(20), addDays(22), {
     trangThai: BOOKING_STATUS.PENDING_PAYMENT,
     ngayTao: minutesAgo(env.PAYMENT_TIMEOUT_MINUTES + 5),
   });
-/** PENDING_PAYMENT still inside its hold. */
+/** Đơn chờ thanh toán còn trong hạn */
 const makeFreshPending = () =>
   createTestBookingDirect(customerId, hotelId, policyId, addDays(20), addDays(22), {
     trangThai: BOOKING_STATUS.PENDING_PAYMENT,
     ngayTao: minutesAgo(1),
   });
-/** CONFIRMED whose check-out was days ago. */
+/** Đơn xác nhận đã trả phòng */
 const makeFinishedConfirmed = () =>
   createTestBookingDirect(customerId, hotelId, policyId, addDays(-5), addDays(-3), { trangThai: BOOKING_STATUS.CONFIRMED });
-/** CONFIRMED whose stay has not ended. */
+/** Đơn xác nhận chưa hết lưu trú */
 const makeUpcomingConfirmed = () =>
   createTestBookingDirect(customerId, hotelId, policyId, addDays(10), addDays(12), { trangThai: BOOKING_STATUS.CONFIRMED });
 
@@ -176,7 +170,7 @@ describe('owner bookings — authorization happens before any sweep (BUG-008)', 
     expect(list.status).toBe(403);
     expect(one.status).toBe(403);
 
-    // Nothing was written: the rejected requests never reached the sweeps.
+    // Yêu cầu bị từ chối không ghi gì
     expect((await dbRow(stale.MaDatPhong)).TrangThai).toBe(BOOKING_STATUS.PENDING_PAYMENT);
     expect((await dbRow(finished.MaDatPhong)).TrangThai).toBe(BOOKING_STATUS.CONFIRMED);
   });
@@ -219,7 +213,7 @@ describe('owner bookings — sweeps are idempotent (BUG-008)', () => {
     const finished = await makeFinishedConfirmed();
     const pending = await makeFreshPending();
 
-    await asOwner(base()); // first call performs the transitions
+    await asOwner(base());
     const afterFirst = {
       stale: await dbRow(stale.MaDatPhong),
       finished: await dbRow(finished.MaDatPhong),
@@ -245,7 +239,7 @@ describe('owner bookings — sweeps are idempotent (BUG-008)', () => {
       finished: await dbRow(finished.MaDatPhong),
       pending: await dbRow(pending.MaDatPhong),
     };
-    // NgayCapNhat and GhiChu (the expiry note) are untouched by repeats: no row was rewritten or double-annotated.
+    // Lặp lại không ghi lại hay chú thích thêm
     expect(afterMany.stale.NgayCapNhat).toEqual(afterFirst.stale.NgayCapNhat);
     expect(afterMany.stale.GhiChu).toBe(afterFirst.stale.GhiChu);
     expect(afterMany.finished.NgayCapNhat).toEqual(afterFirst.finished.NgayCapNhat);

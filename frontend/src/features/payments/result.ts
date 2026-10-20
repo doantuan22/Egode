@@ -1,7 +1,7 @@
 import { BOOKING_STATUS } from '../bookings/status';
 import type { PaymentStatusResponse } from './types';
 
-/** THANH_TOAN / HOAN_TIEN TrangThai — mirrors backend/src/common/constants/payment.ts. */
+/** Trạng thái thanh toán và hoàn tiền */
 export const PAYMENT_STATUS = { PENDING: 'Chờ xử lý', SUCCESS: 'Thành công', FAILED: 'Thất bại' } as const;
 export const REFUND_STATUS = { PENDING: 'Chờ xử lý', SUCCESS: 'Thành công', FAILED: 'Thất bại' } as const;
 
@@ -9,15 +9,15 @@ export type RefundOutcome = 'refunded' | 'pending' | 'failed' | 'none';
 
 export type PaymentResult =
   | { kind: 'confirmed' }
-  /** The booking was cancelled/expired although the gateway captured a payment (the backend then refunds it automatically). */
+  /** Đơn bị hủy dù cổng đã thu tiền */
   | { kind: 'cancelled-paid'; paid: number; refunded: number; refund: RefundOutcome }
   | { kind: 'failed' }
   | { kind: 'processing' };
 
-/** Decides what the payment result page should tell the customer, from the booking's payment-status response. */
+/** Quyết định thông báo của trang kết quả thanh toán */
 export function resolvePaymentResult(status: PaymentStatusResponse): PaymentResult {
   const succeeded = status.ThanhToan.filter((payment) => payment.TrangThai === PAYMENT_STATUS.SUCCESS);
-  // A paid stay that has since been completed (link opened again after check-out) is still a paid booking.
+  // Đơn đã hoàn tất vẫn là đơn đã thanh toán
   if (status.TrangThaiDatPhong === BOOKING_STATUS.CONFIRMED || (status.TrangThaiDatPhong === BOOKING_STATUS.COMPLETED && succeeded.length > 0)) return { kind: 'confirmed' };
   if (status.TrangThaiDatPhong === BOOKING_STATUS.CANCELLED && succeeded.length > 0) {
     const paid = succeeded.reduce((sum, payment) => sum + payment.SoTien, 0);

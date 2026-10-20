@@ -10,7 +10,7 @@ const PaymentResultPage = lazy(() => import('../pages/customer/PaymentResultPage
 const SupportPage = lazy(() => import('../pages/customer/SupportPage'));
 const SupportDetailPage = lazy(() => import('../pages/customer/SupportDetailPage'));
 
-/** Any signed-in account (the customer's own bookings, profile and support). */
+/** Mọi tài khoản đã đăng nhập */
 export const customerRoutes = (
   <Route element={<ProtectedRoute />}>
     <Route path="/profile" element={<ProfilePage />} />

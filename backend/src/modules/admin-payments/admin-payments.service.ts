@@ -3,8 +3,7 @@ import { AppError } from '../../common/errors/app-error';
 import { addDaysToDateKey, businessDayStart, dateKeyOf } from '../../common/utils/business-time';
 import type { PaymentsQuery } from './admin-payments.schemas';
 
-// Deliberately select only staff-operational data. Credentials, email, payment-provider
-// signatures and callback payloads must never be returned by the admin read API.
+// Chỉ chọn dữ liệu vận hành, không trả thông tin xác thực hay chữ ký
 const include = {
   DAT_PHONG: {
     include: {

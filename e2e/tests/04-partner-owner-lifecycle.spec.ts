@@ -1,10 +1,6 @@
 import { test, expect, fx, newAccount, ROLES, login, todayVN, addDays, uniq, type Account } from '../support/fixtures';
 
-/**
- * Partner / owner lifecycle through the real UI:
- * register as a partner -> apply (mandatory confirmation) -> admin approves -> owner creates a hotel (Chờ duyệt, not public)
- * -> admin approves -> owner creates a room type and sets inventory/price -> a customer books -> the inventory floor is enforced.
- */
+/** Vòng đời đối tác và chủ khách sạn qua giao diện thật */
 const API = 'http://localhost:5100/api';
 let admin: Account;
 let city: { id: number; name: string };
@@ -26,7 +22,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   const hotelName = `E2E Khách sạn ${id}`;
   const roomName = `Phòng Deluxe ${id}`;
 
-  // ---- 1. register as a partner: the form continues to the partner application
+  // Đăng ký làm đối tác
   await page.goto('/register');
   await page.locator('input[name="register-intent"][value="partner"]').check({ force: true });
   await page.getByRole('button', { name: /Tiếp tục/ }).click();
@@ -40,14 +36,14 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   await page.locator('form button[type="submit"]').click();
   await expect(page).toHaveURL(/\/partner\/apply/);
 
-  // ---- 2. the application: the confirmation is mandatory (#16), the other fields are validated
+  // Hồ sơ đối tác bắt buộc xác nhận và kiểm tra các trường
   await page.locator('#partner-apply-field-1').fill('012345678901');
   await page.locator('#partner-apply-field-2').fill(`GPKD-${id}`);
   await page.locator('#partner-apply-field-3').fill('0101234567');
   await page.locator('#partner-apply-field-4').fill('https://files.example.com/gpkd.pdf');
   await page.getByRole('button', { name: 'Nộp hồ sơ đối tác' }).click();
   await expect(page.getByText('Vui lòng xác nhận thông tin cung cấp là chính xác')).toBeVisible();
-  expect(await fx('/db/partner-application', { email })).toBeNull(); // nothing was sent
+  expect(await fx('/db/partner-application', { email })).toBeNull();
 
   await page.locator('#partner-apply-confirm').check();
   await page.getByRole('button', { name: 'Nộp hồ sơ đối tác' }).click();
@@ -57,7 +53,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   expect(application).toMatchObject({ status: 'Chờ duyệt' });
   expect((await fx('/db/account', { email })).role).toBe(ROLES.customer);
 
-  // ---- 3. the admin approves the application through the UI
+  // Admin duyệt hồ sơ
   const adminPage = await (await browser.newContext()).newPage();
   await login(adminPage, admin);
   await adminPage.goto(`/admin/partner-applications/${application.id}`);
@@ -66,7 +62,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   await expect(adminPage.getByText(/Đã duyệt|đã được duyệt/i).first()).toBeVisible();
   expect((await fx('/db/account', { email })).role).toBe(ROLES.partner);
 
-  // ---- 4. the owner (same browser session) creates a hotel: it waits for approval and is not public
+  // Chủ khách sạn tạo khách sạn chờ duyệt
   await page.goto('/owner/hotels/new');
   await page.locator('#owner-hotel-form-TenKhachSan').fill(hotelName);
   await page.locator('#owner-hotel-form-HangSao').selectOption('4');
@@ -81,9 +77,9 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   const hotel = await fx('/db/hotel', { name: hotelName });
   expect(hotel).toMatchObject({ TrangThai: 'Chờ duyệt', GioNhanPhong: '14:00', GioTraPhong: '12:00', HangSao: 4 });
   expect(hotel.NgayDuyet).toBeNull();
-  expect((await (await page.request.get(`${API}/hotels/${hotel.MaKhachSan}`)).status())).toBe(404); // not public yet
+  expect((await (await page.request.get(`${API}/hotels/${hotel.MaKhachSan}`)).status())).toBe(404);
 
-  // ---- 5. the admin approves the hotel: it becomes public
+  // Admin duyệt khách sạn để công khai
   await adminPage.goto(`/admin/hotels/${hotel.MaKhachSan}`);
   await adminPage.getByRole('button', { name: 'Duyệt khách sạn' }).click();
   await adminPage.getByRole('dialog').getByRole('button', { name: 'Duyệt', exact: true }).click();
@@ -93,7 +89,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   expect(approved.NgayDuyet).not.toBeNull();
   expect((await page.request.get(`${API}/hotels/${hotel.MaKhachSan}`)).status()).toBe(200);
 
-  // ---- 6. the owner adds a room type through the UI
+  // Chủ khách sạn thêm loại phòng
   await page.goto('/owner/room-types');
   await page.getByRole('button', { name: 'Thêm loại phòng' }).click();
   await page.locator('input[name="name"]').fill(roomName);
@@ -106,7 +102,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   const roomType = await fx('/db/room-type', { hotelId: hotel.MaKhachSan, name: roomName });
   expect(roomType).toMatchObject({ status: 'Hoạt động' });
 
-  // ---- 7. inventory and price for one night, through the form (3 rooms at 600.000)
+  // Đặt tồn kho và giá cho một đêm
   const night = addDays(today, 20);
   await page.goto(`/owner/inventory-pricing?hotelId=${hotel.MaKhachSan}&roomTypeId=${roomType.id}`);
   const dateInputs = page.locator('input[type="date"]');
@@ -119,9 +115,9 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   await expect(page.getByText('Đã cập nhật giá và quỹ phòng')).toBeVisible();
   expect(await fx('/db/stock', { roomTypeId: roomType.id })).toEqual([{ date: night, rooms: 3, price: 600000, status: 'Mở bán' }]);
 
-  // ---- 8. a customer books 2 of the 3 rooms through the real API (a signed-in session)
+  // Khách đặt 2 trong 3 phòng qua API thật
   const customer = await newAccount(ROLES.customer);
-  const customerApi = await playwright.request.newContext(); // its own cookie jar: the owner's browser session must stay the owner's
+  const customerApi = await playwright.request.newContext();
   const loginRes = await customerApi.post(`${API}/auth/login`, { data: { identifier: customer.email, MatKhau: customer.password } });
   const token = (await loginRes.json()).data.accessToken as string;
   const booked = await customerApi.post(`${API}/hotels/${hotel.MaKhachSan}/bookings`, {
@@ -130,7 +126,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   });
   expect(booked.status()).toBe(201);
 
-  // ---- 9. the floor: the owner cannot set fewer rooms than are already booked; the data stays as it was
+  // Không được đặt số phòng thấp hơn số đã đặt
   await page.goto(`/owner/inventory-pricing?hotelId=${hotel.MaKhachSan}&roomTypeId=${roomType.id}`);
   await page.locator('input[type="date"]').nth(0).fill(night);
   await page.locator('input[type="date"]').nth(1).fill(night);
@@ -141,7 +137,7 @@ test('partner registration -> approval -> hotel (Chờ duyệt) -> approval -> r
   await expect(page.getByRole('alert').first()).toContainText(/đã đặt|đã có/i);
   expect((await fx('/db/stock', { roomTypeId: roomType.id }))[0].rooms).toBe(3);
 
-  // ... but exactly the booked number is allowed (2), and the floor then holds at 2
+  // Đúng số đã đặt thì được phép
   await page.locator('input[name="quantity"]').fill('2');
   await page.getByRole('button', { name: 'Cập nhật khoảng ngày' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Ghi đè' }).click();
@@ -174,7 +170,7 @@ test('a partner application the admin rejects: the applicant stays a customer, s
   await page.goto('/partner/apply');
   await expect(page.getByText(/Hồ sơ trước đó đã bị từ chối/)).toBeVisible();
   await expect(page.getByText('Giấy phép không hợp lệ')).toBeVisible();
-  await expect(page.locator('#partner-apply-field-1')).toBeVisible(); // can submit a new one
+  await expect(page.locator('#partner-apply-field-1')).toBeVisible();
 });
 
 test('the owner edits the hotel in the UI: times are "HH:mm" on the way in and out, and the admin sees the same', async ({ page, browser }) => {

@@ -25,7 +25,7 @@ const AdminSupportDetailPage = lazy(() => import('../pages/admin/AdminSupportDet
 const AdminPartnerApplicationsPage = lazy(() => import('../pages/admin/AdminPartnerApplicationsPage'));
 const AdminPartnerApplicationDetailPage = lazy(() => import('../pages/admin/AdminPartnerApplicationDetailPage'));
 
-/** Quản trị hệ thống. */
+/** Quản trị hệ thống */
 export const adminRoutes = (
   <Route element={<ProtectedRoute allowedRoles={[ROLE_NAMES.ADMIN]} />}>
     <Route path="/admin" element={<AdminDashboardPage />} />

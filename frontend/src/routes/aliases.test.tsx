@@ -13,7 +13,7 @@ function visit(url: string) {
     <MemoryRouter initialEntries={[url]}>
       <Routes>
         {aliasRoutes()}
-        {/* Same as AppRoutes: the real, static payment result route must win over the dynamic /payment/:id alias. */}
+        {/* Route kết quả thanh toán thật phải thắng alias động */}
         <Route path="/payment/result" element={<Where />} />
         <Route path="*" element={<Where />} />
       </Routes>

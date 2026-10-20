@@ -6,10 +6,7 @@ export interface PeriodRanges {
   previous: Required<DateRangeQuery>;
 }
 
-/**
- * The last `days` days up to and including `today`, and the `days` days right before them (both ends inclusive,
- * YYYY-MM-DD). `today` is a day of the business calendar (Asia/Ho_Chi_Minh), the same one the server cuts its reports by.
- */
+/** Khoảng N ngày gần nhất và N ngày ngay trước đó */
 export function lastDaysRanges(days: number, today: string = businessToday()): PeriodRanges {
   return {
     current: { from: addDaysToDateKey(today, -(days - 1)), to: today },
@@ -18,19 +15,16 @@ export function lastDaysRanges(days: number, today: string = businessToday()): P
 }
 
 export interface Kpis {
-  /** Percent of room-nights sold; null when the hotel had no rooms on sale in the period. */
+  /** Phần trăm đêm phòng đã bán */
   occupancy: number | null;
-  /** Average daily rate: money received per room-night sold. */
+  /** Giá trung bình mỗi đêm phòng đã bán */
   adr: number | null;
-  /** Revenue per available room-night. */
+  /** Doanh thu trên mỗi đêm phòng có sẵn */
   revpar: number | null;
   newBookings: number;
 }
 
-/**
- * ADR and RevPAR are estimates: the API reports money actually received (DoanhThuThucNhan, net of refunds)
- * and room-nights, not room revenue by stay date, so they are labelled as such where shown.
- */
+/** ADR và RevPAR chỉ là ước tính */
 export function computeKpis(analytics: OwnerAnalytics): Kpis {
   const { TyLeLapDay, DoanhThuThucNhan, TongPhongDem, TongPhongCoTheBan, TongSoBooking } = analytics;
   return {
@@ -48,11 +42,7 @@ export interface Change {
 
 const formatNumber = (value: number) => new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 }).format(Math.abs(value));
 
-/**
- * How `current` moved against `previous`, as text for a KPI card. `percent` compares relatively (+12,5%),
- * `points` is for values that are already percentages (+3,2 điểm %). Higher is better for all of them.
- * Null when there is nothing to compare with.
- */
+/** Văn bản thay đổi của chỉ số so với kỳ trước */
 export function changeVersusPrevious(current: number | null, previous: number | null, kind: 'percent' | 'points', label: string): Change | null {
   if (current === null || previous === null) return null;
   if (kind === 'percent' && previous === 0) return null;

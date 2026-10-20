@@ -19,11 +19,7 @@ import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-s
 import { addDaysToDateKey, businessToday } from '../../common/utils/stay-dates';
 import { assertCapacity, totalCapacity } from './capacity';
 
-/**
- * Bug #18 — the party size is a runtime input of search → rooms → quote → booking (DAT_PHONG stores nothing about it).
- * The server alone decides:  Σ (SucChua × rooms)  >=  guests.   Quote and booking reject otherwise; search only
- * offers hotels whose rooms together could hold the party.
- */
+/** Tổng sức chứa các phòng phải đủ số khách */
 const day = (n: number) => addDaysToDateKey(businessToday(), n);
 const at = (n: number) => new Date(`${day(n)}T00:00:00Z`);
 const prisma = () => getPrismaClient();
@@ -58,7 +54,7 @@ afterAll(async () => {
   await deleteTestDiaPhuong(diaPhuongId);
 });
 
-/** A room type holding `sucChua` guests, `stock` rooms on sale for the nights day+1 and day+2. */
+/** Loại phòng có sức chứa và tồn kho cho hai đêm */
 const roomType = async (sucChua: number, stock: number) => {
   const created = await createTestRoomType(hotelId);
   await prisma().lOAI_PHONG.update({ where: { MaLoaiPhong: created.MaLoaiPhong }, data: { SucChua: sucChua } });
@@ -106,14 +102,14 @@ describe('search offers hotels whose rooms TOGETHER could hold the party', () =>
     await roomType(2, 3);
     await roomType(4, 1);
     for (const guests of [1, 2, 6, 10]) expect(await find(guests), `guests ${guests}`).toMatchObject({ ConPhong: true });
-    expect(await find(11)).toBeUndefined(); // could never hold them, even with every room free
+    expect(await find(11)).toBeUndefined();
   });
 
   it('listed but "hết phòng" when its rooms could hold the party yet too few are free on these dates', async () => {
     await clearHotel();
     const standard = await roomType(2, 3);
     await roomType(4, 1);
-    await occupy(standard, 2); // free now: 1 × 2 + 1 × 4 = 6 guests
+    await occupy(standard, 2);
     expect(await find(6)).toMatchObject({ ConPhong: true });
     const full = await find(7);
     expect(full).toMatchObject({ ConPhong: false, GiaTuDauTu: null });
@@ -121,7 +117,7 @@ describe('search offers hotels whose rooms TOGETHER could hold the party', () =>
 
   it('a hotel with no stock at all for the stay is not offered', async () => {
     await clearHotel();
-    await createTestRoomType(hotelId); // active room type, no calendar rows
+    await createTestRoomType(hotelId);
     expect(await find(1)).toBeUndefined();
   });
 });
@@ -221,7 +217,7 @@ describe('booking validates once more, from the database, and never trusts the q
     const rooms = [{ maLoaiPhong: suite, soLuong: 1 }];
     expect((await quote(rooms, 4)).status).toBe(200);
 
-    await prisma().lOAI_PHONG.update({ where: { MaLoaiPhong: suite }, data: { SucChua: 2 } }); // the owner edits the room type
+    await prisma().lOAI_PHONG.update({ where: { MaLoaiPhong: suite }, data: { SucChua: 2 } });
 
     const res = await book(rooms, 4);
     expect(res.status).toBe(400);

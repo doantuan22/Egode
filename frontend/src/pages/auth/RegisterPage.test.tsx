@@ -22,7 +22,7 @@ beforeEach(() => {
 
 const fillValidForm = async ({ acceptTerms = true }: { acceptTerms?: boolean } = {}) => {
   const user = userEvent.setup();
-  // Step 1 of the page: choose how to register, then the form appears.
+  // Bước 1 chọn kiểu đăng ký rồi mới hiện form
   await user.click(screen.getByRole('radio', { name: /Khách hàng|khách hàng/ }));
   await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
   await user.type(document.getElementById('register-HoTen') as HTMLElement, 'Nguyễn Văn An');

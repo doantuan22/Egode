@@ -90,7 +90,7 @@ describe('PUT /api/owner/room-types/:id/rates (bulk create/update)', () => {
     const rows = await prisma.qUY_PHONG_GIA.findMany({
       where: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: new Date(`${date}T00:00:00.000Z`) },
     });
-    expect(rows).toHaveLength(1); // no duplicate (MaLoaiPhong, NgayApDung) row
+    expect(rows).toHaveLength(1);
     expect(Number(rows[0].GiaPhong)).toBe(480000);
     expect(rows[0].SoLuongPhong).toBe(4);
   });
@@ -113,7 +113,7 @@ describe('PUT /api/owner/room-types/:id/rates (bulk create/update)', () => {
       expect(row.SoLuongPhong).toBe(7);
     }
 
-    // price only: the quantity of the day is kept
+    // Chỉ đổi giá, số phòng giữ nguyên
     expect((await put([{ NgayApDung: dates[0], GiaPhong: 650000, TrangThai: 'Mở bán' }])).status).toBe(200);
     const first = await getPrismaClient().qUY_PHONG_GIA.findFirstOrThrow({
       where: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: new Date(`${dates[0]}T00:00:00.000Z`) },
@@ -192,10 +192,9 @@ describe('PUT /api/owner/room-types/:id/rates (bulk create/update)', () => {
 describe('M2 availability regression: owner rate updates must be reflected correctly', () => {
   it('public /api/hotels/:id/rooms reflects price/quantity set via the owner API, and stays consistent after an update', async () => {
     const { token, hotel, roomType } = await makeOwnerWithRoomType();
-    // The hotel factory defaults to TrangThai='Hoạt động' so it is visible
-    // to the public M2 endpoints without needing admin approval here.
+    // Khách sạn mẫu mặc định hoạt động để hiển thị công khai
     const checkIn = addDays(70);
-    const checkOut = addDays(72); // 2 nights
+    const checkOut = addDays(72);
 
     await request(app)
       .put(`/api/owner/room-types/${roomType.MaLoaiPhong}/rates`)
@@ -216,7 +215,7 @@ describe('M2 availability regression: owner rate updates must be reflected corre
     expect(room.GiaTheoDem).toBe(700000);
     expect(room.ConHang).toBe(true);
 
-    // Owner lowers quantity to 0 (closes out inventory) — public availability must follow.
+    // Số phòng về 0 thì tồn kho công khai theo đó
     await request(app)
       .put(`/api/owner/room-types/${roomType.MaLoaiPhong}/rates`)
       .set('Authorization', `Bearer ${token}`)

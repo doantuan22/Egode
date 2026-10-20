@@ -28,7 +28,7 @@ import { PaymentsRepository } from '../payments/payments.repository';
 import { encodeGatewayRef, signVnpayParams } from '../payments/vnpay';
 import { env } from '../../config/env';
 
-// A stay date is a Vietnam calendar day; refund tiers are measured from its check-in INSTANT (date + hotel check-in time).
+// Ngày lưu trú là ngày lịch Việt Nam
 const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 
 const loginAndGetToken = async (email: string, password: string) => {
@@ -42,7 +42,7 @@ const hotelIds: number[] = [];
 const policyIds: number[] = [];
 
 let hotelId: number;
-/** Tiers: >=72h before check-in → 100%; >=24h → 50%; otherwise → 0%. */
+/** Các mức hoàn tiền theo số giờ trước nhận phòng */
 let tieredPolicyId: number;
 let customerId: number;
 let customerToken: string;
@@ -224,7 +224,7 @@ describe('Cancelling a never-paid booking frees the room it held (M6 §2/§3, en
     expect(createRes.status).toBe(201);
     const maDatPhong = createRes.body.data.MaDatPhong;
 
-    // Room is sold out now — a second booking for the same slot must fail.
+    // Phòng đã hết nên đặt lần hai phải thất bại
     const blockedRes = await request(app)
       .post(`/api/hotels/${hotelId}/bookings`)
       .set('Authorization', `Bearer ${customerToken}`)
@@ -234,7 +234,7 @@ describe('Cancelling a never-paid booking frees the room it held (M6 §2/§3, en
     const cancelRes = await request(app).post(`/api/bookings/${maDatPhong}/cancel`).set('Authorization', `Bearer ${customerToken}`);
     expect(cancelRes.status).toBe(200);
 
-    // Room is free again after cancelling.
+    // Hủy xong phòng trống lại
     const retryRes = await request(app)
       .post(`/api/hotels/${hotelId}/bookings`)
       .set('Authorization', `Bearer ${customerToken}`)
@@ -253,7 +253,7 @@ describe('Payment timeout (M6 §2) — an abandoned "Chờ thanh toán" hold is 
       data: { MaLoaiPhong: roomType.MaLoaiPhong, NgayApDung: checkIn, GiaPhong: 500_000, SoLuongPhong: 1, TrangThai: ROOM_RATE_STATUS.OPEN_FOR_SALE },
     });
 
-    const staleNgayTao = new Date(Date.now() - 60 * 60_000); // 60 minutes ago, well past PAYMENT_TIMEOUT_MINUTES
+    const staleNgayTao = new Date(Date.now() - 60 * 60_000);
     const stale = await createTestBookingDirect(customerId, hotelId, tieredPolicyId, checkIn, checkOut, {
       trangThai: BOOKING_STATUS.PENDING_PAYMENT,
       ngayTao: staleNgayTao,
@@ -266,7 +266,7 @@ describe('Payment timeout (M6 §2) — an abandoned "Chờ thanh toán" hold is 
       .set('Authorization', `Bearer ${customerToken}`)
       .send({ checkIn: iso(checkIn), checkOut: iso(checkOut), rooms: [{ maLoaiPhong: roomType.MaLoaiPhong, soLuong: 1 }] });
 
-    expect(res.status).toBe(201); // would be 409 if the stale hold were not swept
+    expect(res.status).toBe(201);
 
     const refreshedStale = await prisma.dAT_PHONG.findUnique({ where: { MaDatPhong: stale.MaDatPhong } });
     expect(refreshedStale!.TrangThai).toBe(BOOKING_STATUS.CANCELLED);
@@ -335,7 +335,7 @@ describe('BookingsService.cancelBooking — refund tier selection & amount (serv
 
     const result = await service.cancelBooking(booking.MaDatPhong, customerId, {}, '127.0.0.1');
     expect(result.ThanhToan[0].HoanTien).toEqual([]);
-    expect(fakeGateway.calls).toHaveLength(0); // gateway never even called for a 0% refund
+    expect(fakeGateway.calls).toHaveLength(0);
   });
 
   it('the refund amount never exceeds what was actually paid', async () => {
@@ -379,7 +379,7 @@ describe('PaymentsService.retryRefund — idempotent (M6 §4/§6)', () => {
     expect(retried.TrangThai).toBe(REFUND_STATUS.SUCCESS);
     expect(succeedingGateway.calls).toHaveLength(1);
 
-    // Retrying again must NOT call the gateway a second time — already "Thành công" is a no-op.
+    // Thử lại lần nữa không gọi cổng thanh toán
     const retriedAgain = await paymentsService.retryRefund(refundId, customerId, '127.0.0.1');
     expect(retriedAgain.TrangThai).toBe(REFUND_STATUS.SUCCESS);
     expect(succeedingGateway.calls).toHaveLength(1);
@@ -400,8 +400,7 @@ describe('PaymentsService.retryRefund — idempotent (M6 §4/§6)', () => {
       paymentsService.retryRefund(refundId, customerId, '127.0.0.1'),
     ]);
 
-    // One retry does the work; the other either arrives after it (already "Thành công", a no-op) or meets the
-    // attempt in flight and is told so (409) — it never reaches the gateway itself.
+    // Chỉ một lần thử lại thực sự chạy
     const fulfilled = results.filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof paymentsService.retryRefund>>> => r.status === 'fulfilled');
     expect(fulfilled.length).toBeGreaterThanOrEqual(1);
     expect(fulfilled.some((r) => r.value.TrangThai === REFUND_STATUS.SUCCESS)).toBe(true);
@@ -432,7 +431,7 @@ describe('PaymentsService.handleCallback — a late success after the booking al
     const txnRef = 'LATETXN1';
     await createTestPayment(booking.MaDatPhong, 700_000, PAYMENT_STATUS.PENDING, txnRef);
 
-    // Simulate the booking having expired (swept elsewhere) while this payment was in flight.
+    // Giả lập đơn hết hạn trong lúc thanh toán
     await prisma.dAT_PHONG.update({ where: { MaDatPhong: booking.MaDatPhong }, data: { TrangThai: BOOKING_STATUS.CANCELLED } });
 
     const params = {
@@ -448,17 +447,17 @@ describe('PaymentsService.handleCallback — a late success after the booking al
     const outcome = await paymentsService.handleCallback({ ...params, vnp_SecureHash }, '127.0.0.1');
 
     expect(outcome.rspCode).toBe('00');
-    expect(outcome.redirectStatus).toBe('failed'); // the booking was never revived
+    expect(outcome.redirectStatus).toBe('failed');
 
     const refreshedBooking = await prisma.dAT_PHONG.findUnique({ where: { MaDatPhong: booking.MaDatPhong } });
-    expect(refreshedBooking!.TrangThai).toBe(BOOKING_STATUS.CANCELLED); // still cancelled, not reverted to Confirmed
+    expect(refreshedBooking!.TrangThai).toBe(BOOKING_STATUS.CANCELLED);
 
     const refreshedPayment = await prisma.tHANH_TOAN.findFirst({ where: { MaDatPhong: booking.MaDatPhong } });
-    expect(refreshedPayment!.TrangThai).toBe(PAYMENT_STATUS.SUCCESS); // VNPAY really did report success
+    expect(refreshedPayment!.TrangThai).toBe(PAYMENT_STATUS.SUCCESS);
 
     const refund = await prisma.hOAN_TIEN.findFirst({ where: { MaThanhToan: refreshedPayment!.MaThanhToan } });
     expect(refund).not.toBeNull();
-    expect(Number(refund!.SoTienHoan)).toBe(700_000); // auto-refunded 100%, never kept
+    expect(Number(refund!.SoTienHoan)).toBe(700_000);
     expect(refund!.TrangThai).toBe(REFUND_STATUS.SUCCESS);
     expect(fakeGateway.calls).toHaveLength(1);
   });

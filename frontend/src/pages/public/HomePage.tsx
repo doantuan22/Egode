@@ -32,9 +32,7 @@ export default function HomePage() {
     []
   );
 
-  /* =========================================================
-     FEATURED HOTELS
-  ========================================================= */
+  /* Khách sạn nổi bật */
 
   const featured = useSearchHotels({
     checkIn: defaults.checkIn,
@@ -45,9 +43,7 @@ export default function HomePage() {
     sort: 'star_desc',
   });
 
-  /* =========================================================
-     LOCATIONS
-  ========================================================= */
+  /* Địa điểm */
 
   const locations = useLocations();
 
@@ -65,9 +61,7 @@ export default function HomePage() {
   const totalHotels =
     featured.data?.pagination.total;
 
-  /* =========================================================
-     SEARCH
-  ========================================================= */
+  /* Tìm kiếm */
 
   const handleSearch = (values: {
     location?: string;
@@ -107,7 +101,7 @@ export default function HomePage() {
 
       <section className="egode-home-hero">
 
-        {/* Photo + shading layers live behind the content inside a clipped backdrop */}
+        {/* Ảnh và lớp phủ nằm sau nội dung */}
         <div className="egode-home-hero__backdrop" aria-hidden="true">
           <div className="egode-home-hero__bg" />
         </div>
@@ -495,9 +489,7 @@ export default function HomePage() {
   );
 }
 
-/* =========================================================
-   SECTION HEADER
-========================================================= */
+/* Tiêu đề mục */
 
 function SectionHeader({
   eyebrow,
@@ -527,9 +519,7 @@ function SectionHeader({
   );
 }
 
-/* =========================================================
-   BENEFIT CARD
-========================================================= */
+/* Thẻ lợi ích */
 
 function BenefitCard({
   icon,
@@ -565,9 +555,7 @@ function BenefitCard({
   );
 }
 
-/* =========================================================
-   DESTINATION CARD
-========================================================= */
+/* Thẻ điểm đến */
 
 function DestinationCard({
   destination,
@@ -630,9 +618,7 @@ function DestinationCard({
   );
 }
 
-/* =========================================================
-   FEATURED HOTEL CARD
-========================================================= */
+/* Thẻ khách sạn nổi bật */
 
 function FeaturedHotelCard({
   hotel,
@@ -647,7 +633,7 @@ function FeaturedHotelCard({
   return (
     <article className="egode-stay-card">
 
-      {/* IMAGE */}
+      {/* Ảnh */}
 
       <Link
         to={detailUrl}
@@ -674,7 +660,7 @@ function FeaturedHotelCard({
           </div>
         )}
 
-        {/* STAR */}
+        {/* Số sao */}
 
         {hotel.HangSao > 0 && (
           <div className="egode-stay-card__rating">
@@ -688,11 +674,11 @@ function FeaturedHotelCard({
 
       </Link>
 
-      {/* BODY */}
+      {/* Nội dung */}
 
       <div className="egode-stay-card__body">
 
-        {/* LOCATION */}
+        {/* Vị trí */}
 
         <div className="egode-stay-card__location">
 
@@ -705,7 +691,7 @@ function FeaturedHotelCard({
 
         </div>
 
-        {/* NAME */}
+        {/* Tên */}
 
         <h3>
 
@@ -717,7 +703,7 @@ function FeaturedHotelCard({
 
         </h3>
 
-        {/* PRICE */}
+        {/* Giá */}
 
         <div className="egode-stay-card__footer">
 
@@ -753,7 +739,7 @@ function FeaturedHotelCard({
 
         </div>
 
-        {/* AVAILABILITY */}
+        {/* Tình trạng còn phòng */}
 
         <div
           className={`

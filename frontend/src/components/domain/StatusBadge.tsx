@@ -1,4 +1,3 @@
-/* Export the tone helper so unknown/open-domain mapping can be tested directly. */
 /* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from 'react';
 import { cn } from '../../lib/utils';

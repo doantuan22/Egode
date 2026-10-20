@@ -6,7 +6,7 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { hotelIdParamSchema } from './owner-hotels.schemas';
 import { dateRangeQuerySchema } from '../analytics/date-range';
 
-/** Mounted at `/owner/hotels` (same prefix as owner-hotels.routes.ts) — one more owner-scoped, ownership-checked action on a hotel. */
+/** Thống kê của khách sạn thuộc chủ sở hữu */
 const router = Router();
 const controller = new OwnerAnalyticsController();
 

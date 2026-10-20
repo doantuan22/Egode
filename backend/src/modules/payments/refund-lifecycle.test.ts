@@ -24,19 +24,14 @@ import { encodeGatewayRef, signVnpayParams } from './vnpay';
 import type { RefundGateway, RefundRequestInput, RefundResult } from './refund-gateway';
 import { addDaysToDateKey, businessToday } from '../../common/utils/business-time';
 
-/**
- * Bug #8 — the refund simulation is never called while a database transaction is open, and HOAN_TIEN keeps
- * ONE row per refund through its whole life (Chờ xử lý → Thành công / Thất bại), however often it is retried.
- * Everything runs against the real SQL Server test database.
- */
-// A stay date is a Vietnam calendar day; refund tiers are measured from its check-in INSTANT (date + hotel check-in time).
+/** Hoàn tiền không gọi cổng khi còn giao dịch mở và chỉ dùng một dòng */
 const addDays = (days: number): Date => new Date(`${addDaysToDateKey(businessToday(), days)}T00:00:00Z`);
 
 const IP = '127.0.0.1';
 let refSeq = 0;
 const packedRef = () => encodeGatewayRef(`LIFE${Date.now()}${++refSeq}`, `${900000 + refSeq}`, '20260101000000');
 
-/** What the database looked like, from a DIFFERENT connection, at the moment the gateway was called. */
+/** Trạng thái CSDL nhìn từ kết nối khác lúc gọi cổng */
 interface Probe {
   bookingLocked: boolean;
   paymentLocked: boolean;
@@ -45,11 +40,7 @@ interface Probe {
   bookingStatus: string | null;
 }
 
-/**
- * Gateway double that, while "calling VNPAY", looks at the database through another connection with
- * `WITH (NOWAIT)`: if the cancel/callback/retry transaction were still open, those reads would hit its locks
- * (error 1222) or could not see its rows yet. It is the proof that no lock is held across the gateway call.
- */
+/** Cổng giả kiểm tra không còn khóa giao dịch khi được gọi */
 class ProbingGateway implements RefundGateway {
   calls: RefundRequestInput[] = [];
   probes: Probe[] = [];
@@ -73,7 +64,7 @@ class ProbingGateway implements RefundGateway {
         await prisma.$queryRaw(query);
         return false;
       } catch {
-        return true; // lock timeout / NOWAIT conflict: somebody still holds the row
+        return true;
       }
     };
     const bookingLocked = await locked(Prisma.sql`SELECT TrangThai FROM DAT_PHONG WITH (NOWAIT) WHERE MaDatPhong = ${maDatPhong}`);
@@ -101,7 +92,7 @@ beforeAll(async () => {
   otherCustomerId = other.account.MaTaiKhoan;
   diaPhuongId = (await createTestDiaPhuong()).MaDiaPhuong;
   hotelId = (await createTestHotel(owner.account.MaTaiKhoan, diaPhuongId)).MaKhachSan;
-  // >= 72h before check-in → 100%, >= 24h → 50%, otherwise 0%.
+  // Mức hoàn tiền theo giờ trước nhận phòng
   policyId = (await createTestCancellationPolicy([
     { soGioTruocNhanPhong: 72, tyLeHoanTien: 100 },
     { soGioTruocNhanPhong: 24, tyLeHoanTien: 50 },
@@ -122,7 +113,7 @@ afterAll(async () => {
 const bookingsService = (gateway: RefundGateway) => new BookingsService(undefined, gateway);
 const paymentsService = (gateway: RefundGateway) => new PaymentsService(undefined, gateway);
 
-/** A paid, confirmed booking whose stay is `daysAhead` days away. */
+/** Đơn đã thanh toán và xác nhận */
 const paidBooking = async (amount = 1_000_000, daysAhead = 5) => {
   const booking = await createTestBookingDirect(customerId, hotelId, policyId, addDays(daysAhead), addDays(daysAhead + 1), {
     trangThai: BOOKING_STATUS.CONFIRMED,
@@ -139,7 +130,7 @@ const bookingStatus = async (id: number) => (await prisma().dAT_PHONG.findUnique
 describe('cancel → refund lifecycle', () => {
   it('1. a cancellation that earns no refund (0% tier): booking "Đã hủy", no HOAN_TIEN, gateway untouched', async () => {
     const gateway = new ProbingGateway();
-    const { booking, payment } = await paidBooking(1_000_000, 0); // check-in today: always < 24 h away
+    const { booking, payment } = await paidBooking(1_000_000, 0);
 
     const result = await bookingsService(gateway).cancelBooking(booking.MaDatPhong, customerId, {}, IP);
 
@@ -154,7 +145,7 @@ describe('cancel → refund lifecycle', () => {
 
     const result = await bookingsService(gateway).cancelBooking(booking.MaDatPhong, customerId, {}, IP);
 
-    // What the gateway call saw: the refund already committed as pending, the booking already cancelled.
+    // Cổng thấy hoàn tiền đã commit ở trạng thái chờ
     expect(gateway.calls).toHaveLength(1);
     expect(gateway.probes[0].refundRows).toEqual([{ TrangThai: REFUND_STATUS.PENDING, NgayHoanTien: null }]);
     expect(gateway.probes[0].bookingStatus).toBe(BOOKING_STATUS.CANCELLED);
@@ -193,7 +184,7 @@ describe('cancel → refund lifecycle', () => {
     expect(result.TrangThai).toBe(BOOKING_STATUS.CANCELLED);
     const refunds = await refundsOf(payment.MaThanhToan);
     expect(refunds).toHaveLength(1);
-    expect(refunds[0].TrangThai).toBe(REFUND_STATUS.FAILED); // no answer = a failed attempt, which can be retried
+    expect(refunds[0].TrangThai).toBe(REFUND_STATUS.FAILED);
     expect(refunds[0].NgayHoanTien).toBeNull();
   });
 });
@@ -221,7 +212,7 @@ describe('retry refund', () => {
     expect(refunds).toHaveLength(1);
     expect(Number(refunds[0].SoTienHoan)).toBe(Number(refund.SoTienHoan));
     expect(refunds[0].MaGiaoDichDoiTac).toBe(refund.MaGiaoDichDoiTac);
-    expect(gateway.calls[0].refundRef).toBe(firstRefundRef); // same identity sent to the gateway
+    expect(gateway.calls[0].refundRef).toBe(firstRefundRef);
     expect(gateway.calls[0].amount).toBe(Number(refund.SoTienHoan));
   });
 
@@ -315,7 +306,7 @@ describe('retry refund', () => {
     expect(created.NgayYeuCau.getTime()).toBeGreaterThanOrEqual(beforeCancel - 2000);
     expect(created.NgayHoanTien).toBeNull();
 
-    // Pull it far into the past so any code that "stamps now" on retry would be unmistakable.
+    // Kéo về quá khứ để lộ việc ghi lại thời gian khi thử lại
     const requestedAt = new Date(Date.now() - 3 * 60 * 60 * 1000);
     await prisma().hOAN_TIEN.update({ where: { MaHoanTien: created.MaHoanTien }, data: { NgayYeuCau: requestedAt } });
 
@@ -323,15 +314,15 @@ describe('retry refund', () => {
       await paymentsService(new ProbingGateway({ success: false, message: 'still down' })).retryRefund(created.MaHoanTien, customerId, IP);
       const [row] = await refundsOf(payment.MaThanhToan);
       expect(row.TrangThai).toBe(REFUND_STATUS.FAILED);
-      expect(row.NgayYeuCau.getTime()).toBe(requestedAt.getTime()); // unchanged after every failed retry
+      expect(row.NgayYeuCau.getTime()).toBe(requestedAt.getTime());
       expect(row.NgayHoanTien).toBeNull(); // only a success may set it
     }
 
     await paymentsService(new ProbingGateway({ success: true, message: 'ok' })).retryRefund(created.MaHoanTien, customerId, IP);
     const [done] = await refundsOf(payment.MaThanhToan);
     expect(done.TrangThai).toBe(REFUND_STATUS.SUCCESS);
-    expect(done.NgayYeuCau.getTime()).toBe(requestedAt.getTime()); // still the original request time
-    expect(done.NgayHoanTien!.getTime()).toBeGreaterThan(requestedAt.getTime()); // set now, by the success
+    expect(done.NgayYeuCau.getTime()).toBe(requestedAt.getTime());
+    expect(done.NgayHoanTien!.getTime()).toBeGreaterThan(requestedAt.getTime());
   });
 });
 
@@ -386,7 +377,7 @@ describe('concurrency', () => {
     const bookings = bookingsService(gateway);
     const payments = paymentsService(gateway);
 
-    // A retry aimed at a refund that does not exist yet (404), fired together with the cancel, then again once it does.
+    // Thử lại hoàn tiền chưa tồn tại cùng lúc với hủy đơn
     const cancelling = bookings.cancelBooking(booking.MaDatPhong, customerId, {}, IP);
     let retrying: Promise<unknown> = Promise.resolve();
     for (let attempt = 0; attempt < 20; attempt++) {
@@ -403,20 +394,20 @@ describe('concurrency', () => {
     expect(refunds).toHaveLength(1);
     expect(refunds.filter((r) => r.TrangThai === REFUND_STATUS.SUCCESS).length).toBeLessThanOrEqual(1);
     expect(refunds[0].TrangThai).toBe(REFUND_STATUS.SUCCESS);
-    expect(gateway.calls).toHaveLength(1); // the retry met an attempt in flight (409) or an already settled refund
+    expect(gateway.calls).toHaveLength(1);
     expect(await bookingStatus(booking.MaDatPhong)).toBe(BOOKING_STATUS.CANCELLED);
   });
 });
 
 describe('amounts', () => {
   it('9. a refund can never exceed the payment: 50% and 100% tiers are exact, and earlier refunds are deducted', async () => {
-    const half = await paidBooking(1_000_001, 2); // 24h tier → 50%
+    const half = await paidBooking(1_000_001, 2);
     await bookingsService(new ProbingGateway()).cancelBooking(half.booking.MaDatPhong, customerId, {}, IP);
     const [halfRefund] = await refundsOf(half.payment.MaThanhToan);
-    expect(Number(halfRefund.SoTienHoan)).toBe(500_001); // rounded to the đồng, never above the payment
+    expect(Number(halfRefund.SoTienHoan)).toBe(500_001);
     expect(Number(halfRefund.SoTienHoan)).toBeLessThanOrEqual(1_000_001);
 
-    // 700.000 of 1.000.000 is already refunded on this payment: a 100% cancellation may only add the remaining 300.000.
+    // Đã hoàn 700.000 nên chỉ hoàn thêm 300.000
     const partly = await paidBooking(1_000_000, 5);
     await createTestRefund(partly.payment.MaThanhToan, 700_000, REFUND_STATUS.SUCCESS);
     await bookingsService(new ProbingGateway()).cancelBooking(partly.booking.MaDatPhong, customerId, {}, IP);
@@ -424,7 +415,7 @@ describe('amounts', () => {
     expect(rows).toHaveLength(2);
     expect(rows.reduce((sum, r) => sum + Number(r.SoTienHoan), 0)).toBe(1_000_000);
 
-    // Nothing left to refund → the cancellation still succeeds and no further row appears.
+    // Hết tiền hoàn nhưng hủy vẫn thành công
     const none = await paidBooking(1_000_000, 5);
     await createTestRefund(none.payment.MaThanhToan, 1_000_000, REFUND_STATUS.SUCCESS);
     const gateway = new ProbingGateway();
@@ -513,7 +504,7 @@ describe('no lock is held while the refund simulation runs', () => {
     expect(refunds[0].TrangThai).toBe(REFUND_STATUS.SUCCESS);
     expect(Number(refunds[0].SoTienHoan)).toBe(700_000);
 
-    // The same callback again changes nothing and refunds nothing more.
+    // Callback lặp lại không thay đổi gì
     const again = await service.handleCallback(query, IP);
     expect(again.rspCode).toBe('02');
     expect(await refundsOf(payment.MaThanhToan)).toHaveLength(1);

@@ -16,7 +16,7 @@ router.use(authenticate, requireAdmin);
 
 router.get('/', validateRequest({ query: listAccountsQuerySchema }), controller.list);
 router.post('/', validateRequest({ body: createAccountSchema }), controller.create);
-// Must precede '/:id' — otherwise "roles" is parsed (and rejected) as an account id.
+// Phải đứng trước '/:id'
 router.get('/roles', controller.listRoles);
 router.get('/:id', validateRequest({ params: accountIdParamSchema }), controller.getById);
 router.patch(

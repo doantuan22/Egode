@@ -5,15 +5,15 @@ import { Card } from '../common/Card';
 
 interface BookingSummaryProps {
   booking: BookingDetail;
-  /** Retries a refund that did not succeed; gets the refund id. */
+  /** Thử lại hoàn tiền chưa thành công */
   onRetryRefund: (refundId: number) => void;
-  /** A retry is being sent: the retry buttons wait instead of firing a second request. */
+  /** Đang gửi yêu cầu thử lại */
   isRetryingRefund?: boolean;
-  /** Why the last retry was refused (for example "an attempt is already in progress"). */
+  /** Lý do lần thử lại gần nhất bị từ chối */
   retryRefundError?: string | null;
 }
 
-/** The money side of a booking: room total, promotion, the amount to pay, and every payment with its refunds. */
+/** Phần tiền của đơn: tổng phòng, khuyến mãi, số phải trả, thanh toán và hoàn tiền */
 export function BookingSummary({ booking, onRetryRefund, isRetryingRefund = false, retryRefundError = null }: BookingSummaryProps) {
   return (
     <Card padded={false} className="card-body">

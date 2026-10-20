@@ -3,20 +3,14 @@ import { NextFunction, Request, Response } from 'express';
 
 const REQUEST_ID_HEADER = 'X-Request-Id';
 
-/**
- * Structured access log: method, route, status, duration, correlation id,
- * and an error category for 4xx/5xx — never the request body, headers, or
- * query string, so tokens/passwords/reset codes/payment signatures never
- * reach stdout through this path (M9 §10).
- */
+/** Ghi log truy cập có cấu trúc, không ghi dữ liệu nhạy cảm */
 export const requestLogging = (req: Request, res: Response, next: NextFunction): void => {
   const requestId = String(req.headers[REQUEST_ID_HEADER.toLowerCase()] || randomUUID());
   res.setHeader(REQUEST_ID_HEADER, requestId);
 
   const startedAt = process.hrtime.bigint();
   res.on('finish', () => {
-    // Vitest/supertest fire hundreds of requests per run; skip the noisy
-    // per-request line there (matches the rate-limiter test bypass convention).
+    // Bỏ log từng request khi chạy test
     if (process.env.NODE_ENV === 'test') return;
     const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
     const errorCategory = res.statusCode >= 500 ? 'server_error' : res.statusCode >= 400 ? 'client_error' : undefined;

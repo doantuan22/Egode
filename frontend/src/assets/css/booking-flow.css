@@ -1,16 +1,11 @@
-/* ==========================================================
-   BOOKING FLOW
-   Scope: home, hotel list, hotel detail
-========================================================== */
+/* Luồng đặt phòng: trang chủ, danh sách và chi tiết khách sạn */
 
 .booking-flow {
   background: var(--color-bg-secondary);
   color: var(--color-body);
 }
 
-/* ==========================================================
-   SHARED SURFACE
-========================================================== */
+/* Bề mặt dùng chung */
 
 .surface-card {
   background: var(--color-surface-raised);
@@ -30,9 +25,7 @@
   box-shadow: var(--elevation-2);
 }
 
-/* ==========================================================
-   FOCUS
-========================================================== */
+/* Viền focus */
 
 .booking-flow .input:focus,
 .booking-flow .select:focus,
@@ -49,18 +42,14 @@
   letter-spacing: 0;
 }
 
-/* ==========================================================
-   EGODE HOME
-========================================================== */
+/* Trang chủ Egode */
 
 .egode-home {
   overflow-x: hidden;
   background: #f7f9fc;
 }
 
-/* ==========================================================
-   HERO
-========================================================== */
+/* Khu hero */
 
 .egode-home-hero {
   position: relative;
@@ -70,12 +59,11 @@
 
   background: #0b2540;
 
-  /* The hero floats a little above the strip below it. */
+  /* Hero nổi lên trên dải bên dưới */
   box-shadow: 0 0.875rem 2.25rem -0.5rem rgb(7 22 42 / 28%);
 }
 
-/* Clipping container for the background image, parallax drift, and shading layers,
-   allowing popups and dropdowns inside .egode-home-search to overflow freely without clipping. */
+/* Khung cắt ảnh nền và các lớp phủ */
 .egode-home-hero__backdrop {
   position: absolute;
   inset: 0;
@@ -84,8 +72,7 @@
   z-index: 0;
 }
 
-/* Layer 1: the photo, a little taller than the hero so it can drift (parallax) without showing an edge.
-   Photo: "Sunset in Ha Long Bay" by Fuu J, Unsplash (free under the Unsplash License), 2400x1600. */
+/* Lớp 1: ảnh nền hơi cao hơn hero để có hiệu ứng parallax */
 .egode-home-hero__bg {
   position: absolute;
   inset: -4% 0;
@@ -96,7 +83,7 @@
   will-change: transform;
 }
 
-/* Layer 2: shade for the white text on the left, a vignette that pulls the eye in, and a dark foot that seats the search card. */
+/* Lớp 2: lớp tối cho chữ trắng, viền mờ và chân tối đỡ ô tìm kiếm */
 .egode-home-hero__backdrop::before {
   content: '';
   position: absolute;
@@ -109,7 +96,7 @@
     radial-gradient(120% 90% at 72% 38%, rgb(7 22 42 / 0%) 55%, rgb(7 22 42 / 34%) 100%);
 }
 
-/* Layer 3: fine grain; it hides the softness of a scaled photo and gives the image some texture. */
+/* Lớp 3: hạt mịn làm ảnh có độ nhám */
 .egode-home-hero__backdrop::after {
   content: '';
   position: absolute;
@@ -122,7 +109,7 @@
   pointer-events: none;
 }
 
-/* Scroll-driven parallax where the browser supports it (Chromium); elsewhere the photo simply stays put. */
+/* Parallax theo cuộn ở trình duyệt hỗ trợ */
 @keyframes egode-hero-drift {
   to { transform: translate3d(0, 7%, 0) scale(1.05); }
 }
@@ -274,9 +261,7 @@
     );
 }
 
-/* ==========================================================
-   HERO STATS
-========================================================== */
+/* Số liệu hero */
 
 .egode-home-hero__stats {
   display: flex;
@@ -333,9 +318,7 @@
   color: white;
 }
 
-/* ==========================================================
-   SEARCH PANEL
-========================================================== */
+/* Khung tìm kiếm */
 
 .egode-home-search {
   position: relative;
@@ -430,9 +413,7 @@
   font-size: 1.0625rem;
 }
 
-/* ==========================================================
-   SEARCH BAR OVERRIDE ON HOME
-========================================================== */
+/* Ghi đè thanh tìm kiếm ở trang chủ */
 
 .egode-home-search
 .travel-search {
@@ -484,9 +465,7 @@
     );
 }
 
-/* ==========================================================
-   CONTAINER
-========================================================== */
+/* Khung chứa */
 
 .egode-home-container {
   width:
@@ -500,9 +479,7 @@
   margin: 0 auto;
 }
 
-/* ==========================================================
-   BENEFITS
-========================================================== */
+/* Lợi ích */
 
 .egode-benefits {
   padding: 2.125rem 0;
@@ -591,9 +568,7 @@
   line-height: 1.55;
 }
 
-/* ==========================================================
-   HOME SECTIONS
-========================================================== */
+/* Các mục trang chủ */
 
 .egode-home-section {
   padding: 4.375rem 0;
@@ -605,9 +580,7 @@
   background: #f6f8fb;
 }
 
-/* ==========================================================
-   SECTION TITLE
-========================================================== */
+/* Tiêu đề mục */
 
 .egode-section-heading {
   margin-bottom: 1.75rem;
@@ -690,9 +663,7 @@
   text-decoration: underline;
 }
 
-/* ==========================================================
-   DESTINATIONS
-========================================================== */
+/* Điểm đến */
 
 .egode-destination-grid {
   display: grid;
@@ -882,9 +853,7 @@
   font-size: 1.125rem;
 }
 
-/* ==========================================================
-   FEATURED HOTELS
-========================================================== */
+/* Khách sạn nổi bật */
 
 .egode-featured-grid {
   display: grid;
@@ -1157,18 +1126,14 @@ span {
     var(--color-text-muted);
 }
 
-/* ==========================================================
-   CTA
-========================================================== */
+/* Lời kêu gọi hành động */
 
 .egode-home-cta {
   padding: 0 0 4rem;
   background: #f6f8fb;
 }
 
-/* ==========================================================
-   MESSAGE
-========================================================== */
+/* Thông báo */
 
 .egode-home-message {
   padding: 1.875rem;
@@ -1179,9 +1144,7 @@ span {
   text-align: center;
 }
 
-/* ==========================================================
-   RESPONSIVE TABLET
-========================================================== */
+/* Responsive máy tính bảng */
 
 @media (max-width: 1024px) {
   .egode-benefits__grid {
@@ -1202,9 +1165,7 @@ span {
   }
 }
 
-/* ==========================================================
-   RESPONSIVE MOBILE
-========================================================== */
+/* Responsive điện thoại */
 
 @media (max-width: 760px) {
   .egode-home-hero,

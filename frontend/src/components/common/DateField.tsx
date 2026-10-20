@@ -6,29 +6,22 @@ import 'react-day-picker/style.css';
 import { cn, fromDateInputValue, toDateInputValue } from '../../lib/utils';
 import { useAnchoredPosition } from './useAnchoredPosition';
 
-// `type` is accepted (and ignored) so a `<input type="date">` can be swapped for `<DateField>` without touching its props.
+// Nhận type để thay input date mà không đổi props
 type DateFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   type?: string;
-  /**
-   * `dropdown` adds month and year selectors to the calendar header, for dates far from today such as a birth date.
-   * The year list runs from `min` (default 1900) to `max` (default: this year).
-   */
+  /** Thêm chọn tháng và năm cho ngày xa hôm nay */
   captionLayout?: 'label' | 'dropdown';
 };
 
 const POPOVER_WIDTH = 330;
 
 const setNativeValue = (input: HTMLInputElement, value: string) => {
-  // React tracks the value of an <input>: go through the prototype setter so the change is seen as a real edit.
+  // Dùng setter của prototype để React nhận thay đổi
   Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, value);
   input.dispatchEvent(new Event('input', { bubbles: true }));
 };
 
-/**
- * `<input type="date">` with the app's own calendar: the native field stays in the DOM (typing, validation,
- * react-hook-form) and a button opens the same calendar the customer-facing search uses, because the browser's
- * native calendar cannot be styled. Works on `YYYY-MM-DD` strings like the rest of the app.
- */
+/** Ô ngày dùng lịch của ứng dụng thay cho lịch của trình duyệt */
 export const DateField = forwardRef<HTMLInputElement, DateFieldProps>(function DateField(props, forwardedRef) {
   return <EnhancedDateField ref={forwardedRef} {...props} />;
 });
@@ -53,9 +46,7 @@ const EnhancedDateField = forwardRef<HTMLInputElement, DateFieldProps>(function 
     [forwardedRef]
   );
 
-  // react-hook-form can set the value without an event: follow it before paint.
-  // Runs after every render on purpose (nothing re-renders us when the DOM value is set directly); it only sets state
-  // when the two differ, so it settles after one extra pass.
+  // Theo dõi giá trị do react-hook-form đặt trực tiếp
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const input = inputRef.current;

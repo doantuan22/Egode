@@ -5,7 +5,7 @@ import type { OwnerReviewsQuery } from './owner-reviews.schemas';
 
 const dateOnly = (date: Date) => date.toISOString().slice(0, 10);
 
-/** What a hotel owner may read about the reviews of their own hotels. Read-only: moderation stays with the administrator. */
+/** Chủ khách sạn chỉ đọc đánh giá của khách sạn mình */
 export class OwnerReviewsService {
   constructor(
     private readonly reviews: ReviewsRepository = new ReviewsRepository(),
@@ -13,7 +13,7 @@ export class OwnerReviewsService {
   ) {}
 
   async list(ownerId: number, hotelId: number, query: OwnerReviewsQuery) {
-    // 404 for an unknown hotel, 403 for someone else's — before anything about its reviews is read.
+    // Kiểm tra quyền sở hữu trước khi đọc đánh giá
     await this.hotels.getOwnedHotel(ownerId, hotelId);
 
     const [{ items, total }, distribution, summaries] = await Promise.all([
@@ -28,7 +28,7 @@ export class OwnerReviewsService {
         MaDanhGia: review.MaDanhGia,
         DiemDanhGia: review.DiemDanhGia,
         NoiDung: review.NoiDung,
-        // Same abbreviation the public sees: the owner learns no more about a guest than any visitor does.
+        // Dùng cùng tên viết tắt như phía công khai
         TenNguoiDanhGia: maskReviewerName(review.TAI_KHOAN.HoTen),
         HinhAnh: review.HINH_ANH_DANH_GIA.map((image) => image.URL),
         NgayNhanPhong: dateOnly(review.DAT_PHONG.NgayNhanPhong),

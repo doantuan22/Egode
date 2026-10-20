@@ -37,10 +37,7 @@ export class AuthService {
     private readonly partnersRepository: PartnersRepository = new PartnersRepository()
   ) {}
 
-  /**
-   * `passwordHash` is the account's CURRENT bcrypt hash. Only its fingerprint is put into the
-   * refresh token (BUG-012), so a later password change invalidates that token.
-   */
+  /** Chỉ lưu dấu vân tay của mật khẩu vào refresh token */
   private async issueTokens(maTaiKhoan: number, role: string, passwordHash: string): Promise<AuthTokens> {
     const payload = { sub: String(maTaiKhoan), role };
     return {
@@ -59,7 +56,7 @@ export class AuthService {
 
     const customerRole = await this.rolesRepository.findByName(ROLE_NAMES.CUSTOMER);
     if (!customerRole) {
-      // Role must be seeded by database/seed/001_roles.sql before auth can work.
+      // Vai trò phải được seed trước khi dùng
       throw AppError.internal('Vai trò khách hàng chưa được khởi tạo trong hệ thống');
     }
 
@@ -88,16 +85,12 @@ export class AuthService {
   async login(input: LoginInput): Promise<AuthResult> {
     const account = await this.authRepository.findByEmailOrUsername(input.identifier);
     if (!account) {
-      // Keep the unknown-account path close to the same cost as a real bcrypt
-      // comparison, reducing username/email enumeration through timing.
+      // Giữ thời gian xử lý gần bằng khi tài khoản có thật
       await verifyPassword(input.MatKhau, '$2b$12$RDB7iar0FYW8YsEwBSPO.eUPLa/DjejjC6HiP53/P32lcFnkPoFkm');
       throw AppError.unauthorized('Email/tên đăng nhập hoặc mật khẩu không đúng');
     }
 
-    // BUG-004: check the lock BEFORE the password. Doing it after made a locked
-    // account answer 403 only to the correct password and 401 to a wrong one,
-    // so anyone could use the status code as a password oracle. A locked
-    // account now answers 403 regardless of the password, which is never checked.
+    // Kiểm tra khóa tài khoản trước mật khẩu
     if (account.TrangThai === ACCOUNT_STATUS.LOCKED) {
       throw AppError.forbidden('Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên');
     }
@@ -129,8 +122,7 @@ export class AuthService {
       throw AppError.unauthorized('Tài khoản không khả dụng');
     }
 
-    // BUG-012: the token was issued under an older password. Same message as an expired
-    // token, so the response does not reveal that the password changed.
+    // Token cấp từ mật khẩu cũ bị từ chối với cùng thông báo
     if (!matchesPasswordFingerprint(payload.pwdv, account.MatKhau)) {
       throw AppError.unauthorized('Refresh token không hợp lệ hoặc đã hết hạn');
     }
@@ -140,11 +132,10 @@ export class AuthService {
     return this.issueTokens(account.MaTaiKhoan, role.TenVaiTro, account.MatKhau);
   }
 
-  /** Always preserves the same observable result for known/unknown emails. */
+  /** Kết quả luôn giống nhau cho email có và không tồn tại */
   async forgotPassword(input: ForgotPasswordInput): Promise<void> {
     const account = await this.authRepository.findByEmail(input.Email);
-    // A locked account gets no reset mail either: same observable result as an unknown email.
-    // A small random delay keeps the timing indistinguishable from the send-mail branch (anti timing-attack).
+    // Tài khoản bị khóa không nhận email đặt lại
     if (!account || account.TrangThai === ACCOUNT_STATUS.LOCKED) {
       await new Promise((resolve) => setTimeout(resolve, 400 + Math.random() * 200));
       return;
@@ -154,7 +145,7 @@ export class AuthService {
     try {
       resetUrl = this.buildPasswordResetUrl(account.MaTaiKhoan, account.MatKhau);
     } catch (error) {
-      // FRONTEND_URL sai format: log chi tiết để dev sửa, client vẫn nhận success chung.
+      // FRONTEND_URL sai định dạng thì chỉ ghi log
       console.warn(
         `Password reset skipped: FRONTEND_URL không hợp lệ (${env.FRONTEND_URL}) to=${maskEmail(account.Email)} reason=${error instanceof Error ? error.message : String(error)}`
       );
@@ -164,8 +155,7 @@ export class AuthService {
     try {
       await this.emailService.sendPasswordResetEmail({ to: account.Email, resetUrl });
     } catch (error) {
-      // Do not expose delivery errors: doing so only for a known account
-      // would reintroduce account enumeration. Never log token/SMTP secrets.
+      // Không để lộ lỗi gửi mail
       const meta = (error as { meta?: { toMasked?: string; host?: string; port?: number; reason?: string } }).meta;
       console.warn(
         `Password reset email delivery failed to=${meta?.toMasked ?? maskEmail(account.Email)} host=${meta?.host ?? '?'}:${meta?.port ?? '?'} reason=${meta?.reason ?? (error instanceof Error ? error.message : String(error))}`
@@ -202,8 +192,7 @@ export class AuthService {
     if (!account || !matchesPasswordFingerprint(decoded.fp, account.MatKhau)) {
       throw AppError.badRequest('Token đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng');
     }
-    // Only an administrator unlocks an account. A reset token minted before the lock must not be a way around it
-    // (and the password is left untouched, so nothing changes for a locked account).
+    // Chỉ admin mới mở khóa tài khoản
     if (account.TrangThai === ACCOUNT_STATUS.LOCKED) {
       throw AppError.badRequest('Token đặt lại mật khẩu không hợp lệ hoặc đã được sử dụng');
     }
@@ -212,11 +201,7 @@ export class AuthService {
     await this.authRepository.updatePassword(account.MaTaiKhoan, newHash);
   }
 
-  /**
-   * Authenticated password change. A wrong current password is a 400, not a 401:
-   * the caller's session is fine, and a 401 would make the client think it must
-   * refresh or drop the session.
-   */
+  /** Đổi mật khẩu khi đã đăng nhập */
   async changePassword(maTaiKhoan: number, input: ChangePasswordInput): Promise<AuthTokens> {
     const account = await this.authRepository.findById(maTaiKhoan);
     if (!account) throw AppError.unauthorized('Tài khoản không khả dụng');
@@ -229,8 +214,7 @@ export class AuthService {
       throw AppError.badRequest('Mật khẩu hiện tại không đúng', [{ field: 'MatKhauCu', message: 'Mật khẩu hiện tại không đúng' }]);
     }
 
-    // MatKhauCu was just verified against the stored hash, so equality here
-    // means the new password is the current one.
+    // Mật khẩu mới không được trùng mật khẩu hiện tại
     if (input.MatKhauMoi === input.MatKhauCu) {
       throw AppError.badRequest('Mật khẩu mới phải khác mật khẩu hiện tại', [{ field: 'MatKhauMoi', message: 'Mật khẩu mới phải khác mật khẩu hiện tại' }]);
     }
@@ -241,9 +225,7 @@ export class AuthService {
     const newHash = await hashPassword(input.MatKhauMoi);
     await this.authRepository.updatePassword(account.MaTaiKhoan, newHash);
 
-    // BUG-012: the new hash changes the fingerprint, so every refresh token issued before this
-    // point (other devices included) stops working. The caller gets a fresh pair bound to the
-    // new hash so their own session carries on.
+    // Hash mới làm vô hiệu mọi refresh token cũ
     return this.issueTokens(account.MaTaiKhoan, role.TenVaiTro, newHash);
   }
 }

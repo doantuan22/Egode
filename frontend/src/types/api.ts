@@ -2,9 +2,9 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  /** Machine-readable error code on every failure (VALIDATION_ERROR, NOT_FOUND, CONFLICT, ...). */
+  /** Mã lỗi trên mọi phản hồi thất bại */
   code?: string;
-  /** For failures with parts, e.g. validation: [{ field, message }]. */
+  /** Chi tiết lỗi theo trường */
   details?: unknown;
 }
 

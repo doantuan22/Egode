@@ -10,24 +10,24 @@ import { PromoPicker } from './PromoPicker';
 import { Textarea } from '../../common/Textarea';
 
 export interface BookingPanelProps {
-  /** The party size from the search, and what the rooms selected so far can hold (from their SucChua). */
+  /** Số khách và sức chứa của các phòng đã chọn */
   guests: number;
   selectedCapacity: number;
   roomTypeCount: number;
   roomCount: number;
   quoteQuery: UseQueryResult<Quote>;
-  /** The quote on screen was made for the rooms and dates currently selected. */
+  /** Báo giá đang hiện đúng với phòng và ngày đã chọn */
   quoteMatchesSelection: boolean;
-  /** The promo code typed is the one the quote was made with. */
+  /** Mã khuyến mãi đang nhập là mã đã báo giá */
   quoteMatchesPromo: boolean;
-  /** What is typed in the box — not applied until "Áp dụng". */
+  /** Nội dung ô nhập, chưa áp dụng */
   promoInput: string;
-  /** Why a previously applied code was removed (the backend said it is not valid). */
+  /** Lý do mã đã áp dụng bị gỡ */
   promoNotice: string | null;
   onPromoInputChange: (value: string) => void;
-  /** A code was picked from the list of available codes: apply it right away. */
+  /** Mã chọn từ danh sách được áp dụng ngay */
   onSelectPromo: (code: string) => void;
-  /** The code the page has applied ('' when none). */
+  /** Mã trang đang áp dụng */
   appliedPromo: string;
   onApplyPromo: () => void;
   note: string;
@@ -40,12 +40,11 @@ export interface BookingPanelProps {
   onBook: () => void;
 }
 
-/** Presentation only: the quote, the booking request and the promo code are decided by the page. */
+/** Chỉ hiển thị, báo giá và đặt phòng do trang quyết định */
 export function BookingPanel(props: BookingPanelProps) {
   const { roomTypeCount, roomCount, quoteQuery, quoteMatchesSelection } = props;
   const quote = quoteQuery.data;
-  // The rooms chosen cannot hold the party: that one notice says it all, so the server's quote answer (it would be the
-  // same sentence again) and the quote itself are not shown until the selection is big enough.
+  // Phòng không đủ chứa khách thì chỉ hiện một thông báo
   const capacityShort = props.selectedCapacity < props.guests;
 
   return (

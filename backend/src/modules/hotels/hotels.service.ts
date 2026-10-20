@@ -29,7 +29,7 @@ interface RoomTypeWithRates {
 
 const toNumber = (value: unknown): number => Number(value);
 
-/** Shared by search/detail/rooms: runs the availability computation for one room type. */
+/** Tính khả dụng cho một loại phòng */
 const priceRoomType = (roomType: RoomTypeWithRates, nightKeys: string[]) => {
   const ratesByDate = new Map<string, NightlyRate>(
     roomType.QUY_PHONG_GIA.map((r) => [
@@ -56,7 +56,7 @@ export interface HotelSearchItem {
   AnhDaiDien: string | null;
   GiaTuDauTu: number | null;
   ConPhong: boolean;
-  /** Visible reviews only; null average when there is none. */
+  /** Chỉ tính đánh giá hiển thị */
   DiemTrungBinh: number | null;
   SoLuongDanhGia: number;
 }
@@ -70,7 +70,7 @@ export class HotelsService {
   async search(query: SearchHotelsQuery): Promise<{ items: HotelSearchItem[]; pagination: ApiPaginationMeta }> {
     const nightKeys = enumerateNights(query.checkIn, query.checkOut);
 
-    // An unpaid hold past its timeout must not hide rooms from the result.
+    // Đơn giữ chỗ quá hạn không được che phòng
     await releaseExpiredHolds();
     const hotels = await this.hotelsRepository.findCandidateHotels({
       location: query.location,
@@ -81,16 +81,14 @@ export class HotelsService {
       checkOut: query.checkOut,
     });
 
-    // Guests may be split over several rooms, so the question is whether the hotel's rooms TOGETHER can hold the
-    // party: Σ (SucChua × rooms). A hotel that could never hold it (even with every room free) is not listed;
-    // one that could but has too few rooms free on these dates is listed as "hết phòng".
+    // Kiểm tra tổng sức chứa các phòng của khách sạn
     const hosts = (hotel: (typeof hotels)[number]) => {
       let inStock = 0;
       let free = 0;
       let cheapest = Infinity;
       for (const roomType of hotel.LOAI_PHONG) {
         const priced = priceRoomType(roomType, nightKeys);
-        if (priced.totalPrice === null) continue; // a night without a price cannot be sold
+        if (priced.totalPrice === null) continue;
         inStock += roomType.SucChua * stockForStay(nightKeys, roomType.QUY_PHONG_GIA);
         free += roomType.SucChua * priced.available;
         if (priced.available > 0) cheapest = Math.min(cheapest, priced.totalPrice / priced.nights);
@@ -123,10 +121,7 @@ export class HotelsService {
       };
     });
 
-    // Price filtering depends on computed availability, so it happens here,
-    // in-memory, after the DB query — see hotels.repository.ts for the note
-    // on why this scales fine for M2 (dev-scale candidate sets) but would
-    // need query-level filtering at real production scale.
+    // Lọc giá trong bộ nhớ sau khi truy vấn
     if (query.minPrice !== undefined) {
       items = items.filter((h) => h.GiaTuDauTu !== null && h.GiaTuDauTu >= query.minPrice!);
     }
@@ -140,7 +135,7 @@ export class HotelsService {
     const start = (query.page - 1) * query.limit;
     const paged = items.slice(start, start + query.limit);
 
-    // Ratings are looked up for the page being returned only, in one grouped query.
+    // Lấy điểm đánh giá cho trang hiện tại bằng một truy vấn
     const ratings = await this.reviewsRepository.ratingSummaries(paged.map((item) => item.MaKhachSan));
     for (const item of paged) {
       const rating = ratings.get(item.MaKhachSan);
@@ -203,8 +198,7 @@ export class HotelsService {
 
     const nightKeys = enumerateNights(query.checkIn, query.checkOut);
     await releaseExpiredHolds();
-    // Every active room type is listed with its SucChua: a party can be spread over several rooms, so a room that
-    // is "too small for everyone" is not hidden. The capacity check happens on the quote and the booking.
+    // Liệt kê mọi loại phòng, sức chứa kiểm tra khi báo giá và đặt phòng
     const roomTypes = await this.hotelsRepository.findRoomTypesForHotel(maKhachSan, query.checkIn, query.checkOut);
 
     return roomTypes.map((rt) => {

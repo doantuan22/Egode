@@ -15,23 +15,18 @@ const describeDiscount = (promo: AvailablePromotion): string => {
     : `Giảm ${promo.GiaTriGiam}%`;
 };
 
-/**
- * The "Mã khuyến mãi" box. Clicking or focusing it opens a panel with the codes the guest can use right now —
- * the server only lists codes whose date window contains today and that still have uses left — and picking
- * one applies it. Typing a code by hand keeps working. A listed code whose minimum order is not reached yet
- * is shown (so the guest knows what to aim for) but cannot be picked.
- */
+/** Ô Mã khuyến mãi mở danh sách mã dùng được và cho chọn hoặc nhập tay */
 export function PromoPicker({ value, onChange, onApply, applyDisabled, onSelect, appliedCode, subtotal }: {
   value: string;
   onChange: (value: string) => void;
-  /** "Áp dụng": apply what is typed in the box. */
+  /** Áp dụng mã đang nhập */
   onApply: () => void;
   applyDisabled: boolean;
-  /** Called with the chosen code; the page applies it. */
+  /** Gọi khi chọn một mã */
   onSelect: (code: string) => void;
-  /** The code the current quote was priced with, marked in the list. */
+  /** Mã đã báo giá, được đánh dấu */
   appliedCode: string;
-  /** Room total before any discount, to tell whether a code's minimum order is met. */
+  /** Tổng tiền phòng trước giảm giá */
   subtotal: number;
 }) {
   const [open, setOpen] = useState(false);
@@ -91,7 +86,7 @@ export function PromoPicker({ value, onChange, onApply, applyDisabled, onSelect,
             <p className="px-2 py-3 text-xs text-ink-muted">Hiện chưa có mã khuyến mãi nào có thể áp dụng.</p>
           ) : (
             <ul className="space-y-1.5">
-              {/* Codes that can be picked now come first; the locked ones stay below as something to aim for. */}
+              {/* Mã chọn được xếp trước, mã chưa đủ điều kiện ở dưới */}
               {[...promotions.data].sort((a, b) => Number(a.GiaTriDonToiThieu > subtotal) - Number(b.GiaTriDonToiThieu > subtotal)).map((promo) => {
                 const missing = promo.GiaTriDonToiThieu - subtotal;
                 const eligible = missing <= 0;

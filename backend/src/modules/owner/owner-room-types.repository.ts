@@ -2,7 +2,7 @@ import { getPrismaClient } from '../../config/prisma';
 import type { Prisma } from '../../generated/prisma/client';
 import { BOOKING_STATUS, ROOM_TYPE_STATUS } from '../../common/constants/hotel-status';
 
-/** Bookings that still have something to happen: waiting for payment, or paid and the stay is not over. */
+/** Đơn còn đang xử lý */
 const OPEN_BOOKING_STATUSES = [BOOKING_STATUS.PENDING_PAYMENT, BOOKING_STATUS.CONFIRMED];
 
 export class OwnerRoomTypesRepository {
@@ -15,7 +15,7 @@ export class OwnerRoomTypesRepository {
     });
   }
 
-  /** Includes the parent KHACH_SAN so the service can verify ownership. */
+  /** Kèm khách sạn cha để kiểm tra quyền sở hữu */
   async findByIdWithHotel(maLoaiPhong: number) {
     const prisma = getPrismaClient();
     return prisma.lOAI_PHONG.findUnique({
@@ -40,7 +40,7 @@ export class OwnerRoomTypesRepository {
     return prisma.lOAI_PHONG.update({ where: { MaLoaiPhong: maLoaiPhong }, data });
   }
 
-  /** How many open bookings ("Chờ thanh toán", or "Đã xác nhận" with the stay not over) include this room type. */
+  /** Số đơn mở có chứa loại phòng này */
   async countOpenBookings(maLoaiPhong: number): Promise<number> {
     const prisma = getPrismaClient();
     return prisma.dAT_PHONG.count({
@@ -48,10 +48,7 @@ export class OwnerRoomTypesRepository {
     });
   }
 
-  /**
-   * "Hoạt động" → "Ngừng bán" in ONE statement that also requires no open booking of this room type, so a booking
-   * that lands between a separate count and the update cannot be left on a room type that was switched off.
-   */
+  /** Ngừng bán chỉ khi không còn đơn mở */
   async discontinueWhenNoOpenBookings(maLoaiPhong: number): Promise<boolean> {
     const prisma = getPrismaClient();
     const result = await prisma.lOAI_PHONG.updateMany({

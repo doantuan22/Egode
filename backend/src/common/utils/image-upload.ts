@@ -24,7 +24,7 @@ const hasValidSignature = (mime: AllowedImageMime, bytes: Buffer): boolean => {
   return bytes.length >= 6 && ['GIF87a', 'GIF89a'].includes(bytes.subarray(0, 6).toString('ascii'));
 };
 
-/** Validate MIME, decoded size and magic bytes before sending data to Cloudinary. */
+/** Kiểm tra loại file, kích thước và magic bytes trước khi gửi lên Cloudinary */
 export const validateImageDataUri = (value: string): string => {
   const match = value.match(DATA_URI_RE);
   if (!match) {

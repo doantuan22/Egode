@@ -20,13 +20,9 @@ export interface PromotionEvalResult {
   discount: number;
 }
 
-/** A promotion runs on calendar days (DATE columns); "today" is the Vietnam day, compared as `YYYY-MM-DD` strings. */
+/** Khuyến mãi tính theo ngày lịch Việt Nam */
 
-/**
- * Why a promotion cannot be used by a booking made right now, or `null` when it can: status, the date window
- * (read on the Vietnam calendar day the guest is booking, not on the stay dates) and the usage cap. The one
- * source for both pricing a code the guest typed and listing the codes the guest may pick.
- */
+/** Lý do khuyến mãi không dùng được ở thời điểm đặt */
 export function promotionUnavailableReason(
   promo: Pick<PromotionRecord, 'TrangThai' | 'NgayBatDau' | 'NgayKetThuc' | 'SoLuongGioiHan'>,
   now: Date,
@@ -42,12 +38,7 @@ export function promotionUnavailableReason(
   return null;
 }
 
-/**
- * Pure evaluation of a single promotion against a quote subtotal — no DB
- * access here (usedCount is looked up by the caller) so every business rule
- * (window, status, minimum order, usage cap, discount type + max cap) is
- * independently unit-testable.
- */
+/** Đánh giá một khuyến mãi trên tạm tính của báo giá */
 export function evaluatePromotion(
   promo: PromotionRecord,
   tongTienPhong: number,
@@ -68,9 +59,7 @@ export function evaluatePromotion(
   let discount: number;
   if (promo.LoaiGiamGia === DISCOUNT_TYPE.PERCENT) {
     discount = tongTienPhong * (promo.GiaTriGiam / 100);
-    // MucGiamToiDa = 0 is treated as "no cap set" (Chương 6: "có ý nghĩa với
-    // giảm theo %" — a legitimate percent promo would not be configured with
-    // a nonsensical zero cap).
+    // Mức giảm tối đa bằng 0 nghĩa là không giới hạn
     if (promo.MucGiamToiDa > 0) {
       discount = Math.min(discount, promo.MucGiamToiDa);
     }
@@ -78,8 +67,7 @@ export function evaluatePromotion(
     discount = promo.GiaTriGiam;
   }
 
-  // Never discount more than the subtotal (matches DAT_PHONG's own
-  // CK_DAT_PHONG_SoTienGiam <= TongTienPhong check).
+  // Không giảm quá tạm tính
   discount = Math.min(discount, tongTienPhong);
   discount = Math.round(discount);
 

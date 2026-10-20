@@ -7,7 +7,7 @@ import { hotelIdParamSchema, publicReviewsQuerySchema, bookingIdParamSchema, rev
 
 const controller = new ReviewsController();
 
-/** Mounted at `/bookings` — a customer reviewing their own (completed) booking. */
+/** Khách đánh giá đơn hoàn tất của mình */
 export const reviewsBookingRoutes = Router();
 
 reviewsBookingRoutes.post(
@@ -26,11 +26,11 @@ reviewsBookingRoutes.get(
   controller.getMine
 );
 
-/** Mounted at `/hotels` — what everybody (guest or signed-in) may read: the visible reviews of a public hotel. */
+/** Đánh giá công khai của khách sạn */
 export const hotelReviewsRoutes = Router();
 hotelReviewsRoutes.get('/:id/reviews', validateRequest({ params: hotelIdParamSchema, query: publicReviewsQuerySchema }), controller.listPublic);
 
-/** Mounted at `/admin/reviews` — moderation only, never reachable by a customer. */
+/** Kiểm duyệt dành riêng cho admin */
 export const adminReviewsRoutes = Router();
 adminReviewsRoutes.use(authenticate, requireAdmin);
 
@@ -41,6 +41,5 @@ adminReviewsRoutes.patch(
   validateRequest({ params: reviewIdParamSchema, body: moderateReviewSchema }),
   controller.moderate
 );
-// UC37 uses the existing `Ẩn` state as a safe removal marker. This route has
-// no request body, so the caller cannot choose its final status.
+// Xóa an toàn đặt đánh giá về Ẩn
 adminReviewsRoutes.delete('/:id', validateRequest({ params: reviewIdParamSchema }), controller.remove);

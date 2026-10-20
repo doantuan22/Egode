@@ -2,15 +2,15 @@ import { REFUND_STATUS } from '../payments/result';
 import type { BookingDetail } from './types';
 
 export interface RefundSummary {
-  /** refunded: money returned · unfinished: a refund exists but is not completed · none: nothing to refund */
+  /** Trạng thái hoàn tiền: đã hoàn, chưa xong hoặc không có */
   kind: 'refunded' | 'unfinished' | 'none';
-  /** Sum of the refunds that completed. */
+  /** Tổng số tiền đã hoàn xong */
   amount: number;
-  /** Payment method the money goes back to (the original one). */
+  /** Phương thức nhận lại tiền */
   method: string | null;
 }
 
-/** What a just-cancelled, previously paid booking got back, from the booking detail the cancel call returned. */
+/** Kết quả hoàn tiền của đơn vừa hủy */
 export function summarizeRefund(booking: Pick<BookingDetail, 'ThanhToan'>): RefundSummary {
   const paid = booking.ThanhToan.filter((payment) => payment.TrangThai === 'Thành công');
   const refunds = paid.flatMap((payment) => payment.HoanTien);

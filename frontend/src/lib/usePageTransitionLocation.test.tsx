@@ -27,7 +27,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-/** A stand-in for the browser: it calls the update callback and keeps the page until that promise settles. */
+/** Giả lập trình duyệt giữ trang cũ đến khi promise xong */
 function installViewTransition() {
   const calls: Array<{ update: () => Promise<void> | void; done: () => void }> = [];
   (document as unknown as { startViewTransition: unknown }).startViewTransition = vi.fn((update: () => Promise<void> | void) => {
@@ -56,7 +56,7 @@ describe('usePageTransitionLocation', () => {
     expect(screen.getByText('home')).toBeInTheDocument();
 
     await userEvent.setup().click(screen.getByText('to a'));
-    // The router has moved, the picture of the old page is still what is rendered.
+    // Router đã chuyển nhưng vẫn hiện trang cũ
     expect(calls).toHaveLength(1);
     expect(screen.getByText('home')).toBeInTheDocument();
 
@@ -65,7 +65,7 @@ describe('usePageTransitionLocation', () => {
       updated = calls[0].update();
     });
 
-    // The new page is rendered, and the browser is told so at once (it was not left waiting for the give-up timer).
+    // Trang mới đã render và trình duyệt được báo ngay
     expect(screen.getByText('page a')).toBeInTheDocument();
     await expect(Promise.race([updated, new Promise((resolve) => setTimeout(() => resolve('late'), 200))])).resolves.toBeUndefined();
     act(() => calls[0].done());

@@ -10,13 +10,13 @@ import { reconcileBookingLifecycle } from '../bookings/booking-lifecycle';
 
 const HOTEL_IMAGE_FOLDER = 'hotel-booking/hotels';
 
-/** The profile fields an owner may still correct while the hotel is suspended by an administrator. */
+/** Các trường hồ sơ được sửa khi khách sạn bị đình chỉ */
 const SUSPENDED_EDITABLE_FIELDS = ['TenKhachSan', 'DiaChiChiTiet', 'MoTa'] as const;
 
 export class OwnerHotelsService {
   constructor(private readonly repository: OwnerHotelsRepository = new OwnerHotelsRepository()) {}
 
-  /** Loads a hotel and asserts it belongs to ownerId — 404 if it doesn't exist, 403 if someone else's. */
+  /** Tải khách sạn và kiểm tra quyền sở hữu */
   async getOwnedHotel(ownerId: number, maKhachSan: number): Promise<KHACH_SAN> {
     const hotel = await this.repository.findById(maKhachSan);
     if (!hotel) throw AppError.notFound('Không tìm thấy khách sạn');
@@ -43,8 +43,7 @@ export class OwnerHotelsService {
       GioNhanPhong: input.GioNhanPhong,
       GioTraPhong: input.GioTraPhong,
       MaDiaPhuong: input.MaDiaPhuong,
-      // Never owner-approved — an admin approval workflow is a later phase
-      // (same documented gap as "no partner-approval endpoint" from M1).
+      // Khách sạn mới luôn chờ admin duyệt
       TrangThai: this.repository.hotelStatusDefault(),
       NgayDangKy: now,
       NgayCapNhat: now,
@@ -54,7 +53,7 @@ export class OwnerHotelsService {
   async update(ownerId: number, maKhachSan: number, input: UpdateHotelInput) {
     const hotel = await this.getOwnedHotel(ownerId, maKhachSan);
 
-    // A suspended hotel may be corrected (to fix the violation) but not reconfigured: only the profile text can change.
+    // Khách sạn bị đình chỉ chỉ được sửa nội dung hồ sơ
     if (hotel.TrangThai === HOTEL_STATUS.SUSPENDED) {
       const forbidden = Object.keys(input).filter((key) => !SUSPENDED_EDITABLE_FIELDS.includes(key as (typeof SUSPENDED_EDITABLE_FIELDS)[number]));
       if (forbidden.length > 0) {
@@ -70,12 +69,7 @@ export class OwnerHotelsService {
     return this.repository.update(maKhachSan, { ...input, NgayCapNhat: new Date() });
   }
 
-  /**
-   * Hoạt động → Ngừng hoạt động. Only a hotel that is live can be switched off by its owner, and only while it
-   * has no open booking ("Chờ thanh toán", or "Đã xác nhận" with the stay not over): switching it off would
-   * leave guests holding a booking at a hotel that no longer operates. Unpaid holds past their deadline and
-   * finished stays are settled first, so they never block this.
-   */
+  /** Ngừng hoạt động chỉ khi không còn đơn mở */
   async deactivate(ownerId: number, maKhachSan: number) {
     const hotel = await this.getOwnedHotel(ownerId, maKhachSan);
     if (hotel.TrangThai === HOTEL_STATUS.INACTIVE) return hotel;
@@ -90,7 +84,7 @@ export class OwnerHotelsService {
 
     const changed = await this.repository.deactivateWhenNoOpenBookings(maKhachSan, new Date());
     if (!changed) {
-      // Lost a race: either a booking arrived (still the same answer) or an admin changed the hotel meanwhile.
+      // Mất cạnh tranh nên báo xung đột
       const current = await this.repository.countOpenBookings(maKhachSan);
       if (current > 0) throw this.openBookingsError(current);
       throw AppError.conflict('Khách sạn đã đổi trạng thái trước đó — vui lòng tải lại');
@@ -105,10 +99,7 @@ export class OwnerHotelsService {
     );
   }
 
-  /**
-   * Ngừng hoạt động → Hoạt động. Only for a hotel an admin has already approved (NgayDuyet is written by
-   * the admin approval and by nothing else), so an owner can never use this to skip the approval queue.
-   */
+  /** Chỉ bật lại khách sạn đã được admin duyệt */
   async reactivate(ownerId: number, maKhachSan: number) {
     const hotel = await this.getOwnedHotel(ownerId, maKhachSan);
     if (hotel.TrangThai === HOTEL_STATUS.ACTIVE) return hotel;
@@ -123,7 +114,7 @@ export class OwnerHotelsService {
     if (trangThai === HOTEL_STATUS.SUSPENDED) throw AppError.badRequest('Khách sạn đang bị đình chỉ bởi quản trị viên');
   }
 
-  /** Guarded UPDATE (`WHERE TrangThai = from`): a concurrent admin action turns this into a conflict instead of being overwritten. */
+  /** Cập nhật có điều kiện để tránh ghi đè thao tác của admin */
   private async transition(maKhachSan: number, from: string, to: string, conflictMessage: string) {
     const changed = await this.repository.changeStatus(maKhachSan, from, to, new Date());
     if (!changed) throw AppError.conflict(conflictMessage);

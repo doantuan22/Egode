@@ -9,15 +9,11 @@ const JWT_AUDIENCE = 'hotel-booking-web';
 const JWT_ALGORITHM = 'HS256' as const;
 
 export interface JwtPayload {
-  sub: string; // MaTaiKhoan
-  role: string; // VAI_TRO.TenVaiTro
+  sub: string;
+  role: string;
 }
 
-/**
- * Refresh tokens also carry `pwdv`, a fingerprint of the password hash they were
- * issued under. AuthService.refresh() compares it with the account's current hash,
- * so a password change/reset kills every refresh token issued before it.
- */
+/** Refresh token mang dấu vân tay mật khẩu để bị vô hiệu khi đổi mật khẩu */
 export interface RefreshJwtPayload extends JwtPayload {
   pwdv: string;
 }
@@ -67,8 +63,7 @@ export const verifyRefreshToken = (token: string): RefreshJwtPayload => {
     algorithms: [JWT_ALGORITHM], issuer: JWT_ISSUER, audience: JWT_AUDIENCE,
   }) as SignedTokenPayload;
   const payload = assertPayload(decoded, 'refresh');
-  // A refresh token without a valid fingerprint predates BUG-012 (or is forged); it cannot be
-  // checked against the password, so it is refused and the user signs in again.
+  // Refresh token thiếu dấu vân tay hợp lệ bị từ chối
   if (typeof decoded.pwdv !== 'string' || !FINGERPRINT_PATTERN.test(decoded.pwdv)) {
     throw new Error('Invalid token payload');
   }
@@ -76,4 +71,4 @@ export const verifyRefreshToken = (token: string): RefreshJwtPayload => {
 };
 
 export const REFRESH_TOKEN_COOKIE_NAME = 'refresh_token';
-export const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+export const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;

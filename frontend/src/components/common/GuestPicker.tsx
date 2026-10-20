@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { QuantityStepper } from './QuantityStepper';
 
-/** Egode currently sends a single guest count; this keeps that API contract. */
+/** Hiện chỉ gửi một tổng số khách */
 export function GuestPicker({ value, onChange, min = 1, max = 50, label = 'Số khách', open: controlledOpen, onOpenChange, variant = 'field' }: {
   value: number;
   onChange: (value: number) => void;

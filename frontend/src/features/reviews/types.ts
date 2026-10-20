@@ -14,7 +14,7 @@ export interface Review {
   HINH_ANH_DANH_GIA: ReviewImage[];
 }
 
-/** One review as the public sees it (GET /hotels/:id/reviews): abbreviated name, no account or booking data. */
+/** Một đánh giá như người dùng công khai thấy */
 export interface PublicReview {
   MaDanhGia: number;
   DiemDanhGia: number;
@@ -23,7 +23,7 @@ export interface PublicReview {
   HinhAnh: string[];
 }
 
-/** Average and count of the VISIBLE reviews only. */
+/** Trung bình và số lượng đánh giá hiển thị */
 export interface RatingSummary {
   DiemTrungBinh: number | null;
   SoLuongDanhGia: number;

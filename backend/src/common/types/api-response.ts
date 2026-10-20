@@ -2,9 +2,9 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  /** Machine-readable error code (see common/errors/error-codes.ts); present on every failure. */
+  /** Mã lỗi để client xử lý */
   code?: string;
-  /** For failures with parts, e.g. validation: [{ field, message }]. */
+  /** Chi tiết lỗi theo từng trường */
   details?: unknown;
 }
 

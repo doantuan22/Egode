@@ -1,6 +1,4 @@
-/* Back-office (admin + hotel-owner) skin: dashboard shell, sidebar, topbar and admin/owner page widgets.
-   Loaded after components.css so it overrides the shared dashboard defaults; every selector is dashboard/admin/owner-specific,
-   so the public site and customer area are untouched. */
+/* Giao diện trang quản trị của admin và chủ khách sạn */
 
 .dashboard-shell {
   display: flex;
@@ -3941,7 +3939,7 @@
   }
 }
 
-/* The real Egode logo sits in the brand mark (instead of a placeholder letter). */
+/* Logo Egode trong khối thương hiệu */
 .dashboard-shell .dashboard-brand__mark--logo {
   padding: 3px;
   overflow: hidden;
@@ -3955,16 +3953,13 @@
   object-fit: contain;
 }
 
-/* ==========================================================================
-   Dropdown lists and calendars (SelectMenu / DateField, used inside the dashboards).
-   The list and the calendar are portalled to <body>, so they only use global tokens.
-   ========================================================================== */
+/* Danh sách thả xuống và lịch trong trang quản trị */
 .ui-select {
   position: relative;
   min-width: 0;
 }
 
-/* The real <select> stays in the DOM for forms, labels and keyboard focus; only the pointer-facing face is drawn. */
+/* Select thật vẫn nằm trong DOM, chỉ vẽ phần hiển thị */
 .ui-select__native {
   position: absolute;
   inset: 0;
@@ -4021,7 +4016,7 @@
   border-color: var(--color-danger) !important;
 }
 
-/* Compact owner forms and filters use 40px fields. */
+/* Form và bộ lọc gọn của chủ khách sạn dùng ô 40px */
 .owner-module__form-grid .ui-select__face,
 .owner-module__filters .ui-select__face {
   height: 40px;
@@ -4037,7 +4032,7 @@
   background-color: #fbfdff;
 }
 
-/* The hotel scope switcher in the owner header: no box of its own, it sits inside the context card. */
+/* Bộ chọn khách sạn ở đầu trang chủ khách sạn */
 .owner-hotel-context .ui-select__face {
   height: auto;
   min-height: 0;
@@ -4131,7 +4126,7 @@
   padding-right: 42px;
 }
 
-/* The browser's own calendar button is replaced by ours. */
+/* Nút lịch của trình duyệt được thay bằng nút riêng */
 .ui-date__input::-webkit-calendar-picker-indicator {
   display: none;
 }
@@ -4194,7 +4189,7 @@
   text-transform: capitalize;
 }
 
-/* Month / year selectors (captionLayout="dropdown", e.g. a birth date). The real <select>s sit invisibly over the labels. */
+/* Chọn tháng và năm trên lịch */
 .ui-date__popover .rdp-dropdowns {
   gap: 4px;
 }
@@ -4269,7 +4264,7 @@
   color: var(--color-text-disabled);
 }
 
-/* Owner forms and filters use 40px fields. */
+/* Form và bộ lọc của chủ khách sạn dùng ô 40px */
 .owner-module__form-grid .ui-date__input,
 .owner-module__filters .ui-date__input {
   height: 40px;
@@ -4328,10 +4323,7 @@
   }
 }
 
-/* Admin workspace width
-   Use the available desktop canvas instead of leaving wide gutters around
-   1200px list pages. Detail and form pages are widened in smaller steps so
-   fields remain readable rather than becoming excessively long. */
+/* Bề rộng không gian làm việc của admin */
 .dashboard-shell--admin .dashboard-content__canvas {
   max-width: 1680px;
 }
@@ -4357,10 +4349,7 @@
   max-width: 1000px;
 }
 
-/* Admin typography scale
-   Keep the dashboard geometry unchanged while making every text tier easier to
-   read. Tailwind text tokens and the legacy admin component sizes both receive
-   the same 15% increase, scoped so owner/customer/public screens are untouched. */
+/* Cỡ chữ của admin */
 .dashboard-shell--admin {
   --admin-font-9: 10.35px;
   --admin-font-10: 11.5px;
@@ -4395,9 +4384,7 @@
   font-size: 1.15rem;
 }
 
-/* Content frames need one more readability step than the surrounding shell.
-   Re-declaring the same tokens keeps every admin page consistent without
-   changing card dimensions, spacing, grids or responsive breakpoints. */
+/* Khung nội dung cần thêm một bậc dễ đọc */
 .dashboard-shell--admin :is(
   .admin-dashboard__hero,
   .admin-hero-panel,
@@ -4455,7 +4442,7 @@
   font-size: 1.3225rem;
 }
 
-/* Dashboard chrome */
+/* Khung trang quản trị */
 .dashboard-shell--admin .dashboard-brand__copy strong {
   font-size: var(--admin-font-14);
 }
@@ -4488,7 +4475,7 @@
   font-size: var(--admin-font-13);
 }
 
-/* Shared controls used inside admin cards */
+/* Điều khiển dùng chung trong thẻ của admin */
 .dashboard-shell--admin .btn {
   font-size: var(--admin-font-14);
 }
@@ -4546,7 +4533,7 @@
   font-size: var(--admin-font-13);
 }
 
-/* Admin dashboard cards and list surfaces */
+/* Thẻ và danh sách của admin */
 .dashboard-shell--admin .admin-dashboard__eyebrow {
   font-size: var(--admin-font-10);
 }
@@ -4617,7 +4604,7 @@
   font-size: var(--admin-font-13);
 }
 
-/* Arbitrary Tailwind sizes used by admin-only page details and analytics. */
+/* Cỡ Tailwind tùy ý cho chi tiết và thống kê của admin */
 .dashboard-shell--admin [class~="text-[10px]"] {
   font-size: var(--admin-font-10);
 }
@@ -4637,7 +4624,7 @@
   font-size: var(--admin-font-24);
 }
 
-/* Admin list filters: keep the primary search and both select filters on one row. */
+/* Bộ lọc danh sách của admin nằm trên một hàng */
 .dashboard-shell--admin .admin-review-filters__fields,
 .dashboard-shell--admin .admin-support-filters__fields {
   display: grid;
@@ -4710,7 +4697,7 @@
   }
 }
 
-/* Admin bookings: search + status + check-in range, with a wider date control. */
+/* Đặt phòng của admin: tìm kiếm, trạng thái và khoảng ngày */
 .dashboard-shell--admin .admin-booking-filters__fields {
   display: grid;
   grid-template-columns: minmax(320px, 1.5fr) minmax(210px, 0.65fr) minmax(380px, 1.15fr);
@@ -4787,9 +4774,7 @@
   }
 }
 
-/* Owner workspace sizing
-   Match the admin workspace: list pages use the full desktop canvas while
-   detail and editor pages stay intentionally narrower for readability. */
+/* Bề rộng không gian làm việc của chủ khách sạn */
 .dashboard-shell--owner .dashboard-content__canvas {
   max-width: 1680px;
 }
@@ -4823,8 +4808,7 @@
   max-width: 1200px;
 }
 
-/* Owner typography scale
-   Apply the same 15% readability increase used by the admin workspace. */
+/* Cỡ chữ của chủ khách sạn */
 .dashboard-shell--owner {
   --owner-font-9: 10.35px;
   --owner-font-10: 11.5px;
@@ -4860,7 +4844,7 @@
   font-size: 1.15rem;
 }
 
-/* Content surfaces receive the same second readability step as admin cards. */
+/* Khung nội dung dễ đọc hơn như thẻ của admin */
 .dashboard-shell--owner :is(
   .page-header,
   .owner-module__header,
@@ -4918,7 +4902,7 @@
   font-size: 1.3225rem;
 }
 
-/* Owner dashboard chrome */
+/* Khung trang chủ khách sạn */
 .dashboard-shell--owner .dashboard-brand__copy strong {
   font-size: var(--owner-font-14);
 }
@@ -4946,7 +4930,7 @@
   font-size: var(--owner-font-17);
 }
 
-/* Owner page headings and common controls */
+/* Tiêu đề và điều khiển chung của chủ khách sạn */
 .dashboard-shell--owner .page-header h1,
 .dashboard-shell--owner .owner-module__header h1,
 .dashboard-shell--owner .owner-module__title h1,
@@ -5008,7 +4992,7 @@
   font-size: var(--owner-font-14);
 }
 
-/* Owner module content */
+/* Nội dung các module của chủ khách sạn */
 .dashboard-shell--owner .owner-hotel-context small {
   font-size: var(--owner-font-11);
 }
@@ -5080,7 +5064,7 @@
   font-size: var(--owner-font-13);
 }
 
-/* Arbitrary Tailwind sizes used across owner dashboards and editors. */
+/* Cỡ Tailwind tùy ý cho trang của chủ khách sạn */
 .dashboard-shell--owner [class~="text-[10px]"] {
   font-size: var(--owner-font-10);
 }
@@ -5121,11 +5105,7 @@
   font-size: var(--owner-font-24);
 }
 
-/* Admin on laptop screens. Admin rules are tuned in px for a wide monitor, so at 1181-1599px (a 1366-1536px laptop, or a
-   1080p screen at 125%/150% Windows scaling) the sidebar, toolbars, tables and action buttons were too big and overlapped.
-   Scale the whole admin shell down instead (like browser zoom 85-90%) so it gets the layout width of a large screen.
-   `zoom` also scales viewport units, so the viewport-height rules are divided by the zoom factor to keep filling the screen.
-   Below 1181px the sidebar is an off-canvas drawer and the shell is left at 100%. */
+/* Admin trên màn hình laptop thu nhỏ toàn bộ khung quản trị */
 .dashboard-shell--admin { --admin-zoom: 1; }
 @media (min-width: 1181px) and (max-width: 1599px) { .dashboard-shell--admin { --admin-zoom: 0.9; } }
 @media (min-width: 1181px) and (max-width: 1399px) { .dashboard-shell--admin { --admin-zoom: 0.85; } }

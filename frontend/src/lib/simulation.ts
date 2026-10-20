@@ -1,15 +1,11 @@
-/**
- * Payment and refund are simulated (PAYMENT_PROVIDER=simulated on the backend): the server finishes them at once, so the
- * client keeps its "processing" animation on screen for a moment, as a real bank/gateway round trip would. The record in
- * the database is written by the server call itself, not by this delay.
- */
+/** Thanh toán và hoàn tiền giả lập giữ hiệu ứng đang xử lý một lúc */
 const configured = import.meta.env.VITE_SIMULATION_DELAY_MS;
 const parsed = configured === undefined || configured === '' ? NaN : Number(configured);
 
-/** How long the processing animation stays at least (ms). */
+/** Thời gian tối thiểu của hiệu ứng, tính bằng ms */
 export const SIMULATION_DELAY_MS = Number.isFinite(parsed) && parsed >= 0 ? parsed : 2600;
 
-/** Waits for `work` AND for the minimum delay, then returns its result (or throws its error — also after the delay). */
+/** Chờ cả công việc và độ trễ tối thiểu */
 export async function withMinimumDelay<T>(work: Promise<T>, ms: number = SIMULATION_DELAY_MS): Promise<T> {
   const timer = new Promise<void>((resolve) => setTimeout(resolve, ms));
   const [result] = await Promise.allSettled([work, timer]);

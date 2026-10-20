@@ -26,11 +26,11 @@ test.describe('Customer account and session (register, sign in, session refresh,
     await expect(page).not.toHaveURL(/\/register/);
     expect((await fx('/db/account', { email })).status).toBe('Hoạt động');
 
-    // the refresh cookie is HttpOnly, scoped to the auth endpoints, and not readable by page scripts
+    // Cookie refresh là HttpOnly và giới hạn đường dẫn xác thực
     expect(await refreshCookie(page)).toMatchObject({ httpOnly: true, path: '/api/auth', sameSite: 'Lax' });
     expect(await page.evaluate(() => document.cookie)).not.toContain('refresh_token');
 
-    // a full reload drops the in-memory access token; the cookie brings the session back
+    // Tải lại trang thì cookie khôi phục phiên
     await page.goto('/profile');
     await expect(page.getByLabel('Email')).toHaveValue(email);
     await expect(page.locator('button.site-header__user')).toBeVisible();
@@ -46,11 +46,11 @@ test.describe('Customer account and session (register, sign in, session refresh,
     const id = uniq();
     const email = `e2e_${id}@example.com`;
     await fillRegistration(page, id, email, 'Reg-Passw0rd!');
-    // terms deliberately left unticked
+    // Cố ý không tích điều khoản
     await page.locator('form button[type="submit"]').click();
 
     await page.waitForTimeout(1500);
-    // Still on /register, the message is at the checkbox, and no account was created (NEW-1, resolved).
+    // Vẫn ở trang đăng ký và chưa tạo tài khoản
     expect(await fx('/db/account', { email })).toBeNull();
     await expect(page).toHaveURL(/\/register/);
     await expect(page.locator('#register-DongYDieuKhoan-error')).toHaveText('Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật');
@@ -80,7 +80,7 @@ test.describe('Customer account and session (register, sign in, session refresh,
     await page.getByRole('button', { name: 'Đổi mật khẩu' }).click();
     await expect(page.getByText('Đổi mật khẩu thành công.')).toBeVisible();
 
-    await page.reload(); // the replaced cookie still restores the password section
+    await page.reload();
     await expect(page.locator('button.site-header__user')).toBeVisible();
     await page.goto('/profile');
     await expect(page.getByLabel('Email')).toHaveValue(user.email);
@@ -90,7 +90,7 @@ test.describe('Customer account and session (register, sign in, session refresh,
     await page.locator('#identifier').fill(user.email);
     await page.locator('#MatKhau').fill(user.password);
     await page.locator('form button[type="submit"]').click();
-    await expect(page.getByRole('alert')).toBeVisible(); // old password refused
+    await expect(page.getByRole('alert')).toBeVisible();
 
     await login(page, { email: user.email, password: 'Brand-New-Passw0rd!' });
     await expect(page.locator('button.site-header__user')).toBeVisible();
@@ -113,7 +113,7 @@ test.describe('Customer account and session (register, sign in, session refresh,
     await page.goto('/profile');
     await expect(page.getByLabel('Email')).toHaveValue(user.email);
 
-    // the server answers 401 once (as if 15 minutes had passed), then behaves normally
+    // Máy chủ trả 401 một lần rồi hoạt động bình thường
     let answered401 = false;
     await page.route('**/api/profile/me', async (route) => {
       if (!answered401 && route.request().method() === 'PATCH') {
@@ -150,7 +150,7 @@ test.describe('Customer account and session (register, sign in, session refresh,
     await login(page, user);
     await fx('/set-account-status', { id: user.id, status: 'Khóa' });
 
-    await page.goto('/profile'); // reload: the access token is gone and the refresh is refused for a locked account
+    await page.goto('/profile');
     await expect(page).toHaveURL(/\/login/);
     await page.locator('#identifier').fill(user.email);
     await page.locator('#MatKhau').fill(user.password);

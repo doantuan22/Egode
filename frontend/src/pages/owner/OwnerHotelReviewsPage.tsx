@@ -49,7 +49,7 @@ function DistributionBars({ distribution, total }: { distribution: ScoreDistribu
   );
 }
 
-/** "Đánh giá của khách": what guests wrote about one of the owner's hotels (read-only; moderation is the administrator's). */
+/** Đánh giá của khách về khách sạn của chủ sở hữu */
 export default function OwnerHotelReviewsPage() {
   const hotelId = Number(useParams<{ hotelId: string }>().hotelId);
   const { values, page, setValue, setPage } = useListParams(FILTER_DEFAULTS);

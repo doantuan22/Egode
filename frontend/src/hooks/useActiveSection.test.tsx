@@ -106,7 +106,7 @@ describe('useActiveSection', () => {
       act(() => result.current[1]('amenities'));
       expect(result.current[0]).toBe('amenities');
 
-      // the page is still moving and a shorter section above stays in the reading band
+      // Trang còn đang cuộn
       see('overview', true);
       expect(result.current[0]).toBe('amenities');
     });

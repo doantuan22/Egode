@@ -11,7 +11,7 @@ describe('GET /api/cancellation-policies', () => {
     if (res.body.data.length > 0) {
       expect(res.body.data[0]).toHaveProperty('MaChinhSachHuy');
       expect(res.body.data[0]).toHaveProperty('CHI_TIET_CHINH_SACH_HUY');
-      // G0-03 / M1 DDI: system-level policy, no per-booking or per-hotel FK.
+      // Chính sách cấp hệ thống, không gắn đơn hay khách sạn
       expect(res.body.data[0]).not.toHaveProperty('MaDatPhong');
       expect(res.body.data[0]).not.toHaveProperty('MaKhachSan');
     }

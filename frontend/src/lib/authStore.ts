@@ -4,26 +4,19 @@ import { decodeAccessToken } from './jwt';
 interface AuthState {
   accessToken: string | null;
   role: string | null;
-  /** True until the initial silent-refresh attempt (on app load) resolves. */
+  /** Đang chờ lần refresh đầu khi mở ứng dụng */
   isBootstrapping: boolean;
-  /** True only when the session ended because a refresh attempt failed (not a manual logout) — lets LoginPage explain the redirect instead of bouncing the user silently. */
+  /** Phiên kết thúc do refresh thất bại */
   sessionExpired: boolean;
   setAccessToken: (token: string | null) => void;
   clear: () => void;
-  /** Called by apiClient when a 401 survives a refresh attempt — distinct from clear() so the UI can tell "expired" apart from "logged out". */
+  /** Được gọi khi 401 vẫn còn sau khi refresh */
   expireSession: () => void;
   acknowledgeSessionExpired: () => void;
   finishBootstrap: () => void;
 }
 
-/**
- * Client-side auth state. Intentionally minimal per TECH-0 (Zustand only for
- * client/UI state): holds the in-memory access token and the role decoded
- * from it for UX routing. The full profile is server state and belongs to
- * TanStack Query (see features/auth/hooks.ts useMe), not duplicated here.
- * The access token is memory-only (never localStorage) — the refresh token
- * lives in an httpOnly cookie the frontend cannot and does not touch.
- */
+/** Trạng thái đăng nhập phía client, access token chỉ giữ trong bộ nhớ */
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   role: null,

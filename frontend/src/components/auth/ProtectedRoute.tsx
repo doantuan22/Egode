@@ -8,11 +8,7 @@ interface ProtectedRouteProps {
   allowedRoles?: RoleName[];
 }
 
-/**
- * Frontend route guard — UX convenience only. The backend re-checks auth
- * and role on every request (section 27); this just avoids showing a page
- * the API would reject anyway.
- */
+/** Chặn route theo đăng nhập và vai trò ở phía giao diện */
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const location = useLocation();
   const accessToken = useAuthStore((s) => s.accessToken);

@@ -51,9 +51,9 @@ describe('RoomOffer detail dialog', () => {
     expect(within(dialog).getByText('Giường đôi')).toBeInTheDocument();
     expect(within(dialog).getByText('Tối đa 2 khách')).toBeInTheDocument();
     expect(within(dialog).getByText('Phòng tiêu chuẩn ấm cúng với giường đôi.')).toBeInTheDocument();
-    expect(within(dialog).getByText('Két sắt an toàn')).toBeInTheDocument(); // the 5th: the list card only shows 4
+    expect(within(dialog).getByText('Két sắt an toàn')).toBeInTheDocument();
     expect(within(dialog).getByText('/ phòng / đêm')).toBeInTheDocument();
-    expect(within(dialog).getAllByText(/450\.000/)).toHaveLength(2); // nightly price and stay total
+    expect(within(dialog).getAllByText(/450\.000/)).toHaveLength(2);
     expect(within(dialog).getByText(/cho 1 đêm/)).toBeInTheDocument();
     expect(within(dialog).getByText('Còn 10 phòng')).toBeInTheDocument();
   });

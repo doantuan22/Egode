@@ -4,12 +4,7 @@ import { cn, formatCurrencyVND } from '../../lib/utils';
 import { Icon } from '../common/Icon';
 import { QuantityStepper } from '../common/QuantityStepper';
 
-/**
- * Everything the search result already knows about one room type — all photos, full description,
- * every amenity — in a native modal <dialog> (focus trap, Esc to close and inert background come from
- * the browser). The guest can also pick the number of rooms here, so the decision does not need a
- * trip back to the list.
- */
+/** Hộp thoại chi tiết loại phòng gồm ảnh, mô tả, tiện nghi và chọn số phòng */
 export function RoomDetailDialog({ room, open, onClose, selectedQuantity, onQuantityChange }: {
   room: RoomTypeWithAvailability;
   open: boolean;
@@ -34,7 +29,7 @@ export function RoomDetailDialog({ room, open, onClose, selectedQuantity, onQuan
 
   const requestClose = () => {
     const dialog = dialogRef.current;
-    if (dialog && typeof dialog.close === 'function') dialog.close(); // fires the native 'close' event -> onClose
+    if (dialog && typeof dialog.close === 'function') dialog.close();
     else {
       dialog?.removeAttribute('open');
       onClose();
@@ -60,7 +55,7 @@ function RoomDetailBody({ room, onClose, selectedQuantity, onQuantityChange }: {
   selectedQuantity: number;
   onQuantityChange: (quantity: number) => void;
 }) {
-  // Cover first, so the dialog opens on the same photo the list showed.
+  // Ảnh bìa đứng đầu
   const images = [...room.HinhAnh].sort((a, b) => Number(b.LaAnhDaiDien) - Number(a.LaAnhDaiDien));
   const [activeIndex, setActiveIndex] = useState(0);
   const active = images[activeIndex];

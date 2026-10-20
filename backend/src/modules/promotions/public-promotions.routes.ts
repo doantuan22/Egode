@@ -5,7 +5,7 @@ import { PublicPromotionsService } from './public-promotions.service';
 const router = Router();
 const service = new PublicPromotionsService();
 
-// Public, read-only — the promo picker of the booking panel. Admin management stays under /admin/promotions.
+// Công khai, chỉ đọc, dùng cho bộ chọn mã khuyến mãi
 router.get('/available', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     sendSuccess(res, await service.listAvailable());

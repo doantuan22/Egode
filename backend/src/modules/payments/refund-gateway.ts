@@ -1,25 +1,18 @@
-/**
- * Abstraction over "actually tell the payment gateway to send money back".
- * PaymentsService depends on the interface, not on VnpayRefundGateway
- * directly (DI via constructor default, same pattern as
- * BookingsService/BookingsRepository) — tests inject a FakeRefundGateway so
- * refund idempotency/cap logic can be verified without a live network call
- * to VNPAY sandbox (see payments.test.ts).
- */
+/** Giao diện gọi cổng thanh toán để hoàn tiền */
 import { createHmac } from 'node:crypto';
 import { env } from '../../config/env';
 import { toVnpayDate } from './vnpay';
 
 export interface RefundRequestInput {
-  /** Our own refund request id (HOAN_TIEN.MaGiaoDichDoiTac) — VNPAY's vnp_TxnRef for the refund call. */
+  /** Mã yêu cầu hoàn tiền của hệ thống */
   refundRef: string;
-  /** The ORIGINAL payment's vnp_TxnRef. */
+  /** Mã giao dịch gốc của thanh toán */
   originalTxnRef: string;
-  /** VNPAY's vnp_TransactionNo from the original successful payment callback. */
+  /** Số giao dịch VNPAY của thanh toán gốc */
   originalTransactionNo: string;
-  /** VNPAY's vnp_PayDate from the original successful payment callback (yyyyMMddHHmmss). */
+  /** Ngày thanh toán gốc của VNPAY */
   originalPayDate: string;
-  /** VND — the amount to refund (already capped to <= amount paid by PaymentsService). */
+  /** Số tiền hoàn bằng VND */
   amount: number;
   reason: string;
   ipAddr: string;
@@ -32,19 +25,11 @@ export interface RefundResult {
 
 export interface RefundGateway {
   requestRefund(input: RefundRequestInput): Promise<RefundResult>;
-  /** false for a gateway that does not need the original VNPAY transaction number (the simulated one). Default: true. */
+  /** Cổng giả lập không cần số giao dịch gốc */
   requiresOriginalTransaction?(): boolean;
 }
 
-/**
- * Real VNPAY sandbox refund call (`vnp_Command=refund`, their merchant
- * webapi — documented publicly, distinct endpoint/signing scheme from the
- * hosted-page payment flow in vnpay.ts: pipe-joined fields, not sorted
- * query params). Requires a real VNPAY_TMN_CODE/VNPAY_HASH_SECRET —  with
- * the `dev`/`dev` placeholders this project ships with, VNPAY will reject
- * the signature and this correctly resolves to `success: false` (HOAN_TIEN
- * ends up "Thất bại", never faked as "Thành công" — see M6 report §4).
- */
+/** Gọi API hoàn tiền thật của VNPAY sandbox */
 export class VnpayRefundGateway implements RefundGateway {
   async requestRefund(input: RefundRequestInput): Promise<RefundResult> {
     const now = new Date();
@@ -52,7 +37,7 @@ export class VnpayRefundGateway implements RefundGateway {
     const vnp_Version = '2.1.0';
     const vnp_Command = 'refund';
     const vnp_TmnCode = env.VNPAY_TMN_CODE;
-    const vnp_TransactionType = '02'; // 02 = full/partial refund of a successful transaction
+    const vnp_TransactionType = '02';
     const vnp_TxnRef = input.originalTxnRef;
     const vnp_Amount = Math.round(input.amount * 100);
     const vnp_TransactionNo = input.originalTransactionNo;
@@ -110,7 +95,7 @@ export class VnpayRefundGateway implements RefundGateway {
       if (json?.vnp_ResponseCode === '00') {
         return { success: true, message: json.vnp_Message ?? 'Refund confirmed by VNPAY' };
       }
-      // VNPAY answered with a response code other than 00: a definitive rejection.
+      // VNPAY từ chối với mã khác 00
       if (json?.vnp_ResponseCode) {
         return { success: false, message: json.vnp_Message ?? `VNPAY refund rejected (code ${json.vnp_ResponseCode})` };
       }

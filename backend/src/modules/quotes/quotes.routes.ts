@@ -6,7 +6,7 @@ import { quoteRequestSchema, hotelIdParamSchema } from './quotes.schemas';
 const router = Router();
 const controller = new QuotesController();
 
-// Public, read-only computation — no booking is created (M4 §3/§4).
+// Tính toán công khai, không tạo đơn
 router.post(
   '/:id/quote',
   validateRequest({ params: hotelIdParamSchema, body: quoteRequestSchema }),

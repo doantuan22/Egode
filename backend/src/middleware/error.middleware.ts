@@ -8,7 +8,7 @@ const send = (res: Response, status: number, body: Omit<ErrorBody, 'success'>): 
   res.status(status).json({ success: false, ...body } satisfies ErrorBody);
 };
 
-/** Zod issues → [{ field, message }], one entry per issue, `field` being the dotted request path. */
+/** Chuyển lỗi Zod thành danh sách field và message */
 const toValidationDetails = (error: ZodError): ErrorDetail[] =>
   error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message }));
 
@@ -40,7 +40,7 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  // Known, operational errors: their own message and details (never for server errors).
+  // Lỗi nghiệp vụ trả về message và details của chính nó
   if (err instanceof AppError) {
     if (err.statusCode >= 500) logServerError('Operational server error:', err, err.code);
     send(res, err.statusCode, {
@@ -51,7 +51,7 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  // Anything else is a bug: logged here, and only a generic message leaves the server (no stack, no internals).
+  // Lỗi không lường trước chỉ trả message chung
   logServerError('Unhandled server error:', err);
   send(res, 500, { message: 'Internal server error', code: ERROR_CODES.INTERNAL_ERROR });
 };

@@ -93,7 +93,7 @@ export default function LoginPage() {
         }
       );
     } catch {
-      // Error displayed below
+      // Lỗi hiển thị bên dưới
     }
   };
 
@@ -193,7 +193,7 @@ export default function LoginPage() {
         "
       />
 
-      {/* Blue glow */}
+      {/* Vầng sáng xanh */}
 
       <div
         className="
@@ -265,7 +265,7 @@ export default function LoginPage() {
           >
             <div className="max-w-[47.5rem]">
 
-              {/* Mini badge */}
+              {/* Huy hiệu nhỏ */}
 
               <div
                 className="
@@ -309,7 +309,7 @@ export default function LoginPage() {
                 Đặt phòng dễ dàng cùng Egode
               </div>
 
-              {/* MAIN HEADLINE */}
+              {/* Tiêu đề chính */}
 
               <h1
                 className="
@@ -360,7 +360,7 @@ export default function LoginPage() {
                 </span>
               </h1>
 
-              {/* decorative line */}
+              {/* Đường trang trí */}
 
               <div
                 className="
@@ -397,7 +397,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* DESCRIPTION */}
+              {/* Mô tả */}
 
               <p
                 className="
@@ -517,7 +517,7 @@ export default function LoginPage() {
                 "
               >
 
-                {/* LOGO */}
+                {/* Logo */}
 
                 <div
                   className="
@@ -545,7 +545,7 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {/* TITLE */}
+                {/* Tiêu đề */}
 
                 <h2
                   className="
@@ -572,7 +572,7 @@ export default function LoginPage() {
                   Đăng nhập
                 </h2>
 
-                {/* SUBTITLE */}
+                {/* Phụ đề */}
 
                 <p
                   className="
@@ -603,7 +603,7 @@ export default function LoginPage() {
                 </p>
               </header>
 
-              {/* SESSION EXPIRED */}
+              {/* Phiên hết hạn */}
 
               {showSessionExpired &&
                 !loginMutation.isError && (
@@ -655,7 +655,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
-              {/* LOGIN ERROR */}
+              {/* Lỗi đăng nhập */}
 
               {loginMutation.isError && (
                 <div
@@ -722,7 +722,7 @@ export default function LoginPage() {
                 noValidate
               >
 
-                {/* USERNAME */}
+                {/* Tên đăng nhập */}
 
                 <div>
                   <label
@@ -814,7 +814,7 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* PASSWORD */}
+                {/* Mật khẩu */}
 
                 <div>
                   <label
@@ -963,7 +963,7 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* FORGOT PASSWORD */}
+                {/* Quên mật khẩu */}
 
                 <div
                   className="
@@ -990,7 +990,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                {/* LOGIN BUTTON */}
+                {/* Nút đăng nhập */}
 
                 <Button
                   type="submit"
@@ -1108,7 +1108,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* REGISTER */}
+              {/* Đăng ký */}
 
               <p
                 className="
@@ -1147,9 +1147,7 @@ export default function LoginPage() {
   );
 }
 
-/* ==========================================================
-   FEATURE CARD
-========================================================== */
+/* Thẻ tính năng */
 
 interface LoginFeatureCardProps {
   icon: string;
@@ -1195,7 +1193,7 @@ function LoginFeatureCard({
       "
     >
 
-      {/* ICON */}
+      {/* Biểu tượng */}
 
       <div
         className="
@@ -1237,7 +1235,7 @@ function LoginFeatureCard({
         />
       </div>
 
-      {/* TITLE */}
+      {/* Tiêu đề */}
 
       <h3
         className="
@@ -1257,7 +1255,7 @@ function LoginFeatureCard({
         {title}
       </h3>
 
-      {/* DESCRIPTION */}
+      {/* Mô tả */}
 
       <p
         className="

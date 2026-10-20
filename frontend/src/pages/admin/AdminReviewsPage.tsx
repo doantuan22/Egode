@@ -16,7 +16,7 @@ import { Icon } from '../../components/common/Icon';
 import { AdminListPanel } from '../../components/admin/AdminListPanel';
 
 const PAGE_SIZE = 10;
-// Reviews are published as soon as they are posted; 'Chờ duyệt' only exists on rows written before that change.
+// Đánh giá hiển thị ngay khi đăng, Chờ duyệt chỉ còn ở dữ liệu cũ
 const STATUSES = ['Hiển thị', 'Ẩn', 'Vi phạm'];
 
 const FILTER_DEFAULTS = { search: '', status: '', star: '' };
@@ -29,7 +29,7 @@ export default function AdminReviewsPage() {
   const setStatus = (value: string) => setValue('status', value);
   const star = values.star;
   const setStar = (value: string) => setValue('star', value);
-  // Older shared URLs used ALL explicitly; normalize them to the current empty/default value.
+  // URL cũ dùng ALL nên chuẩn hóa về giá trị mặc định
   const selectedStatus = status === 'ALL' ? '' : status;
   const selectedStar = star === 'ALL' ? '' : star;
 
@@ -55,7 +55,7 @@ export default function AdminReviewsPage() {
   };
 
   const visibleReviews = query.data?.items
-    // The star filter is also applied locally so a stale cached page never shows the wrong score.
+    // Lọc sao cả ở client để không hiện sai điểm
     .filter((r) => !selectedStar || r.DiemDanhGia.toString() === selectedStar);
 
   const activeFilterCount = Number(Boolean(search)) + Number(Boolean(selectedStatus)) + Number(Boolean(selectedStar));

@@ -9,8 +9,7 @@ const controller = new BookingsController();
 
 const router = Router();
 
-// Only signed-in customers create bookings — everything is recomputed
-// server-side inside a locked transaction (M5 §1/§2), never trusting quote.
+// Chỉ khách đã đăng nhập mới đặt phòng
 router.post(
   '/:id/bookings',
   authenticate,
@@ -21,7 +20,7 @@ router.post(
 
 export default router;
 
-/** Self-service booking endpoints (M6) — mounted at `/bookings`, not hotel-scoped like the router above. Ownership is always re-checked server-side, never trusted from the URL alone. */
+/** Các endpoint đặt phòng của khách, luôn kiểm tra quyền sở hữu */
 export const myBookingsRoutes = Router();
 
 myBookingsRoutes.get('/', authenticate, requireRole(ROLE_NAMES.CUSTOMER), controller.listMine);

@@ -12,10 +12,10 @@ export class OwnerAnalyticsService {
     private readonly analytics: AnalyticsRepository = new AnalyticsRepository()
   ) {}
 
-  /** getOwnedHotel throws 404 (no such hotel) or 403 (someone else's) before any analytics query runs — an owner never even reaches the aggregation step for a hotel that isn't theirs. */
+  /** Kiểm tra quyền sở hữu trước khi thống kê */
   async getHotelAnalytics(ownerId: number, maKhachSan: number, query: DateRangeQuery) {
     await this.ownerHotelsService.getOwnedHotel(ownerId, maKhachSan);
-    await reconcileBookingLifecycle(); // counts must not show expired holds as "Chờ thanh toán" or finished stays as "Đã xác nhận"
+    await reconcileBookingLifecycle();
 
     const scope = { maKhachSan, from: query.from, to: query.to ? toExclusiveEnd(query.to) : undefined };
 

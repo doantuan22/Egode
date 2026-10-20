@@ -30,7 +30,7 @@ export interface Quote {
   SoDem: number;
   ChiTietPhong: QuoteRoomLine[];
   KhaDung: boolean;
-  /** The party size the quote was checked for and what the chosen rooms can hold. */
+  /** Số khách và sức chứa phòng đã chọn */
   SoKhach?: number;
   TongSucChua?: number;
   TongTienPhong: number;
@@ -45,7 +45,7 @@ export interface Quote {
 export interface QuoteRequest {
   checkIn: string;
   checkOut: string;
-  /** Party size; the server checks it against the capacity of the chosen rooms. */
+  /** Số khách, máy chủ kiểm tra theo sức chứa */
   guests: number;
   rooms: Array<{ maLoaiPhong: number; soLuong: number }>;
   promoCode?: string;

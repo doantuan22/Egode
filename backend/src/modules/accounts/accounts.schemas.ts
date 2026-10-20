@@ -20,16 +20,14 @@ export const createAccountSchema = z.object({
   MatKhau: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').max(128),
   HoTen: z.string().min(2).max(150),
   SoDienThoai: phoneNumberSchema,
-  // DDI-01 (resolved): nullable in the baseline, optional here too.
+  // Cho phép để trống
   NgaySinh: z.coerce.date().optional(),
   GioiTinh: z.enum(['Nam', 'Nữ', 'Khác']).optional(),
   MaVaiTro: z.coerce.number().int(),
 });
 export type CreateAccountInput = z.infer<typeof createAccountSchema>;
 
-// Deliberately excludes TrangThai (see lock/unlock endpoints) and MatKhau
-// (password reset is a separate, explicit concern, not a silent side-effect
-// of a general "update account" call).
+// Không cho sửa trạng thái và mật khẩu qua cập nhật chung
 export const updateAccountSchema = z
   .object({
     TenDangNhap: z

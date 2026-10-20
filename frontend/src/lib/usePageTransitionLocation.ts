@@ -1,21 +1,13 @@
 import { startTransition, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, type Location } from 'react-router-dom';
 
-/** If the next page is not ready by then, the old page is released and the new one simply replaces it. */
+/** Quá thời gian này trang cũ được thay bằng trang mới */
 const GIVE_UP_MS = 1200;
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/**
- * The location the page area should RENDER. It follows the router's location, but a change of page goes through the
- * browser's View Transition: the old page's picture stays up until the next page has rendered, then the two dissolve
- * into each other (see ::view-transition-* in motion.css). There is no moment with a blank or half-faded page, which
- * is what a plain fade-in looks like as a flash.
- *
- * Only a change of pathname is a "page change"; a new query string (filters, pages of a list) swaps at once.
- * Browsers without the API, and reduced-motion users, get an instant swap.
- */
+/** Vị trí mà vùng trang cần render, chuyển trang qua View Transition */
 export function usePageTransitionLocation(): Location {
   const location = useLocation();
   const [displayed, setDisplayed] = useState(location);
@@ -24,7 +16,7 @@ export function usePageTransitionLocation(): Location {
   useEffect(() => {
     if (location.key === displayed.key) return;
 
-    // A newer navigation overtakes one still waiting: drop the animation and show the latest page.
+    // Lần điều hướng mới thay thế lần đang chờ
     if (inFlight.current) {
       inFlight.current.settle();
       inFlight.current.transition.skipTransition();
@@ -49,7 +41,7 @@ export function usePageTransitionLocation(): Location {
     });
     const giveUp = window.setTimeout(() => settle(), GIVE_UP_MS);
     const transition = document.startViewTransition(() => {
-      // As a React transition: a page whose code is still loading keeps the old one in place until it can render.
+      // Chuyển trang như React transition
       startTransition(() => setDisplayed(location));
       return ready;
     });
@@ -58,11 +50,11 @@ export function usePageTransitionLocation(): Location {
       window.clearTimeout(giveUp);
       if (inFlight.current?.transition === transition) inFlight.current = null;
     });
-    // `displayed` is deliberately not a dependency: this runs for a new router location only.
+    // Chỉ chạy khi vị trí router đổi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  // The new page is in the DOM: let the browser take its picture and start the dissolve.
+  // Trang mới đã vào DOM, bắt đầu hiệu ứng
   useLayoutEffect(() => {
     inFlight.current?.settle();
   }, [displayed]);

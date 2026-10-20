@@ -31,7 +31,7 @@ export class HealthService {
         });
         dbStatus = await Promise.race([this.healthRepository.checkDatabase(), timeout]);
       } catch (error) {
-        // Never include driver messages here: they can contain host, login, or connection details.
+        // Không đưa thông báo của driver vào kết quả
         if (error instanceof Error && error.message === 'Database health check timed out') {
           console.error('Database readiness probe timed out');
         } else {

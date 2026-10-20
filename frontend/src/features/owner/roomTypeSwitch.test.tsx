@@ -8,10 +8,7 @@ import type { OwnerRoomType } from './types';
 
 vi.mock('./api');
 
-/**
- * The room-type page renders `LOAI_PHONG_TIEN_NGHI.map(...)` from the cached room type. A stop/resume answer that is only the
- * bare row (no relations) must never replace that cache entry, or the whole page falls into the error boundary.
- */
+/** Kết quả ngừng hoặc bán lại chỉ có dòng trần không được thay cache */
 const full = { MaLoaiPhong: 11, MaKhachSan: 1, TrangThai: 'Ngừng bán', LOAI_PHONG_TIEN_NGHI: [{ MaTienNghi: 1 }], HINH_ANH_LOAI_PHONG: [], KHACH_SAN: { TenKhachSan: 'A' } } as unknown as OwnerRoomType;
 const bare = { MaLoaiPhong: 11, MaKhachSan: 1, TrangThai: 'Hoạt động' } as unknown as OwnerRoomType;
 

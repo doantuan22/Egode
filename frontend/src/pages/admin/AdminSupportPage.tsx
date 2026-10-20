@@ -27,7 +27,7 @@ export default function AdminSupportPage() {
   const setStatus = (value: string) => setValue('status', value);
   const type = values.type;
   const setType = (value: string) => setValue('type', value);
-  // Older shared URLs used ALL explicitly; normalize it to the current empty/default value.
+  // URL cũ dùng ALL nên chuẩn hóa về giá trị mặc định
   const selectedStatus = status === 'ALL' ? '' : status;
 
   const query = useAdminSupportList({

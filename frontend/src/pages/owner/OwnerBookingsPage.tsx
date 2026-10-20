@@ -37,7 +37,7 @@ export default function OwnerBookingsPage() {
   
   const query = useOwnerBookings(hotelId, filters);
 
-  // Filters live in the URL, but replace the entry so typing doesn't flood browser history.
+  // Bộ lọc nằm trên URL nhưng thay thế lịch sử
   const setFilter = (key: string, value: string) => {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
@@ -52,11 +52,12 @@ export default function OwnerBookingsPage() {
     setParams(next);
   };
 
-  // Local input + debounce: one request per pause instead of one per keystroke.
+  // Ô nhập cục bộ có debounce
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
   const debouncedSearch = useDebouncedValue(searchInput.trim());
   useEffect(() => {
     if (debouncedSearch !== (params.get('search') ?? '')) setFilter('search', debouncedSearch);
+    // Chỉ phản ứng khi giá trị đã ổn định
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to the settled input
   }, [debouncedSearch]);
 
@@ -67,7 +68,7 @@ export default function OwnerBookingsPage() {
     setParams(next, { replace: true });
   };
 
-  // Only the first load replaces the page; later filter changes keep the previous rows visible.
+  // Chỉ lần tải đầu thay trang, các lần sau giữ dòng cũ
   if (scope.hotelsQuery.isLoading) {
     return <PageSpinner />;
   }

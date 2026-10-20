@@ -1,11 +1,8 @@
-/* Egode Design System — Base / Reset */
+/* Egode Design System: nền tảng và reset */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-/* Fluid UI scale for the public / customer site. Text, buttons, spacing and the content width are all in rem,
-   so the whole interface grows with the viewport: 1rem = 16px up to ~1280px wide, ~17px on a 1536px laptop,
-   18px at 1920px and capped at 20px (2560px). The preference of the browser's own font size is kept (rem inside
-   clamp), and dashboards keep a fixed 16px root: their layout is tuned in dense, table-first px-based rules. */
+/* Cỡ chữ gốc co giãn theo chiều rộng màn hình */
 html:not(:has(.dashboard-shell)) { font-size: clamp(1rem, 0.75rem + 0.3125vw, 1.25rem); }
 body {
   margin: 0;
@@ -47,8 +44,7 @@ input, select, textarea { font-family: inherit; }
   }
 }
 
-/* The single content container. Same edges for the header, every page and the footer.
-   (Not named .container: Tailwind generates its own .container with breakpoint max-widths.) */
+/* Khung nội dung chung cho đầu trang, các trang và chân trang */
 .page-container {
   width: min(100% - 2 * var(--gutter), var(--container-max));
   margin-inline: auto;

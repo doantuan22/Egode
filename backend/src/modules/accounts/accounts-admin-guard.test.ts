@@ -9,14 +9,7 @@ import { ACCOUNT_STATUS } from '../../common/constants/account-status';
 import { AccountsService } from './accounts.service';
 import { AccountsRepository } from './accounts.repository';
 
-/**
- * Bug #7 — an administrator may not lock, delete or demote themselves, and the system must always keep one
- * active administrator, even when two administrators act at the same moment.
- *
- * The shared test database also holds the real seeded administrators, so "the last admin" cannot be produced
- * there. The service tests therefore use a repository that counts "other active admins" inside a small set of
- * test accounts only; everything else (the locking, the transaction, the checks, the writes) is the real code.
- */
+/** Quản trị viên không được tự khóa, xóa hay hạ quyền và luôn còn một admin hoạt động */
 const ids: number[] = [];
 const prisma = () => getPrismaClient();
 
@@ -29,7 +22,7 @@ const makeAccount = async (role: (typeof ROLE_NAMES)[keyof typeof ROLE_NAMES] = 
 const row = (id: number) => prisma().tAI_KHOAN.findUnique({ where: { MaTaiKhoan: id } });
 const as = (token: string) => ({ Authorization: `Bearer ${token}` });
 
-/** Repository whose "other active admins" are only the given test accounts. */
+/** Repository chỉ đếm admin trong nhóm tài khoản test */
 class ScopedAccountsRepository extends AccountsRepository {
   constructor(private readonly universe: number[]) {
     super();

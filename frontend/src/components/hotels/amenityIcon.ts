@@ -1,4 +1,4 @@
-/** Phosphor icon for an amenity, picked by its name (the stored BieuTuong is free text, not an icon name); a neutral default otherwise. */
+/** Chọn biểu tượng cho tiện nghi theo tên */
 const AMENITY_ICONS: Array<[RegExp, string]> = [
   [/wi-?fi|internet/, 'wifi-high'],
   [/ho boi|be boi|boi/, 'swimming-pool'],

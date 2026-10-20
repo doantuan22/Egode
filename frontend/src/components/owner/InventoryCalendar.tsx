@@ -17,26 +17,23 @@ export interface IsoRange {
 }
 
 interface InventoryCalendarProps {
-  /** Any day of the month to show. */
+  /** Ngày bất kỳ của tháng cần hiện */
   month: Date;
-  /** Saved rate per day, keyed by YYYY-MM-DD. Days with no record are shown empty. */
+  /** Giá đã lưu theo ngày */
   cells: Record<string, DayCell>;
-  /** The range that the update form will apply to. */
+  /** Khoảng ngày form cập nhật sẽ áp dụng */
   selected: IsoRange | null;
   onSelect: (range: IsoRange) => void;
   onMonthChange: (month: Date) => void;
   formatPrice: (value: number) => string;
 }
 
-/**
- * Month grid of price and rooms left per day. Click a first day, then a last day, to pick a range;
- * a third click starts a new one. Past days cannot be picked.
- */
+/** Lịch tháng giá và số phòng còn, chọn khoảng bằng hai lần bấm */
 export function InventoryCalendar({ month, cells, selected, onSelect, onMonthChange, formatPrice }: InventoryCalendarProps) {
   const [anchor, setAnchor] = useState<string | null>(null);
   const year = month.getFullYear();
   const monthIndex = month.getMonth();
-  // Monday-first: JS Sunday is 0, so shift it to the end.
+  // Tuần bắt đầu từ thứ Hai
   const leadingBlanks = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const today = businessToday(); // a night is "past" by Vietnam's calendar, the same day the server uses

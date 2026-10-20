@@ -4,12 +4,12 @@ import { Icon } from './Icon';
 export interface EmptyStateProps {
   title: string;
   description?: string;
-  /** Phosphor icon name, e.g. `users`. */
+  /** Tên biểu tượng Phosphor */
   icon?: string;
   action?: ReactNode;
 }
 
-/** The empty-list state; styles live in components.css (`.empty-state`). */
+/** Trạng thái danh sách rỗng */
 export function EmptyState({ title, description, icon = 'tray', action }: EmptyStateProps) {
   return (
     <div className="empty-state">

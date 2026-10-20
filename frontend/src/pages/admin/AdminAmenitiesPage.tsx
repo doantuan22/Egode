@@ -30,7 +30,7 @@ export default function AdminAmenitiesPage() {
 
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ['admin', 'hotels', 'amenities'] });
-    // The public filter and the owner pickers read the same catalogue.
+    // Bộ lọc công khai và bộ chọn của chủ khách sạn dùng chung danh mục
     void queryClient.invalidateQueries({ queryKey: ['amenities'] });
   };
   const resetForm = () => {

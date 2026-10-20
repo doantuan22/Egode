@@ -26,9 +26,9 @@ test.describe('Refund (simulated)', () => {
     await page.getByRole('button', { name: 'Xác nhận hủy' }).click();
 
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Đang xử lý hủy đặt phòng và hoàn tiền'); // loading effect
+    await expect(dialog).toContainText('Đang xử lý hủy đặt phòng và hoàn tiền');
     await expect(dialog).toContainText('Hủy đặt phòng thành công');
-    await expect(dialog).toContainText(money(300_000)); // 100 % tier, a month ahead
+    await expect(dialog).toContainText(money(300_000));
     await expect(dialog).toContainText('đã được hoàn về phương thức thanh toán ban đầu');
     await dialog.getByRole('button', { name: 'Đóng' }).click();
     await expect(page.getByText('Đã hủy').first()).toBeVisible();
@@ -41,7 +41,7 @@ test.describe('Refund (simulated)', () => {
     expect(Number(refund[0].SoTienHoan)).toBe(300_000);
     expect(refund[0].NgayHoanTien).not.toBeNull();
     expect(new Date(refund[0].NgayHoanTien).getTime()).toBeGreaterThanOrEqual(new Date(refund[0].NgayYeuCau).getTime());
-    // nothing left to retry, and the booking page shows the refund as done
+    // Không còn gì để thử lại và trang đơn báo đã hoàn tiền
     await expect(page.getByRole('button', { name: /Thử lại/ })).toHaveCount(0);
   });
 
@@ -49,7 +49,7 @@ test.describe('Refund (simulated)', () => {
     const h = await fx('/hotel', { ownerId: owner.id, name: 'E2E Hotel Không Hoàn' });
     const rt = await fx('/room-type', { hotelId: h.id, name: 'Phòng Sát Ngày', rooms: 2, price: 300_000, fromOffset: 0, days: 4 });
     const customer = await newAccount(ROLES.customer);
-    // check-in today (Vietnam): inside the shortest refund window of the default policy
+    // Nhận phòng hôm nay nằm trong mức hoàn tiền ngắn nhất
     const paid = await fx('/paid-booking-for', { customerId: customer.id, hotelId: h.id, roomTypeId: rt.id, checkIn: today });
     await login(page, customer);
     await page.goto(`/bookings/${paid.id}`);
@@ -63,7 +63,7 @@ test.describe('Refund (simulated)', () => {
     await expect(dialog).not.toContainText('đã được hoàn về');
     const row = await fx('/db/booking', { id: paid.id });
     expect(row.TrangThai).toBe('Đã hủy');
-    expect(row.THANH_TOAN[0].HOAN_TIEN).toHaveLength(0); // the fixture policy refunds 100 % only 24 h or more ahead; check-in is today
+    expect(row.THANH_TOAN[0].HOAN_TIEN).toHaveLength(0);
   });
 });
 
@@ -83,20 +83,20 @@ test.describe('Inventory under contention and hold expiry', () => {
       players.push({ page, customer });
     }
 
-    // both are looking at an available room; fire both at once
+    // Hai khách cùng thấy phòng trống và đặt cùng lúc
     await Promise.all(players.map(({ page }) => page.locator('#dat-phong').getByRole('button', { name: /Tạo đặt phòng/ }).click()));
     await Promise.all(players.map(({ page }) => page.waitForLoadState('networkidle')));
 
     const bookings = await Promise.all(players.map(({ customer }) => fx('/db/latest-booking', { customerId: customer.id })));
     const created = bookings.filter(Boolean);
-    expect(created).toHaveLength(1); // not 2: no oversell
+    expect(created).toHaveLength(1);
     expect(created[0].CHI_TIET_DAT_PHONG.reduce((n: number, l: { SoLuongPhong: number }) => n + l.SoLuongPhong, 0)).toBe(1);
 
     const winner = players.find((p, i) => bookings[i]);
     const loser = players.find((p, i) => !bookings[i])!;
     await expect(winner!.page).toHaveURL(/\/bookings\/\d+/);
-    await expect(loser.page).toHaveURL(/\/hotels\//); // stayed on the hotel page ...
-    await expect(loser.page.getByRole('alert').first()).toBeVisible(); // ... with the reason shown
+    await expect(loser.page).toHaveURL(/\/hotels\//);
+    await expect(loser.page.getByRole('alert').first()).toBeVisible();
   });
 
   test('an unpaid booking holds the room for 15 minutes; after that the room is sellable again and the old booking is cancelled', async ({ page, browser }) => {
@@ -106,7 +106,7 @@ test.describe('Inventory under contention and hold expiry', () => {
     const first = await newAccount(ROLES.customer);
     const second = await newAccount(ROLES.customer);
 
-    // the first customer books and does not pay
+    // Khách đầu đặt phòng nhưng không thanh toán
     await login(page, first);
     await page.goto(url);
     await page.getByRole('button', { name: 'Tăng phòng Phòng Giữ Chỗ' }).click();
@@ -115,14 +115,14 @@ test.describe('Inventory under contention and hold expiry', () => {
     const heldId = Number(new URL(page.url()).pathname.split('/').pop());
     await expect(page.getByText(/Chờ thanh toán/).first()).toBeVisible();
 
-    // within the hold the room is NOT available to anyone else
+    // Trong thời gian giữ chỗ người khác không đặt được
     const other = await (await browser.newContext()).newPage();
     await login(other, second);
     await other.goto(url);
     const roomStatus = await other.request.get(`${API}/hotels/${h.id}/rooms?checkIn=${addDays(today, 13)}&checkOut=${addDays(today, 14)}&guests=2`);
     expect((await roomStatus.json()).data.find((r: { MaLoaiPhong: number }) => r.MaLoaiPhong === rt.id).SoPhongConLai).toBe(0);
 
-    // 16 minutes pass
+    // Trôi qua 16 phút
     await fx('/backdate-booking', { id: heldId, minutes: 16 });
     await other.goto(url);
     await other.getByRole('button', { name: 'Tăng phòng Phòng Giữ Chỗ' }).click();
@@ -130,7 +130,7 @@ test.describe('Inventory under contention and hold expiry', () => {
     await other.locator('#dat-phong').getByRole('button', { name: /Tạo đặt phòng/ }).click();
     await expect(other).toHaveURL(/\/bookings\/\d+/);
 
-    // the abandoned booking was cancelled by the system and the room is held by the new customer only
+    // Đơn bị bỏ đã bị hệ thống hủy và phòng thuộc khách mới
     expect((await fx('/db/booking', { id: heldId })).TrangThai).toBe('Đã hủy');
     await page.goto('/bookings');
     await expect(page.getByText('Đã hủy').first()).toBeVisible();

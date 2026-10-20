@@ -29,7 +29,7 @@ const textOf = (node: ReactNode): string =>
     .map((child) => (typeof child === 'string' || typeof child === 'number' ? String(child) : isValidElement<{ children?: ReactNode }>(child) ? textOf(child.props.children) : ''))
     .join('');
 
-/** The <option>s of a <select>'s children (also through fragments and <optgroup>), as plain data. */
+/** Các option của select dưới dạng dữ liệu */
 const readOptions = (children: ReactNode): MenuOption[] =>
   Children.toArray(children).flatMap((child): MenuOption[] => {
     if (!isValidElement<{ value?: string | number; disabled?: boolean; children?: ReactNode }>(child)) return [];
@@ -39,11 +39,7 @@ const readOptions = (children: ReactNode): MenuOption[] =>
     return [{ value: String(child.props.value ?? label), label, disabled: Boolean(child.props.disabled) }];
   });
 
-/**
- * A `<select>` that opens a styled list instead of the browser's own. The native `<select>` stays in the DOM and is the
- * real control: it keeps the value, the label, form submission, react-hook-form's ref and keyboard focus. Only the
- * pointer-facing part is replaced; Space / Alt+Arrow Down open the same list from the keyboard.
- */
+/** Danh sách chọn có giao diện riêng, select gốc vẫn nằm trong DOM */
 export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function SelectMenu(
   { className, children, disabled, onChange, onKeyDown, value, defaultValue, ...rest },
   forwardedRef
@@ -55,7 +51,7 @@ export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTM
   const options = readOptions(children);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  // Mirrors the native value for the uncontrolled case (react-hook-form, defaultValue); a controlled `value` wins.
+  // Phản chiếu giá trị của select gốc khi không điều khiển
   const [nativeValue, setNativeValue] = useState(defaultValue === undefined ? '' : String(defaultValue));
   const current = value === undefined ? nativeValue : String(value);
   const selected = options.find((option) => option.value === current);
@@ -69,9 +65,7 @@ export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTM
     [forwardedRef]
   );
 
-  // The form can change the native value without an event (reset(), a default value): follow it before paint.
-  // Runs after every render on purpose (nothing re-renders us when the DOM value is set directly); it only sets state
-  // when the two differ, so it settles after one extra pass.
+  // Theo dõi giá trị do form đặt trực tiếp
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const native = nativeRef.current;
@@ -79,7 +73,7 @@ export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTM
   });
 
   const close = useCallback(() => setOpen(false), []);
-  // The list lines up with the wider card around the field when there is one (`data-select-anchor`), else with the field.
+  // Danh sách căn theo khung rộng hơn bao quanh ô
   const anchor = useMemo(
     () => ({
       get current() {
@@ -107,12 +101,12 @@ export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTM
     nativeRef.current?.focus();
   };
 
-  // Focus the list while it is open so it receives the arrow keys; `choose` / Escape give focus back to the field.
+  // Đưa tiêu điểm vào danh sách khi đang mở
   useLayoutEffect(() => {
     if (open && position) listRef.current?.focus({ preventScroll: true });
   }, [open, position]);
 
-  // A list wider than its field can run past the right edge of the window: pull it back in.
+  // Kéo danh sách vào lại nếu tràn mép phải
   useLayoutEffect(() => {
     const list = listRef.current;
     if (!open || !position || !list) return;
@@ -229,7 +223,7 @@ export const SelectMenu = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTM
             aria-label={rest['aria-label']}
             aria-activedescendant={activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
             className="ui-select__list"
-            // At least as wide as its field (or the card around it); wider when the names need it, so they stay on one line.
+            // Rộng ít nhất bằng ô chọn
             style={{ ...position, width: undefined, minWidth: position.width }}
             onKeyDown={onListKeyDown}
           >

@@ -130,7 +130,7 @@ describe('HotelFilterBar', () => {
     const group = screen.getByRole('group', { name: 'Tiện nghi' });
     const cards = () => within(group).getAllByRole('button');
 
-    // jsdom has no layout, so the grid uses its 6-column fallback: 5 amenities + the "Xem thêm" card, which is last.
+    // jsdom không có layout nên lưới dùng 6 cột dự phòng
     expect(cards()).toHaveLength(6);
     expect(screen.getByRole('button', { name: 'Tiện nghi 5' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Tiện nghi 6' })).not.toBeInTheDocument();

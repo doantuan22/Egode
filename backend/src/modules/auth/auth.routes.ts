@@ -14,19 +14,14 @@ import { requireTrustedOrigin } from '../../middleware/trusted-origin.middleware
 
 const router = Router();
 const controller = new AuthController();
-// Login is deliberately strict because it accepts a password. Refresh is a
-// cookie-authenticated session-continuation endpoint and is called during app
-// bootstrap (including in several open tabs), so it needs an independent,
-// higher budget. Sharing the old bucket could turn normal refreshes into a
-// 429 on the next login from the same IP.
+// Giới hạn riêng cho đăng nhập và refresh
 const loginLimiter = createRateLimiter({ windowMs: 15 * 60_000, max: 10, keyPrefix: 'auth-login' });
 const refreshLimiter = createRateLimiter({ windowMs: 15 * 60_000, max: 60, keyPrefix: 'auth-refresh' });
 const registerLimiter = createRateLimiter({ windowMs: 60 * 60_000, max: 10, keyPrefix: 'register' });
 const forgotPasswordLimiter = createRateLimiter({ windowMs: 60 * 60_000, max: 5, keyPrefix: 'forgot-password' });
-// Stricter than forgot-password: this endpoint takes a bearer-style secret token
-// as input, so a missing limit here would let an attacker brute-force it.
+// Giới hạn chặt vì nhận token bí mật
 const resetPasswordLimiter = createRateLimiter({ windowMs: 60 * 60_000, max: 10, keyPrefix: 'reset-password' });
-// Takes the current password as input, so it needs a guess limit like login does.
+// Giới hạn đoán mật khẩu hiện tại
 const changePasswordLimiter = createRateLimiter({ windowMs: 15 * 60_000, max: 10, keyPrefix: 'change-password' });
 const applyOutsideTests = (middleware: ReturnType<typeof createRateLimiter>) =>
   process.env.NODE_ENV === 'test' ? (_req: unknown, _res: unknown, next: () => void) => next() : middleware;

@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { phoneNumberSchema } from '../../common/utils/phone-number';
 
-// Whitelist only — MaVaiTro, TrangThai, NgayTao, TenDangNhap, Email, MatKhau
-// are intentionally excluded so a client can never self-elevate via /profile.
+// Chỉ cho sửa các trường trong danh sách cho phép
 export const updateProfileSchema = z
   .object({
     HoTen: z.string().min(2, 'Họ tên ít nhất 2 ký tự').max(150),

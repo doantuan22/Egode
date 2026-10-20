@@ -27,7 +27,7 @@ export interface QuoteResponse {
   SoDem: number;
   ChiTietPhong: QuoteRoomLine[];
   KhaDung: boolean;
-  /** The party size this quote was checked for, and what the chosen rooms can hold. */
+  /** Số khách của báo giá và sức chứa phòng đã chọn */
   SoKhach: number;
   TongSucChua: number;
   TongTienPhong: number;
@@ -67,7 +67,7 @@ export class QuotesService {
       );
     }
 
-    // Not the client's word: capacity comes from LOAI_PHONG.SucChua, the party size is checked against it.
+    // Sức chứa lấy từ loại phòng, không tin client
     const tongSucChua = assertCapacity(
       input.guests,
       input.rooms.map((line) => ({ sucChua: roomTypes.find((rt) => rt.MaLoaiPhong === line.maLoaiPhong)!.SucChua, soLuong: line.soLuong }))

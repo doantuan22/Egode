@@ -14,16 +14,16 @@ export const searchFormSchema = z
   });
 export type SearchFormValues = z.infer<typeof searchFormSchema>;
 
-/** Guests assumed when a search does not say: what the home search box shows, and what every page falls back to. */
+/** Số khách mặc định khi tìm kiếm */
 export const DEFAULT_GUESTS = 2;
 
-/** Guest count from a URL parameter; the default when it is missing or not a whole number of at least 1. */
+/** Số khách từ tham số URL */
 export const parseGuests = (raw: string | null): number => {
   const guests = Number(raw);
   return raw !== null && Number.isInteger(guests) && guests >= 1 ? guests : DEFAULT_GUESTS;
 };
 
-/** Defaults a fresh search form to tomorrow → the day after (a valid 1-night stay). */
+/** Mặc định ngày mai đến ngày kia */
 export const defaultSearchDates = (): { checkIn: string; checkOut: string } => {
   const today = businessToday();
   return { checkIn: addDaysToDateKey(today, 1), checkOut: addDaysToDateKey(today, 2) };

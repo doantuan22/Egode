@@ -24,7 +24,7 @@ test.describe('Admin: hotels', () => {
     expect((await page.request.get(`${API}/hotels/${toApprove.id}`)).status()).toBe(404);
 
     await page.goto(`/admin/hotels/${toApprove.id}`);
-    await expect(page.getByRole('button', { name: 'Kích hoạt lại' })).toHaveCount(0); // a pending hotel is approved, not "reactivated"
+    await expect(page.getByRole('button', { name: 'Kích hoạt lại' })).toHaveCount(0);
     await page.getByRole('button', { name: 'Duyệt khách sạn' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Duyệt', exact: true }).click();
     await expect(page.getByText('Hoạt động').first()).toBeVisible();
@@ -111,19 +111,19 @@ test.describe('Admin: accounts and last-admin protection', () => {
 
   test('an admin cannot lock, delete or demote themself; with two admins one may lock the other, and one active admin always remains', async ({ page, playwright }) => {
     const second = await newAccount(ROLES.admin);
-    await fx('/admin/isolate', { keep: [admin.id, second.id] }); // a known admin set: just these two
+    await fx('/admin/isolate', { keep: [admin.id, second.id] });
     try {
       expect((await fx('/db/active-admins')).count).toBe(2);
       await login(page, admin);
 
-      // own account: no lock / delete controls, with the reason
+      // Tài khoản của chính mình không có nút khóa hay xóa
       const me = (await (await page.request.get(`${API}/profile/me`, { headers: { Authorization: `Bearer ${await accessToken(page)}` } })).json()).data;
       await page.goto(`/admin/accounts/${me.MaTaiKhoan}`);
       await expect(page.getByText(/không thể tự khóa hoặc xóa chính mình/)).toBeVisible();
       await expect(page.getByRole('button', { name: 'Khóa tài khoản' })).toHaveCount(0);
       await expect(page.getByRole('button', { name: 'Xóa tài khoản' })).toHaveCount(0);
 
-      // ... and the server refuses it too (not only the UI)
+      // Máy chủ cũng từ chối
       const api = await playwright.request.newContext();
       const token = (await (await api.post(`${API}/auth/login`, { data: { identifier: admin.email, MatKhau: admin.password } })).json()).data.accessToken;
       const selfLock = await api.post(`${API}/admin/accounts/${admin.id}/lock`, { headers: { Authorization: `Bearer ${token}` } });
@@ -132,14 +132,14 @@ test.describe('Admin: accounts and last-admin protection', () => {
       expect(selfDelete.status()).toBe(400);
       expect((await fx('/db/active-admins')).count).toBe(2);
 
-      // the other admin can be locked (one remains) ...
+      // Admin còn lại có thể bị khóa
       await page.goto(`/admin/accounts/${second.id}`);
       await page.getByRole('button', { name: 'Khóa tài khoản' }).click();
       await page.getByRole('dialog').getByRole('button', { name: 'Khóa tài khoản', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Mở khóa tài khoản' })).toBeVisible();
       expect((await fx('/db/active-admins')).count).toBe(1);
 
-      // ... and nobody is left who could lock the last one: self actions stay refused
+      // Không ai còn lại để khóa admin cuối cùng
       const again = await api.post(`${API}/admin/accounts/${admin.id}/lock`, { headers: { Authorization: `Bearer ${token}` } });
       expect(again.status()).toBe(400);
       expect((await fx('/db/active-admins')).count).toBe(1);
@@ -173,7 +173,7 @@ test.describe('Admin: analytics', () => {
   });
 });
 
-/** The access token the SPA currently holds, obtained the way the app itself does: a cookie refresh. */
+/** Access token SPA đang giữ, lấy bằng refresh cookie */
 async function accessToken(page: import('@playwright/test').Page): Promise<string> {
   const res = await page.request.post(`${API}/auth/refresh`, { headers: { Origin: 'http://localhost:5174' } });
   return (await res.json()).data.accessToken as string;

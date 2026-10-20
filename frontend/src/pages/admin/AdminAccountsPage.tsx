@@ -18,7 +18,7 @@ const PAGE_SIZE = 10;
 
 const FILTER_DEFAULTS = { search: '', status: '', role: '' };
 
-// Customers and hotel owners first (the two groups an administrator looks for), any other role after them.
+// Khách hàng và chủ khách sạn xếp trước
 const ROLE_ORDER = ['Khách hàng', 'Chủ khách sạn'];
 
 export default function AdminAccountsPage() {

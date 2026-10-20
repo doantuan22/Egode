@@ -4,16 +4,16 @@ import { Card } from '../common/Card';
 
 interface KpiCardProps {
   label: string;
-  /** Already formatted. */
+  /** Đã định dạng */
   value: string;
   change?: Change | null;
-  /** A caveat shown under the figure, e.g. that it is an estimate. */
+  /** Ghi chú dưới số liệu */
   note?: string;
 }
 
 const TONE = { good: 'text-success-ink', bad: 'text-danger-ink', neutral: 'text-ink-muted' } as const;
 
-/** One figure with its change against the previous period. The tone comes from the caller, never guessed from the sign. */
+/** Một chỉ số kèm thay đổi so với kỳ trước */
 export function KpiCard({ label, value, change, note }: KpiCardProps) {
   return (
     <Card>

@@ -37,11 +37,7 @@ export class PromotionsService {
 
     return this.repository.create({
       ...input,
-      // Gate 0 (G0-01): KHUYEN_MAI_KHACH_SAN does not exist, so every
-      // promotion is system-wide regardless of what PhamViApDung would say —
-      // M4 already decided this (docs/m4-report.md); M8 goes further and
-      // never even exposes the field as a choice, to avoid offering a
-      // "Theo phạm vi" option that would silently do nothing.
+      // Mọi khuyến mãi áp dụng toàn hệ thống
       PhamViApDung: PROMOTION_SCOPE.SYSTEM_WIDE,
       TrangThai: PROMOTION_STATUS.ACTIVE,
     });

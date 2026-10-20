@@ -45,7 +45,7 @@ export default function PartnerApplyPage() {
   const hasActiveApplication = displayedApplication && displayedApplication.TrangThaiDuyet !== 'Từ chối';
   const displayedStatus = displayedApplication ? statusLabel[displayedApplication.TrangThaiDuyet] : undefined;
 
-  // The confirmation is a form-only guard: the API receives the four business fields.
+  // Xác nhận chỉ có ở form, API nhận bốn trường nghiệp vụ
   const onSubmit = ({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }: ApplyPartnerFormValues) =>
     applyMutation.mutate({ SoCCCD, SoGiayPhepKinhDoanh, MaSoThue, TepGiayTo }, { onSuccess: () => partnerSignupLock.release(), onError: (error) => applyServerFieldErrors(error, setError, ['SoCCCD', 'SoGiayPhepKinhDoanh', 'MaSoThue', 'TepGiayTo']) });
 

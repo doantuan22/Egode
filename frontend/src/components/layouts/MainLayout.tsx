@@ -31,14 +31,14 @@ export function MainLayout() {
   const { signOut, isPending: isSigningOut } = useSignOut();
   const isLockedToApply = signupLocked && !!accessToken && role === ROLE_NAMES.CUSTOMER;
 
-  // The lock only makes sense for a signed-in customer; drop it once the session or role changes.
+  // Khóa chỉ áp dụng cho khách đã đăng nhập
   useEffect(() => {
     if (signupLocked && !isBootstrapping && (!accessToken || (role && role !== ROLE_NAMES.CUSTOMER))) {
       partnerSignupLock.release();
     }
   }, [signupLocked, isBootstrapping, accessToken, role]);
 
-  // Warn on tab close/reload while the lock is on.
+  // Cảnh báo khi đóng hoặc tải lại tab lúc đang khóa
   useEffect(() => {
     if (!isLockedToApply) return undefined;
     const handler = (event: BeforeUnloadEvent) => {

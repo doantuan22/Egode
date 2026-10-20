@@ -9,7 +9,7 @@ export class SupportService {
 
   async create(customerId: number, input: CreateSupportInput) {
     if (input.maDatPhong) {
-      // RB10 — a request attached to a booking must belong to the same customer sending it.
+      // Yêu cầu gắn với đơn phải thuộc về khách gửi
       const booking = await this.repository.findBookingOwner(input.maDatPhong);
       if (!booking) throw AppError.badRequest('Đặt phòng không tồn tại');
       if (booking.MaTaiKhoanKhachHang !== customerId) {
@@ -58,7 +58,7 @@ export class SupportService {
     return request;
   }
 
-  /** MaTaiKhoanXuLy always comes from the authenticated admin, never the request body (M7 §4). */
+  /** Người xử lý lấy từ admin đã đăng nhập */
   async adminUpdate(maYeuCauHoTro: number, adminId: number, input: AdminUpdateSupportInput) {
     const existing = await this.repository.findById(maYeuCauHoTro);
     if (!existing) throw AppError.notFound('Không tìm thấy yêu cầu hỗ trợ');

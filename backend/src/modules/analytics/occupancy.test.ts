@@ -18,12 +18,8 @@ import { ROLE_NAMES } from '../../common/constants/roles';
 import { BOOKING_STATUS, ROOM_RATE_STATUS } from '../../common/constants/hotel-status';
 import { AnalyticsRepository } from './analytics.repository';
 
-/**
- * Bug #14 — occupancy = room-nights sold / room-nights in stock × 100, numerator and denominator counted per
- * (room type, night) from the same rows: only "Đã xác nhận" + "Hoàn tất" are sold, every stock row counts
- * (closed nights too), a night is never more than full, so the rate cannot exceed 100 %.
- */
-const D = (n: number) => new Date(Date.UTC(2031, 2, n)); // 1 March 2031 + (n-1) days, as a DATE value
+/** Công suất phòng không bao giờ vượt quá 100% */
+const D = (n: number) => new Date(Date.UTC(2031, 2, n));
 const prisma = () => getPrismaClient();
 const repo = new AnalyticsRepository();
 
@@ -68,7 +64,7 @@ const newRoomType = async () => {
   roomTypes.push(id);
   return id;
 };
-/** Stock rows for one room type: night n (1-based, March 2031) → rooms, optionally closed for sale. */
+/** Tạo quỹ phòng cho một loại phòng theo số đêm */
 const stock = async (roomType: number, nights: Record<number, number>, closed: number[] = []) => {
   for (const [night, rooms] of Object.entries(nights)) {
     await prisma().qUY_PHONG_GIA.create({
@@ -79,12 +75,12 @@ const stock = async (roomType: number, nights: Record<number, number>, closed: n
     });
   }
 };
-/** `rooms` rooms of `roomType` from night `from` up to (not including) night `to`. */
+/** Tạo đơn đặt phòng trong khoảng đêm */
 const sell = async (roomType: number, rooms: number, from: number, to: number, trangThai: string = BOOKING_STATUS.CONFIRMED) => {
   const booking = await createTestBookingDirect(customerId, hotelId, policyId, D(from), D(to), { trangThai });
   await prisma().cHI_TIET_DAT_PHONG.create({ data: { MaDatPhong: booking.MaDatPhong, MaLoaiPhong: roomType, SoLuongPhong: rooms } });
 };
-/** Occupancy of the hotel over nights `from`..`to` (inclusive). */
+/** Công suất của khách sạn trong khoảng đêm */
 const occupancy = (from = 1, to = 31) => repo.occupancy({ maKhachSan: hotelId, from: D(from), to: D(to + 1) });
 
 describe('the formula', () => {
@@ -97,19 +93,19 @@ describe('the formula', () => {
   it('100 % when every room of every night is sold', async () => {
     const rt = await newRoomType();
     await stock(rt, { 1: 4, 2: 4, 3: 4 });
-    await sell(rt, 4, 1, 4); // nights 1,2,3
+    await sell(rt, 4, 1, 4);
     expect(await occupancy()).toEqual({ TongPhongDem: 12, TongPhongCoTheBan: 12, TyLeLapDay: 100 });
   });
 
   it('different stock per night and per room type: sold / total, exactly', async () => {
     const a = await newRoomType();
     const b = await newRoomType();
-    await stock(a, { 1: 2, 2: 4, 3: 6 }); // 12
-    await stock(b, { 1: 3, 2: 3 }); // 6
-    await sell(a, 2, 1, 4); // 2 + 2 + 2 = 6
-    await sell(a, 1, 3, 4); // night 3: +1 → 7 for a
-    await sell(b, 3, 2, 3); // night 2 of b: 3
-    // sold = 7 + 3 = 10 of 18
+    await stock(a, { 1: 2, 2: 4, 3: 6 });
+    await stock(b, { 1: 3, 2: 3 });
+    await sell(a, 2, 1, 4);
+    await sell(a, 1, 3, 4);
+    await sell(b, 3, 2, 3);
+    // Đã bán 10 trên 18
     expect(await occupancy()).toEqual({ TongPhongDem: 10, TongPhongCoTheBan: 18, TyLeLapDay: 55.56 });
   });
 
@@ -128,8 +124,8 @@ describe('stock rows are never dropped', () => {
   it('a night closed for sale still counts in the denominator (its rooms existed)', async () => {
     const rt = await newRoomType();
     await stock(rt, { 1: 4, 2: 4, 3: 4, 4: 4 }, [4]);
-    await sell(rt, 4, 1, 3); // nights 1-2 full
-    // 8 sold of 16 — not 8 of 12, which would hide the closed night
+    await sell(rt, 4, 1, 3);
+    // Đã bán 8 trên 16
     expect(await occupancy()).toEqual({ TongPhongDem: 8, TongPhongCoTheBan: 16, TyLeLapDay: 50 });
   });
 
@@ -145,26 +141,26 @@ describe('it can never exceed 100 %', () => {
   it('a night that old data shows as overbooked counts as full, not more than full', async () => {
     const rt = await newRoomType();
     await stock(rt, { 1: 3, 2: 3 });
-    await sell(rt, 5, 1, 2); // 5 booked on a 3-room night (legacy overbooking)
+    await sell(rt, 5, 1, 2);
     await sell(rt, 2, 2, 3);
     const result = await occupancy();
-    expect(result).toEqual({ TongPhongDem: 5, TongPhongCoTheBan: 6, TyLeLapDay: 83.33 }); // 3 (capped) + 2
+    expect(result).toEqual({ TongPhongDem: 5, TongPhongCoTheBan: 6, TyLeLapDay: 83.33 });
     expect(result.TyLeLapDay!).toBeLessThanOrEqual(100);
-    // the stored data was not touched to get that answer
+    // Dữ liệu lưu trữ không bị thay đổi
     expect((await prisma().cHI_TIET_DAT_PHONG.aggregate({ where: { MaLoaiPhong: rt }, _sum: { SoLuongPhong: true } }))._sum.SoLuongPhong).toBe(7);
   });
 
   it('nights without a stock row (old bookings from before the calendar existed) are ignored, not added to the numerator', async () => {
     const rt = await newRoomType();
     await stock(rt, { 2: 2 });
-    await sell(rt, 2, 1, 4); // nights 1,2,3 — only night 2 has stock
+    await sell(rt, 2, 1, 4);
     expect(await occupancy()).toEqual({ TongPhongDem: 2, TongPhongCoTheBan: 2, TyLeLapDay: 100 });
   });
 
   it('a booking that sticks out of the range is clipped to the range on both sides', async () => {
     const rt = await newRoomType();
     await stock(rt, { 1: 2, 2: 2, 3: 2, 4: 2, 5: 2 });
-    await sell(rt, 2, 1, 6); // nights 1..5
+    await sell(rt, 2, 1, 6);
     expect(await occupancy(2, 3)).toEqual({ TongPhongDem: 4, TongPhongCoTheBan: 4, TyLeLapDay: 100 });
     expect(await occupancy(4, 5)).toEqual({ TongPhongDem: 4, TongPhongCoTheBan: 4, TyLeLapDay: 100 });
   });

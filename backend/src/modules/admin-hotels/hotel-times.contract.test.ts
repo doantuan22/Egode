@@ -6,10 +6,7 @@ import { getPrismaClient } from '../../config/prisma';
 import { ROLE_NAMES } from '../../common/constants/roles';
 import { HHMM_PATTERN, timeOfDayJsonReplacer } from '../../common/utils/time-of-day';
 
-/**
- * Bug #19 — GioNhanPhong / GioTraPhong are "HH:mm" for admin and owner alike: the same accepted values, the same
- * rejected values, the same message, and the same representation in every response (not 1970-01-01T…Z).
- */
+/** Giờ nhận/trả phòng luôn dạng HH:mm cho admin và chủ khách sạn */
 const accountIds: number[] = [];
 let diaPhuongId = 0;
 let hotelId = 0;
@@ -49,7 +46,7 @@ describe.each<Role>(['admin', 'owner'])('%s PATCH hotel — check-in / check-out
     const res = await patch(role, { GioNhanPhong: value, GioTraPhong: value });
     expect(res.status).toBe(200);
     expect(await stored()).toEqual({ in: value, out: value });
-    // the response shows the same "HH:mm", never a 1970 timestamp
+    // Phản hồi dùng HH:mm, không phải mốc thời gian 1970
     expect(res.body.data.GioNhanPhong).toBe(value);
     expect(res.body.data.GioTraPhong).toBe(value);
   });

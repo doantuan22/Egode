@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-/** Compact, keyboard-native quantity control for bounded counts. */
+/** Bộ chọn số lượng có giới hạn */
 export function QuantityStepper({ value, min = 0, max, label, onChange, disabled = false }: {
   value: number;
   min?: number;

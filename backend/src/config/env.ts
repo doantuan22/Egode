@@ -2,14 +2,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { z } from 'zod';
 
-// Load .env file
+// Nạp file .env
 dotenv.config({ path: path.resolve(process.cwd(), '.env'), quiet: true });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(5000),
 
-  // Database discrete parameters (Amazon RDS for SQL Server)
+  // Tham số kết nối cơ sở dữ liệu
   DB_HOST: z.string().trim().optional(),
   DB_PORT: z.coerce.number().int().min(1).max(65535).default(1433),
   DB_NAME: z.string().trim().optional().default('HotelBooking'),
@@ -18,28 +18,26 @@ const envSchema = z.object({
   DB_ENCRYPT: z.enum(['true', 'false']).optional(),
   DB_TRUST_SERVER_CERTIFICATE: z.enum(['true', 'false']).optional(),
 
-  // Database Connection URL (can be provided directly or auto-built from DB_* discrete variables)
+  // Chuỗi kết nối cơ sở dữ liệu
   DATABASE_URL: z
     .string()
     .default(
       'sqlserver://localhost:1433;database=HotelBooking;user=sa;password=YourPassword;encrypt=false;trustServerCertificate=true;connectionTimeout=15000;socketTimeout=30000;poolTimeout=10;connectionLimit=10'
     ),
 
-  // CORS & Frontend
+  // CORS và frontend
   FRONTEND_URL: z.string().default('http://localhost:5173'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   TRUST_PROXY: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
-  // Refresh-cookie SameSite policy. `lax` when the SPA and the API are the same site; `none` (forces Secure) when they
-  // are different sites. Optional outside production (defaults to lax); production must choose explicitly — see below.
+  // Chính sách SameSite của cookie refresh token
   REFRESH_COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).optional(),
 
-  // SMTP is optional outside production so contributors can run the API
-  // without an email server. Production must configure the complete set.
+  // SMTP
   SMTP_HOST: z.string().trim().optional().default(''),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
   SMTP_SECURE: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
   SMTP_USER: z.string().trim().optional().default(''),
-  // Gmail app-password hay bị paste kèm dấu cách (xxxx xxxx ...): chuẩn hoá bỏ hết khoảng trắng.
+  // Bỏ khoảng trắng trong mật khẩu ứng dụng Gmail
   SMTP_PASSWORD: z.string().optional().default('').transform((value) => value.replace(/\s+/g, '')),
   SMTP_FROM: z.string().trim().optional().default(''),
 
@@ -52,23 +50,19 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
 
-  // How payments and refunds are completed: `simulated` (default outside production — no external gateway, the whole
-  // flow is recorded in our own database) or `vnpay` (real VNPAY redirect/IPN/refund; needs the VNPAY_* values below).
-  // Production must choose explicitly: simulating payments there would confirm bookings without any money moving.
+  // Cách xử lý thanh toán và hoàn tiền: simulated hoặc vnpay
   PAYMENT_PROVIDER: z.preprocess((value) => (value === '' ? undefined : value), z.enum(['simulated', 'vnpay']).optional()),
 
-  // VNPAY Sandbox (M6) — only used when PAYMENT_PROVIDER=vnpay
+  // Cấu hình VNPAY sandbox
   VNPAY_TMN_CODE: z.string().optional().default(''),
   VNPAY_HASH_SECRET: z.string().optional().default(''),
   VNPAY_PAYMENT_URL: z.string().optional().default('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
   VNPAY_REFUND_URL: z.string().optional().default('https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'),
-  // Mounted under app.use('/api', routes) (see app.ts) — NOT /api/v1.
+  // API được gắn dưới /api
   VNPAY_RETURN_URL: z.string().optional().default('http://localhost:5000/api/payments/vnpay-return'),
   VNPAY_IPN_URL: z.string().optional().default('http://localhost:5000/api/payments/vnpay-ipn'),
 
-  // A DAT_PHONG left in "Chờ thanh toán" longer than this is treated as
-  // abandoned and auto-cancelled the next time it is touched (M6 §2) — see
-  // bookings/booking-expiry.ts.
+  // Thời gian tối đa chờ thanh toán trước khi tự hủy đơn
   PAYMENT_TIMEOUT_MINUTES: z.coerce.number().positive().default(15),
 }).superRefine((value, ctx) => {
   const smtpRequiredFields = [
@@ -93,7 +87,7 @@ const envSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SMTP_FROM'], message: 'SMTP_FROM must be a valid email address' });
   }
 
-  // Credentialed CORS needs exact origins; a wildcard can never be combined with cookies.
+  // CORS có credentials cần origin cụ thể
   for (const [key, raw] of [['CORS_ORIGIN', value.CORS_ORIGIN], ['FRONTEND_URL', value.FRONTEND_URL]] as const) {
     if (raw.split(',').some((origin) => origin.includes('*'))) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} must list exact origins; wildcards cannot be used with credentials` });
@@ -110,8 +104,7 @@ const envSchema = z.object({
     });
   }
 
-  // Render public HTTP ports terminate at its ingress/load balancer and provide X-Forwarded-For.
-  // Express must trust that managed ingress for per-client rate-limit keys; public access must go only through it.
+  // Tin cậy proxy phía trước để lấy IP client
   if (!value.TRUST_PROXY) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['TRUST_PROXY'], message: 'TRUST_PROXY=true is required behind the Render / reverse proxy public ingress so rate limits use client addresses' });
   }
@@ -207,8 +200,7 @@ const envSchema = z.object({
       });
     }
   };
-  // The MSSQL adapter reads socketTimeout as the query/request timeout and poolTimeout in seconds.
-  // Keep these bounded so readiness and normal requests cannot wait indefinitely.
+  // Giới hạn thời gian chờ của kết nối MSSQL
   boundedIntegerOption('connectionTimeout', 1_000, 60_000, ' milliseconds');
   boundedIntegerOption('socketTimeout', 1_000, 60_000, ' milliseconds');
   boundedIntegerOption('poolTimeout', 1, 60, ' seconds');

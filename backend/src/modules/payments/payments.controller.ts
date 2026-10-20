@@ -18,7 +18,7 @@ export class PaymentsController {
     }
   };
 
-  /** Simulated payment (PAYMENT_PROVIDER=simulated): pays and confirms in one call, no redirect. */
+  /** Thanh toán giả lập, xác nhận ngay không chuyển hướng */
   paySimulated = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params as unknown as { id: number };
@@ -29,7 +29,7 @@ export class PaymentsController {
     }
   };
 
-  /** Which payment mode is active, so the client knows whether to redirect to a gateway or run the simulated flow. */
+  /** Cho client biết chế độ thanh toán đang bật */
   getConfig = (_req: Request, res: Response): void => {
     sendSuccess(res, this.service.getConfig());
   };
@@ -44,7 +44,7 @@ export class PaymentsController {
     }
   };
 
-  /** Browser redirect after paying on the VNPAY-hosted page — display-only; the IPN below is the authoritative confirmation. */
+  /** Trình duyệt quay lại sau khi trả tiền, chỉ để hiển thị */
   vnpayReturn = async (req: Request, res: Response): Promise<void> => {
     try {
       const outcome = await this.service.handleCallback(req.query as Record<string, unknown>, resolveIp(req));
@@ -58,7 +58,7 @@ export class PaymentsController {
     }
   };
 
-  /** Server-to-server notification from VNPAY — the authoritative trigger for confirming a booking. Must always answer {RspCode, Message}, per VNPAY's IPN contract, never throw/500. */
+  /** Thông báo IPN của VNPAY, bắt buộc trả {RspCode, Message} */
   vnpayIpn = async (req: Request, res: Response): Promise<void> => {
     try {
       const outcome = await this.service.handleCallback(req.query as Record<string, unknown>, resolveIp(req));
